@@ -7,6 +7,9 @@ import pytest
 
 from data_pipeline.sources.ingest_odds import ingest_data, validate_odds
 
+# 标记整个模块的测试为integration测试
+pytestmark = pytest.mark.integration
+
 
 @pytest.fixture(scope="module")
 def db_connection():
