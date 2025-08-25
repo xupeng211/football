@@ -7,6 +7,60 @@
 [![XGBoost](https://img.shields.io/badge/XGBoost-2.0+-orange.svg)](https://xgboost.readthedocs.io/)
 [![Docker](https://img.shields.io/badge/Docker-ready-blue.svg)](https://www.docker.com/)
 
+## 🚀 新人快速上手（⚡ 5分钟了解整个项目）
+
+> **👋 第一次接触本项目？** 无论你是开发者、AI助手还是项目维护者，这个指南将帮你最快速度了解项目全貌！
+
+### ⚡ 一键获取项目完整情况（最重要！）
+```bash
+make show.context  # 🔥 这个命令会给你项目的"说明书"：架构图、技术栈、开发流程、已知问题等
+```
+
+### ✅ 验证开发环境是否就绪
+```bash
+make ci            # 运行完整检查：代码格式、类型检查、安全扫描、测试执行
+```
+**如果这两个命令都成功，恭喜！你已经掌握了80%的项目信息，可以开始开发了。**
+
+> 📖 **需要更详细的指南？** 查看 [QUICKSTART.md](./QUICKSTART.md) 获取完整的上手指南，包括常见问题解答和开发工作流。
+
+### 📚 深入了解（可选）
+```bash
+# 项目演进历程
+head -50 docs/dev_log.md
+
+# 最近代码变更
+git log --oneline -10
+
+# 当前工作状态
+git status
+```
+
+### 📁 重要文件导航
+```
+📂 必读文档（按优先级）
+├── 📋 context/_pack.md           # 🔥 项目完整上下文（最重要！）
+├── 📖 docs/ARCHITECTURE.md       # 架构设计详解
+├── 📝 docs/TASKS.md              # 开发任务清单
+├── 📊 docs/dev_log.md            # 开发历程记录
+├── ⚙️  pyproject.toml             # 项目配置（依赖、工具配置）
+└── 🛠️  Makefile                   # 常用开发命令
+
+🔧 常用开发命令
+├── make fmt      # 代码格式化
+├── make ci       # 完整检查
+├── make test     # 运行测试
+└── make lint     # 代码检查
+```
+
+### 💡 关键优势
+- ⚡ **零依赖启动**：无需配置数据库，集成测试自动跳过
+- 📖 **SSOT文档**：单一数据源，信息永远最新
+- 🤖 **AI友好**：完善的上下文打包和自动化验证
+- 🔄 **现代化CI/CD**：代码质量和安全有保障
+
+---
+
 ## 🎯 核心特性
 
 - **🔮 智能预测**: 基于XGBoost的三分类预测（主胜/平局/客胜）
@@ -71,7 +125,7 @@ cd football-predict-system
 
 ```bash
 # 复制环境变量模板
-cp env_example.txt .env
+cp .env.example .env
 
 # 编辑配置文件（填入API密钥等）
 vim .env

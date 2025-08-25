@@ -87,7 +87,9 @@ class FootballAPICollector:
         if not self.session:
             raise RuntimeError("需要在async with语句中使用")
 
-        logger.info("开始收集比赛数据", start_date=str(start_date), end_date=str(end_date), leagues=leagues)
+        logger.info(
+            "开始收集比赛数据", start_date=str(start_date), end_date=str(end_date), leagues=leagues
+        )
 
         matches = []
 
