@@ -24,9 +24,7 @@ registry = CollectorRegistry()
 ProcessCollector(registry=registry)
 
 # 定义应用指标
-REQUEST_COUNT = Counter(
-    "api_requests_total", "API请求总数", ["method", "endpoint"], registry=registry
-)
+REQUEST_COUNT = Counter("api_requests_total", "API请求总数", ["method", "endpoint"], registry=registry)
 
 REQUEST_DURATION = Histogram(
     "api_request_duration_seconds", "API请求耗时", ["method", "endpoint"], registry=registry
