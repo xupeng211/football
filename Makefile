@@ -48,40 +48,33 @@ seed.sample.features:
 	python3 data_pipeline/transforms/ingest_features.py
 
 
-.PHONY: hooks.install
+.PHONY: install hooks.install docker-up docker-down dev
+install:
+	pip install -e .
+	@echo "项目依赖已安装"
+
 hooks.install:
 	@python -m pip install -U pre-commit >/dev/null
 	@pre-commit install || true
 	@echo "pre-commit hooks installed."
 
+docker-up:
+	docker-compose up -d postgres redis prefect-server
+	@echo "基础服务已启动"
+
+docker-down:
+	docker-compose down
+	@echo "所有服务已停止"
+
+dev:
+	docker-compose up --build api
+	@echo "开发服务已启动"
+
 .PHONY: repo.protect
 repo.protect:
 	@echo "[保护] applying branch protection to main & dev on $(OWNER)/$(REPO)"
 	@mkdir -p .github
-	@cat > .github/branch_protection.json <<'JSON'
-{
-  "required_status_checks": {
-    "strict": true,
-    "checks": [
-      { "context": "CI" },
-      { "context": "CodeQL" },
-      { "context": "Gitleaks" }
-    ]
-  },
-  "enforce_admins": true,
-  "required_pull_request_reviews": {
-    "dismiss_stale_reviews": true,
-    "required_approving_review_count": 1
-  },
-  "restrictions": null,
-  "allow_force_pushes": false,
-  "allow_deletions": false,
-  "required_linear_history": true,
-  "block_creations": false,
-  "lock_branch": false,
-  "allow_fork_syncing": false
-}
-JSON
+	@echo '{ "required_status_checks": { "strict": true, "checks": [{"context":"CI"},{"context":"CodeQL"},{"context":"Gitleaks"}] }, "enforce_admins": true, "required_pull_request_reviews": { "dismiss_stale_reviews": true, "required_approving_review_count": 1 }, "restrictions": null, "allow_force_pushes": false, "allow_deletions": false, "required_linear_history": true, "block_creations": false, "lock_branch": false, "allow_fork_syncing": false }' > .github/branch_protection.json
 	@gh api -X PUT "repos/$(OWNER)/$(REPO)/branches/main/protection" -H "Accept: application/vnd.github+json" --input .github/branch_protection.json
 	@# dev 不存在时跳过
 	@if git ls-remote --heads origin dev | grep -q dev; then \
@@ -99,15 +92,3 @@ repo.check:
 	  gh api repos/$$OWNER/$$REPO/branches/$$BR/protection -H "Accept: application/vnd.github+json" | sed -n '1,120p' || echo "gh 未配置或无权限"; \
 	done
 	@echo "=== 工作流文件 ==="; ls -la .github/workflows || true
-
-
-
-.PHONY: dev docker-up docker-down
-dev:
-	docker-compose --profile app up -d --build
-
-docker-up:
-	docker-compose up -d
-
-docker-down:
-	docker-compose down

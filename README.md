@@ -125,7 +125,7 @@ cd football-predict-system
 
 ```bash
 # 复制环境变量模板
-cp env_example.txt .env
+cp .env.example .env
 
 # 编辑配置文件（填入API密钥等）
 vim .env
