@@ -285,7 +285,9 @@ class ModelRegistry:
         self._set_active_version(model_id, version)
         self._save_index()
 
-        logger.info("模型版本已提升", model_id=model_id, old_version=old_active, new_version=version)
+        logger.info(
+            "模型版本已提升", model_id=model_id, old_version=old_active, new_version=version
+        )
 
     def get_registry_stats(self) -> Dict[str, Any]:
         """获取注册表统计信息"""

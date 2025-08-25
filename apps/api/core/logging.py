@@ -62,4 +62,6 @@ def log_api_response(
 ) -> None:
     """记录API响应日志"""
     logger = get_logger_with_trace(trace_id)
-    logger.info("API响应", method=method, path=path, status_code=status_code, duration_ms=duration_ms)
+    logger.info(
+        "API响应", method=method, path=path, status_code=status_code, duration_ms=duration_ms
+    )

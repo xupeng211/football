@@ -3,6 +3,9 @@ import os
 import pytest
 from sqlalchemy import create_engine, inspect
 
+# 标记整个模块的测试为integration测试
+pytestmark = pytest.mark.integration
+
 
 @pytest.fixture(scope="module")
 def db_engine():

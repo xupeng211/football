@@ -8,6 +8,9 @@ from data_pipeline.transforms.ingest_features import (
     ingest_features_data,
 )
 
+# 标记整个模块的测试为integration测试
+pytestmark = pytest.mark.integration
+
 
 @pytest.fixture(scope="module")
 def db_connection():
