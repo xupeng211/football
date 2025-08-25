@@ -13,7 +13,7 @@ sec:
 	bandit -r apps/ data_pipeline/ models/ --skip B101
 
 test:
-	pytest
+	python -m pytest
 ci: lint type sec test
 
 .PHONY: context.pack
