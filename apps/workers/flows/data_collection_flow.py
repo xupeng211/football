@@ -31,7 +31,9 @@ async def collect_matches_task(
     Returns:
         比赛数据列表
     """
-    logger.info("开始收集比赛数据", start_date=str(start_date), end_date=str(end_date), leagues=leagues)
+    logger.info(
+        "开始收集比赛数据", start_date=str(start_date), end_date=str(end_date), leagues=leagues
+    )
 
     try:
         # TODO: 实现实际的数据采集逻辑

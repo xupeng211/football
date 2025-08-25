@@ -13,7 +13,8 @@ sec:
 	bandit -r apps/ data_pipeline/ models/ --skip B101
 
 test:
-	pytest
+	pytest -q --disable-warnings --cov=. --cov-report=term --cov-fail-under=20
+
 ci: lint type sec test
 
 .PHONY: context.pack

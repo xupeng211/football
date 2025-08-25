@@ -44,9 +44,9 @@ strict = false
 check_untyped_defs = true
 
 [tool.pytest.ini_options]
-addopts = "-q --disable-warnings --cov=. --cov-report=term-missing --cov-fail-under=20"
+
+addopts = "-q --maxfail=1 --cov=. --cov-report=term-missing --cov-fail-under=20"
 testpaths = ["tests"]
-python_files = ["test_*.py", "*_test.py"]
 
 [tool.coverage.run]
 source = ["apps", "data_pipeline", "models"]
