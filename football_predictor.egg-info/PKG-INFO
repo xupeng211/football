@@ -1,0 +1,23 @@
+Metadata-Version: 2.4
+Name: football-predictor
+Version: 0.1.0
+Author: Development Team
+Requires-Python: >=3.11
+Requires-Dist: fastapi
+Requires-Dist: uvicorn
+Requires-Dist: pydantic
+Requires-Dist: pydantic-settings
+Requires-Dist: xgboost
+Requires-Dist: pandas
+Requires-Dist: numpy
+Requires-Dist: psycopg[binary]
+Requires-Dist: sqlalchemy
+Requires-Dist: prefect
+Requires-Dist: prometheus-client
+Requires-Dist: httpx
+Requires-Dist: beautifulsoup4
+Requires-Dist: structlog
+Requires-Dist: pytest
+Requires-Dist: pytest-cov
+Dynamic: author
+Dynamic: requires-python

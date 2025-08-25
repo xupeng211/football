@@ -1,0 +1,116 @@
+version: '3.8'
+
+services:
+  # PostgreSQL数据库
+  postgres:
+    image: postgres:15
+    container_name: project-db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-sports}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infra/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - football_net
+
+  # Redis缓存
+  redis:
+    image: redis:7-alpine
+    container_name: football_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - football_net
+
+  # Prefect服务器
+  prefect-server:
+    image: prefecthq/prefect:2.14.21-python3.11
+    container_name: football_prefect
+    ports:
+      - "4200:4200"
+    environment:
+      - PREFECT_SERVER_API_HOST=0.0.0.0
+      - PREFECT_API_DATABASE_CONNECTION_URL=postgresql+asyncpg://postgres:password@postgres:5432/prefect
+    depends_on:
+      - postgres
+    networks:
+      - football_net
+    command: prefect server start
+
+  # API服务
+  api:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile.api
+    container_name: football_api
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:password@postgres:5432/football_predict
+      - REDIS_URL=redis://redis:6379/0
+      - PREFECT_API_URL=http://prefect-server:4200/api
+    depends_on:
+      - postgres
+      - redis
+      - prefect-server
+    volumes:
+      - .:/app
+      - ./models/artifacts:/app/models/artifacts
+    networks:
+      - football_net
+    profiles: ["app"]
+
+  # 数据采集工作器
+  data-worker:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile.worker
+    container_name: football_data_worker
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:password@postgres:5432/football_predict
+      - REDIS_URL=redis://redis:6379/0
+      - PREFECT_API_URL=http://prefect-server:4200/api
+    depends_on:
+      - postgres
+      - redis
+      - prefect-server
+    volumes:
+      - .:/app
+    networks:
+      - football_net
+    profiles: ["workers"]
+
+  # 训练工作器
+  training-worker:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile.worker
+    container_name: football_training_worker
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:password@postgres:5432/football_predict
+      - REDIS_URL=redis://redis:6379/0
+      - PREFECT_API_URL=http://prefect-server:4200/api
+    depends_on:
+      - postgres
+      - redis
+      - prefect-server
+    volumes:
+      - .:/app
+      - ./models/artifacts:/app/models/artifacts
+    networks:
+      - football_net
+    profiles: ["workers"]
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  football_net:
+    driver: bridge 

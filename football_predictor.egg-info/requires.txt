@@ -1,0 +1,16 @@
+fastapi
+uvicorn
+pydantic
+pydantic-settings
+xgboost
+pandas
+numpy
+psycopg[binary]
+sqlalchemy
+prefect
+prometheus-client
+httpx
+beautifulsoup4
+structlog
+pytest
+pytest-cov

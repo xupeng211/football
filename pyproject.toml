@@ -1,0 +1,67 @@
+[project]
+name = "football-predictor"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "pydantic",
+    "pydantic-settings",
+    "xgboost",
+    "pandas",
+    "numpy",
+    "psycopg[binary]",
+    "sqlalchemy",
+    "prefect",
+    "prometheus-client",
+    "httpx",
+    "beautifulsoup4",
+    "structlog",
+    "pytest",
+    "pytest-cov",
+]
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "C90", "I"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = true
+strict = false
+check_untyped_defs = true
+
+[tool.pytest.ini_options]
+addopts = "-q --disable-warnings --cov=. --cov-report=term-missing --cov-fail-under=20"
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+
+[tool.coverage.run]
+source = ["apps", "data_pipeline", "models"]
+omit = [
+    "*/tests/*",
+    "*/test_*.py",
+    "*/__pycache__/*",
+    "*/.*",
+    "setup.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+] 

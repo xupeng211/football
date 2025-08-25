@@ -1,0 +1,26 @@
+[
+  {
+    "match_id": 1001,
+    "bookmaker": "demo",
+    "home_odds": 2.20,
+    "draw_odds": 3.10,
+    "away_odds": 3.40,
+    "collected_at": "2025-08-24T00:00:00Z"
+  },
+  {
+    "match_id": 1002,
+    "bookmaker": "demo",
+    "home_odds": 1.95,
+    "draw_odds": 3.25,
+    "away_odds": 4.00,
+    "collected_at": "2025-08-24T00:05:00Z"
+  },
+  {
+    "match_id": 1001,
+    "bookmaker": "another_bookie",
+    "home_odds": 2.25,
+    "draw_odds": 3.05,
+    "away_odds": 3.35,
+    "collected_at": "2025-08-24T00:00:00Z"
+  }
+]
