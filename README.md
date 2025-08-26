@@ -372,3 +372,4 @@ pytest tests/ --cov=. --cov-report=html
 ---
 
 ⭐ **如果这个项目对你有帮助，请给它一个星标！** 
+# CI Fix Applied Tue Aug 26 08:11:25 CST 2025
