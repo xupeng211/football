@@ -1,6 +1,6 @@
 # Football Prediction System - Development Makefile
 .DEFAULT_GOAL := help
-.PHONY: help clean format lint type test security ci dev docker-up docker-down install
+.PHONY: help clean format lint type test security ci dev docker-up docker-down install cov local-ci
 
 # Configuration
 PYTHON := python3
@@ -193,3 +193,8 @@ setup-dev: ## Automated development environment setup
 	else \
 		echo "$(RED)❌ scripts/setup-dev-env.sh not found$(NC)"; \
 	fi
+
+cov: test ## Alias for test (coverage included)
+
+local-ci: format lint type validate policy-guard sec cov ## Run complete local CI pipeline
+	@echo "$(GREEN)🎊 All local CI checks passed!$(NC)"
