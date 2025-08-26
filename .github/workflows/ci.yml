@@ -16,7 +16,11 @@ env:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
+    defaults:
+      run:
+        shell: bash
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -32,7 +36,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt', '**/uv.lock') }}
           restore-keys: |
             ${{ runner.os }}-pip-
 
@@ -46,16 +50,19 @@ jobs:
           echo "::group::Dependency Installation"
           python -m pip install -U pip uv
           
-          # Priority 1: Use uv.lock if available
+          # Priority 1: Use uv.lock if available for exact CI reproducibility
           if [ -f "uv.lock" ]; then
-            echo "🚀 Using uv.lock for consistent dependencies..."
+            echo "🚀 Using uv.lock for exact dependency reproduction..."
             uv pip sync --frozen uv.lock || {
               echo "⚠️ uv.lock sync failed, falling back to requirements.txt"
-              uv pip install --no-cache --strict --resolution=lowest-direct -r requirements.txt
+              pip install -r requirements.txt
             }
+          elif [ -f "requirements.txt" ]; then
+            echo "📦 Using requirements.txt..."
+            pip install -r requirements.txt
           else
-            echo "📦 uv.lock not found, using requirements.txt..."
-            uv pip install --no-cache --strict --resolution=lowest-direct -r requirements.txt
+            echo "❌ No dependency file found"
+            exit 1
           fi
           
           # Install project in editable mode
@@ -70,6 +77,16 @@ jobs:
         with:
           path: ~/.cache/pre-commit
           key: ${{ runner.os }}-pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
+
+      - name: Validate Configs (syntax + single-source)
+        run: |
+          echo "::group::Config Validation"
+          # Validate TOML syntax
+          python -c "import tomllib; [tomllib.load(open(f,'rb')) for f in ['pyproject.toml', '.gitleaks.toml'] if __import__('os').path.exists(f)]"
+          # Validate YAML syntax
+          python -c "import yaml; [yaml.safe_load(open(f)) for f in ['.github/workflows/ci.yml'] if __import__('os').path.exists(f)]"
+          echo "✅ Configuration syntax validation passed"
+          echo "::endgroup::"
 
       - name: Run code formatting check
         run: |
@@ -86,21 +103,19 @@ jobs:
       - name: Run type checking (core modules - strict)
         run: |
           echo "::group::Type Checking - Core Modules"
-          mypy apps/ data_pipeline/ trainer/ 2>/dev/null || mypy apps/ data_pipeline/ 2>/dev/null || {
-            echo "Running mypy on available core directories..."
-            for dir in apps data_pipeline trainer; do
-              if [ -d "$dir" ]; then
-                echo "Checking $dir..."
-                mypy "$dir/"
-              fi
-            done
-          }
+          # Check core modules strictly
+          for dir in apps data_pipeline trainer; do
+            if [ -d "$dir" ]; then
+              echo "🔍 Strict type checking: $dir/"
+              mypy "$dir/"
+            fi
+          done
           echo "::endgroup::"
 
       - name: Run type checking (other modules - advisory)
         continue-on-error: true
         run: |
-          echo "::group::Type Checking - Other Modules"
+          echo "::group::Type Checking - Other Modules (Advisory)"
           echo "🔍 Advisory type checking for remaining modules..."
           for dir in tests scripts models infra docs; do
             if [ -d "$dir" ]; then
@@ -120,30 +135,55 @@ jobs:
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          config-path: .gitleaks.toml
+          GITLEAKS_CONFIG: .gitleaks.toml
 
-      - name: Run tests with coverage gate
+      - name: Run tests with coverage gate (single run)
+        env:
+          COV_MIN: ${{ vars.COV_MIN || '15' }}
+          TEST_SEED: 42
         run: |
           echo "::group::Tests with Coverage Gate"
-          pytest -v --cov=apps --cov=data_pipeline --cov=models --cov=trainer \
-            --cov-report=xml --cov-report=term-missing --cov-report=html --cov-report=json \
-            --cov-fail-under=${{ vars.COV_MIN || '15' }} \
+          set -euo pipefail
+          
+          # Dynamic coverage directory detection
+          COV_ARGS=""
+          for d in apps data_pipeline models trainer; do
+            [ -d "$d" ] && COV_ARGS="$COV_ARGS --cov=$d"
+          done
+          
+          # Fallback to root if no specific directories found
+          if [ -z "$COV_ARGS" ]; then
+            echo "📁 No specific coverage directories found, using root"
+            COV_ARGS="--cov=."
+          else
+            echo "📁 Coverage directories: $COV_ARGS"
+          fi
+
+          # Single comprehensive test run with all reports
+          pytest -v ${COV_ARGS} \
+            --cov-report=xml \
+            --cov-report=term-missing \
+            --cov-report=html \
+            --cov-report=json \
+            --cov-fail-under="${COV_MIN}" \
             tests/ || {
-              echo "❌ Tests failed or coverage below threshold (${{ vars.COV_MIN || '15' }}%)"
+              echo "❌ Tests failed or coverage below threshold (${COV_MIN}%)"
               exit 1
             }
+          
+          echo "✅ Tests passed with coverage above ${COV_MIN}%"
           echo "::endgroup::"
 
       - name: Upload coverage artifacts
-        uses: actions/upload-artifact@v4
         if: always()
+        uses: actions/upload-artifact@v4
         with:
-          name: coverage-reports
+          name: ci-artifacts
           path: |
             .coverage
             coverage.xml
             coverage.json
             htmlcov/**
             pytestdebug.log
+          if-no-files-found: ignore
           retention-days: 30

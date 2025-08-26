@@ -22,24 +22,29 @@ make ci                          # 验证环境并运行完整检查
 ### 本地 = CI 一致性命令
 
 ```bash
-# 1. 安装依赖（与CI完全一致）
-make install
+# 1. 安装依赖（与CI完全一致，推荐首选）
+make install  # 🚀 uv优先策略，自动回退到requirements.txt
 
-# 推荐：使用 uv.lock 确保与CI完全一致的依赖版本
-uv pip sync --frozen uv.lock
-
-# 回退方案：使用 requirements.txt
-uv pip install --no-cache --strict --resolution=lowest-direct -r requirements.txt
+# 等价手动方式（高级用户）：
+# uv pip sync --frozen uv.lock              # 精确依赖复现
+# uv pip install -r requirements.txt        # 回退方案
 
 # 2. 运行完整CI检查
 make ci
 
 # 3. 单独运行各项检查
+make format   # 代码格式化
 make lint     # 代码风格检查
 make type     # 类型检查
 make security # 安全扫描
 make test     # 测试
 ```
+
+**💡 依赖安装策略说明：**
+
+- CI使用 `uv.lock` 优先，`requirements.txt` 回退
+- `make install` 与CI保持完全一致的安装逻辑
+- 自动创建虚拟环境，无需手动配置
 
 ### Pre-commit 钩子
 
