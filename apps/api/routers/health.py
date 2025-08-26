@@ -25,7 +25,7 @@ class HealthResponse(BaseModel):
 
 
 @router.get("/health", response_model=HealthResponse)
-async def health_check() -> dict[str, str]:
+async def health_check() -> HealthResponse:
     """
     健康检查端点
 
