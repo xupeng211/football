@@ -47,3 +47,4 @@ types-beautifulsoup4
 types-lxml
 types-setuptools
 mypy
+types-requests
