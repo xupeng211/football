@@ -1,27 +1,81 @@
 name: CI
-
 on:
   push:
     branches: [ main, dev ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, dev ]
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    
+  build-test:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    env:
+      PIP_DISABLE_PIP_VERSION_CHECK: "1"
+      PIP_DEFAULT_TIMEOUT: "60"
+      UV_SYSTEM_PYTHON: "1"
+
     steps:
-    - uses: actions/checkout@v5
-    
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
-        
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        
-    - name: Run CI checks
-      run: make ci 
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python 3.11.9
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11.9"
+          cache: "pip"
+
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          uv --version
+
+      - name: Show env for debugging
+        run: |
+          python -V
+          which python
+          pip -V
+          uname -a
+
+      - name: Install dependencies (frozen by uv.lock)
+        run: |
+          uv pip install --no-cache --strict --resolution=lowest-direct -r requirements.txt
+          python -m pip check
+          python - << 'PY'
+import sys, platform
+print("Platform:", sys.platform, platform.platform())
+PY
+
+      - name: Cache test/type/lint results
+        uses: actions/cache@v4
+        with:
+          path: |
+            .pytest_cache
+            .mypy_cache
+            .ruff_cache
+          key: ${{ runner.os }}-cache-${{ hashFiles('**/pyproject.toml', '**/requirements*.txt', '**/uv.lock') }}
+
+      - name: Lint (ruff)
+        run: ruff check .
+
+      - name: Type check (mypy)
+        run: mypy .
+
+      - name: Security (bandit)
+        run: bandit -q -r .
+
+      - name: Run tests
+        run: pytest -q --disable-warnings --maxfail=1 --cov=apps --cov-report=term-missing
+
+      - name: On failure, dump resolver context
+        if: failure()
+        run: |
+          python -V
+          pip -V
+          pip debug
+          pip list --format=freeze
+          pip cache dir
+          pip index versions numpy
+          pip index versions pandas
+          pip index versions xgboost
