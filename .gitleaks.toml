@@ -1,13 +1,7 @@
 # Gitleaks配置文件 - 排除GitHub Actions标准变量的误报
 
-[[rules]]
-id = "github-token"
-description = "GitHub Actions standard token usage"
-regex = '''GITHUB_TOKEN'''
-path = '''\.github/workflows/.*\.yml$'''
-
 [allowlist]
-description = "允许GitHub Actions标准变量"
+description = "排除GitHub Actions标准变量和Dependabot更新"
 paths = [
     '''.github/workflows/.*\.yml$''',
 ]
@@ -15,4 +9,7 @@ regexes = [
     '''secrets\.GITHUB_TOKEN''',
     '''\$\{\{\s*secrets\.GITHUB_TOKEN\s*\}\}''',
     '''Bearer \$GITHUB_TOKEN''',
+    '''GITHUB_TOKEN''',
+    '''actions/setup-python@v\d+''',
+    '''actions/checkout@v\d+''',
 ]
