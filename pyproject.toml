@@ -80,6 +80,7 @@ omit = [ "*/tests/*", "*/test_*.py", "*/__pycache__/*", "*/.*", "setup.py", "*/v
 branch = true
 
 [tool.coverage.report]
+fail_under = 5
 precision = 2
 show_missing = true
 skip_covered = false

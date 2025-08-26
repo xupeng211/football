@@ -3,6 +3,7 @@
 """
 
 from datetime import date, datetime
+from typing import Any
 from uuid import uuid4
 
 import structlog
@@ -10,6 +11,7 @@ from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field
 
 logger = structlog.get_logger()
+router = APIRouter()
 router = APIRouter()
 
 
@@ -134,7 +136,7 @@ async def predict_batch_matches(request: BatchMatchPredictionRequest) -> BatchPr
 async def get_prediction_history(
     limit: int = Query(default=10, ge=1, le=100, description="返回结果数量限制"),
     offset: int = Query(default=0, ge=0, description="结果偏移量"),
-) -> dict[str, list]:
+) -> dict[str, Any]:
     """
     获取预测历史记录
     """

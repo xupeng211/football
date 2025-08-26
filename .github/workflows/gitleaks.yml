@@ -1,3 +1,4 @@
+---
 name: Gitleaks
 on:
   pull_request:

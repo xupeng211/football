@@ -1,3 +1,4 @@
+---
 name: Guardrail Daily Check
 on:
   schedule:
@@ -39,7 +40,7 @@ jobs:
 
           echo "[Workflows] check…"
           ls .github/workflows/ci.yml
-          grep -qi 'name:\s*CodeQL' .github/workflows/* 
+          grep -qi 'name:\s*CodeQL' .github/workflows/*
           grep -qi 'name:\s*Gitleaks' .github/workflows/*
 
           echo "[Branch Protection] check…"
@@ -70,4 +71,4 @@ jobs:
           ! git ls-files | grep -q '^\.\?env$'
           ! git ls-files | grep -q '^infra/host\.env$'
 
-          echo "✅ Guardrail daily check passed." 
+          echo "✅ Guardrail daily check passed."

@@ -83,6 +83,50 @@ clean: ## 清理生成的文件
 	rm -f bandit-report.json
 	@echo "$(GREEN)✅ Cleanup complete$(NC)"
 
+# 新增质量检查和修复目标
+quality-check: check-venv ## 快速质量检查（避免CI失败）
+	@echo "$(YELLOW)Running quality checks...$(NC)"
+	@if [ -f "scripts/quality-check.py" ]; then \
+		python scripts/quality-check.py; \
+	else \
+		echo "$(YELLOW)Running basic checks...$(NC)"; \
+		ruff format --check .; \
+		ruff check .; \
+		mypy apps/ data_pipeline/; \
+		bandit -r . -c pyproject.toml -q; \
+		python -m pytest tests/ -v --tb=short; \
+	fi
+	@echo "$(GREEN)✅ Quality checks completed$(NC)"
+
+fix: check-venv ## 自动修复代码问题
+	@echo "$(YELLOW)Auto-fixing code issues...$(NC)"
+	ruff check --fix .
+	ruff format .
+	@echo "$(GREEN)✅ Code issues fixed$(NC)"
+
+pre-commit-check: check-venv ## 提交前全面检查
+	@echo "$(YELLOW)Pre-commit comprehensive check...$(NC)"
+	@echo "$(BLUE)1. Environment check...$(NC)"
+	@echo "$(GREEN)✅ Virtual environment active$(NC)"
+	@echo "$(BLUE)2. Quality check...$(NC)"
+	@$(MAKE) quality-check
+	@echo "$(BLUE)3. Git status...$(NC)"
+	@git status --porcelain
+	@echo "$(GREEN)✅ Pre-commit check completed$(NC)"
+
+validate-configs: check-venv ## 验证配置文件语法
+	@echo "$(YELLOW)Validating configuration files...$(NC)"
+	@python -c "import tomllib; [tomllib.load(open(f,'rb')) for f in ['pyproject.toml', '.gitleaks.toml']]"
+	@echo "$(GREEN)✅ Configuration files valid$(NC)"
+
+setup-dev: ## 自动化开发环境设置
+	@echo "$(BLUE)🚀 Setting up development environment...$(NC)"
+	@if [ -f "scripts/setup-dev-env.sh" ]; then \
+		bash scripts/setup-dev-env.sh; \
+	else \
+		echo "$(RED)❌ scripts/setup-dev-env.sh not found$(NC)"; \
+	fi
+
 # AI开发工具快速启动
 ai-setup: ## AI开发工具快速环境设置
 	@echo "$(BLUE)🤖 AI开发工具环境设置$(NC)"
