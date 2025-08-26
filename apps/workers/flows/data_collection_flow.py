@@ -3,14 +3,9 @@
 """
 
 from datetime import date, datetime, timedelta
-from typing import TYPE_CHECKING
 
 import structlog
 from prefect import flow, task
-from prefect.task_runners import ConcurrentTaskRunner
-
-if TYPE_CHECKING:
-    pass
 
 # TODO: 导入实际的数据采集模块
 # from data_pipeline.collectors.football_api import FootballAPICollector, Match
@@ -187,7 +182,6 @@ async def store_data_task(matches: list[dict], odds: list[dict]) -> dict:
 @flow(
     name="每日数据采集",
     description="每日定时采集足球比赛和赔率数据",
-    task_runner=ConcurrentTaskRunner(),
 )
 async def daily_data_collection_flow(
     target_date: date | None = None, leagues: list[str] | None = None
