@@ -32,7 +32,7 @@ warn_unreachable = true
 strict_equality = true
 ignore_missing_imports = true
 show_error_codes = true
-no_untyped_def = false
+disallow_untyped_defs = false
 [[tool.mypy.overrides]]
 module = "tests.*"
 disallow_untyped_defs = false
@@ -56,9 +56,6 @@ quote-style = "double"
 indent-style = "space"
 skip-magic-trailing-comma = false
 line-ending = "auto"
-
-[tool.bandit.assert_used]
-skips = [ "**/test_*.py", "**/tests/**",]
 
 [tool.ai-development.rules]
 virtual_env_required = true

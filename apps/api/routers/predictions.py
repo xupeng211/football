@@ -1,8 +1,8 @@
-from typing import Any
 """
 预测API路由
 """
 
+from typing import Any
 from datetime import date, datetime
 from uuid import uuid4
 
