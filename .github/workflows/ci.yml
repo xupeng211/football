@@ -1,11 +1,13 @@
 ---
 name: CI
-
 on:
   push:
     branches: [main, dev, feat/ci-foundation]
   pull_request:
     branches: [main, dev]
+
+permissions:
+  contents: read
 
 env:
   PIP_DISABLE_PIP_VERSION_CHECK: 1
@@ -14,102 +16,77 @@ env:
 
 jobs:
   test:
-    runs-on: ubuntu-22.04
-
+    runs-on: ubuntu-latest
     steps:
-        - name: Checkout code
+      - name: Checkout code
         uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+        with:
+          fetch-depth: 0
 
       - name: Set up Python 3.11.9
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.11.9"
-
-      - name: Install gitleaks
-      uses: gitleaks/gitleaks-action@v2
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11.9"
 
       - name: Cache pip packages
-      uses: actions/cache@v4
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
 
       - name: Install system dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y build-essential
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends build-essential
 
       - name: Install Python dependencies
-      run: |
-        python -m pip install --upgrade pip uv
-        pip install -r requirements.txt
-        pip install -e .
-        pip install pre-commit ruff mypy pytest pytest-cov bandit
+        run: |
+          python -m pip install --upgrade pip uv
+          pip install -r requirements.txt
+          pip install -e .
+          pip install pre-commit ruff mypy pytest pytest-cov bandit
 
       - name: Cache pre-commit
-      uses: actions/cache@v4
-      with:
-        path: ~/.cache/pre-commit
-        key: ${{ runner.os }}-pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pre-commit
+          key: ${{ runner.os }}-pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
 
       - name: Run code formatting check
-      run: |
-        echo "::group::Code formatting"
-        ruff format --check .
-        echo "::endgroup::"
+        run: |
+          echo "::group::Code Formatting"
+          ruff format --check .
+          echo "::endgroup::"
 
       - name: Run linting
-      run: |
-        echo "::group::Linting"
-        ruff check .
-        echo "::endgroup::"
+        run: |
+          echo "::group::Linting"
+          ruff check .
+          echo "::endgroup::"
 
       - name: Run type checking
-      run: |
-        echo "::group::Type checking"
-        mypy .
-        echo "::endgroup::"
+        run: |
+          echo "::group::Type Checking"
+          mypy .
+          echo "::endgroup::"
 
       - name: Run security scan
-      run: |
-        echo "::group::Security scanning"
-        bandit -r . --configfile pyproject.toml
-        echo "::endgroup::"
+        run: |
+          echo "::group::Security Scan"
+          bandit -r . --configfile pyproject.toml
+          echo "::endgroup::"
 
-      - name: Run manual gitleaks scan
-      run: |
-        echo "::group::Secrets scanning"
-        # Gitleaks should already be installed by the action
-        if command -v gitleaks >/dev/null 2>&1; then
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            gitleaks protect --config .gitleaks.toml --verbose --no-banner
-          else
-            gitleaks detect --config .gitleaks.toml --verbose --no-banner
-          fi
-        else
-          echo "⚠️ Gitleaks not found, skipping scan"
-        fi
-        echo "::endgroup::"
+      - name: Run gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          config-path: .gitleaks.toml
 
       - name: Run tests
-      run: |
-        echo "::group::Testing"
-        pytest -v --cov-report=xml --cov-report=term-missing
-        echo "::endgroup::"
-
-      - name: Debug on failure
-      if: failure()
-      run: |
-        echo "::group::Debug information"
-        echo "Python version: $(python --version)"
-        echo "Pip version: $(pip --version)"
-        echo "Gitleaks version: $(gitleaks version 2>/dev/null || echo 'Not installed')"
-        echo "Environment:"
-        env | sort
-        echo "::endgroup::"
+        run: |
+          echo "::group::Tests"
+          pytest -v --cov-report=xml
+          echo "::endgroup::"
