@@ -36,5 +36,4 @@ repos:
     rev: 1.7.9
     hooks:
       - id: bandit
-        args: ["-r", ".", "--configfile", "pyproject.toml"]
-        exclude: ^(tests/|build/|dist/)
+        args: ["-c", "pyproject.toml"]
