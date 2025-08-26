@@ -36,9 +36,12 @@ def validate_odds(record: dict[str, Any]) -> bool:
     return True
 
 
-def ingest_data(odds_data: list[dict[str, Any]], db_conn_str: str):
+def ingest_data(odds_data: list[dict[str, Any]], db_conn_str: str) -> tuple[int, int, int]:
     """
     Ingests validated odds data into the PostgreSQL database using an UPSERT operation.
+
+    Returns:
+        tuple[int, int, int]: (inserted_count, updated_count, error_count)
     """
     validated_data = [d for d in odds_data if validate_odds(d)]
     inserted_count = 0

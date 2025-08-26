@@ -51,7 +51,7 @@ def get_logger_with_trace(trace_id: str) -> Any:
     return structlog.get_logger().bind(trace_id=trace_id)
 
 
-def log_api_request(method: str, path: str, trace_id: str, **kwargs) -> None:
+def log_api_request(method: str, path: str, trace_id: str, **kwargs: Any) -> None:
     """记录API请求日志"""
     logger = get_logger_with_trace(trace_id)
     logger.info("API请求", method=method, path=path, **kwargs)

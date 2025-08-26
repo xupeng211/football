@@ -29,9 +29,12 @@ def fetch_source_data(db_conn_str: str) -> pd.DataFrame:
         return pd.DataFrame()
 
 
-def ingest_features_data(features_df: pd.DataFrame, db_conn_str: str):
+def ingest_features_data(features_df: pd.DataFrame, db_conn_str: str) -> tuple[int, int]:
     """
     Ingests features into the features table using an UPSERT operation.
+
+    Returns:
+        tuple[int, int]: (inserted/updated rows, error count)
     """
     if features_df.empty:
         logger.info("No features to ingest.")

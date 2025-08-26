@@ -53,7 +53,7 @@ def test_cors_middleware():
     from apps.api.main import app
 
     # 检查中间件是否配置
-    middleware_types = [m.cls.__name__ for m in app.user_middleware]
+    middleware_types = [getattr(m.cls, "__name__", str(m.cls)) for m in app.user_middleware]
     assert "CORSMiddleware" in middleware_types
 
 

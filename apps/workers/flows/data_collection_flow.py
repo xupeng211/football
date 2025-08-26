@@ -3,10 +3,14 @@
 """
 
 from datetime import date, datetime, timedelta
+from typing import TYPE_CHECKING
 
 import structlog
 from prefect import flow, task
 from prefect.task_runners import ConcurrentTaskRunner
+
+if TYPE_CHECKING:
+    pass
 
 # TODO: 导入实际的数据采集模块
 # from data_pipeline.collectors.football_api import FootballAPICollector, Match
