@@ -1,8 +1,20 @@
 import os
+import random
 
 import psycopg2
 import pytest
 from psycopg2 import OperationalError
+
+# 设置固定种子确保测试可重现
+SEED = int(os.getenv("TEST_SEED", "42"))
+random.seed(SEED)
+
+try:
+    import numpy as np
+
+    np.random.seed(SEED)
+except ImportError:
+    pass  # numpy not available, skip numpy seed setting
 
 
 def db_available():
@@ -30,3 +42,16 @@ def pytest_collection_modifyitems(config, items):
         for item in items:
             if "integration" in item.keywords:
                 item.add_marker(skip_integration)
+
+
+def pytest_runtest_setup(item):
+    """禁止网络访问, 除非标记 @pytest.mark.allow_network"""
+    try:
+        import pytest_socket
+
+        pytest_socket.disable_socket()
+    except ImportError:
+        return  # pytest-socket not available, skip network isolation
+
+    if any(mark.name == "allow_network" for mark in item.iter_markers()):
+        pytest_socket.enable_socket()

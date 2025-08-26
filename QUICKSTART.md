@@ -41,7 +41,7 @@ git status
 
 ### 核心文档阅读顺序
 1. **`context/_pack.md`** - 项目完整上下文（SSOT）
-2. **`docs/ARCHITECTURE.md`** - 架构设计详解  
+2. **`docs/ARCHITECTURE.md`** - 架构设计详解
 3. **`docs/TASKS.md`** - 开发任务清单
 4. **`docs/dev_log.md`** - 开发历程记录
 
@@ -117,4 +117,4 @@ A: 设置环境变量 `ENABLE_DB_TESTS=1` 后运行 `make test`。
 3. **🧪 运行示例**：尝试启动API服务或运行回测
 4. **💡 贡献代码**：选择一个感兴趣的功能开始开发
 
-**欢迎加入足球预测系统的开发！** ⚽🚀 
+**欢迎加入足球预测系统的开发！** ⚽🚀

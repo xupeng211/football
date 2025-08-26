@@ -192,7 +192,7 @@ engineer = FeatureEngineer(window_days=30, min_games=5)
 features = engineer.create_match_features(
     match_id="PL_2024_001",
     home_team="Manchester United",
-    away_team="Arsenal", 
+    away_team="Arsenal",
     match_date=datetime(2024, 1, 15),
     historical_data=historical_matches_df
 )
@@ -226,7 +226,7 @@ curl -X POST "http://localhost:8000/api/v1/predictions/single" \
      -H "Content-Type: application/json" \
      -d '{
        "home_team": "Manchester United",
-       "away_team": "Arsenal", 
+       "away_team": "Arsenal",
        "match_date": "2024-01-15",
        "league": "PL"
      }'
@@ -275,7 +275,7 @@ make format
 # 代码检查
 make lint
 
-# 类型检查  
+# 类型检查
 make type
 
 # 运行测试
@@ -371,5 +371,5 @@ pytest tests/ --cov=. --cov-report=html
 
 ---
 
-⭐ **如果这个项目对你有帮助，请给它一个星标！** 
+⭐ **如果这个项目对你有帮助，请给它一个星标！**
 # CI Fix Applied Tue Aug 26 08:11:25 CST 2025

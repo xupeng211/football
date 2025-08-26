@@ -20,7 +20,7 @@ jobs:
     defaults:
       run:
         shell: bash
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -49,7 +49,7 @@ jobs:
         run: |
           echo "::group::Dependency Installation"
           python -m pip install -U pip uv
-          
+
           # Priority 1: Use uv.lock if available for exact CI reproducibility
           if [ -f "uv.lock" ]; then
             echo "🚀 Using uv.lock for exact dependency reproduction..."
@@ -64,10 +64,10 @@ jobs:
             echo "❌ No dependency file found"
             exit 1
           fi
-          
+
           # Install project in editable mode
           pip install -e .
-          
+
           # Install additional dev tools
           pip install pre-commit ruff mypy pytest pytest-cov bandit
           echo "::endgroup::"
@@ -144,13 +144,13 @@ jobs:
         run: |
           echo "::group::Tests with Coverage Gate"
           set -euo pipefail
-          
+
           # Dynamic coverage directory detection
           COV_ARGS=""
           for d in apps data_pipeline models trainer; do
             [ -d "$d" ] && COV_ARGS="$COV_ARGS --cov=$d"
           done
-          
+
           # Fallback to root if no specific directories found
           if [ -z "$COV_ARGS" ]; then
             echo "📁 No specific coverage directories found, using root"
@@ -170,7 +170,7 @@ jobs:
               echo "❌ Tests failed or coverage below threshold (${COV_MIN}%)"
               exit 1
             }
-          
+
           echo "✅ Tests passed with coverage above ${COV_MIN}%"
           echo "::endgroup::"
 
