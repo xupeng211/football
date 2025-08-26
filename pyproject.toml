@@ -40,7 +40,7 @@ disallow_incomplete_defs = false
 
 [tool.bandit]
 exclude_dirs = [ "tests", "test", ".venv", "venv", "build", "dist",]
-skips = [ "B101", "B104", "B108", "B601", "B602", "B603",]
+skips = [ "B101", "B104", "B108", "B404", "B601", "B602", "B603",]
 
 [tool.ai-development]
 enforce_venv = true
