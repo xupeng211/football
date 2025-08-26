@@ -4,7 +4,7 @@
 
 from dataclasses import dataclass
 from datetime import date
-from typing import Any, Dict, List
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -25,8 +25,8 @@ class BacktestResult:
 
     # 准确率指标
     accuracy: float
-    precision_by_class: Dict[str, float]  # 各类别精确率
-    recall_by_class: Dict[str, float]  # 各类别召回率
+    precision_by_class: dict[str, float]  # 各类别精确率
+    recall_by_class: dict[str, float]  # 各类别召回率
 
     # 投注收益指标
     total_stakes: float
@@ -40,8 +40,8 @@ class BacktestResult:
     avg_odds: float
 
     # 详细记录
-    daily_pnl: List[float]
-    prediction_details: List[Dict[str, Any]]
+    daily_pnl: list[float]
+    prediction_details: list[dict[str, Any]]
 
 
 class BacktestEngine:
@@ -49,7 +49,7 @@ class BacktestEngine:
 
     def __init__(self):
         """初始化回测引擎"""
-        self.results_history: List[BacktestResult] = []
+        self.results_history: list[BacktestResult] = []
 
     def run_backtest(
         self,
@@ -171,7 +171,7 @@ class BacktestEngine:
         """生成预测结果"""
         logger.info("生成预测结果", matches=len(test_data))
 
-        # 提取特征（需要与训练时保持一致）
+        # 提取特征(需要与训练时保持一致)
         # TODO: 实现特征提取逻辑
         feature_columns = [
             col for col in test_data.columns if col.startswith(("home_", "away_", "diff_"))
@@ -192,7 +192,7 @@ class BacktestEngine:
 
         features = test_data[feature_columns].fillna(0)
 
-        # 生成预测（占位实现）
+        # 生成预测(占位实现)
         # TODO: 使用实际模型进行预测
         # probabilities = model.predict_proba(features)
 
@@ -210,7 +210,7 @@ class BacktestEngine:
 
         return test_data
 
-    def _calculate_pnl(self, predictions: pd.DataFrame, stake_per_bet: float) -> Dict[str, Any]:
+    def _calculate_pnl(self, predictions: pd.DataFrame, stake_per_bet: float) -> dict[str, Any]:
         """计算盈亏"""
         results = []
         daily_pnl = {}
@@ -280,7 +280,7 @@ class BacktestEngine:
         home_score = row.get("home_score", 0)
         away_score = row.get("away_score", 0)
 
-        # 如果没有比分数据，生成随机结果用于演示
+        # 如果没有比分数据,生成随机结果用于演示
         if pd.isna(home_score) or pd.isna(away_score):
             return np.random.choice([0, 1, 2])  # 随机结果
 
@@ -291,7 +291,7 @@ class BacktestEngine:
         else:
             return 0  # 客胜
 
-    def _calculate_accuracy_metrics(self, predictions: pd.DataFrame) -> Dict[str, Any]:
+    def _calculate_accuracy_metrics(self, predictions: pd.DataFrame) -> dict[str, Any]:
         """计算准确率指标"""
         actual_results = []
         predicted_results = []
@@ -304,7 +304,9 @@ class BacktestEngine:
             predicted_results.append(predicted)
 
         # 整体准确率
-        correct_predictions = sum(1 for a, p in zip(actual_results, predicted_results) if a == p)
+        correct_predictions = sum(
+            1 for a, p in zip(actual_results, predicted_results, strict=False) if a == p
+        )
         accuracy = correct_predictions / len(predictions) if len(predictions) > 0 else 0
 
         # 各类别精确率和召回率
@@ -313,16 +315,16 @@ class BacktestEngine:
         recall_by_class = {}
 
         for class_idx, class_name in enumerate(class_names):
-            # 精确率：预测为该类别且正确的 / 预测为该类别的总数
+            # 精确率:预测为该类别且正确的 / 预测为该类别的总数
             predicted_as_class = sum(1 for p in predicted_results if p == class_idx)
             correct_as_class = sum(
                 1
-                for a, p in zip(actual_results, predicted_results)
+                for a, p in zip(actual_results, predicted_results, strict=False)
                 if p == class_idx and a == class_idx
             )
             precision = correct_as_class / predicted_as_class if predicted_as_class > 0 else 0
 
-            # 召回率：预测为该类别且正确的 / 实际为该类别的总数
+            # 召回率:预测为该类别且正确的 / 实际为该类别的总数
             actual_as_class = sum(1 for a in actual_results if a == class_idx)
             recall = correct_as_class / actual_as_class if actual_as_class > 0 else 0
 
@@ -335,7 +337,7 @@ class BacktestEngine:
             "recall_by_class": recall_by_class,
         }
 
-    def _calculate_risk_metrics(self, pnl_results: Dict[str, Any]) -> Dict[str, Any]:
+    def _calculate_risk_metrics(self, pnl_results: dict[str, Any]) -> dict[str, Any]:
         """计算风险指标"""
         results = pnl_results["results"]
         daily_pnl = pnl_results["daily_pnl"]
@@ -351,14 +353,14 @@ class BacktestEngine:
         avg_odds = np.mean([r["odds"] for r in results])
 
         # 最大回撤
-        cumulative_pnl = np.cumsum([0] + daily_pnl)
+        cumulative_pnl = np.cumsum([0, *daily_pnl])
         running_max = np.maximum.accumulate(cumulative_pnl)
         drawdowns = running_max - cumulative_pnl
         max_drawdown = np.max(drawdowns) if len(drawdowns) > 0 else 0
 
         return {"max_drawdown": max_drawdown, "win_rate": win_rate, "avg_odds": avg_odds}
 
-    def compare_strategies(self, strategy_names: List[str]) -> pd.DataFrame:
+    def compare_strategies(self, strategy_names: list[str]) -> pd.DataFrame:
         """比较不同策略的回测结果"""
         if not self.results_history:
             return pd.DataFrame()

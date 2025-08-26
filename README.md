@@ -1,3 +1,52 @@
+# 🤖 AI 开发工具使用规则
+
+**⚠️ 重要：所有 AI 编程工具必须在虚拟环境中开发！**
+
+```bash
+# 🚀 快速开始（AI工具必读）
+source scripts/activate-venv.sh  # 自动激活虚拟环境
+make ci                          # 验证环境并运行完整检查
+```
+
+**详细规则**: 📋 [AI_DEVELOPMENT_RULES.md](docs/AI_DEVELOPMENT_RULES.md)
+
+---
+
+## 🚀 本地开发快速开始
+
+### 环境要求
+- Python 3.11.9
+- uv (自动安装)
+
+### 本地 = CI 一致性命令
+```bash
+# 1. 安装依赖（与CI完全一致）
+make install
+# 或者直接运行：
+uv pip install --no-cache --strict --resolution=lowest-direct -r requirements.txt
+
+# 2. 运行完整CI检查
+make ci
+
+# 3. 单独运行各项检查
+make lint     # 代码风格检查
+make type     # 类型检查
+make security # 安全扫描
+make test     # 测试
+```
+
+### Pre-commit 钩子
+```bash
+# 安装pre-commit钩子（一次性）
+pip install pre-commit
+pre-commit install
+
+# 手动运行所有检查
+pre-commit run --all-files
+```
+
+---
+
 # ⚽ 足球赛果预测系统
 
 一个基于机器学习的足球比赛结果预测系统，采用现代化的Python技术栈，支持数据采集、特征工程、模型训练、实时预测和回测分析。
@@ -192,7 +241,7 @@ engineer = FeatureEngineer(window_days=30, min_games=5)
 features = engineer.create_match_features(
     match_id="PL_2024_001",
     home_team="Manchester United",
-    away_team="Arsenal", 
+    away_team="Arsenal",
     match_date=datetime(2024, 1, 15),
     historical_data=historical_matches_df
 )
@@ -226,7 +275,7 @@ curl -X POST "http://localhost:8000/api/v1/predictions/single" \
      -H "Content-Type: application/json" \
      -d '{
        "home_team": "Manchester United",
-       "away_team": "Arsenal", 
+       "away_team": "Arsenal",
        "match_date": "2024-01-15",
        "league": "PL"
      }'
@@ -275,7 +324,7 @@ make format
 # 代码检查
 make lint
 
-# 类型检查  
+# 类型检查
 make type
 
 # 运行测试
@@ -371,5 +420,5 @@ pytest tests/ --cov=. --cov-report=html
 
 ---
 
-⭐ **如果这个项目对你有帮助，请给它一个星标！** 
+⭐ **如果这个项目对你有帮助，请给它一个星标！**
 # CI Fix Applied Tue Aug 26 08:11:25 CST 2025

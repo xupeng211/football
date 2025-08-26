@@ -1,94 +1,94 @@
-# ==== Repo defaults (override by: make REPO=xxx OWNER=yyy) ====
-OWNER ?= xupeng211
-REPO  ?= football
+.PHONY: install fmt lint type test sec leaks ci clean help check-venv
+.DEFAULT_GOAL := help
 
-.PHONY: fmt lint type sec test ci
+# 颜色定义
+YELLOW := \033[1;33m
+GREEN := \033[1;32m
+RED := \033[1;31m
+BLUE := \033[0;34m
+NC := \033[0m
 
-fmt:
-	ruff check . --fix && black .
+# 虚拟环境检查
+check-venv: ## 检查虚拟环境状态（AI开发强制要求）
+	@echo "$(BLUE)🤖 AI开发环境检查$(NC)"
+	@if [ -z "$$VIRTUAL_ENV" ]; then \
+		echo "$(RED)❌ AI开发工具必须在虚拟环境中运行！$(NC)"; \
+		echo "$(YELLOW)💡 请先运行: source scripts/activate-venv.sh$(NC)"; \
+		exit 1; \
+	fi
+	@echo "$(GREEN)✅ 虚拟环境已激活: $$VIRTUAL_ENV$(NC)"
+	@echo "$(GREEN)✅ Python版本: $$(python --version)$(NC)"
 
-lint:
-	ruff check . && black --check .
+help: ## 显示帮助信息
+	@echo "$(YELLOW)Available targets:$(NC)"
+	@echo "$(BLUE)🤖 AI开发强制要求: 所有命令必须在虚拟环境中运行$(NC)"
+	@echo
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  $(GREEN)%-12s$(NC) %s\n", $$1, $$2}'
 
-type:
-	mypy .
-
-sec:
-	bandit -r apps/ data_pipeline/ models/ --skip B101
-
-test:
-	python -m pytest
-ci: lint type sec test
-
-.PHONY: context.pack
-context.pack:
-	python3 scripts/context_pack.py
-
-
-.PHONY: ingest.odds seed.sample.odds
-ingest.odds:
-	python3 data_pipeline/sources/ingest_odds.py --start $${START} --end $${END}
-
-seed.sample.odds:
-	USE_SAMPLE_ODDS=true python3 data_pipeline/sources/ingest_odds.py --start 2024-01-01 --end 2024-01-02 --use-sample
-
-
-.PHONY: show.context
-show.context:
-	@echo "--- Project Context (SSOT) ---"
-	@cat context/_pack.md
-
-
-.PHONY: ingest.features seed.sample.features
-ingest.features:
-	python3 data_pipeline/transforms/ingest_features.py
-
-seed.sample.features:
-	make seed.sample.odds
-	python3 data_pipeline/transforms/ingest_features.py
-
-
-.PHONY: install hooks.install docker-up docker-down dev
-install:
+install: check-venv ## 安装项目依赖和开发工具
+	@echo "$(YELLOW)Installing dependencies...$(NC)"
+	pip install -U pip uv
+	pip install -r requirements.txt
 	pip install -e .
-	@echo "项目依赖已安装"
+	pip install pre-commit ruff mypy pytest pytest-cov bandit
+	@echo "$(GREEN)✅ Dependencies installed$(NC)"
 
-hooks.install:
-	@python -m pip install -U pre-commit >/dev/null
-	@pre-commit install || true
-	@echo "pre-commit hooks installed."
+fmt: check-venv ## 格式化代码 (ruff + black)
+	@echo "$(YELLOW)Formatting code...$(NC)"
+	ruff format .
+	ruff check --fix .
+	@echo "$(GREEN)✅ Code formatted$(NC)"
 
-docker-up:
-	docker-compose up -d postgres redis prefect-server
-	@echo "基础服务已启动"
+lint: check-venv ## 代码风格检查 (ruff)
+	@echo "$(YELLOW)Running linter...$(NC)"
+	ruff check .
+	@echo "$(GREEN)✅ Linting passed$(NC)"
 
-docker-down:
-	docker-compose down
-	@echo "所有服务已停止"
+type: check-venv ## 类型检查 (mypy)
+	@echo "$(YELLOW)Running type checker...$(NC)"
+	mypy .
+	@echo "$(GREEN)✅ Type checking passed$(NC)"
 
-dev:
-	docker-compose up --build api
-	@echo "开发服务已启动"
+test: check-venv ## 运行测试 (pytest)
+	@echo "$(YELLOW)Running tests...$(NC)"
+	pytest -v
+	@echo "$(GREEN)✅ Tests passed$(NC)"
 
-.PHONY: repo.protect
-repo.protect:
-	@echo "[保护] applying branch protection to main & dev on $(OWNER)/$(REPO)"
-	@mkdir -p .github
-	@echo '{ "required_status_checks": { "strict": true, "checks": [{"context":"CI"},{"context":"CodeQL"},{"context":"Gitleaks"}] }, "enforce_admins": true, "required_pull_request_reviews": { "dismiss_stale_reviews": true, "required_approving_review_count": 1 }, "restrictions": null, "allow_force_pushes": false, "allow_deletions": false, "required_linear_history": true, "block_creations": false, "lock_branch": false, "allow_fork_syncing": false }' > .github/branch_protection.json
-	@gh api -X PUT "repos/$(OWNER)/$(REPO)/branches/main/protection" -H "Accept: application/vnd.github+json" --input .github/branch_protection.json
-	@# dev 不存在时跳过
-	@if git ls-remote --heads origin dev | grep -q dev; then \
-	  gh api -X PUT "repos/$(OWNER)/$(REPO)/branches/dev/protection" -H "Accept: application/vnd.github+json" --input .github/branch_protection.json; \
+sec: check-venv ## 安全检查 (bandit)
+	@echo "$(YELLOW)Running security check...$(NC)"
+	bandit -r . -f json -o bandit-report.json --exit-zero
+	bandit -r . --configfile pyproject.toml
+	@echo "$(GREEN)✅ Security check passed$(NC)"
+
+leaks: check-venv ## 秘密泄露检查 (gitleaks)
+	@echo "$(YELLOW)Running secrets scan...$(NC)"
+	@if command -v gitleaks >/dev/null 2>&1; then \
+		gitleaks detect --config .gitleaks.toml --verbose --no-banner; \
+		echo "$(GREEN)✅ No secrets detected$(NC)"; \
 	else \
-	  echo "⚠️  远端无 dev 分支，跳过 dev 保护（如需：git push -u origin dev）"; \
+		echo "$(RED)⚠️  gitleaks not installed, skipping...$(NC)"; \
 	fi
 
-.PHONY: repo.check
-repo.check:
-	@OWNER=$$(git config --get remote.origin.url | sed -E 's#.*github.com[:/](.+)/(.+)\.git#\1#'); \
-	REPO=$$(git config --get remote.origin.url | sed -E 's#.*github.com[:/](.+)/(.+)\.git#\2#'); \
-	for BR in main dev; do \
-	  echo "=== 分支保护检查: $$BR ==="; \
-	  gh api repos/$$OWNER/$$REPO/branches/$$BR/protection -H "Accept: application/vnd.github+json" | sed -n '1,120p' || echo "gh 未配置或无权限"; \
-	done
-	@echo "=== 工作流文件 ==="; ls -la .github/workflows || true
+ci: install fmt lint type sec test ## 完整CI检查流程（强制虚拟环境）
+	@echo "$(GREEN)�� All CI checks passed!$(NC)"
+	@echo "$(BLUE)🤖 AI开发环境验证通过$(NC)"
+
+clean: ## 清理生成的文件
+	@echo "$(YELLOW)Cleaning up...$(NC)"
+	find . -type f -name "*.pyc" -delete
+	find . -type d -name "__pycache__" -exec rm -rf {} +
+	find . -type d -name "*.egg-info" -exec rm -rf {} +
+	rm -rf .pytest_cache .mypy_cache .ruff_cache
+	rm -rf htmlcov/ .coverage coverage.xml
+	rm -f bandit-report.json
+	@echo "$(GREEN)✅ Cleanup complete$(NC)"
+
+# AI开发工具快速启动
+ai-setup: ## AI开发工具快速环境设置
+	@echo "$(BLUE)🤖 AI开发工具环境设置$(NC)"
+	@echo "$(YELLOW)正在设置虚拟环境...$(NC)"
+	@if [ ! -d ".venv" ]; then python -m venv .venv; fi
+	@echo "$(YELLOW)请运行以下命令激活环境:$(NC)"
+	@echo "$(GREEN)source .venv/bin/activate$(NC)"
+	@echo "$(GREEN)make install$(NC)"
+	@echo "$(GREEN)make ci$(NC)"

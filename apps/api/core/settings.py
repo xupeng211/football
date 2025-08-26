@@ -1,5 +1,4 @@
 # apps/api/core/settings.py
-from typing import Optional
 
 from pydantic_settings import BaseSettings
 
@@ -13,7 +12,7 @@ class Settings(BaseSettings):
 
     # 数据库配置
     database_url: str = "postgresql://postgres:postgres@localhost:5432/sports"
-    pg_password: Optional[str] = None
+    pg_password: str | None = None
 
     # Redis配置
     redis_url: str = "redis://localhost:6379"
@@ -28,7 +27,7 @@ class Settings(BaseSettings):
     model_cache_size: int = 10
 
     # 数据源配置
-    football_api_key: Optional[str] = None
+    football_api_key: str | None = None
     data_update_interval_minutes: int = 60
 
     # 监控配置
@@ -42,8 +41,8 @@ class Settings(BaseSettings):
     feature_set: str = "v1"
 
     # 回测配置
-    backtest_start_date: Optional[str] = None
-    backtest_end_date: Optional[str] = None
+    backtest_start_date: str | None = None
+    backtest_end_date: str | None = None
 
     class Config:
         env_file = ".env"

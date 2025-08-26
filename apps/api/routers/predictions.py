@@ -1,9 +1,9 @@
+from typing import Any
 """
 预测API路由
 """
 
 from datetime import date, datetime
-from typing import List, Optional
 from uuid import uuid4
 
 import structlog
@@ -51,13 +51,13 @@ class PredictionResponse(BaseModel):
 class BatchPredictionRequest(BaseModel):
     """批量预测请求模型"""
 
-    matches: List[PredictionRequest] = Field(description="比赛列表")
+    matches: list[PredictionRequest] = Field(description="比赛列表")
 
 
 class BatchPredictionResponse(BaseModel):
     """批量预测响应模型"""
 
-    predictions: List[PredictionResponse]
+    predictions: list[PredictionResponse]
     total_count: int
     successful_count: int
     failed_count: int
@@ -104,7 +104,7 @@ async def predict_single_match(request: PredictionRequest):
 
     except Exception as e:
         logger.error("预测失败", exc=str(e), trace_id=trace_id)
-        raise HTTPException(status_code=500, detail=f"预测失败: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"预测失败: {e!s}") from None
 
 
 @router.post("/predictions/batch", response_model=BatchPredictionResponse)
@@ -142,15 +142,15 @@ async def predict_batch_matches(request: BatchPredictionRequest):
 
     except Exception as e:
         logger.error("批量预测失败", exc=str(e))
-        raise HTTPException(status_code=500, detail=f"批量预测失败: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"批量预测失败: {e!s}") from None
 
 
 @router.get("/predictions/history")
 async def get_prediction_history(
     limit: int = Query(default=100, ge=1, le=1000, description="返回数量限制"),
     offset: int = Query(default=0, ge=0, description="偏移量"),
-    team: Optional[str] = Query(default=None, description="筛选球队"),
-    league: Optional[str] = Query(default=None, description="筛选联赛"),
+    team: str | None = Query(default=None, description="筛选球队"),
+    league: str | None = Query(default=None, description="筛选联赛"),
 ):
     """
     获取历史预测记录

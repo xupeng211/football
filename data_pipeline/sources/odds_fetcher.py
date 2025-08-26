@@ -2,7 +2,7 @@ import json
 import logging
 import os
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 import requests
 from requests.adapters import HTTPAdapter
@@ -16,7 +16,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def fetch_odds(start_date: str, end_date: str) -> List[Dict[str, Any]]:
+def fetch_odds(start_date: str, end_date: str) -> list[dict[str, Any]]:
     """
     Fetches odds data from a remote API or a local sample file.
 
@@ -33,7 +33,7 @@ def fetch_odds(start_date: str, end_date: str) -> List[Dict[str, Any]]:
         if not sample_path.exists():
             logger.error(f"Sample data not found at {sample_path}")
             return []
-        with open(sample_path, "r", encoding="utf-8") as f:
+        with open(sample_path, encoding="utf-8") as f:
             return json.load(f)
 
     # API call logic (placeholder)

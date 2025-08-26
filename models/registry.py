@@ -7,7 +7,7 @@ import pickle  # nosec B403
 from dataclasses import asdict, dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import structlog
 
@@ -45,7 +45,7 @@ class ModelMetadata:
 
     # 其他信息
     created_by: str = "system"
-    tags: Optional[List[str]] = None
+    tags: list[str] | None = None
 
     def __post_init__(self):
         if self.tags is None:
@@ -59,13 +59,13 @@ class ModelVersion:
     version: str
     metadata: ModelMetadata
     is_active: bool = False
-    deployment_date: Optional[datetime] = None
+    deployment_date: datetime | None = None
 
 
 class ModelRegistry:
     """模型注册表"""
 
-    def __init__(self, registry_path: Optional[str] = None):
+    def __init__(self, registry_path: str | None = None):
         """
         初始化模型注册表
 
@@ -82,7 +82,7 @@ class ModelRegistry:
     def _load_index(self) -> None:
         """加载注册表索引"""
         if self.index_file.exists():
-            with open(self.index_file, "r") as f:
+            with open(self.index_file) as f:
                 self.index = json.load(f)
         else:
             self.index = {
@@ -98,7 +98,10 @@ class ModelRegistry:
             json.dump(self.index, f, indent=2, default=str)
 
     def register_model(
-        self, model: Any, metadata: ModelMetadata, make_active: bool = True  # 训练好的模型对象
+        self,
+        model: Any,
+        metadata: ModelMetadata,
+        make_active: bool = True,  # 训练好的模型对象
     ) -> str:
         """
         注册新模型版本
@@ -172,13 +175,13 @@ class ModelRegistry:
 
         self.index["active_versions"][model_id] = version
 
-    def load_model(self, model_id: str, version: Optional[str] = None) -> Any:
+    def load_model(self, model_id: str, version: str | None = None) -> Any:
         """
         加载模型
 
         Args:
             model_id: 模型ID
-            version: 模型版本，None表示加载活跃版本
+            version: 模型版本,None表示加载活跃版本
 
         Returns:
             模型对象
@@ -194,7 +197,7 @@ class ModelRegistry:
             for v_info in self.index["models"][model_id]:
                 if v_info["version"] == version:
                     metadata_path = v_info["metadata_path"]
-                    with open(metadata_path, "r") as f:
+                    with open(metadata_path) as f:
                         metadata = json.load(f)
                     model_path = metadata["model_path"]
                     break
@@ -209,11 +212,11 @@ class ModelRegistry:
         logger.info("模型加载成功", model_id=model_id, version=version)
         return model
 
-    def get_active_version(self, model_id: str) -> Optional[str]:
+    def get_active_version(self, model_id: str) -> str | None:
         """获取活跃版本"""
         return self.index["active_versions"].get(model_id)
 
-    def list_models(self) -> Dict[str, List[str]]:
+    def list_models(self) -> dict[str, list[str]]:
         """列出所有模型和版本"""
         result = {}
         for model_id, versions in self.index["models"].items():
@@ -232,7 +235,7 @@ class ModelRegistry:
         if metadata_path is None:
             raise ValueError(f"找不到模型版本: {model_id}:{version}")
 
-        with open(metadata_path, "r") as f:
+        with open(metadata_path) as f:
             metadata_dict = json.load(f)
 
         # 转换日期字符串
@@ -285,9 +288,11 @@ class ModelRegistry:
         self._set_active_version(model_id, version)
         self._save_index()
 
-        logger.info("模型版本已提升", model_id=model_id, old_version=old_active, new_version=version)
+        logger.info(
+            "模型版本已提升", model_id=model_id, old_version=old_active, new_version=version
+        )
 
-    def get_registry_stats(self) -> Dict[str, Any]:
+    def get_registry_stats(self) -> dict[str, Any]:
         """获取注册表统计信息"""
         stats = {
             "total_models": len(self.index["models"]),
