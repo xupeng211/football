@@ -1,0 +1,33 @@
+{
+  "python.defaultInterpreterPath": "./.venv/bin/python",
+  "python.terminal.activateEnvironment": true,
+  "python.terminal.activateEnvInCurrentTerminal": true,
+  "python.linting.enabled": true,
+  "python.linting.ruffEnabled": true,
+  "python.formatting.provider": "none",
+  "python.analysis.typeCheckingMode": "strict",
+  "python.analysis.autoImportCompletions": true,
+  "terminal.integrated.env.linux": {
+    "VIRTUAL_ENV_PROMPT": "🤖 AI-DEV"
+  },
+  "terminal.integrated.env.osx": {
+    "VIRTUAL_ENV_PROMPT": "🤖 AI-DEV"
+  },
+  "files.associations": {
+    "*.py": "python"
+  },
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit",
+    "source.fixAll.ruff": "explicit"
+  },
+  "ruff.args": ["--config=pyproject.toml"],
+  "mypy-type-checker.args": ["--config-file=pyproject.toml"],
+  "terminal.integrated.defaultProfile.linux": "bash",
+  "terminal.integrated.profiles.linux": {
+    "AI Development (venv)": {
+      "path": "bash",
+      "args": ["-c", "source .venv/bin/activate && exec bash"]
+    }
+  }
+}

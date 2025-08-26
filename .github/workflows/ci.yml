@@ -1,21 +1,22 @@
 name: CI
+
 on:
   push:
-    branches: [ main, dev ]
+    branches: [ main, dev, feat/ci-foundation ]
   pull_request:
     branches: [ main, dev ]
 
 jobs:
-  build-test:
+  test:
     runs-on: ubuntu-22.04
     timeout-minutes: 30
     env:
-      PIP_DISABLE_PIP_VERSION_CHECK: "1"
-      PIP_DEFAULT_TIMEOUT: "60"
-      UV_SYSTEM_PYTHON: "1"
+      PYTHONUNBUFFERED: "1"
+      PYTHONDONTWRITEBYTECODE: "1"
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -25,54 +26,99 @@ jobs:
           python-version: "3.11.9"
           cache: "pip"
 
-      - name: Install uv
+      - name: Install system dependencies
         run: |
-          curl -LsSf https://astral.sh/uv/install.sh | sh
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
-          uv --version
+          sudo apt-get update
+          sudo apt-get install -y build-essential
 
-      - name: Show env for debugging
+      - name: Install Python dependencies
         run: |
-          python -V
-          which python
-          pip -V
-          uname -a
+          python -m pip install --upgrade pip uv
+          pip install -r requirements.txt
+          pip install -e .
+          pip install pre-commit ruff mypy pytest pytest-cov bandit
 
-      - name: Install dependencies (frozen by uv.lock)
+      - name: Install gitleaks
         run: |
-          uv pip install --no-cache --strict --resolution=lowest-direct -r requirements.txt
-          python -m pip check
-          python -c "import sys, platform; print('Platform:', sys.platform, platform.platform())"
+          curl -sSfL https://github.com/gitleaks/gitleaks/releases/latest/download/gitleaks_8.21.2_linux_x64.tar.gz | tar -xzC /tmp
+          sudo mv /tmp/gitleaks /usr/local/bin/
+          gitleaks version
 
-      - name: Cache test/type/lint results
+      - name: Cache pre-commit
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml') }}
+
+      - name: Cache tool results
         uses: actions/cache@v4
         with:
           path: |
-            .pytest_cache
             .mypy_cache
+            .pytest_cache
             .ruff_cache
-          key: ${{ runner.os }}-cache-${{ hashFiles('**/pyproject.toml', '**/requirements*.txt', '**/uv.lock') }}
+          key: tools-${{ runner.os }}-${{ hashFiles('**/pyproject.toml', '**/requirements*.txt') }}
 
-      - name: Lint (ruff)
-        run: ruff check .
+      - name: Run formatting check
+        run: |
+          echo "::group::Code formatting"
+          ruff format --check .
+          echo "::endgroup::"
 
-      - name: Type check (mypy)
-        run: mypy .
+      - name: Run linting
+        run: |
+          echo "::group::Code linting"
+          ruff check .
+          echo "::endgroup::"
 
-      - name: Security (bandit)
-        run: bandit -q -r . --configfile pyproject.toml
+      - name: Run type checking
+        run: |
+          echo "::group::Type checking"
+          mypy .
+          echo "::endgroup::"
+
+      - name: Run security check
+        run: |
+          echo "::group::Security scanning"
+          bandit -r . --configfile pyproject.toml
+          echo "::endgroup::"
 
       - name: Run tests
-        run: pytest -q --disable-warnings --maxfail=1 --cov=apps --cov-report=term-missing
+        run: |
+          echo "::group::Running tests"
+          pytest -v --cov-report=xml
+          echo "::endgroup::"
 
-      - name: On failure, dump resolver context
+      - name: Run gitleaks scan
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "::group::Secrets scanning"
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            gitleaks protect --config .gitleaks.toml --verbose --no-banner
+          else
+            gitleaks detect --config .gitleaks.toml --verbose --no-banner
+          fi
+          echo "::endgroup::"
+
+      - name: Upload coverage reports
+        if: success()
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
+
+      - name: Debug on failure
         if: failure()
         run: |
-          python -V
-          pip -V
-          pip debug
-          pip list --format=freeze
-          pip cache dir
-          pip index versions numpy
-          pip index versions pandas
-          pip index versions xgboost
+          echo "::group::Environment info"
+          python --version
+          pip --version
+          pip list
+          echo "::endgroup::"
+
+          echo "::group::File permissions"
+          ls -la
+          echo "::endgroup::"

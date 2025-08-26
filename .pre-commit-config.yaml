@@ -1,26 +1,38 @@
 repos:
-  - repo: https://github.com/psf/black
-    rev: 24.4.2
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
     hooks:
-      - id: black
-        language_version: python3.11
-  - repo: https://github.com/charliermarsh/ruff-pre-commit
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+      - id: check-merge-conflict
+      - id: debug-statements
+      - id: check-toml
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.5.5
     hooks:
       - id: ruff
-        args: [ "--fix" ]
+        args: [--fix, --exit-non-zero-on-fix]
+      - id: ruff-format
+
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.10.0
     hooks:
       - id: mypy
         additional_dependencies: []
+        exclude: ^(tests/|build/|dist/)
+
   - repo: https://github.com/PyCQA/bandit
     rev: 1.7.9
     hooks:
       - id: bandit
-        args: [ "-q", "-r", "." ]
+        args: [-r, ., --configfile, pyproject.toml]
+        exclude: ^tests/
+
   - repo: https://github.com/gitleaks/gitleaks
     rev: v8.18.4
     hooks:
       - id: gitleaks
-        args: [ "protect", "--staged", "--config", ".gitleaks.toml" ]
+        args: [detect, --config, .gitleaks.toml, --verbose, --no-banner]

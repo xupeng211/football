@@ -42,7 +42,7 @@ def db_connection():
 def sample_odds_data():
     """Loads odds data from the sample JSON file."""
     sample_path = Path(__file__).parent.parent.parent / "data" / "samples" / "odds_sample.json"
-    with open(sample_path, "r") as f:
+    with open(sample_path) as f:
         return json.load(f)
 
 

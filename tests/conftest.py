@@ -6,7 +6,7 @@ from psycopg2 import OperationalError
 
 
 def db_available():
-    """检测数据库是否可用，1秒超时"""
+    """检测数据库是否可用,1秒超时"""
     try:
         default_url = "postgresql://postgres:password@localhost:5432/sports"
         db_url = os.environ.get("DATABASE_URL", default_url)

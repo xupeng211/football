@@ -1,0 +1,49 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "🤖 AI: 激活虚拟环境",
+      "type": "shell",
+      "command": "source",
+      "args": ["scripts/activate-venv.sh"],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🤖 AI: 检查环境",
+      "type": "shell",
+      "command": "make",
+      "args": ["check-venv"],
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🤖 AI: 完整CI检查",
+      "type": "shell",
+      "command": "make",
+      "args": ["ci"],
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
+      "problemMatcher": ["$ruff", "$mypy"]
+    }
+  ]
+}

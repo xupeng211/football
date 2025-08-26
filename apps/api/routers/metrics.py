@@ -24,7 +24,9 @@ registry = CollectorRegistry()
 ProcessCollector(registry=registry)
 
 # 定义应用指标
-REQUEST_COUNT = Counter("api_requests_total", "API请求总数", ["method", "endpoint"], registry=registry)
+REQUEST_COUNT = Counter(
+    "api_requests_total", "API请求总数", ["method", "endpoint"], registry=registry
+)
 
 REQUEST_DURATION = Histogram(
     "api_request_duration_seconds", "API请求耗时", ["method", "endpoint"], registry=registry
@@ -42,7 +44,7 @@ def get_metrics() -> Response:
     """
     获取系统指标 - Prometheus格式
 
-    提供系统运行状态的关键指标，包括：
+    提供系统运行状态的关键指标,包括:
     - API请求统计
     - 模型预测统计
     - 系统资源使用

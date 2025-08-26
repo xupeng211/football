@@ -4,7 +4,7 @@ XGBoost训练器 - 负责模型训练、验证和超参数优化
 
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -46,29 +46,29 @@ class TrainingResult:
     train_score: float
     val_score: float
     test_score: float
-    feature_importance: Dict[str, float]
+    feature_importance: dict[str, float]
     training_time: float
-    model_params: Dict[str, Any]
-    cv_scores: List[float]
+    model_params: dict[str, Any]
+    cv_scores: list[float]
 
 
 class XGBoostTrainer:
     """XGBoost训练器"""
 
-    def __init__(self, config: Optional[TrainingConfig] = None):
+    def __init__(self, config: TrainingConfig | None = None):
         """
         初始化训练器
 
         Args:
-            config: 训练配置，None时使用默认配置
+            config: 训练配置,None时使用默认配置
         """
         self.config = config or TrainingConfig()
-        self.model: Optional[xgb.XGBClassifier] = None
-        self.feature_names: List[str] = []
+        self.model: xgb.XGBClassifier | None = None
+        self.feature_names: list[str] = []
 
     def prepare_data(
         self, features: pd.DataFrame, targets: pd.Series
-    ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.Series, pd.Series]:
+    ) -> tuple[pd.DataFrame, pd.DataFrame, pd.Series, pd.Series]:
         """
         准备训练数据
 
@@ -185,7 +185,9 @@ class XGBoostTrainer:
         val_score = cv_scores.mean()
 
         # 特征重要性
-        feature_importance = dict(zip(self.feature_names, self.model.feature_importances_))
+        feature_importance = dict(
+            zip(self.feature_names, self.model.feature_importances_, strict=False)
+        )
 
         # 计算训练时间
         training_time = (datetime.now() - start_time).total_seconds()
@@ -222,7 +224,7 @@ class XGBoostTrainer:
             预测概率 (n_samples, 3) - [客胜概率, 平局概率, 主胜概率]
         """
         if self.model is None:
-            raise ValueError("模型未训练，请先调用train()方法")
+            raise ValueError("模型未训练,请先调用train()方法")
 
         return self.model.predict_proba(features)
 
@@ -237,11 +239,11 @@ class XGBoostTrainer:
             预测类别 (0: 客胜, 1: 平局, 2: 主胜)
         """
         if self.model is None:
-            raise ValueError("模型未训练，请先调用train()方法")
+            raise ValueError("模型未训练,请先调用train()方法")
 
         return self.model.predict(features)
 
-    def get_feature_importance(self, top_k: int = 20) -> Dict[str, float]:
+    def get_feature_importance(self, top_k: int = 20) -> dict[str, float]:
         """
         获取特征重要性
 
@@ -254,7 +256,7 @@ class XGBoostTrainer:
         if self.model is None:
             raise ValueError("模型未训练")
 
-        importance = dict(zip(self.feature_names, self.model.feature_importances_))
+        importance = dict(zip(self.feature_names, self.model.feature_importances_, strict=False))
         # 按重要性降序排列
         sorted_importance = dict(sorted(importance.items(), key=lambda x: x[1], reverse=True))
 
@@ -284,7 +286,7 @@ class XGBoostTrainer:
         self.model.load_model(filepath)
         logger.info("模型已加载", filepath=filepath)
 
-    def hyperparameter_tuning(self, X_train: pd.DataFrame, y_train: pd.Series) -> Dict[str, Any]:
+    def hyperparameter_tuning(self, X_train: pd.DataFrame, y_train: pd.Series) -> dict[str, Any]:
         """
         超参数优化 (TODO: 实现)
 

@@ -3,7 +3,6 @@
 """
 
 from datetime import date, datetime, timedelta
-from typing import List, Optional
 
 import structlog
 from prefect import flow, task
@@ -18,8 +17,8 @@ logger = structlog.get_logger()
 
 @task(name="收集比赛数据")
 async def collect_matches_task(
-    start_date: date, end_date: date, leagues: Optional[List[str]] = None
-) -> List[dict]:
+    start_date: date, end_date: date, leagues: list[str] | None = None
+) -> list[dict]:
     """
     收集比赛数据任务
 
@@ -31,7 +30,9 @@ async def collect_matches_task(
     Returns:
         比赛数据列表
     """
-    logger.info("开始收集比赛数据", start_date=str(start_date), end_date=str(end_date), leagues=leagues)
+    logger.info(
+        "开始收集比赛数据", start_date=str(start_date), end_date=str(end_date), leagues=leagues
+    )
 
     try:
         # TODO: 实现实际的数据采集逻辑
@@ -63,7 +64,7 @@ async def collect_matches_task(
 
 
 @task(name="收集赔率数据")
-async def collect_odds_task(match_ids: List[str]) -> List[dict]:
+async def collect_odds_task(match_ids: list[str]) -> list[dict]:
     """
     收集赔率数据任务
 
@@ -103,7 +104,7 @@ async def collect_odds_task(match_ids: List[str]) -> List[dict]:
 
 
 @task(name="数据验证和清洗")
-def validate_and_clean_data(matches: List[dict], odds: List[dict]) -> dict:
+def validate_and_clean_data(matches: list[dict], odds: list[dict]) -> dict:
     """
     数据验证和清洗任务
 
@@ -136,7 +137,7 @@ def validate_and_clean_data(matches: List[dict], odds: List[dict]) -> dict:
 
 
 @task(name="数据存储")
-async def store_data_task(matches: List[dict], odds: List[dict]) -> dict:
+async def store_data_task(matches: list[dict], odds: list[dict]) -> dict:
     """
     数据存储任务
 
@@ -185,14 +186,14 @@ async def store_data_task(matches: List[dict], odds: List[dict]) -> dict:
     task_runner=ConcurrentTaskRunner(),
 )
 async def daily_data_collection_flow(
-    target_date: Optional[date] = None, leagues: Optional[List[str]] = None
+    target_date: date | None = None, leagues: list[str] | None = None
 ) -> dict:
     """
     每日数据采集工作流
 
     Args:
-        target_date: 目标日期，None表示昨天
-        leagues: 联赛列表，None表示所有主要联赛
+        target_date: 目标日期,None表示昨天
+        leagues: 联赛列表,None表示所有主要联赛
 
     Returns:
         执行结果统计
@@ -237,7 +238,7 @@ async def daily_data_collection_flow(
 
 @flow(name="历史数据回填", description="回填指定时间范围的历史数据")
 async def historical_data_backfill_flow(
-    start_date: date, end_date: date, leagues: Optional[List[str]] = None
+    start_date: date, end_date: date, leagues: list[str] | None = None
 ) -> dict:
     """
     历史数据回填工作流
@@ -260,7 +261,7 @@ async def historical_data_backfill_flow(
     total_matches = []
     total_odds = []
 
-    # 按周分批处理，避免单次请求过大
+    # 按周分批处理,避免单次请求过大
     current_date = start_date
     while current_date <= end_date:
         week_end = min(current_date + timedelta(days=6), end_date)

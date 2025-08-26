@@ -1,7 +1,7 @@
 import argparse
 import logging
 import os
-from typing import Any, Dict, List
+from typing import Any
 
 import psycopg2
 from psycopg2.extras import execute_batch
@@ -16,7 +16,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def validate_odds(record: Dict[str, Any]) -> bool:
+def validate_odds(record: dict[str, Any]) -> bool:
     """Validates a single odds record."""
     required_keys = ["match_id", "bookmaker", "home_odds", "draw_odds", "away_odds"]
     for key in required_keys:
@@ -29,14 +29,14 @@ def validate_odds(record: Dict[str, Any]) -> bool:
         return False
 
     for key in ["home_odds", "draw_odds", "away_odds"]:
-        if not isinstance(record[key], (int, float)) or record[key] <= 0:
+        if not isinstance(record[key], int | float) or record[key] <= 0:
             logger.warning(f"Skipping record due to invalid odds value for {key}. Record: {record}")
             return False
 
     return True
 
 
-def ingest_data(odds_data: List[Dict[str, Any]], db_conn_str: str):
+def ingest_data(odds_data: list[dict[str, Any]], db_conn_str: str):
     """
     Ingests validated odds data into the PostgreSQL database using an UPSERT operation.
     """

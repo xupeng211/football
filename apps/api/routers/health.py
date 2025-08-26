@@ -3,7 +3,7 @@
 """
 
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any
 
 import structlog
 from fastapi import APIRouter, HTTPException
@@ -21,15 +21,15 @@ class HealthResponse(BaseModel):
     status: str
     timestamp: datetime
     version: str
-    components: Dict[str, Any]
+    components: dict[str, Any]
 
 
 @router.get("/health", response_model=HealthResponse)
-async def health_check():
+async def health_check() -> dict[str, str]:
     """
     健康检查端点
 
-    检查系统各组件的健康状态：
+    检查系统各组件的健康状态:
     - API服务状态
     - 数据库连接
     - Redis连接
@@ -55,7 +55,7 @@ async def health_check():
         # TODO: 实现Prefect连接检查
         components["prefect"] = {"status": "unknown", "message": "TODO: 实现Prefect连接检查"}
 
-        # 如果任何组件不健康，整体状态为不健康
+        # 如果任何组件不健康,整体状态为不健康
         if any(comp.get("status") == "unhealthy" for comp in components.values()):
             overall_status = "unhealthy"
 
@@ -68,4 +68,4 @@ async def health_check():
 
     except Exception as e:
         logger.error("健康检查失败", exc=str(e))
-        raise HTTPException(status_code=503, detail="健康检查失败")
+        raise HTTPException(status_code=503, detail="健康检查失败") from None

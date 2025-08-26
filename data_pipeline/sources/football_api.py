@@ -5,7 +5,6 @@
 import asyncio
 from dataclasses import dataclass
 from datetime import date, datetime
-from typing import List, Optional
 
 import httpx
 import structlog
@@ -26,10 +25,10 @@ class Match:
     league: str
     season: str
     match_date: datetime
-    home_score: Optional[int] = None
-    away_score: Optional[int] = None
+    home_score: int | None = None
+    away_score: int | None = None
     status: str = "scheduled"  # scheduled, live, finished
-    venue: Optional[str] = None
+    venue: str | None = None
 
 
 @dataclass
@@ -40,17 +39,17 @@ class Team:
     name: str
     league: str
     season: str
-    founded: Optional[int] = None
-    venue: Optional[str] = None
+    founded: int | None = None
+    venue: str | None = None
 
 
 class FootballAPICollector:
     """足球数据采集器"""
 
-    def __init__(self, api_key: Optional[str] = None):
+    def __init__(self, api_key: str | None = None):
         self.api_key = api_key or settings.football_api_key
         self.base_url = "https://api.football-data.org/v4"  # 示例API
-        self.session: Optional[httpx.AsyncClient] = None
+        self.session: httpx.AsyncClient | None = None
 
     async def __aenter__(self):
         """异步上下文管理器入口"""
@@ -71,15 +70,15 @@ class FootballAPICollector:
             await self.session.aclose()
 
     async def collect_matches_by_date(
-        self, start_date: date, end_date: date, leagues: Optional[List[str]] = None
-    ) -> List[Match]:
+        self, start_date: date, end_date: date, leagues: list[str] | None = None
+    ) -> list[Match]:
         """
         按日期范围收集比赛数据
 
         Args:
             start_date: 开始日期
             end_date: 结束日期
-            leagues: 联赛列表，None表示所有联赛
+            leagues: 联赛列表,None表示所有联赛
 
         Returns:
             比赛数据列表
@@ -87,7 +86,9 @@ class FootballAPICollector:
         if not self.session:
             raise RuntimeError("需要在async with语句中使用")
 
-        logger.info("开始收集比赛数据", start_date=str(start_date), end_date=str(end_date), leagues=leagues)
+        logger.info(
+            "开始收集比赛数据", start_date=str(start_date), end_date=str(end_date), leagues=leagues
+        )
 
         matches = []
 
@@ -111,7 +112,7 @@ class FootballAPICollector:
         logger.info(f"成功收集{len(matches)}场比赛数据")
         return matches
 
-    async def collect_team_info(self, team_ids: List[str]) -> List[Team]:
+    async def collect_team_info(self, team_ids: list[str]) -> list[Team]:
         """
         收集球队信息
 
@@ -144,8 +145,8 @@ class FootballAPICollector:
         logger.info(f"成功收集{len(teams)}个球队信息")
         return teams
 
-    def _generate_mock_matches(self, league: str, start_date: date, end_date: date) -> List[Match]:
-        """生成模拟比赛数据（仅用于开发阶段）"""
+    def _generate_mock_matches(self, league: str, start_date: date, end_date: date) -> list[Match]:
+        """生成模拟比赛数据(仅用于开发阶段)"""
         matches = []
 
         # 简单的模拟数据生成
@@ -165,7 +166,7 @@ class FootballAPICollector:
 
         while current_date <= end_date:
             # 每天生成1-3场比赛
-            for i in range(1, 3):
+            for _i in range(1, 3):
                 if match_counter % 7 == 0:  # 不是每天都有比赛
                     continue
 
