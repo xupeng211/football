@@ -1,25 +1,15 @@
-# Gitleaks配置 - 完全排除GitHub Actions相关的误报
+# Gitleaks配置文件 - 排除GitHub Actions标准变量的误报
 
 [allowlist]
-description = "排除GitHub Actions和Dependabot相关的误报"
+description = "排除GitHub Actions标准变量和Dependabot更新"
 paths = [
-    '''.github/.*''',
-    '''.*\.yml$''',
-    '''.*\.yaml$''',
+    '''.github/workflows/.*\.yml$''',
 ]
 regexes = [
     '''secrets\.GITHUB_TOKEN''',
     '''\$\{\{\s*secrets\.GITHUB_TOKEN\s*\}\}''',
     '''Bearer \$GITHUB_TOKEN''',
     '''GITHUB_TOKEN''',
-    '''github_token''',
-    '''actions/.*@v\d+''',
-    '''actions/setup-python.*''',
-    '''actions/checkout.*''',
-    '''dependabot.*''',
-]
-
-# 排除特定的commit或文件
-files = [
-    '''\.github/workflows/.*''',
+    '''actions/setup-python@v\d+''',
+    '''actions/checkout@v\d+''',
 ]
