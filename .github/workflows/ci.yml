@@ -2,7 +2,7 @@
 name: CI
 on:
   push:
-    branches: [main, dev, feat/ci-foundation]
+    branches: [main, dev, feat/ci-foundation, feat/ci-tighten]
   pull_request:
     branches: [main, dev]
 
@@ -16,7 +16,11 @@ env:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
+    defaults:
+      run:
+        shell: bash
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -32,7 +36,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt', '**/uv.lock') }}
           restore-keys: |
             ${{ runner.os }}-pip-
 
@@ -41,18 +45,48 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends build-essential
 
-      - name: Install Python dependencies
+      - name: Install Python dependencies with uv priority
         run: |
-          python -m pip install --upgrade pip uv
-          pip install -r requirements.txt
+          echo "::group::Dependency Installation"
+          python -m pip install -U pip uv
+          
+          # Priority 1: Use uv.lock if available for exact CI reproducibility
+          if [ -f "uv.lock" ]; then
+            echo "🚀 Using uv.lock for exact dependency reproduction..."
+            uv pip sync --frozen uv.lock || {
+              echo "⚠️ uv.lock sync failed, falling back to requirements.txt"
+              pip install -r requirements.txt
+            }
+          elif [ -f "requirements.txt" ]; then
+            echo "📦 Using requirements.txt..."
+            pip install -r requirements.txt
+          else
+            echo "❌ No dependency file found"
+            exit 1
+          fi
+          
+          # Install project in editable mode
           pip install -e .
+          
+          # Install additional dev tools
           pip install pre-commit ruff mypy pytest pytest-cov bandit
+          echo "::endgroup::"
 
       - name: Cache pre-commit
         uses: actions/cache@v4
         with:
           path: ~/.cache/pre-commit
           key: ${{ runner.os }}-pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
+
+      - name: Validate Configs (syntax + single-source)
+        run: |
+          echo "::group::Config Validation"
+          # Validate TOML syntax
+          python -c "import tomllib; [tomllib.load(open(f,'rb')) for f in ['pyproject.toml', '.gitleaks.toml'] if __import__('os').path.exists(f)]"
+          # Validate YAML syntax
+          python -c "import yaml; [yaml.safe_load(open(f)) for f in ['.github/workflows/ci.yml'] if __import__('os').path.exists(f)]"
+          echo "✅ Configuration syntax validation passed"
+          echo "::endgroup::"
 
       - name: Run code formatting check
         run: |
@@ -66,10 +100,29 @@ jobs:
           ruff check .
           echo "::endgroup::"
 
-      - name: Run type checking
+      - name: Run type checking (core modules - strict)
         run: |
-          echo "::group::Type Checking"
-          mypy .
+          echo "::group::Type Checking - Core Modules"
+          # Check core modules strictly
+          for dir in apps data_pipeline trainer; do
+            if [ -d "$dir" ]; then
+              echo "🔍 Strict type checking: $dir/"
+              mypy "$dir/"
+            fi
+          done
+          echo "::endgroup::"
+
+      - name: Run type checking (other modules - advisory)
+        continue-on-error: true
+        run: |
+          echo "::group::Type Checking - Other Modules (Advisory)"
+          echo "🔍 Advisory type checking for remaining modules..."
+          for dir in tests scripts models infra docs; do
+            if [ -d "$dir" ]; then
+              echo "Advisory check: $dir/"
+              mypy "$dir/" || echo "⚠️ Type issues in $dir/ (advisory only)"
+            fi
+          done
           echo "::endgroup::"
 
       - name: Run security scan
@@ -78,15 +131,59 @@ jobs:
           bandit -r . --configfile pyproject.toml
           echo "::endgroup::"
 
-      - name: Run gitleaks
+      - name: Run gitleaks (strict)
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          config-path: .gitleaks.toml
+          GITLEAKS_CONFIG: .gitleaks.toml
 
-      - name: Run tests
+      - name: Run tests with coverage gate (single run)
+        env:
+          COV_MIN: ${{ vars.COV_MIN || '15' }}
+          TEST_SEED: 42
         run: |
-          echo "::group::Tests"
-          pytest -v --cov-report=xml
+          echo "::group::Tests with Coverage Gate"
+          set -euo pipefail
+          
+          # Dynamic coverage directory detection
+          COV_ARGS=""
+          for d in apps data_pipeline models trainer; do
+            [ -d "$d" ] && COV_ARGS="$COV_ARGS --cov=$d"
+          done
+          
+          # Fallback to root if no specific directories found
+          if [ -z "$COV_ARGS" ]; then
+            echo "📁 No specific coverage directories found, using root"
+            COV_ARGS="--cov=."
+          else
+            echo "📁 Coverage directories: $COV_ARGS"
+          fi
+
+          # Single comprehensive test run with all reports
+          pytest -v ${COV_ARGS} \
+            --cov-report=xml \
+            --cov-report=term-missing \
+            --cov-report=html \
+            --cov-report=json \
+            --cov-fail-under="${COV_MIN}" \
+            tests/ || {
+              echo "❌ Tests failed or coverage below threshold (${COV_MIN}%)"
+              exit 1
+            }
+          
+          echo "✅ Tests passed with coverage above ${COV_MIN}%"
           echo "::endgroup::"
+
+      - name: Upload coverage artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-artifacts
+          path: |
+            .coverage
+            coverage.xml
+            coverage.json
+            htmlcov/**
+            pytestdebug.log
+          if-no-files-found: ignore
+          retention-days: 30

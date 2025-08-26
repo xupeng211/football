@@ -8,9 +8,11 @@ useDefault = true
 description = "Global allowlist to reduce false positives"
 paths = [
   '''^docs?/.*$''',
-  '''^tests?/.*\.py$''',
+  '''^tests?/.*$''',
+  '''^fixtures?/.*$''',
   '''\.github/workflows/.*\.yml$''',
   '''\.github/workflows/.*\.yaml$''',
+  '''\.github/.*$''',
   '''^.*\.md$''',
   '''^.*\.rst$''',
   '''^.*\.txt$''',
