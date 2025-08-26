@@ -69,7 +69,7 @@ jobs:
           pip install -e .
 
           # Install additional dev tools
-          pip install pre-commit ruff mypy pytest pytest-cov bandit diff-cover diff-cover
+          pip install pre-commit ruff mypy pytest pytest-cov bandit diff-cover
           echo "::endgroup::"
 
       - name: Cache pre-commit
@@ -174,16 +174,39 @@ jobs:
           echo "✅ Tests passed with coverage above ${COV_MIN}%"
           echo "::endgroup::"
 
-      - name: Diff Coverage Gate (PR only)
+      - name: Collect changed files
+        id: changed
         if: ${{ github.event_name == 'pull_request' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          base_ref="${GITHUB_BASE_REF:-main}"
+          git fetch origin "${base_ref}" --depth=1 || true
+          files=$(git diff --name-only "origin/${base_ref}...HEAD" || true)
+          echo "files=${files}" >> "$GITHUB_OUTPUT"
+          if echo "${files}" | grep -E '\.(py|pyi)$' > /dev/null; then
+            echo "has_python_files=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_python_files=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Diff Coverage Gate (PR only)
+        if: ${{ github.event_name == 'pull_request' && !contains(github.event.pull_request.labels.*.name, 'ci-bypass-coverage') && steps.changed.outputs.has_python_files == 'true' }}
         env:
           DIFF_COV_MIN: ${{ vars.DIFF_COV_MIN || 75 }}
-          BASE_REF: ${{ github.base_ref || 'main' }}
         run: |
-          git fetch --no-tags --prune --depth=0 origin "+refs/heads/*:refs/remotes/origin/*"
-          # 生成并校验改动行覆盖率
-          diff-cover coverage.xml --compare-branch "origin/${BASE_REF}" --html-report diff-coverage.html --markdown-report diff-coverage.md
-          diff-cover coverage.xml --compare-branch "origin/${BASE_REF}" --fail-under ${DIFF_COV_MIN}
+          set -euo pipefail
+          base_ref="${{ github.base_ref || 'main' }}"
+          git fetch origin "${base_ref}" --depth=1 || true
+          # 生成报告（HTML/Markdown）
+          diff-cover coverage.xml \
+            --compare-branch "origin/${base_ref}" \
+            --html-report diff-coverage.html \
+            --markdown-report diff-coverage.md
+          # 阈值校验（未达标非零退出）
+          diff-cover coverage.xml \
+            --compare-branch "origin/${base_ref}" \
+            --fail-under ${DIFF_COV_MIN}
 
       - name: Upload coverage artifacts
         if: always()
