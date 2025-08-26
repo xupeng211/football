@@ -40,7 +40,8 @@ python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
 
 # Environment
-python-dotenv==1.0.0 types-requests
+python-dotenv==1.0.0
+types-requests
 types-urllib3
 types-beautifulsoup4
 types-lxml
