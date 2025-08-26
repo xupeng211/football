@@ -15,14 +15,20 @@ make ci                          # 验证环境并运行完整检查
 ## 🚀 本地开发快速开始
 
 ### 环境要求
+
 - Python 3.11.9
 - uv (自动安装)
 
 ### 本地 = CI 一致性命令
+
 ```bash
 # 1. 安装依赖（与CI完全一致）
 make install
-# 或者直接运行：
+
+# 推荐：使用 uv.lock 确保与CI完全一致的依赖版本
+uv pip sync --frozen uv.lock
+
+# 回退方案：使用 requirements.txt
 uv pip install --no-cache --strict --resolution=lowest-direct -r requirements.txt
 
 # 2. 运行完整CI检查
@@ -36,6 +42,7 @@ make test     # 测试
 ```
 
 ### Pre-commit 钩子
+
 ```bash
 # 安装pre-commit钩子（一次性）
 pip install pre-commit
@@ -61,19 +68,23 @@ pre-commit run --all-files
 > **👋 第一次接触本项目？** 无论你是开发者、AI助手还是项目维护者，这个指南将帮你最快速度了解项目全貌！
 
 ### ⚡ 一键获取项目完整情况（最重要！）
+
 ```bash
 make show.context  # 🔥 这个命令会给你项目的"说明书"：架构图、技术栈、开发流程、已知问题等
 ```
 
 ### ✅ 验证开发环境是否就绪
+
 ```bash
 make ci            # 运行完整检查：代码格式、类型检查、安全扫描、测试执行
 ```
+
 **如果这两个命令都成功，恭喜！你已经掌握了80%的项目信息，可以开始开发了。**
 
 > 📖 **需要更详细的指南？** 查看 [QUICKSTART.md](./QUICKSTART.md) 获取完整的上手指南，包括常见问题解答和开发工作流。
 
 ### 📚 深入了解（可选）
+
 ```bash
 # 项目演进历程
 head -50 docs/dev_log.md
@@ -86,6 +97,7 @@ git status
 ```
 
 ### 📁 重要文件导航
+
 ```
 📂 必读文档（按优先级）
 ├── 📋 context/_pack.md           # 🔥 项目完整上下文（最重要！）
@@ -103,6 +115,7 @@ git status
 ```
 
 ### 💡 关键优势
+
 - ⚡ **零依赖启动**：无需配置数据库，集成测试自动跳过
 - 📖 **SSOT文档**：单一数据源，信息永远最新
 - 🤖 **AI友好**：完善的上下文打包和自动化验证
@@ -350,7 +363,7 @@ make clean
 
 - API健康状态: `GET /api/v1/health`
 - 系统指标: `GET /api/v1/metrics`
-- Prefect监控面板: http://localhost:4200
+- Prefect监控面板: <http://localhost:4200>
 
 ### 日志查看
 
@@ -408,8 +421,8 @@ pytest tests/ --cov=. --cov-report=html
 ## 📞 联系方式
 
 - 项目维护者: Development Team
-- 邮箱: dev@example.com
-- 项目地址: https://github.com/your-org/football-predict-system
+- 邮箱: <dev@example.com>
+- 项目地址: <https://github.com/your-org/football-predict-system>
 
 ## 🙏 致谢
 
@@ -421,4 +434,5 @@ pytest tests/ --cov=. --cov-report=html
 ---
 
 ⭐ **如果这个项目对你有帮助，请给它一个星标！**
+
 # CI Fix Applied Tue Aug 26 08:11:25 CST 2025
