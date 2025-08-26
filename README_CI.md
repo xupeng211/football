@@ -6,6 +6,7 @@ make install     # 本地依赖（uv 优先，与 CI 一致）
 make format && make lint
 make type        # 若有分阶段策略，核心阻塞，其它非阻塞
 make cov         # 覆盖率门槛由 COV_MIN 控制（默认 15）
+make diffcov     # 改动行覆盖率检查（仅对 PR 改动行要求 ≥ 75%）
 make local-ci    # 本地一次性跑完整 CI
 
 ## 原则
@@ -19,3 +20,9 @@ make local-ci    # 本地一次性跑完整 CI
 Week1: COV_MIN=15；gitleaks/mypy 非阻塞
 Week2: COV_MIN=20；gitleaks 阻塞（已启用），mypy 对核心目录阻塞
 Week3+: 逐步提升 COV_MIN 并扩大 mypy 阻塞范围
+
+## 改动行覆盖率门禁
+
+**改动行覆盖率门禁**：CI 仅对本次 PR 改动行要求覆盖率 ≥ `${DIFF_COV_MIN:-75}%`；本地可运行 `make diffcov BASE=main` 预检。
+
+阈值可通过仓库变量 `DIFF_COV_MIN` 配置（默认 75）。

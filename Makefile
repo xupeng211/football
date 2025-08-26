@@ -1,6 +1,6 @@
 # Football Prediction System - Development Makefile
 .DEFAULT_GOAL := help
-.PHONY: help clean format lint type test security ci dev docker-up docker-down install cov local-ci
+.PHONY: help clean format lint type test security ci dev docker-up docker-down install cov diffcov local-ci
 
 # Configuration
 PYTHON := python3
@@ -195,6 +195,14 @@ setup-dev: ## Automated development environment setup
 	fi
 
 cov: test ## Alias for test (coverage included)
+
+diffcov: check-venv ## Run diff coverage check for changed lines
+	@echo "$(BLUE)🔍 Running diff coverage check...$(NC)"
+	@. $(VENV)/bin/activate 2>/dev/null || true; \
+	python -m pip install -U diff-cover >/dev/null; \
+	git fetch origin $${BASE:-main} --depth=1 || true; \
+	diff-cover coverage.xml --compare-branch origin/$${BASE:-main} --fail-under=$${DIFF_COV_MIN:-75} --html-report diff-coverage.html --markdown-report diff-coverage.md
+	@echo "$(GREEN)✅ Diff coverage check completed$(NC)"
 
 local-ci: format lint type validate policy-guard sec cov ## Run complete local CI pipeline
 	@echo "$(GREEN)🎊 All local CI checks passed!$(NC)"

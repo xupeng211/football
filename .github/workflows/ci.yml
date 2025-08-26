@@ -174,6 +174,22 @@ jobs:
           echo "✅ Tests passed with coverage above ${COV_MIN}%"
           echo "::endgroup::"
 
+      - name: Diff coverage gate (changed lines)
+        if: ${{ github.event_name == 'pull_request' }}
+        env:
+          DIFF_COV_MIN: ${{ vars.DIFF_COV_MIN || '75' }}
+        run: |
+          set -euo pipefail
+          python -m pip install -U diff-cover
+          # 确保拿到基线分支最新提交
+          git fetch origin ${{ github.base_ref }} --depth=1 || true
+          # 生成文本与 HTML 报告；未达标将非零退出阻断合并
+          diff-cover coverage.xml \
+            --compare-branch origin/${{ github.base_ref }} \
+            --fail-under "${DIFF_COV_MIN}" \
+            --html-report diff-coverage.html \
+            --markdown-report diff-coverage.md
+
       - name: Upload coverage artifacts
         if: always()
         uses: actions/upload-artifact@v4
@@ -185,5 +201,7 @@ jobs:
             coverage.json
             htmlcov/**
             pytestdebug.log
+            diff-coverage.html
+            diff-coverage.md
           if-no-files-found: ignore
           retention-days: 30
