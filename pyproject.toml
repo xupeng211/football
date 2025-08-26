@@ -78,4 +78,12 @@ exclude_lines = [
     "def __repr__",
     "raise AssertionError",
     "raise NotImplementedError",
-] 
+]
+
+[tool.bandit]
+exclude_dirs = ["tests", "test"]
+skips = ["B101", "B104", "B108", "B601"]
+# B101: assert_used - 允许在测试中使用 assert
+# B104: hardcoded_bind_all_interfaces - 忽略 0.0.0.0 绑定警告
+# B108: hardcoded_tmp_directory - 忽略硬编码临时目录警告
+# B601: paramiko_calls - 忽略 paramiko 调用警告 
