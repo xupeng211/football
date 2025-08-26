@@ -1,22 +1,14 @@
 name: "Gitleaks"
-
 on:
-  push:
-    branches: [ main, dev ]
-  pull_request:
-    branches: [ main, dev ]
-
-permissions:
-  contents: read
-
+  push: { branches: ["main","dev"] }
+  pull_request: { branches: ["main","dev"] }
 jobs:
   scan:
-    name: scan
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@v5
       - uses: gitleaks/gitleaks-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          args: detect --source . --redact 
