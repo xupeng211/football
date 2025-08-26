@@ -42,10 +42,7 @@ jobs:
         run: |
           uv pip install --no-cache --strict --resolution=lowest-direct -r requirements.txt
           python -m pip check
-          python - << 'PY'
-import sys, platform
-print("Platform:", sys.platform, platform.platform())
-PY
+          python -c "import sys, platform; print('Platform:', sys.platform, platform.platform())"
 
       - name: Cache test/type/lint results
         uses: actions/cache@v4
