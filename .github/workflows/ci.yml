@@ -69,7 +69,7 @@ jobs:
           pip install -e .
 
           # Install additional dev tools
-          pip install pre-commit ruff mypy pytest pytest-cov bandit
+          pip install pre-commit ruff mypy pytest pytest-cov bandit diff-cover diff-cover
           echo "::endgroup::"
 
       - name: Cache pre-commit
@@ -174,21 +174,16 @@ jobs:
           echo "✅ Tests passed with coverage above ${COV_MIN}%"
           echo "::endgroup::"
 
-      - name: Diff coverage gate (changed lines)
+      - name: Diff Coverage Gate (PR only)
         if: ${{ github.event_name == 'pull_request' }}
         env:
-          DIFF_COV_MIN: ${{ vars.DIFF_COV_MIN || '75' }}
+          DIFF_COV_MIN: ${{ vars.DIFF_COV_MIN || 75 }}
+          BASE_REF: ${{ github.base_ref || 'main' }}
         run: |
-          set -euo pipefail
-          python -m pip install -U diff-cover
-          # 确保拿到基线分支最新提交
-          git fetch origin ${{ github.base_ref }} --depth=1 || true
-          # 生成文本与 HTML 报告；未达标将非零退出阻断合并
-          diff-cover coverage.xml \
-            --compare-branch origin/${{ github.base_ref }} \
-            --fail-under "${DIFF_COV_MIN}" \
-            --html-report diff-coverage.html \
-            --markdown-report diff-coverage.md
+          git fetch --no-tags --prune --depth=0 origin "+refs/heads/*:refs/remotes/origin/*"
+          # 生成并校验改动行覆盖率
+          diff-cover coverage.xml --compare-branch "origin/${BASE_REF}" --html-report diff-coverage.html --markdown-report diff-coverage.md
+          diff-cover coverage.xml --compare-branch "origin/${BASE_REF}" --fail-under ${DIFF_COV_MIN}
 
       - name: Upload coverage artifacts
         if: always()

@@ -196,13 +196,14 @@ setup-dev: ## Automated development environment setup
 
 cov: test ## Alias for test (coverage included)
 
-diffcov: check-venv ## Run diff coverage check for changed lines
-	@echo "$(BLUE)🔍 Running diff coverage check...$(NC)"
-	@. $(VENV)/bin/activate 2>/dev/null || true; \
-	python -m pip install -U diff-cover >/dev/null; \
-	git fetch origin $${BASE:-main} --depth=1 || true; \
-	diff-cover coverage.xml --compare-branch origin/$${BASE:-main} --fail-under=$${DIFF_COV_MIN:-75} --html-report diff-coverage.html --markdown-report diff-coverage.md
-	@echo "$(GREEN)✅ Diff coverage check completed$(NC)"
+diffcov: ## Run diff coverage check for changed lines (usage: make diffcov BASE=main DIFF_COV_MIN=80)
+	@. .venv/bin/activate 2>/dev/null || true
+	@pytest --cov=apps --cov=data_pipeline --cov=models --cov-report=xml:coverage.xml -q
+	@BASE=$${BASE:-main}; \
+	THRESH=$${DIFF_COV_MIN:-75}; \
+	pip show diff-cover >/dev/null 2>&1 || pip install diff-cover; \
+	diff-cover coverage.xml --compare-branch "origin/$$BASE" --markdown-report diff-coverage.md; \
+	diff-cover coverage.xml --compare-branch "origin/$$BASE" --fail-under $$THRESH
 
 local-ci: format lint type validate policy-guard sec cov ## Run complete local CI pipeline
 	@echo "$(GREEN)🎊 All local CI checks passed!$(NC)"
