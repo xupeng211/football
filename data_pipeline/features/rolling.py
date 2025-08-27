@@ -11,10 +11,10 @@ def add_form(
     df: pd.DataFrame, team_col: str, points_col: str, window: int = 5, min_periods: int = 1
 ) -> pd.DataFrame:
     """
-    计算球队状态（滚动积分平均）
+    计算球队状态(滚动积分平均)
 
     Args:
-        df: 输入数据框，需包含球队和积分列
+        df: 输入数据框,需包含球队和积分列
         team_col: 球队列名
         points_col: 积分列名
         window: 滚动窗口大小
@@ -96,7 +96,7 @@ def add_rolling_stats(
         team_col: 球队列名
         value_col: 数值列名
         window: 滚动窗口大小
-        stats: 统计函数列表，默认['mean', 'std']
+        stats: 统计函数列表,默认['mean', 'std']
         prefix: 新列名前缀
 
     Returns:
@@ -180,7 +180,7 @@ def add_recent_form(df: pd.DataFrame, window: int = 5) -> pd.DataFrame:
     为比赛数据添加主客队近期状态
 
     Args:
-        df: 比赛数据框，需包含 'home', 'away', 'result' 列
+        df: 比赛数据框,需包含 'home', 'away', 'result' 列
         window: 状态计算窗口
 
     Returns:

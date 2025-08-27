@@ -65,7 +65,7 @@ async def startup_event():
     try:
         predictor = create_predictor()
         if predictor.model is None:
-            print("警告: 未找到模型文件，API将使用默认预测")
+            print("警告: 未找到模型文件,API将使用默认预测")
     except Exception as e:
         print(f"预测器初始化失败: {e}")
 
@@ -130,7 +130,7 @@ async def predict_matches(matches: list[MatchInput]):
         if predictor and predictor.model is not None:
             predictions = predictor.predict_batch(match_data)
         else:
-            # 如果模型未加载，返回默认预测
+            # 如果模型未加载,返回默认预测
             predictions = []
             for _ in matches:
                 predictions.append(
@@ -152,7 +152,7 @@ async def predict_matches(matches: list[MatchInput]):
         return results
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"预测失败: {e!s}")
+        raise HTTPException(status_code=500, detail=f"预测失败: {e!s}") from None
 
 
 @app.get("/")

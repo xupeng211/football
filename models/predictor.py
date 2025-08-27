@@ -21,7 +21,7 @@ class Predictor:
         初始化预测器
 
         Args:
-            model_path: 模型文件路径，如果为None则加载最新模型
+            model_path: 模型文件路径,如果为None则加载最新模型
         """
         self.model = None
         self.model_version = None
@@ -44,7 +44,7 @@ class Predictor:
         if not model_dirs:
             return None
 
-        # 按创建时间排序，选择最新的
+        # 按创建时间排序,选择最新的
         latest_dir = max(model_dirs, key=lambda x: x.stat().st_ctime)
 
         model_file = latest_dir / "model.pkl"
@@ -78,10 +78,10 @@ class Predictor:
             print(f"模型加载成功: {self.model_version}")
 
         except Exception as e:
-            # 如果加载失败，使用stub模型
+            # 如果加载失败,使用stub模型
             import warnings
 
-            warnings.warn(f"模型加载失败，使用默认模型: {e}")
+            warnings.warn(f"模型加载失败,使用默认模型: {e}", stacklevel=2)
             self.model = _StubModel()
 
     def predict_single(
@@ -116,7 +116,7 @@ class Predictor:
         # 转换为DataFrame
         feature_df = pd.DataFrame([features])
 
-        # 如果有特征列信息，确保列顺序一致
+        # 如果有特征列信息,确保列顺序一致
         if self.feature_columns:
             missing_cols = set(self.feature_columns) - set(feature_df.columns)
             for col in missing_cols:
@@ -138,7 +138,7 @@ class Predictor:
         批量预测比赛结果
 
         Args:
-            matches: 比赛列表，每个元素包含 home, away, odds_h, odds_d, odds_a 等字段
+            matches: 比赛列表,每个元素包含 home, away, odds_h, odds_d, odds_a 等字段
 
         Returns:
             List[Dict[str, float]]: 预测结果列表
@@ -159,7 +159,7 @@ class Predictor:
                 )
                 results.append(result)
             except Exception as e:
-                # 返回默认预测（平均分布）
+                # 返回默认预测(平均分布)
                 results.append(
                     {
                         "home_win": 0.33,
@@ -205,7 +205,7 @@ class _StubModel:
 
 
 def _safe_load_or_stub(path: str):
-    """安全加载模型，失败时返回stub"""
+    """安全加载模型,失败时返回stub"""
     try:
         import pickle
 
@@ -214,5 +214,5 @@ def _safe_load_or_stub(path: str):
     except Exception:
         import warnings
 
-        warnings.warn("Predictor: model missing, using stub")
+        warnings.warn("Predictor: model missing, using stub", stacklevel=2)
         return _StubModel()

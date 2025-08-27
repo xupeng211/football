@@ -125,7 +125,7 @@ def add_form_features(df: pd.DataFrame, config: dict[str, Any]) -> pd.DataFrame:
     )
 
     # 将进球统计合并回原数据
-    # 这里简化处理，实际应该基于时间窗口
+    # 这里简化处理,实际应该基于时间窗口
     team_stats = (
         all_goals_data.groupby("team")
         .agg({"avg_goals_for_mean_5": "last", "avg_goals_against_mean_5": "last"})
@@ -164,7 +164,7 @@ def add_odds_features(df: pd.DataFrame) -> pd.DataFrame:
     df["prob_d"] = 1 / df["d"]
     df["prob_a"] = 1 / df["a"]
 
-    # 标准化概率（去除赔率商利润）
+    # 标准化概率(去除赔率商利润)
     total_prob = df["prob_h"] + df["prob_d"] + df["prob_a"]
     df["prob_h_norm"] = df["prob_h"] / total_prob
     df["prob_d_norm"] = df["prob_d"] / total_prob
@@ -186,7 +186,7 @@ def add_head_to_head_features(df: pd.DataFrame, config: dict[str, Any]) -> pd.Da
     """添加历史对战特征"""
     df = df.copy()
 
-    # 简化版本：计算基础对战统计
+    # 简化版本:计算基础对战统计
     # 实际实现需要基于历史数据的时间窗口
 
     # 为每场比赛添加对战记录特征
@@ -195,8 +195,8 @@ def add_head_to_head_features(df: pd.DataFrame, config: dict[str, Any]) -> pd.Da
     df["h2h_away_wins"] = 0  # 占位符
     df["h2h_total_matches"] = 0  # 占位符
 
-    # 如果有足够的历史数据，这里应该实现真实的对战统计
-    # 由于这是MVP版本，先用占位符
+    # 如果有足够的历史数据,这里应该实现真实的对战统计
+    # 由于这是MVP版本,先用占位符
 
     return df
 
@@ -227,7 +227,7 @@ def create_feature_vector(
     team_stats: dict | None = None,
 ) -> dict[str, float]:
     """
-    为单场比赛创建特征向量（用于预测）
+    为单场比赛创建特征向量(用于预测)
 
     Args:
         home_team: 主队名称
@@ -262,7 +262,7 @@ def create_feature_vector(
     features["is_home"] = 1
     features["is_away"] = 0
 
-    # 如果有球队统计数据，添加相关特征
+    # 如果有球队统计数据,添加相关特征
     if team_stats:
         features["home_form"] = team_stats.get("home_form", 1.5)
         features["away_form"] = team_stats.get("away_form", 1.5)

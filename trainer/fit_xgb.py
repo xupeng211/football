@@ -37,7 +37,7 @@ def prepare_features(matches_df: pd.DataFrame, odds_df: pd.DataFrame) -> pd.Data
         features_df = build_match_features(matches_df, odds_df)
         return features_df
     except Exception as e:
-        print(f"特征构建失败，使用简化版本: {e}")
+        print(f"特征构建失败,使用简化版本: {e}")
 
         # 简化版本的特征构建
         df = matches_df.merge(odds_df, left_on="id", right_on="match_id", how="left")
@@ -183,7 +183,7 @@ def main():
         # 6. 保存模型
         version = save_model_and_metrics(model, metrics)
 
-        print("训练完成！")
+        print("训练完成!")
         return version
 
     except Exception as e:
