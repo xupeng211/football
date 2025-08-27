@@ -1,3 +1,5 @@
+from typing import Any
+
 """
 足球数据采集器 - 从外部API获取比赛数据
 """
