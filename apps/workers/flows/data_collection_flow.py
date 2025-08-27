@@ -198,8 +198,8 @@ async def daily_data_collection_flow(
     每日数据采集工作流
 
     Args:
-        target_date: 目标日期,None表示昨天
-        leagues: 联赛列表,None表示所有主要联赛
+        target_date: 目标日期, None表示昨天
+        leagues: 联赛列表, None表示所有主要联赛
 
     Returns:
         执行结果统计
@@ -267,7 +267,7 @@ async def historical_data_backfill_flow(
     total_matches = []
     total_odds = []
 
-    # 按周分批处理,避免单次请求过大
+    # 按周分批处理, 避免单次请求过大
     current_date = start_date
     while current_date <= end_date:
         week_end = min(current_date + timedelta(days=6), end_date)

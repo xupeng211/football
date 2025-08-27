@@ -10,6 +10,7 @@ import uvicorn
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
+from apps.api.routers import health, metrics, predictions
 from models.predictor import create_predictor
 
 
@@ -41,16 +42,6 @@ class PredictionOutput(BaseModel):
     model_version: str = Field(..., description="模型版本")
 
 
-class HealthResponse(BaseModel):
-    """健康检查响应"""
-
-    model_config = {"protected_namespaces": ()}
-
-    status: str
-    message: str
-    model_loaded: bool
-
-
 class VersionResponse(BaseModel):
     """版本信息响应"""
 
@@ -63,6 +54,9 @@ class VersionResponse(BaseModel):
 
 # 创建FastAPI应用
 app = FastAPI(title="足球预测API", description="足球比赛结果预测服务", version="1.0.0")
+app.include_router(predictions.router)
+app.include_router(health.router)
+app.include_router(metrics.router)
 
 # 全局预测器实例
 predictor = None
@@ -78,18 +72,6 @@ async def startup_event() -> None:
             print("警告: 未找到模型文件,API将使用默认预测")
     except Exception as e:
         print(f"预测器初始化失败: {e}")
-
-
-@app.get("/health", response_model=HealthResponse)
-async def health_check() -> HealthResponse:
-    """健康检查接口"""
-    model_loaded = predictor is not None and predictor.model is not None
-
-    return HealthResponse(
-        status="healthy" if model_loaded else "warning",
-        message="服务正常运行" if model_loaded else "模型未加载",
-        model_loaded=model_loaded,
-    )
 
 
 @app.get("/version", response_model=VersionResponse)

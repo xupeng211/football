@@ -75,7 +75,10 @@ class FootballAPICollector:
             await self.session.aclose()
 
     async def collect_matches_by_date(
-        self, start_date: date, end_date: date, leagues: list[str] | None = None
+        self,
+        start_date: date,
+        end_date: date,
+        leagues: list[str] | None = None,
     ) -> list[Match]:
         """
         按日期范围收集比赛数据
@@ -83,7 +86,7 @@ class FootballAPICollector:
         Args:
             start_date: 开始日期
             end_date: 结束日期
-            leagues: 联赛列表,None表示所有联赛
+            leagues: 联赛列表, None表示所有联赛
 
         Returns:
             比赛数据列表
@@ -159,7 +162,7 @@ class FootballAPICollector:
     def _generate_mock_matches(
         self, league: str, start_date: date, end_date: date
     ) -> list[Match]:
-        """生成模拟比赛数据(仅用于开发阶段)"""
+        """生成模拟比赛数据 (仅用于开发阶段)"""
         matches = []
 
         # 简单的模拟数据生成

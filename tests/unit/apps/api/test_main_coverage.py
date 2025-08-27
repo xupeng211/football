@@ -30,8 +30,8 @@ class TestAPIMainCoverage:
 
         data = response.json()
         assert "status" in data
-        assert "message" in data
-        assert "model_loaded" in data
+        assert "components" in data
+        assert "version" in data
 
     def test_version_endpoint_coverage(self, client):
         """测试版本端点覆盖率"""

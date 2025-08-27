@@ -217,7 +217,10 @@ def clean_features(df: pd.DataFrame) -> pd.DataFrame:
     numeric_columns = df.select_dtypes(include=[np.number]).columns
     for col in numeric_columns:
         if col not in ["id", "home", "away", "target"]:
-            df[col] = df[col].fillna(df[col].mean())
+            mean_val = df[col].mean()
+            if pd.isna(mean_val):
+                mean_val = 0  # 如果无法计算平均值, 则默认为0
+            df[col] = df[col].fillna(mean_val)
 
     # 移除不需要的列
     columns_to_drop = ["date", "result", "provider", "match_id"]

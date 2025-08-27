@@ -80,4 +80,4 @@ async def health_check() -> HealthResponse:
 
     except Exception as e:
         logger.error("健康检查失败", exc=str(e))
-        raise HTTPException(status_code=503, detail="健康检查失败") from None
+        raise HTTPException(status_code=503, detail="健康检查失败") from e

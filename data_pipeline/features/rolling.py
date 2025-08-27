@@ -196,47 +196,48 @@ def add_recent_form(df: pd.DataFrame, window: int = 5) -> pd.DataFrame:
     Returns:
         pd.DataFrame: 添加了 'home_form', 'away_form' 列的数据框
     """
-    df = df.copy()
+    df = df.copy().reset_index().rename(columns={"index": "match_order"})
 
-    # 创建主队数据
-    home_data = df[["home", "result"]].copy()
-    home_data["team"] = home_data["home"]
-    home_data["points"] = home_data["result"].apply(
-        lambda x: calculate_points(x, is_home=True)
+    # 转换数据为长格式, 每场比赛两行
+    home_df = df[["match_order", "home", "result"]].rename(columns={"home": "team"})
+    home_df["is_home"] = True
+
+    away_df = df[["match_order", "away", "result"]].rename(columns={"away": "team"})
+    away_df["is_home"] = False
+
+    # 合并并按比赛顺序排序
+    long_df = (
+        pd.concat([home_df, away_df]).sort_values("match_order").reset_index(drop=True)
     )
 
-    # 创建客队数据
-    away_data = df[["away", "result"]].copy()
-    away_data["team"] = away_data["away"]
-    away_data["points"] = away_data["result"].apply(
-        lambda x: calculate_points(x, is_home=False)
+    # 计算积分
+    long_df["points"] = long_df.apply(
+        lambda row: calculate_points(row["result"], row["is_home"]), axis=1
     )
-
-    # 合并所有球队数据
-    all_team_data = pd.concat(
-        [home_data[["team", "points"]], away_data[["team", "points"]]]
-    ).reset_index()
 
     # 计算滚动状态
-    all_team_data = add_form(all_team_data, "team", "points", window)
+    # 计算不包含当前比赛的滚动状态
+    long_df["form"] = (
+        long_df.groupby("team")["points"]
+        .shift(1)
+        .rolling(window=window, min_periods=1)
+        .mean()
+    )
 
     # 将状态合并回原数据
-    # 为主队添加状态
-    home_form_data = all_team_data[all_team_data["team"].isin(df["home"])]
-    home_form_map = dict(
-        zip(home_form_data.index, home_form_data["form"], strict=False)
+    home_form = long_df[long_df["is_home"]][["match_order", "form"]].rename(
+        columns={"form": "home_form"}
     )
-    df["home_form"] = df.index.map(home_form_map)
-
-    # 为客队添加状态
-    away_form_data = all_team_data[all_team_data["team"].isin(df["away"])]
-    away_form_map = dict(
-        zip(away_form_data.index, away_form_data["form"], strict=False)
+    away_form = long_df[~long_df["is_home"]][["match_order", "form"]].rename(
+        columns={"form": "away_form"}
     )
-    df["away_form"] = df.index.map(away_form_map)
 
-    # 填充缺失值
-    df["home_form"] = df["home_form"].fillna(1.5)  # 默认状态
-    df["away_form"] = df["away_form"].fillna(1.5)  # 默认状态
+    df = df.merge(home_form, on="match_order").merge(away_form, on="match_order")
+
+    # 填充缺失值(通常是赛季初)
+    df["home_form"] = df["home_form"].fillna(1.5)
+    df["away_form"] = df["away_form"].fillna(1.5)
+
+    df = df.drop(columns=["match_order"])
 
     return df

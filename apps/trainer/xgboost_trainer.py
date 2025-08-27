@@ -60,7 +60,7 @@ class XGBoostTrainer:
         初始化训练器
 
         Args:
-            config: 训练配置,None时使用默认配置
+            config: 训练配置, None时使用默认配置
         """
         self.config = config or TrainingConfig()
         self.model: xgb.XGBClassifier | None = None
@@ -188,13 +188,21 @@ class XGBoostTrainer:
 
         # 交叉验证
         cv_scores = cross_val_score(
-            self.model, X_train, y_train, cv=self.config.cv_folds, scoring="accuracy"
+            self.model,
+            X_train,
+            y_train,
+            cv=self.config.cv_folds,
+            scoring="accuracy",
         )
         val_score = cv_scores.mean()
 
         # 特征重要性
         feature_importance = dict(
-            zip(self.feature_names, self.model.feature_importances_, strict=False)
+            zip(
+                self.feature_names,
+                self.model.feature_importances_,
+                strict=False,
+            )
         )
 
         # 计算训练时间
@@ -232,7 +240,7 @@ class XGBoostTrainer:
             预测概率 (n_samples, 3) - [客胜概率, 平局概率, 主胜概率]
         """
         if self.model is None:
-            raise ValueError("模型未训练,请先调用train()方法")
+            raise ValueError("模型未训练, 请先调用train()方法")
 
         return self.model.predict_proba(features)
 
@@ -247,7 +255,7 @@ class XGBoostTrainer:
             预测类别 (0: 客胜, 1: 平局, 2: 主胜)
         """
         if self.model is None:
-            raise ValueError("模型未训练,请先调用train()方法")
+            raise ValueError("模型未训练, 请先调用train()方法")
 
         return self.model.predict(features)  # type: ignore[no-any-return]
 
@@ -265,7 +273,11 @@ class XGBoostTrainer:
             raise ValueError("模型未训练")
 
         importance = dict(
-            zip(self.feature_names, self.model.feature_importances_, strict=False)
+            zip(
+                self.feature_names,
+                self.model.feature_importances_,
+                strict=False,
+            )
         )
         # 按重要性降序排列
         sorted_importance = dict(

@@ -7,7 +7,7 @@ import pickle  # nosec B403
 from dataclasses import asdict, dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import structlog
 
@@ -47,7 +47,7 @@ class ModelMetadata:
     created_by: str = "system"
     tags: list[str] | None = None
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if self.tags is None:
             self.tags = []
 
@@ -191,7 +191,7 @@ class ModelRegistry:
 
         Args:
             model_id: 模型ID
-            version: 模型版本,None表示加载活跃版本
+            version: 模型版本, None表示加载活跃版本
 
         Returns:
             模型对象
@@ -224,7 +224,7 @@ class ModelRegistry:
 
     def get_active_version(self, model_id: str) -> str | None:
         """获取活跃版本"""
-        return self.index["active_versions"].get(model_id)
+        return cast(str | None, self.index["active_versions"].get(model_id))
 
     def list_models(self) -> dict[str, list[str]]:
         """列出所有模型和版本"""

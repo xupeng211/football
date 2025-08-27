@@ -180,7 +180,7 @@ class BacktestEngine:
         """生成预测结果"""
         logger.info("生成预测结果", matches=len(test_data))
 
-        # 提取特征(需要与训练时保持一致)
+        # 提取特征 (需要与训练时保持一致)
         # TODO: 实现特征提取逻辑
         feature_columns = [
             col
@@ -203,7 +203,7 @@ class BacktestEngine:
 
         features = test_data[feature_columns].fillna(0)
 
-        # 生成预测(占位实现)
+        # 生成预测 (占位实现)
         # TODO: 使用实际模型进行预测
         # probabilities = model.predict_proba(features)
 
