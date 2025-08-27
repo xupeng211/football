@@ -80,7 +80,7 @@ def ingest_features_data(
         return 0, len(features_df)
 
 
-def main():
+def main() -> None:
     # Parser is kept for future arguments, but not used for now.
     argparse.ArgumentParser(description="Generate and ingest features.").parse_args()
 

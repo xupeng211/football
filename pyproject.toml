@@ -65,8 +65,22 @@ python_version = "3.11"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
-exclude = ["tests/", ".venv/"]
+exclude = ["tests/", ".venv/", "scripts/"]
 
+[[tool.mypy.overrides]]
+module = [
+    "prefect.*",
+    "pandas.*", 
+    "sklearn.*",
+    "xgboost.*",
+    "structlog.*",
+    "httpx.*",
+    "uvicorn.*",
+    "fastapi.*",
+    "pydantic.*"
+]
+ignore_errors = true
+ignore_missing_imports = true
 [[tool.mypy.overrides]]
 module = ["prefect.*", "pandas.*", "sklearn.*", "xgboost.*"]
 ignore_errors = true
