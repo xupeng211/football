@@ -1,0 +1,20 @@
+apps/backtest/engine.py:50: error: Function is missing a return type annotation  [no-untyped-def]
+apps/backtest/engine.py:50: note: Use "-> None" if function does not return a value
+apps/backtest/engine.py:52: note: By default the bodies of untyped functions are not checked, consider using --check-untyped-defs  [annotation-unchecked]
+apps/backtest/engine.py:146: error: Argument "prediction_details" to "BacktestResult" has incompatible type "list[dict[Hashable, Any]]"; expected "list[dict[str, Any]]"  [arg-type]
+apps/backtest/engine.py:295: error: Returning Any from function declared to return "int"  [no-any-return]
+data_pipeline/features/build.py:103: error: Incompatible types in assignment (expression has type "list[str]", variable has type "Index[str]")  [assignment]
+data_pipeline/features/build.py:106: error: Incompatible types in assignment (expression has type "list[str]", variable has type "Index[str]")  [assignment]
+models/predictor.py:200: error: Function is missing a type annotation  [no-untyped-def]
+trainer/fit_xgb.py:199: error: No return value expected  [return-value]
+apps/trainer/xgboost_trainer.py:252: error: Returning Any from function declared to return "ndarray[Any, Any]"  [no-any-return]
+data_pipeline/sources/football_api.py:54: error: Function is missing a return type annotation  [no-untyped-def]
+data_pipeline/sources/football_api.py:67: error: Function is missing a type annotation  [no-untyped-def]
+models/registry.py:50: error: Function is missing a return type annotation  [no-untyped-def]
+models/registry.py:50: note: Use "-> None" if function does not return a value
+models/registry.py:227: error: Returning Any from function declared to return "str | None"  [no-any-return]
+apps/api/main.py:74: error: Function is missing a return type annotation  [no-untyped-def]
+apps/api/main.py:169: error: Function is missing a return type annotation  [no-untyped-def]
+apps/workers/flows/data_collection_flow.py:309: error: Function is missing a return type annotation  [no-untyped-def]
+apps/workers/flows/data_collection_flow.py:309: note: Use "-> None" if function does not return a value
+Found 15 errors in 9 files (checked 43 source files)

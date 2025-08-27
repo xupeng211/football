@@ -16,7 +16,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def fetch_odds(start_date: str, end_date: str) -> list[dict[str, Any]]:
+def fetch_odds(start_date: str, end_date: str) -> Any:
     """
     Fetches odds data from a remote API or a local sample file.
 

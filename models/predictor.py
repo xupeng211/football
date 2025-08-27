@@ -138,7 +138,7 @@ class Predictor:
             "model_version": self.model_version or "unknown",
         }
 
-    def predict_batch(self, matches: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    def predict_batch(self, matches: list[dict[str, Any]]) -> Any:
         """
         批量预测比赛结果
 
