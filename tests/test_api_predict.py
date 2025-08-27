@@ -16,8 +16,8 @@ def test_health_endpoint():
 
     data = response.json()
     assert "status" in data
-    assert "message" in data
-    assert "model_loaded" in data
+    assert "timestamp" in data
+    assert "components" in data
 
 
 def test_version_endpoint():
