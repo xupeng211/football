@@ -1,7 +1,7 @@
 # 🚫 CI红灯问题全面分析报告
 
-> **目标**: 为AI开发项目制定避免CI问题的完整策略  
-> **适用**: 所有使用AI进行项目开发的场景  
+> **目标**: 为AI开发项目制定避免CI问题的完整策略
+> **适用**: 所有使用AI进行项目开发的场景
 > **更新**: 2025-08-26
 
 ## 📊 问题分类概览
@@ -29,7 +29,7 @@
 - **影响**: Gitleaks工作流完全失败
 - **根因**: 手动编写复杂TOML格式时语法不正确
 
-#### 1.2 `pyproject.toml` 配置结构问题  
+#### 1.2 `pyproject.toml` 配置结构问题
 
 - **错误**: ruff配置项在错误位置
 - **影响**: 工具警告和配置不生效
@@ -123,7 +123,7 @@ repos:
   run: |
     GITLEAKS_VERSION="8.18.4"  # 明确版本
     curl -I "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" || exit 1
-    
+
 # 策略3: 依赖检查脚本
 check-dependencies:
  @echo "🔍 检查所有依赖可用性..."
@@ -406,14 +406,14 @@ def function_template(
 ) -> dict[str, Any]:
     """
     函数描述
-    
+
     Args:
         param1: 参数1描述
         param2: 参数2描述
-        
+
     Returns:
         返回值描述
-        
+
     Raises:
         ValueError: 错误情况描述
     """
@@ -524,7 +524,7 @@ pre-dev-check:
  @make check-dependencies
  @echo "🎉 环境检查完成，可以开始开发"
 
-# 提交前检查 (Pre-Commit Checklist)  
+# 提交前检查 (Pre-Commit Checklist)
 pre-commit-check:
  @echo "📝 提交前完整检查"
  @make test-local
@@ -549,7 +549,7 @@ def generate_gitleaks_config():
             "description": "Standard allowlist for AI projects",
             "paths": [
                 r"^docs?/.*$",
-                r"^tests?/.*\.py$", 
+                r"^tests?/.*\.py$",
                 r"^\.github/workflows/.*\.ya?ml$"
             ]
         }
@@ -588,24 +588,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: AI Development Environment Check
         run: |
           echo "🤖 AI开发环境检查"
-          
+
           # 检查虚拟环境配置
           if [ ! -f ".venv/pyvenv.cfg" ]; then
             echo "⚠️ 建议：创建虚拟环境"
           fi
-          
+
           # 检查配置文件语法
           python -c "import tomllib; tomllib.load(open('pyproject.toml','rb'))" || exit 1
-          
+
           # 检查依赖版本锁定
           if ! grep -q "==" requirements.txt; then
             echo "⚠️ 建议：锁定依赖版本"
           fi
-          
+
           # 检查文档同步
           if [ $(git log --oneline -1 --format="%s" | grep -c "docs\|README") -eq 0 ]; then
             echo "💡 提示：考虑更新相关文档"
@@ -637,12 +637,12 @@ jobs:
 ### ✅ 开发前 (Pre-Development)
 
 - [ ] 虚拟环境已激活且版本正确
-- [ ] 所有配置文件语法验证通过  
+- [ ] 所有配置文件语法验证通过
 - [ ] 依赖版本已锁定且可安装
 - [ ] Git工作流设置正确
 - [ ] 文档与当前代码状态一致
 
-### ✅ 开发中 (During Development)  
+### ✅ 开发中 (During Development)
 
 - [ ] 代码符合格式化标准
 - [ ] 类型注解完整且正确

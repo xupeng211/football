@@ -20,10 +20,10 @@ jobs:
     defaults:
       run:
         shell: bash
-    
+
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -49,7 +49,7 @@ jobs:
         run: |
           echo "::group::Dependency Installation"
           python -m pip install -U pip uv
-          
+
           # Priority 1: Use uv.lock if available for exact CI reproducibility
           if [ -f "uv.lock" ]; then
             echo "🚀 Using uv.lock for exact dependency reproduction..."
@@ -64,12 +64,12 @@ jobs:
             echo "❌ No dependency file found"
             exit 1
           fi
-          
+
           # Install project in editable mode
           pip install -e .
-          
+
           # Install additional dev tools
-          pip install pre-commit ruff mypy pytest pytest-cov bandit
+          pip install pre-commit ruff mypy pytest pytest-cov bandit diff-cover
           echo "::endgroup::"
 
       - name: Cache pre-commit
@@ -144,13 +144,13 @@ jobs:
         run: |
           echo "::group::Tests with Coverage Gate"
           set -euo pipefail
-          
+
           # Dynamic coverage directory detection
           COV_ARGS=""
           for d in apps data_pipeline models trainer; do
             [ -d "$d" ] && COV_ARGS="$COV_ARGS --cov=$d"
           done
-          
+
           # Fallback to root if no specific directories found
           if [ -z "$COV_ARGS" ]; then
             echo "📁 No specific coverage directories found, using root"
@@ -170,9 +170,43 @@ jobs:
               echo "❌ Tests failed or coverage below threshold (${COV_MIN}%)"
               exit 1
             }
-          
+
           echo "✅ Tests passed with coverage above ${COV_MIN}%"
           echo "::endgroup::"
+
+      - name: Collect changed files
+        id: changed
+        if: ${{ github.event_name == 'pull_request' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          base_ref="${GITHUB_BASE_REF:-main}"
+          git fetch origin "${base_ref}" --depth=1 || true
+          files=$(git diff --name-only "origin/${base_ref}...HEAD" || true)
+          echo "files=${files}" >> "$GITHUB_OUTPUT"
+          if echo "${files}" | grep -E '\.(py|pyi)$' > /dev/null; then
+            echo "has_python_files=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_python_files=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Diff Coverage Gate (PR only)
+        if: ${{ github.event_name == 'pull_request' && !contains(github.event.pull_request.labels.*.name, 'ci-bypass-coverage') && steps.changed.outputs.has_python_files == 'true' }}
+        env:
+          DIFF_COV_MIN: ${{ vars.DIFF_COV_MIN || 75 }}
+        run: |
+          set -euo pipefail
+          base_ref="${{ github.base_ref || 'main' }}"
+          git fetch origin "${base_ref}" --depth=1 || true
+          # 生成报告（HTML/Markdown）
+          diff-cover coverage.xml \
+            --compare-branch "origin/${base_ref}" \
+            --html-report diff-coverage.html \
+            --markdown-report diff-coverage.md
+          # 阈值校验（未达标非零退出）
+          diff-cover coverage.xml \
+            --compare-branch "origin/${base_ref}" \
+            --fail-under ${DIFF_COV_MIN}
 
       - name: Upload coverage artifacts
         if: always()
@@ -185,5 +219,7 @@ jobs:
             coverage.json
             htmlcov/**
             pytestdebug.log
+            diff-coverage.html
+            diff-coverage.md
           if-no-files-found: ignore
           retention-days: 30

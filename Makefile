@@ -1,6 +1,6 @@
 # Football Prediction System - Development Makefile
 .DEFAULT_GOAL := help
-.PHONY: help clean format lint type test security ci dev docker-up docker-down install
+.PHONY: help clean format lint type test security ci dev docker-up docker-down install cov diffcov local-ci
 
 # Configuration
 PYTHON := python3
@@ -193,3 +193,69 @@ setup-dev: ## Automated development environment setup
 	else \
 		echo "$(RED)❌ scripts/setup-dev-env.sh not found$(NC)"; \
 	fi
+
+cov: test ## Alias for test (coverage included)
+
+diffcov: ## Run diff coverage check for changed lines (usage: make diffcov BASE=main DIFF_COV_MIN=80)
+	@. .venv/bin/activate 2>/dev/null || true
+	@pytest --cov=apps --cov=data_pipeline --cov=models --cov-report=xml:coverage.xml -q
+	@BASE=$${BASE:-main}; \
+	THRESH=$${DIFF_COV_MIN:-75}; \
+	pip show diff-cover >/dev/null 2>&1 || pip install diff-cover; \
+	diff-cover coverage.xml --compare-branch "origin/$$BASE" --markdown-report diff-coverage.md; \
+	diff-cover coverage.xml --compare-branch "origin/$$BASE" --fail-under $$THRESH
+
+local-ci: format lint type validate policy-guard sec cov ## Run complete local CI pipeline
+	@echo "$(GREEN)🎊 All local CI checks passed!$(NC)"
+
+# MVP 相关命令
+mvp-up: ## 启动MVP环境 (数据库 + API)
+	@echo "$(BLUE)🚀 启动MVP环境...$(NC)"
+	docker-compose -f docker-compose.mvp.yml up -d
+	@echo "$(GREEN)✅ MVP环境已启动$(NC)"
+	@echo "API地址: http://localhost:8000"
+	@echo "API文档: http://localhost:8000/docs"
+
+mvp-down: ## 停止MVP环境
+	@echo "$(BLUE)🛑 停止MVP环境...$(NC)"
+	docker-compose -f docker-compose.mvp.yml down
+	@echo "$(GREEN)✅ MVP环境已停止$(NC)"
+
+mvp-logs: ## 查看MVP环境日志
+	docker-compose -f docker-compose.mvp.yml logs -f
+
+mvp-build: ## 构建MVP镜像
+	@echo "$(BLUE)🔨 构建MVP镜像...$(NC)"
+	docker-compose -f docker-compose.mvp.yml build
+
+ingest: ## 运行数据摄取
+	@echo "$(BLUE)📥 运行数据摄取...$(NC)"
+	$(PYTHON_VENV) -m data_pipeline.ingest.csv_adapter
+
+train: ## 训练XGBoost模型
+	@echo "$(BLUE)🤖 训练模型...$(NC)"
+	$(PYTHON_VENV) trainer/fit_xgb.py
+
+serve: ## 启动API服务 (本地开发)
+	@echo "$(BLUE)🚀 启动API服务...$(NC)"
+	$(PYTHON_VENV) -m uvicorn apps.api.main:app --host 0.0.0.0 --port 8000 --reload
+
+test-api: ## 测试API接口
+	@echo "$(BLUE)🧪 测试API接口...$(NC)"
+	curl -X POST "http://localhost:8000/predict" \
+		-H "Content-Type: application/json" \
+		-d '[{"home":"Arsenal","away":"Chelsea","odds_h":2.1,"odds_d":3.3,"odds_a":3.2}]' | jq
+
+mvp-demo: ## 运行完整MVP演示
+	@echo "$(BLUE)🎯 运行完整MVP演示...$(NC)"
+	@make mvp-up
+	@echo "等待服务启动..."
+	@sleep 10
+	@make test-api
+	@echo "$(GREEN)✅ MVP演示完成！$(NC)"
+
+mvp-clean: ## 清理MVP环境和数据
+	@echo "$(BLUE)🧹 清理MVP环境...$(NC)"
+	docker-compose -f docker-compose.mvp.yml down -v
+	docker system prune -f
+	@echo "$(GREEN)✅ MVP环境已清理$(NC)"

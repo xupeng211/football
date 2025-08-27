@@ -1,89 +1,171 @@
 """
-足球赛果预测系统 - API主入口
+足球预测API服务
+
+提供足球比赛结果预测的REST API接口
 """
 
-from collections.abc import AsyncGenerator
-from contextlib import asynccontextmanager
+from typing import Any
 
-import structlog
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+import uvicorn
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, Field
 
-from apps.api.core.logging import setup_logging
-from apps.api.core.settings import settings
-from apps.api.routers import health, metrics, predictions
-
-# 配置已导入
-
-# 设置日志
-setup_logging()
-logger = structlog.get_logger()
+from models.predictor import create_predictor
 
 
-@asynccontextmanager
-async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
-    """应用生命周期管理"""
-    logger.info("🚀 启动足球赛果预测系统API")
+# Pydantic模型定义
+class MatchInput(BaseModel):
+    """单场比赛输入"""
 
-    # TODO: 初始化数据库连接池
-    # TODO: 初始化模型注册表
-    # TODO: 初始化Redis连接
-    # TODO: 启动后台任务
+    home: str = Field(..., description="主队名称")
+    away: str = Field(..., description="客队名称")
+    home_form: float = Field(default=1.5, description="主队状态")
+    away_form: float = Field(default=1.5, description="客队状态")
+    odds_h: float = Field(default=2.0, description="主胜赔率")
+    odds_d: float = Field(default=3.0, description="平局赔率")
+    odds_a: float = Field(default=3.0, description="客胜赔率")
 
-    yield
 
-    # TODO: 清理资源
-    logger.info("🛑 关闭足球赛果预测系统API")
+class PredictionOutput(BaseModel):
+    """预测结果输出"""
+
+    home_win: float = Field(..., description="主胜概率")
+    draw: float = Field(..., description="平局概率")
+    away_win: float = Field(..., description="客胜概率")
+    model_version: str = Field(..., description="模型版本")
+
+
+class HealthResponse(BaseModel):
+    """健康检查响应"""
+
+    status: str
+    message: str
+    model_loaded: bool
+
+
+class VersionResponse(BaseModel):
+    """版本信息响应"""
+
+    api_version: str
+    model_version: str
+    model_info: dict[str, Any]
 
 
 # 创建FastAPI应用
-app = FastAPI(
-    title="足球赛果预测系统",
-    description="基于机器学习的足球比赛结果预测API",
-    version="0.1.0",
-    openapi_url="/api/v1/openapi.json",
-    docs_url="/docs",
-    redoc_url="/redoc",
-    lifespan=lifespan,
-)
+app = FastAPI(title="足球预测API", description="足球比赛结果预测服务", version="1.0.0")
 
-# 添加CORS中间件
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # TODO: 生产环境需要限制
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# 全局预测器实例
+predictor = None
 
 
-@app.exception_handler(Exception)
-async def global_exception_handler(request, exc):
-    """全局异常处理"""
-    logger.error("未处理的异常", exc=str(exc), path=str(request.url))
-    return JSONResponse(status_code=500, content={"detail": "内部服务器错误"})
+@app.on_event("startup")
+async def startup_event():
+    """应用启动时初始化预测器"""
+    global predictor
+    try:
+        predictor = create_predictor()
+        if predictor.model is None:
+            print("警告: 未找到模型文件,API将使用默认预测")
+    except Exception as e:
+        print(f"预测器初始化失败: {e}")
 
 
-# 注册路由
-app.include_router(health.router, prefix="/api/v1", tags=["健康检查"])
-app.include_router(predictions.router, prefix="/api/v1", tags=["预测"])
-app.include_router(metrics.router, prefix="/api/v1", tags=["监控"])
+@app.get("/health", response_model=HealthResponse)
+async def health_check():
+    """健康检查接口"""
+    model_loaded = predictor is not None and predictor.model is not None
+
+    return HealthResponse(
+        status="healthy" if model_loaded else "warning",
+        message="服务正常运行" if model_loaded else "模型未加载",
+        model_loaded=model_loaded,
+    )
+
+
+@app.get("/version", response_model=VersionResponse)
+async def get_version():
+    """获取版本信息"""
+    model_info = {}
+    model_version = "unknown"
+
+    if predictor and predictor.model is not None:
+        model_info = predictor.get_model_info()
+        model_version = predictor.model_version or "unknown"
+
+    return VersionResponse(api_version="1.0.0", model_version=model_version, model_info=model_info)
+
+
+@app.post("/predict", response_model=list[PredictionOutput])
+async def predict_matches(matches: list[MatchInput]):
+    """
+    批量预测比赛结果
+
+    Args:
+        matches: 比赛列表
+
+    Returns:
+        List[PredictionOutput]: 预测结果列表
+    """
+    if not matches:
+        raise HTTPException(status_code=400, detail="比赛列表不能为空")
+
+    if len(matches) > 100:
+        raise HTTPException(status_code=400, detail="单次请求最多支持100场比赛")
+
+    try:
+        # 转换输入格式
+        match_data = []
+        for match in matches:
+            match_dict = {
+                "home": match.home,
+                "away": match.away,
+                "h": match.odds_h,
+                "d": match.odds_d,
+                "a": match.odds_a,
+                "team_stats": {"home_form": match.home_form, "away_form": match.away_form},
+            }
+            match_data.append(match_dict)
+
+        # 进行预测
+        if predictor and predictor.model is not None:
+            predictions = predictor.predict_batch(match_data)
+        else:
+            # 如果模型未加载,返回默认预测
+            predictions = []
+            for _ in matches:
+                predictions.append(
+                    {"home_win": 0.33, "draw": 0.34, "away_win": 0.33, "model_version": "default"}
+                )
+
+        # 转换输出格式
+        results = []
+        for pred in predictions:
+            results.append(
+                PredictionOutput(
+                    home_win=pred["home_win"],
+                    draw=pred["draw"],
+                    away_win=pred["away_win"],
+                    model_version=pred.get("model_version", "unknown"),
+                )
+            )
+
+        return results
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"预测失败: {e!s}") from None
 
 
 @app.get("/")
 async def root():
     """根路径"""
-    return {"message": "足球赛果预测系统API", "version": "0.1.0", "status": "running"}
+    return {
+        "message": "足球预测API服务",
+        "docs": "/docs",
+        "health": "/health",
+        "version": "/version",
+    }
 
 
 if __name__ == "__main__":
-    import uvicorn
-
-    uvicorn.run(
-        "apps.api.main:app",
-        host=settings.api_host,
-        port=settings.app_port,
-        reload=settings.api_debug,
-        log_level="info",
-    )
+    # 开发模式运行
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

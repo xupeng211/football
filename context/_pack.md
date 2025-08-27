@@ -619,4 +619,3 @@ FAILED tests/test_models.py::test_model_registry_basic - json.decoder.JSONDecode
   - **特征扩展**: `features` 表扩展至 11 个特征，并通过 `psql` 验证。
   - **CI 与覆盖率**: `make ci` 全绿通过，覆盖率 50.11%。
 - **遗留问题**: 无。
-

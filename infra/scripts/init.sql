@@ -49,6 +49,3 @@ CREATE TABLE features (
     -- Additional Features
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
-
-

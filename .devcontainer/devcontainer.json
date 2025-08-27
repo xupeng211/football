@@ -1,0 +1,15 @@
+{
+    "name": "ai-dev",
+    "image": "mcr.microsoft.com/devcontainers/python:3.11",
+    "postCreateCommand": "make install",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "charliermarsh.ruff",
+                "ms-python.python",
+                "ms-toolsai.jupyter",
+                "ms-python.vscode-pylance"
+            ]
+        }
+    }
+}
