@@ -1,0 +1,4 @@
+error: invalid value 'verbose' for '--output-format <OUTPUT_FORMAT>'
+  [possible values: text, concise, full, json, json-lines, junit, grouped, github, gitlab, pylint, rdjson, azure, sarif]
+
+For more information, try '--help'.

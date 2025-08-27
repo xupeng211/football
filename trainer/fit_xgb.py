@@ -190,7 +190,7 @@ def main() -> None:
 
         # 5. 评估模型
         print("评估模型...")
-        metrics = evaluate_model(model, X_test, y_test)
+        _metrics = evaluate_model(model, X_test, y_test)
 
         # 6. 保存模型
         # version = save_model_and_metrics(model, metrics)
