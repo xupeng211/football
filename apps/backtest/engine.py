@@ -143,7 +143,10 @@ class BacktestEngine:
             avg_odds=risk_metrics["avg_odds"],
             # 详细数据
             daily_pnl=pnl_results["daily_pnl"],
-            prediction_details=[{str(k): v for k, v in record.items()} for record in confident_predictions.to_dict("records")],
+            prediction_details=[
+                {str(k): v for k, v in record.items()}
+                for record in confident_predictions.to_dict("records")
+            ],
         )
 
         self.results_history.append(result)
