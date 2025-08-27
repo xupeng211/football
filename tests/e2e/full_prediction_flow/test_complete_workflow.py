@@ -25,22 +25,28 @@ class TestCompleteUserWorkflow:
         """模拟真实用户输入数据"""
         return [
             {
-                "home_team": "Manchester United",
-                "away_team": "Liverpool",
+                "home": "Manchester United",
+                "away": "Liverpool",
+                "home_form": 1.5,
+                "away_form": 1.5,
                 "odds_h": 2.50,
                 "odds_d": 3.20,
                 "odds_a": 3.00,
             },
             {
-                "home_team": "Chelsea",
-                "away_team": "Arsenal",
+                "home": "Chelsea",
+                "away": "Arsenal",
+                "home_form": 1.5,
+                "away_form": 1.5,
                 "odds_h": 2.80,
                 "odds_d": 3.10,
                 "odds_a": 2.70,
             },
             {
-                "home_team": "Manchester City",
-                "away_team": "Tottenham",
+                "home": "Manchester City",
+                "away": "Tottenham",
+                "home_form": 1.5,
+                "away_form": 1.5,
                 "odds_h": 1.90,
                 "odds_d": 3.80,
                 "odds_a": 4.20,
@@ -80,9 +86,7 @@ class TestCompleteUserWorkflow:
         print("\n📝 步骤4: 验证预测结果")
         for i, prediction in enumerate(predictions):
             match_data = sample_user_data[i]
-            print(
-                f"\n🏈 比赛 {i+1}: {match_data['home_team']} vs {match_data['away_team']}"
-            )
+            print(f"\n🏈 比赛 {i+1}: {match_data['home']} vs {match_data['away']}")
             print(f"   预测结果: {prediction['predicted_outcome']}")
             print(f"   主胜概率: {prediction['home_win']:.2%}")
             print(f"   平局概率: {prediction['draw']:.2%}")
@@ -127,7 +131,7 @@ class TestCompleteUserWorkflow:
 
         # 场景2: 用户提交格式错误的数据
         print("\n🚫 场景2: 格式错误的数据")
-        invalid_data = [{"home_team": "Team A"}]  # 缺少必需字段
+        invalid_data = [{"home": "Team A"}]  # 缺少必需字段
         invalid_response = api_client.post("/predict", json=invalid_data)
         assert invalid_response.status_code == 422
         print("✅ 正确拒绝无效格式")
@@ -136,8 +140,10 @@ class TestCompleteUserWorkflow:
         print("\n🚫 场景3: 超出限制的批量请求")
         large_data = [
             {
-                "home_team": f"Team A{i}",
-                "away_team": f"Team B{i}",
+                "home": f"Team A{i}",
+                "away": f"Team B{i}",
+                "home_form": 1.5,
+                "away_form": 1.5,
                 "odds_h": 2.0,
                 "odds_d": 3.0,
                 "odds_a": 4.0,
@@ -173,8 +179,10 @@ class TestCompleteUserWorkflow:
         print("\n🏆 场景1: 经典德比大战")
         classico = [
             {
-                "home_team": "Real Madrid",
-                "away_team": "Barcelona",
+                "home": "Real Madrid",
+                "away": "Barcelona",
+                "home_form": 1.5,
+                "away_form": 1.5,
                 "odds_h": 2.30,
                 "odds_d": 3.50,
                 "odds_a": 3.20,
@@ -193,8 +201,10 @@ class TestCompleteUserWorkflow:
         print("\n📅 场景2: 周末多场比赛预测")
         weekend_matches = [
             {
-                "home_team": f"Home{i}",
-                "away_team": f"Away{i}",
+                "home": f"Home{i}",
+                "away": f"Away{i}",
+                "home_form": 1.5,
+                "away_form": 1.5,
                 "odds_h": 2.0 + i * 0.1,
                 "odds_d": 3.0,
                 "odds_a": 4.0 - i * 0.1,
@@ -234,8 +244,10 @@ class TestCompleteUserWorkflow:
         print("\n⏱️ 测试单次预测响应时间")
         single_match = [
             {
-                "home_team": "Performance Test A",
-                "away_team": "Performance Test B",
+                "home": "Performance Test A",
+                "away": "Performance Test B",
+                "home_form": 1.5,
+                "away_form": 1.5,
                 "odds_h": 2.0,
                 "odds_d": 3.0,
                 "odds_a": 4.0,
@@ -260,8 +272,10 @@ class TestCompleteUserWorkflow:
         for batch_size in batch_sizes:
             batch_matches = [
                 {
-                    "home_team": f"Batch{i}A",
-                    "away_team": f"Batch{i}B",
+                    "home": f"Batch{i}A",
+                    "away": f"Batch{i}B",
+                    "home_form": 1.5,
+                    "away_form": 1.5,
                     "odds_h": 2.0,
                     "odds_d": 3.0,
                     "odds_a": 4.0,
@@ -301,24 +315,30 @@ class TestUserDataIntegration:
         format_variations = [
             # 标准格式
             {
-                "home_team": "Standard Home",
-                "away_team": "Standard Away",
+                "home": "Standard Home",
+                "away": "Standard Away",
+                "home_form": 1.5,
+                "away_form": 1.5,
                 "odds_h": 2.50,
                 "odds_d": 3.20,
                 "odds_a": 3.00,
             },
             # 整数赔率
             {
-                "home_team": "Integer Home",
-                "away_team": "Integer Away",
+                "home": "Integer Home",
+                "away": "Integer Away",
+                "home_form": 1.5,
+                "away_form": 1.5,
                 "odds_h": 2,
                 "odds_d": 3,
                 "odds_a": 4,
             },
             # 高精度赔率
             {
-                "home_team": "Precise Home",
-                "away_team": "Precise Away",
+                "home": "Precise Home",
+                "away": "Precise Away",
+                "home_form": 1.5,
+                "away_form": 1.5,
                 "odds_h": 2.547,
                 "odds_d": 3.198,
                 "odds_a": 2.999,
@@ -344,24 +364,30 @@ class TestUserDataIntegration:
         edge_cases = [
             # 极端赔率
             {
-                "home_team": "Extreme Favorite",
-                "away_team": "Extreme Underdog",
+                "home": "Extreme Favorite",
+                "away": "Extreme Underdog",
+                "home_form": 3.0,
+                "away_form": 0.5,
                 "odds_h": 1.01,
                 "odds_d": 15.0,
                 "odds_a": 50.0,
             },
             # 非常接近的赔率
             {
-                "home_team": "Close Match A",
-                "away_team": "Close Match B",
+                "home": "Close Match A",
+                "away": "Close Match B",
+                "home_form": 1.5,
+                "away_form": 1.5,
                 "odds_h": 2.001,
                 "odds_d": 2.002,
                 "odds_a": 2.003,
             },
             # 特殊队名
             {
-                "home_team": "FC Barcelona & Real Madrid United",
-                "away_team": "Manchester City F.C. (England)",
+                "home": "FC Barcelona & Real Madrid United",
+                "away": "Manchester City F.C. (England)",
+                "home_form": 1.5,
+                "away_form": 1.5,
                 "odds_h": 2.5,
                 "odds_d": 3.2,
                 "odds_a": 3.0,

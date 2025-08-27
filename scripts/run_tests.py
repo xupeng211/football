@@ -97,7 +97,7 @@ class TestRunner:
     def run_quick_tests(self) -> int:
         """运行快速测试套件"""
         print("🏃 运行快速测试套件...")
-        return self.run_tests("unit", coverage=False, markers=["fast"])
+        return self.run_tests("unit", coverage=False)
 
     def run_full_tests(self) -> int:
         """运行完整测试套件"""

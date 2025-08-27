@@ -64,7 +64,12 @@ class FootballAPICollector:
         )
         return self
 
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
+    async def __aexit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: object,
+    ) -> None:
         """异步上下文管理器退出"""
         if self.session:
             await self.session.aclose()

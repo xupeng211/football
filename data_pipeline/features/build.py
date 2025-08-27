@@ -100,10 +100,10 @@ def add_form_features(df: pd.DataFrame, config: dict[str, Any]) -> pd.DataFrame:
 
     # 计算进球状态
     home_goals_data = df[["home", "home_goals", "away_goals"]].copy()
-    home_goals_data.columns = ["team", "goals_for", "goals_against"]
+    home_goals_data.columns = pd.Index(["team", "goals_for", "goals_against"])
 
     away_goals_data = df[["away", "away_goals", "home_goals"]].copy()
-    away_goals_data.columns = ["team", "goals_for", "goals_against"]
+    away_goals_data.columns = pd.Index(["team", "goals_for", "goals_against"])
 
     # 合并进球数据
     all_goals_data = pd.concat([home_goals_data, away_goals_data])
@@ -248,6 +248,49 @@ def create_feature_vector(
     Returns:
         Dict[str, float]: 特征字典
     """
+
+    # 输入验证和安全检查
+    def validate_team_name(name: str, field_name: str) -> str:
+        if not isinstance(name, str):
+            raise ValueError(f"{field_name}必须是字符串类型")
+        if len(name) > 100:  # 防止DoS攻击
+            raise ValueError(f"{field_name}长度不能超过100个字符")
+        if not name.strip():
+            raise ValueError(f"{field_name}不能为空")
+        return name.strip()
+
+    def validate_odds(value: float, field_name: str) -> float:
+        # 类型检查
+        if not isinstance(value, (int, float)):
+            raise ValueError(f"{field_name}必须是数字类型,收到:{type(value)}")
+
+        # 转换为float
+        try:
+            odds_value = float(value)
+        except (ValueError, TypeError):
+            raise ValueError(f"{field_name}无法转换为数字:{value}")
+
+        # 数值有效性检查
+        import math
+
+        if math.isnan(odds_value):
+            raise ValueError(f"{field_name}不能是NaN")
+        if math.isinf(odds_value):
+            raise ValueError(f"{field_name}不能是无穷大")
+        if odds_value <= 0:
+            raise ValueError(f"{field_name}必须大于0,收到:{odds_value}")
+        if odds_value > 1000:  # 合理的上限
+            raise ValueError(f"{field_name}过大,最大值1000,收到:{odds_value}")
+
+        return odds_value
+
+    # 验证输入
+    home_team = validate_team_name(home_team, "主队名称")
+    away_team = validate_team_name(away_team, "客队名称")
+    odds_h = validate_odds(odds_h, "主胜赔率")
+    odds_d = validate_odds(odds_d, "平局赔率")
+    odds_a = validate_odds(odds_a, "客胜赔率")
+
     features = {}
 
     # 基础赔率特征
@@ -255,7 +298,7 @@ def create_feature_vector(
     features["d"] = odds_d
     features["a"] = odds_a
 
-    # 隐含概率
+    # 隐含概率 - 现在安全了,因为已经验证了输入
     features["prob_h"] = 1 / odds_h
     features["prob_d"] = 1 / odds_d
     features["prob_a"] = 1 / odds_a

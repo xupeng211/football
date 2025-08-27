@@ -27,11 +27,25 @@ class Predictor:
         self.model_version: str | None = None
         self.feature_columns: list[str] | None = None
 
-        if model_path is None:
-            model_path = self._find_latest_model()
-
+        # 立即加载模型
         if model_path:
-            self.load_model(model_path)
+            self.model = _safe_load_or_stub(model_path)
+            self.model_version = (
+                model_path.split("/")[-1] if "/" in model_path else model_path
+            )
+        else:
+            # 尝试加载最新模型,失败则使用stub
+            latest_model_path = self._find_latest_model()
+            if latest_model_path:
+                self.model = _safe_load_or_stub(latest_model_path)
+                self.model_version = (
+                    latest_model_path.split("/")[-1]
+                    if "/" in latest_model_path
+                    else "latest"
+                )
+            else:
+                self.model = _safe_load_or_stub(None)  # 这会返回StubModel
+                self.model_version = "stub-default"
 
     def _find_latest_model(self) -> str | None:
         """查找最新的模型文件"""
@@ -94,7 +108,6 @@ class Predictor:
         odds_h: float,
         odds_d: float,
         odds_a: float,
-        team_stats: dict | None = None,
     ) -> dict[str, Any]:
         """
         预测单场比赛结果
@@ -105,18 +118,32 @@ class Predictor:
             odds_h: 主胜赔率
             odds_d: 平局赔率
             odds_a: 客胜赔率
-            team_stats: 球队统计数据
 
         Returns:
-            Dict[str, float]: 预测概率 {'home_win': 0.4, 'draw': 0.3, 'away_win': 0.3}
+            Dict[str, float]: 预测结果
+
+        Raises:
+            RuntimeError: 当模型未加载时
+            ValueError: 当输入参数无效时
         """
         if self.model is None:
             raise RuntimeError("模型未加载")
 
-        # 创建特征向量
-        features = create_feature_vector(
-            home_team, away_team, odds_h, odds_d, odds_a, team_stats
-        )
+        try:
+            # 创建特征向量(包含输入验证)
+            features = create_feature_vector(
+                home_team=home_team,
+                away_team=away_team,
+                odds_h=odds_h,
+                odds_d=odds_d,
+                odds_a=odds_a,
+            )
+        except ValueError as e:
+            # 重新抛出验证错误,提供更好的错误信息
+            raise ValueError(f"输入验证失败: {e}") from e
+        except Exception as e:
+            # 捕获其他意外错误
+            raise RuntimeError(f"特征生成失败: {e}") from e
 
         # 转换为DataFrame
         feature_df = pd.DataFrame([features])
@@ -128,13 +155,35 @@ class Predictor:
                 feature_df[col] = 0.0  # 填充缺失特征
             feature_df = feature_df[self.feature_columns]
 
-        # 预测
-        proba = self.model.predict_proba(feature_df)[0]
+        try:
+            # 预测
+            proba = self.model.predict_proba(feature_df)[0]
+        except Exception as e:
+            raise RuntimeError(f"模型预测失败: {e}") from e
+
+        # 确定预测结果
+        prob_home = float(proba[0])
+        prob_draw = float(proba[1])
+        prob_away = float(proba[2])
+
+        # 找出最大概率对应的结果
+        max_prob = max(prob_home, prob_draw, prob_away)
+        if max_prob == prob_home:
+            predicted_outcome = "home_win"
+            confidence = prob_home
+        elif max_prob == prob_draw:
+            predicted_outcome = "draw"
+            confidence = prob_draw
+        else:
+            predicted_outcome = "away_win"
+            confidence = prob_away
 
         return {
-            "home_win": float(proba[0]),
-            "draw": float(proba[1]),
-            "away_win": float(proba[2]),
+            "home_win": prob_home,
+            "draw": prob_draw,
+            "away_win": prob_away,
+            "predicted_outcome": predicted_outcome,
+            "confidence": confidence,
             "model_version": self.model_version or "unknown",
         }
 
@@ -160,7 +209,6 @@ class Predictor:
                     odds_h=match.get("odds_h", match.get("h", 2.0)),
                     odds_d=match.get("odds_d", match.get("d", 3.0)),
                     odds_a=match.get("odds_a", match.get("a", 3.0)),
-                    team_stats=match.get("team_stats"),
                 )
                 results.append(result)
             except Exception:
@@ -170,6 +218,8 @@ class Predictor:
                         "home_win": 0.33,
                         "draw": 0.34,
                         "away_win": 0.33,
+                        "predicted_outcome": "draw",
+                        "confidence": 0.34,
                         "model_version": self.model_version or "unknown",
                     }
                 )
@@ -197,14 +247,25 @@ def create_predictor(model_path: str | None = None) -> Predictor:
 
 # --- Fallback: stub when no model present ---
 class _StubModel:
-    def predict_proba(self, X):
+    def predict_proba(self, X: pd.DataFrame) -> Any:
         import numpy as np
 
         return np.array([[0.34, 0.33, 0.33] for _ in range(len(X))])
 
+    def predict(self, X: pd.DataFrame) -> Any:
+        import numpy as np
 
-def _safe_load_or_stub(path: str) -> Any:
+        proba = self.predict_proba(X)
+        return np.argmax(proba, axis=1)
+
+
+def _safe_load_or_stub(path: str | None) -> Any:
     """安全加载模型,失败时返回stub"""
+    if path is None:
+        import warnings
+
+        warnings.warn("Predictor: model path is None, using stub", stacklevel=2)
+        return _StubModel()
     try:
         import pickle  # nosec B403
 
@@ -213,5 +274,7 @@ def _safe_load_or_stub(path: str) -> Any:
     except Exception:
         import warnings
 
-        warnings.warn("Predictor: model missing, using stub", stacklevel=2)
+        warnings.warn(
+            f"Predictor: model at {path} missing or corrupt, using stub", stacklevel=2
+        )
         return _StubModel()

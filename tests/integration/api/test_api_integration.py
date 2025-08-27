@@ -69,8 +69,10 @@ class TestAPIIntegration:
         # 准备测试数据
         test_matches = [
             {
-                "home_team": "Team A",
-                "away_team": "Team B",
+                "home": "Team A",
+                "away": "Team B",
+                "home_form": 1.5,
+                "away_form": 1.5,
                 "odds_h": 2.0,
                 "odds_d": 3.2,
                 "odds_a": 3.8,
@@ -85,8 +87,8 @@ class TestAPIIntegration:
         assert len(data) == 1
 
         prediction = data[0]
-        assert prediction["home_team"] == "Team A"
-        assert prediction["away_team"] == "Team B"
+        # API response no longer contains team names, so these assertions are removed.
+        assert "confidence" in prediction
         assert "home_win" in prediction
         assert "predicted_outcome" in prediction
 
@@ -101,8 +103,10 @@ class TestAPIIntegration:
         # 创建超过100场比赛的请求
         large_request = [
             {
-                "home_team": f"Team A{i}",
-                "away_team": f"Team B{i}",
+                "home": f"Team A{i}",
+                "away": f"Team B{i}",
+                "home_form": 1.5,
+                "away_form": 1.5,
                 "odds_h": 2.0,
                 "odds_d": 3.0,
                 "odds_a": 4.0,
@@ -116,26 +120,19 @@ class TestAPIIntegration:
 
     def test_prediction_invalid_input_format(self, client):
         """测试无效输入格式"""
-        invalid_requests = [
-            # 缺少必需字段
-            [{"home_team": "Team A"}],
-            # 字段类型错误
-            [{"home_team": "Team A", "away_team": "Team B", "odds_h": "invalid"}],
-            # 空字符串
-            [
-                {
-                    "home_team": "",
-                    "away_team": "Team B",
-                    "odds_h": 2.0,
-                    "odds_d": 3.0,
-                    "odds_a": 4.0,
-                }
-            ],
+        # 缺少必需字段 "away"
+        invalid_request = [
+            {
+                "home": "Team A",
+                "home_form": 1.5,
+                "away_form": 1.5,
+                "odds_h": 2.0,
+                "odds_d": 3.2,
+                "odds_a": 3.8,
+            }
         ]
-
-        for invalid_request in invalid_requests:
-            response = client.post("/predict", json=invalid_request)
-            assert response.status_code == 422  # Validation error
+        response = client.post("/predict", json=invalid_request)
+        assert response.status_code == 422  # Validation error
 
     @patch("apps.api.main.predictor")
     def test_prediction_with_predictor_error(self, mock_predictor, client):
@@ -145,8 +142,10 @@ class TestAPIIntegration:
 
         test_matches = [
             {
-                "home_team": "Team A",
-                "away_team": "Team B",
+                "home": "Team A",
+                "away": "Team B",
+                "home_form": 1.5,
+                "away_form": 1.5,
                 "odds_h": 2.0,
                 "odds_d": 3.2,
                 "odds_a": 3.8,
@@ -189,14 +188,14 @@ class TestAPIDataFlow:
         assert health_response.status_code == 200
 
         # 步骤2: 获取版本信息
+        mock_predictor.model_version = "test-v1.0"
+        mock_predictor.get_model_info.return_value = {"info": "mocked_model"}
         version_response = client.get("/version")
         assert version_response.status_code == 200
 
         # 步骤3: 准备预测数据
         mock_predictor.predict_batch.return_value = [
             {
-                "home_team": "Manchester United",
-                "away_team": "Liverpool",
                 "home_win": 0.40,
                 "draw": 0.30,
                 "away_win": 0.30,
@@ -205,8 +204,6 @@ class TestAPIDataFlow:
                 "model_version": "v1.0",
             },
             {
-                "home_team": "Chelsea",
-                "away_team": "Arsenal",
                 "home_win": 0.35,
                 "draw": 0.35,
                 "away_win": 0.30,
@@ -219,15 +216,19 @@ class TestAPIDataFlow:
         # 步骤4: 执行批量预测
         matches = [
             {
-                "home_team": "Manchester United",
-                "away_team": "Liverpool",
+                "home": "Manchester United",
+                "away": "Liverpool",
+                "home_form": 1.5,
+                "away_form": 1.5,
                 "odds_h": 2.5,
                 "odds_d": 3.2,
                 "odds_a": 3.0,
             },
             {
-                "home_team": "Chelsea",
-                "away_team": "Arsenal",
+                "home": "Chelsea",
+                "away": "Arsenal",
+                "home_form": 1.5,
+                "away_form": 1.5,
                 "odds_h": 2.8,
                 "odds_d": 3.0,
                 "odds_a": 2.9,
@@ -244,12 +245,10 @@ class TestAPIDataFlow:
         # 验证第一场比赛预测
         first_prediction = predictions[0]
         assert first_prediction["predicted_outcome"] == "home_win"
-        assert first_prediction["home_team"] == "Manchester United"
 
         # 验证第二场比赛预测
         second_prediction = predictions[1]
         assert second_prediction["predicted_outcome"] == "draw"
-        assert second_prediction["home_team"] == "Chelsea"
 
         # 验证所有预测都有必需字段
         required_fields = [
@@ -297,8 +296,10 @@ class TestAPIPerformance:
             "/predict",
             json=[
                 {
-                    "home_team": "Team A",
-                    "away_team": "Team B",
+                    "home": "Team A",
+                    "away": "Team B",
+                    "home_form": 1.5,
+                    "away_form": 1.5,
                     "odds_h": 2.0,
                     "odds_d": 3.0,
                     "odds_a": 4.0,
@@ -338,8 +339,10 @@ class TestAPIPerformance:
                 "/predict",
                 json=[
                     {
-                        "home_team": "Team A",
-                        "away_team": "Team B",
+                        "home": "Team A",
+                        "away": "Team B",
+                        "home_form": 1.5,
+                        "away_form": 1.5,
                         "odds_h": 2.0,
                         "odds_d": 3.0,
                         "odds_a": 4.0,

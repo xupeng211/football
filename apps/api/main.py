@@ -29,14 +29,22 @@ class MatchInput(BaseModel):
 class PredictionOutput(BaseModel):
     """预测结果输出"""
 
+    model_config = {"protected_namespaces": ()}
+
     home_win: float = Field(..., description="主胜概率")
     draw: float = Field(..., description="平局概率")
     away_win: float = Field(..., description="客胜概率")
+    predicted_outcome: str = Field(
+        ..., description="预测结果 (home_win, draw, away_win)"
+    )
+    confidence: float = Field(..., description="预测置信度")
     model_version: str = Field(..., description="模型版本")
 
 
 class HealthResponse(BaseModel):
     """健康检查响应"""
+
+    model_config = {"protected_namespaces": ()}
 
     status: str
     message: str
@@ -45,6 +53,8 @@ class HealthResponse(BaseModel):
 
 class VersionResponse(BaseModel):
     """版本信息响应"""
+
+    model_config = {"protected_namespaces": ()}
 
     api_version: str
     model_version: str
@@ -155,6 +165,8 @@ async def predict_matches(matches: list[MatchInput]) -> list[PredictionOutput]:
                     home_win=float(pred["home_win"]),
                     draw=float(pred["draw"]),
                     away_win=float(pred["away_win"]),
+                    predicted_outcome=str(pred.get("predicted_outcome", "unknown")),
+                    confidence=float(pred.get("confidence", 0.0)),
                     model_version=str(pred.get("model_version", "unknown")),
                 )
             )
@@ -178,4 +190,4 @@ async def root() -> dict[str, str]:
 
 if __name__ == "__main__":
     # 开发模式运行
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)  # nosec B104

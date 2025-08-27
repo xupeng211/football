@@ -30,21 +30,20 @@ class TestPredictor:
         # 由于路径不存在,应该使用StubModel
         assert isinstance(predictor.model, _StubModel)
 
-    @patch("models.predictor._find_latest_model")
     @patch("models.predictor._safe_load_or_stub")
-    def test_load_model_success(self, mock_safe_load, mock_find_latest):
+    def test_load_model_success(self, mock_safe_load):
         """测试成功加载模型"""
         # Mock设置
-        mock_find_latest.return_value = "/path/to/model.pkl"
+        # We directly mock _safe_load_or_stub, so we don't need to mock _find_latest_model
         mock_model = Mock()
         mock_safe_load.return_value = mock_model
 
         predictor = Predictor()
-        predictor.load_model()
+        mock_safe_load.reset_mock()  # Ignore call from __init__
+        predictor.load_model("path/to/model.pkl")
 
         assert predictor.model == mock_model
-        mock_find_latest.assert_called_once()
-        mock_safe_load.assert_called_once_with("/path/to/model.pkl")
+        mock_safe_load.assert_called_once_with("path/to/model.pkl")
 
     def test_predict_single_with_stub_model(self):
         """测试使用stub模型进行单次预测"""
@@ -134,7 +133,7 @@ class TestSafeLoadOrStub:
         result = _safe_load_or_stub(None)
         assert isinstance(result, _StubModel)
 
-    @patch("models.predictor.pickle.load")
+    @patch("pickle.load")
     @patch("builtins.open", create=True)
     def test_safe_load_success(self, mock_open, mock_pickle_load):
         """测试成功加载模型"""
@@ -150,7 +149,7 @@ class TestSafeLoadOrStub:
         result = _safe_load_or_stub("/nonexistent/path.pkl")
         assert isinstance(result, _StubModel)
 
-    @patch("models.predictor.pickle.load", side_effect=Exception("Corrupt file"))
+    @patch("pickle.load", side_effect=Exception("Corrupt file"))
     @patch("builtins.open", create=True)
     def test_safe_load_corrupt_file(self, mock_open, mock_pickle_load):
         """测试损坏文件的情况"""
@@ -213,17 +212,17 @@ class TestPredictorEdgeCases:
         """测试无效赔率的情况"""
         predictor = Predictor()
 
-        # 应该能处理异常的赔率值
-        result = predictor.predict_single(
-            "Team A",
-            "Team B",
-            odds_h=-1,  # 负赔率
-            odds_d=0,  # 零赔率
-            odds_a=float("inf"),  # 无穷大赔率
-        )
-
-        # 仍应返回有效结果
-        assert isinstance(result, dict)
+        # It should raise a ValueError due to invalid odds
+        with pytest.raises(
+            ValueError, match="输入验证失败: 主胜赔率必须大于0,收到:-1.0"
+        ):
+            predictor.predict_single(
+                "Team A",
+                "Team B",
+                odds_h=-1,  # 负赔率
+                odds_d=0,  # 零赔率
+                odds_a=float("inf"),  # 无穷大赔率
+            )
 
     def test_predictor_large_batch(self):
         """测试大批量预测的性能"""

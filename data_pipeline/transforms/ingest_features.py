@@ -21,9 +21,9 @@ def fetch_source_data(db_conn_str: str) -> pd.DataFrame:
     query = "SELECT match_id, bookmaker, home_odds, draw_odds, away_odds FROM odds;"
     try:
         with psycopg2.connect(db_conn_str) as conn:
-            df = pd.read_sql_query(query, conn)
+            df = pd.read_sql_query(query, conn)  # type: ignore[call-overload]
             logger.info(f"Fetched {len(df)} odds records from the database.")
-            return df
+            return df  # type: ignore[no-any-return]
     except psycopg2.Error as e:
         logger.error(f"Database error during source data fetch: {e}")
         return pd.DataFrame()
