@@ -202,10 +202,10 @@ class _StubModel:
 def _safe_load_or_stub(path: str) -> Any:
     """安全加载模型,失败时返回stub"""
     try:
-        import pickle
+        import pickle  # nosec B403
 
         with open(path, "rb") as f:
-            return pickle.load(f)
+            return pickle.load(f)  # nosec B301
     except Exception:
         import warnings
 

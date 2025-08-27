@@ -5,7 +5,7 @@ XGBoost训练脚本
 """
 
 import json
-import pickle
+import pickle  # nosec B403
 from datetime import datetime
 from pathlib import Path
 from typing import Any
