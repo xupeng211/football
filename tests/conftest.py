@@ -21,6 +21,17 @@ try:
 except ImportError:
     pass  # numpy not available, skip numpy seed setting
 
+# 设置固定种子确保测试可重现
+SEED = int(os.getenv("TEST_SEED", "42"))
+random.seed(SEED)
+
+try:
+    import numpy as np
+
+    np.random.seed(SEED)
+except ImportError:
+    pass  # numpy not available, skip numpy seed setting
+
 
 def db_available():
     """检测数据库是否可用,1秒超时"""

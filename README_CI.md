@@ -34,6 +34,7 @@ CI 在 PR 上执行 diff-cover，默认阈值 75（变量 DIFF_COV_MIN 可调）
 - 避免对历史代码的大规模返工，渐进式提升代码质量
 
 ## 产物与版本控制策略
+
 - **版本库中仅保留**：`reports/CI_GATES_REPORT.md`（人读摘要）。
 - **不纳入版本控制**：覆盖率与改动行可视化产物（`htmlcov/**`, `coverage.xml/json`, `diff-coverage.html/md`）。
   - 本地查看：`make diffcov BASE=main`
