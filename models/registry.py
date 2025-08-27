@@ -117,7 +117,12 @@ class ModelRegistry:
         model_id = metadata.model_id
         version = metadata.version
 
-        logger.info("注册新模型版本", model_id=model_id, version=version, make_active=make_active)
+        logger.info(
+            "注册新模型版本",
+            model_id=model_id,
+            version=version,
+            make_active=make_active,
+        )
 
         # 创建模型目录
         model_dir = self.registry_path / model_id / version
@@ -155,7 +160,12 @@ class ModelRegistry:
 
         self._save_index()
 
-        logger.info("模型注册成功", model_id=model_id, version=version, model_path=str(model_file))
+        logger.info(
+            "模型注册成功",
+            model_id=model_id,
+            version=version,
+            model_path=str(model_file),
+        )
 
         return f"{model_id}:{version}"
 
@@ -240,7 +250,9 @@ class ModelRegistry:
 
         # 转换日期字符串
         if isinstance(metadata_dict["training_date"], str):
-            metadata_dict["training_date"] = datetime.fromisoformat(metadata_dict["training_date"])
+            metadata_dict["training_date"] = datetime.fromisoformat(
+                metadata_dict["training_date"]
+            )
 
         return ModelMetadata(**metadata_dict)
 
@@ -289,14 +301,19 @@ class ModelRegistry:
         self._save_index()
 
         logger.info(
-            "模型版本已提升", model_id=model_id, old_version=old_active, new_version=version
+            "模型版本已提升",
+            model_id=model_id,
+            old_version=old_active,
+            new_version=version,
         )
 
     def get_registry_stats(self) -> dict[str, Any]:
         """获取注册表统计信息"""
         stats = {
             "total_models": len(self.index["models"]),
-            "total_versions": sum(len(versions) for versions in self.index["models"].values()),
+            "total_versions": sum(
+                len(versions) for versions in self.index["models"].values()
+            ),
             "active_models": len(self.index["active_versions"]),
             "registry_path": str(self.registry_path),
             "created_date": self.index["created_date"],

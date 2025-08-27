@@ -59,7 +59,7 @@ predictor = None
 
 
 @app.on_event("startup")
-async def startup_event():
+async def startup_event() -> None:
     """应用启动时初始化预测器"""
     global predictor
     try:
@@ -71,7 +71,7 @@ async def startup_event():
 
 
 @app.get("/health", response_model=HealthResponse)
-async def health_check():
+async def health_check() -> dict[str, str]:
     """健康检查接口"""
     model_loaded = predictor is not None and predictor.model is not None
 
@@ -92,7 +92,9 @@ async def get_version() -> VersionResponse:
         model_info = predictor.get_model_info()
         model_version = predictor.model_version or "unknown"
 
-    return VersionResponse(api_version="1.0.0", model_version=model_version, model_info=model_info)
+    return VersionResponse(
+        api_version="1.0.0", model_version=model_version, model_info=model_info
+    )
 
 
 @app.post("/predict", response_model=list[PredictionOutput])
@@ -122,7 +124,10 @@ async def predict_matches(matches: list[MatchInput]) -> list[PredictionOutput]:
                 "h": match.odds_h,
                 "d": match.odds_d,
                 "a": match.odds_a,
-                "team_stats": {"home_form": match.home_form, "away_form": match.away_form},
+                "team_stats": {
+                    "home_form": match.home_form,
+                    "away_form": match.away_form,
+                },
             }
             match_data.append(match_dict)
 
@@ -134,7 +139,12 @@ async def predict_matches(matches: list[MatchInput]) -> list[PredictionOutput]:
             predictions = []
             for _ in matches:
                 predictions.append(
-                    {"home_win": 0.33, "draw": 0.34, "away_win": 0.33, "model_version": "default"}
+                    {
+                        "home_win": 0.33,
+                        "draw": 0.34,
+                        "away_win": 0.33,
+                        "model_version": "default",
+                    }
                 )
 
         # 转换输出格式

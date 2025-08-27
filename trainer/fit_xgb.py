@@ -16,7 +16,10 @@ from sklearn.metrics import accuracy_score, classification_report, log_loss
 from sklearn.model_selection import train_test_split
 
 from data_pipeline.features.build import build_match_features
-from data_pipeline.ingest.csv_adapter import create_sample_match_source, create_sample_odds_source
+from data_pipeline.ingest.csv_adapter import (
+    create_sample_match_source,
+    create_sample_odds_source,
+)
 
 
 def load_training_data() -> tuple[pd.DataFrame, pd.DataFrame]:
@@ -57,7 +60,14 @@ def prepare_features(matches_df: pd.DataFrame, odds_df: pd.DataFrame) -> pd.Data
         df["target"] = df["result"].map({"H": 0, "D": 1, "A": 2})
 
         # 选择特征列
-        feature_cols = ["prob_h", "prob_d", "prob_a", "prob_h_norm", "prob_d_norm", "prob_a_norm"]
+        feature_cols = [
+            "prob_h",
+            "prob_d",
+            "prob_a",
+            "prob_h_norm",
+            "prob_d_norm",
+            "prob_a_norm",
+        ]
         df = df[[*feature_cols, "target"]].dropna()
 
         return df
@@ -106,7 +116,9 @@ def evaluate_model(
         "accuracy": float(accuracy),
         "log_loss": float(logloss),
         "classification_report": class_report,
-        "feature_importance": dict(zip(X_test.columns, model.feature_importances_, strict=False)),
+        "feature_importance": dict(
+            zip(X_test.columns, model.feature_importances_, strict=False)
+        ),
         "n_samples_train": len(X_test),
         "n_features": len(X_test.columns),
     }
@@ -144,7 +156,7 @@ def save_model_and_metrics(
     return version
 
 
-def main():
+def main() -> None:
     """主训练流程"""
     print("开始训练XGBoost模型...")
 

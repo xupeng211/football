@@ -102,7 +102,9 @@ class BacktestEngine:
         predictions = self._generate_predictions(model, test_data)
 
         # 筛选高置信度预测
-        confident_predictions = predictions[predictions["confidence"] >= min_confidence].copy()
+        confident_predictions = predictions[
+            predictions["confidence"] >= min_confidence
+        ].copy()
 
         logger.info(
             f"筛选出{len(confident_predictions)}个高置信度预测",
@@ -155,7 +157,9 @@ class BacktestEngine:
 
         return result
 
-    def _merge_odds_data(self, match_data: pd.DataFrame, odds_data: pd.DataFrame) -> pd.DataFrame:
+    def _merge_odds_data(
+        self, match_data: pd.DataFrame, odds_data: pd.DataFrame
+    ) -> pd.DataFrame:
         """合并赔率数据"""
         # TODO: 实现赔率数据合并逻辑
         # 按match_id和时间匹配最接近的赔率
@@ -167,14 +171,18 @@ class BacktestEngine:
 
         return match_data
 
-    def _generate_predictions(self, model: Any, test_data: pd.DataFrame) -> pd.DataFrame:
+    def _generate_predictions(
+        self, model: Any, test_data: pd.DataFrame
+    ) -> pd.DataFrame:
         """生成预测结果"""
         logger.info("生成预测结果", matches=len(test_data))
 
         # 提取特征(需要与训练时保持一致)
         # TODO: 实现特征提取逻辑
         feature_columns = [
-            col for col in test_data.columns if col.startswith(("home_", "away_", "diff_"))
+            col
+            for col in test_data.columns
+            if col.startswith(("home_", "away_", "diff_"))
         ]
 
         if not feature_columns:
@@ -210,7 +218,9 @@ class BacktestEngine:
 
         return test_data
 
-    def _calculate_pnl(self, predictions: pd.DataFrame, stake_per_bet: float) -> dict[str, Any]:
+    def _calculate_pnl(
+        self, predictions: pd.DataFrame, stake_per_bet: float
+    ) -> dict[str, Any]:
         """计算盈亏"""
         results = []
         daily_pnl = {}
@@ -322,7 +332,9 @@ class BacktestEngine:
                 for a, p in zip(actual_results, predicted_results, strict=False)
                 if p == class_idx and a == class_idx
             )
-            precision = correct_as_class / predicted_as_class if predicted_as_class > 0 else 0
+            precision = (
+                correct_as_class / predicted_as_class if predicted_as_class > 0 else 0
+            )
 
             # 召回率:预测为该类别且正确的 / 实际为该类别的总数
             actual_as_class = sum(1 for a in actual_results if a == class_idx)
@@ -358,7 +370,11 @@ class BacktestEngine:
         drawdowns = running_max - cumulative_pnl
         max_drawdown = np.max(drawdowns) if len(drawdowns) > 0 else 0
 
-        return {"max_drawdown": max_drawdown, "win_rate": win_rate, "avg_odds": avg_odds}
+        return {
+            "max_drawdown": max_drawdown,
+            "win_rate": win_rate,
+            "avg_odds": avg_odds,
+        }
 
     def compare_strategies(self, strategy_names: list[str]) -> pd.DataFrame:
         """比较不同策略的回测结果"""

@@ -115,12 +115,16 @@ class XGBoostTrainer:
         # 检查空值
         null_counts = features.isnull().sum()
         if null_counts.sum() > 0:
-            logger.warning("发现空值", null_features=null_counts[null_counts > 0].to_dict())
+            logger.warning(
+                "发现空值", null_features=null_counts[null_counts > 0].to_dict()
+            )
 
         # 检查无穷值
         inf_counts = np.isinf(features.select_dtypes(include=[np.number])).sum()
         if inf_counts.sum() > 0:
-            logger.warning("发现无穷值", inf_features=inf_counts[inf_counts > 0].to_dict())
+            logger.warning(
+                "发现无穷值", inf_features=inf_counts[inf_counts > 0].to_dict()
+            )
 
         # 检查目标变量分布
         target_counts = targets.value_counts()
@@ -133,7 +137,11 @@ class XGBoostTrainer:
             )
 
     def train(
-        self, X_train: pd.DataFrame, X_test: pd.DataFrame, y_train: pd.Series, y_test: pd.Series
+        self,
+        X_train: pd.DataFrame,
+        X_test: pd.DataFrame,
+        y_train: pd.Series,
+        y_test: pd.Series,
     ) -> TrainingResult:
         """
         训练模型
@@ -256,9 +264,13 @@ class XGBoostTrainer:
         if self.model is None:
             raise ValueError("模型未训练")
 
-        importance = dict(zip(self.feature_names, self.model.feature_importances_, strict=False))
+        importance = dict(
+            zip(self.feature_names, self.model.feature_importances_, strict=False)
+        )
         # 按重要性降序排列
-        sorted_importance = dict(sorted(importance.items(), key=lambda x: x[1], reverse=True))
+        sorted_importance = dict(
+            sorted(importance.items(), key=lambda x: x[1], reverse=True)
+        )
 
         return dict(list(sorted_importance.items())[:top_k])
 
@@ -286,7 +298,9 @@ class XGBoostTrainer:
         self.model.load_model(filepath)
         logger.info("模型已加载", filepath=filepath)
 
-    def hyperparameter_tuning(self, X_train: pd.DataFrame, y_train: pd.Series) -> dict[str, Any]:
+    def hyperparameter_tuning(
+        self, X_train: pd.DataFrame, y_train: pd.Series
+    ) -> dict[str, Any]:
         """
         超参数优化 (TODO: 实现)
 

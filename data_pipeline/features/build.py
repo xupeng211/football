@@ -13,7 +13,9 @@ from .rolling import add_recent_form, add_rolling_stats
 
 
 def build_match_features(
-    matches_df: pd.DataFrame, odds_df: pd.DataFrame, feature_config: dict[str, Any] | None = None
+    matches_df: pd.DataFrame,
+    odds_df: pd.DataFrame,
+    feature_config: dict[str, Any] | None = None,
 ) -> pd.DataFrame:
     """
     构建比赛特征
@@ -78,7 +80,9 @@ def add_basic_features(df: pd.DataFrame) -> pd.DataFrame:
     # 进球相关特征
     df["total_goals"] = df["home_goals"] + df["away_goals"]
     df["goal_difference"] = df["home_goals"] - df["away_goals"]
-    df["both_teams_scored"] = ((df["home_goals"] > 0) & (df["away_goals"] > 0)).astype(int)
+    df["both_teams_scored"] = ((df["home_goals"] > 0) & (df["away_goals"] > 0)).astype(
+        int
+    )
 
     # 比赛强度特征
     df["high_scoring"] = (df["total_goals"] > 2.5).astype(int)
@@ -133,7 +137,9 @@ def add_form_features(df: pd.DataFrame, config: dict[str, Any]) -> pd.DataFrame:
     )
 
     # 为主队添加统计
-    df = df.merge(team_stats, left_on="home", right_on="team", how="left", suffixes=("", "_home"))
+    df = df.merge(
+        team_stats, left_on="home", right_on="team", how="left", suffixes=("", "_home")
+    )
     df = df.rename(
         columns={
             "avg_goals_for_mean_5": "home_avg_goals_for",
@@ -143,7 +149,9 @@ def add_form_features(df: pd.DataFrame, config: dict[str, Any]) -> pd.DataFrame:
     df = df.drop("team", axis=1)
 
     # 为客队添加统计
-    df = df.merge(team_stats, left_on="away", right_on="team", how="left", suffixes=("", "_away"))
+    df = df.merge(
+        team_stats, left_on="away", right_on="team", how="left", suffixes=("", "_away")
+    )
     df = df.rename(
         columns={
             "avg_goals_for_mean_5": "away_avg_goals_for",
@@ -267,9 +275,13 @@ def create_feature_vector(
         features["home_form"] = team_stats.get("home_form", 1.5)
         features["away_form"] = team_stats.get("away_form", 1.5)
         features["home_avg_goals_for"] = team_stats.get("home_avg_goals_for", 1.5)
-        features["home_avg_goals_against"] = team_stats.get("home_avg_goals_against", 1.5)
+        features["home_avg_goals_against"] = team_stats.get(
+            "home_avg_goals_against", 1.5
+        )
         features["away_avg_goals_for"] = team_stats.get("away_avg_goals_for", 1.5)
-        features["away_avg_goals_against"] = team_stats.get("away_avg_goals_against", 1.5)
+        features["away_avg_goals_against"] = team_stats.get(
+            "away_avg_goals_against", 1.5
+        )
     else:
         # 使用默认值
         features["home_form"] = 1.5

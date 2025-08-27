@@ -21,7 +21,9 @@ def validate_odds(record: dict[str, Any]) -> bool:
     required_keys = ["match_id", "bookmaker", "home_odds", "draw_odds", "away_odds"]
     for key in required_keys:
         if key not in record or record[key] is None:
-            logger.warning(f"Skipping record due to missing key: {key}. Record: {record}")
+            logger.warning(
+                f"Skipping record due to missing key: {key}. Record: {record}"
+            )
             return False
 
     if not isinstance(record["match_id"], int) or record["match_id"] <= 0:
@@ -30,13 +32,17 @@ def validate_odds(record: dict[str, Any]) -> bool:
 
     for key in ["home_odds", "draw_odds", "away_odds"]:
         if not isinstance(record[key], int | float) or record[key] <= 0:
-            logger.warning(f"Skipping record due to invalid odds value for {key}. Record: {record}")
+            logger.warning(
+                f"Skipping record due to invalid odds value for {key}. Record: {record}"
+            )
             return False
 
     return True
 
 
-def ingest_data(odds_data: list[dict[str, Any]], db_conn_str: str) -> tuple[int, int, int]:
+def ingest_data(
+    odds_data: list[dict[str, Any]], db_conn_str: str
+) -> tuple[int, int, int]:
     """
     Ingests validated odds data into the PostgreSQL database using an UPSERT operation.
 
@@ -91,9 +97,11 @@ def ingest_data(odds_data: list[dict[str, Any]], db_conn_str: str) -> tuple[int,
     return inserted_count, updated_count, len(odds_data) - len(validated_data)
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description="Fetch and ingest odds data.")
-    parser.add_argument("--start", required=True, help="Start date in YYYY-MM-DD format.")
+    parser.add_argument(
+        "--start", required=True, help="Start date in YYYY-MM-DD format."
+    )
     parser.add_argument("--end", required=True, help="End date in YYYY-MM-DD format.")
     parser.add_argument(
         "--use-sample",

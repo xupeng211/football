@@ -26,7 +26,9 @@ def test_fetch_odds_api_placeholder():
     Tests the API fetching logic placeholder without making a real call.
     This test assumes the example URL will fail, and the function should handle it gracefully.
     """
-    with patch.dict(os.environ, {"FOOTBALL_API_KEY": "fake_key", "USE_SAMPLE_ODDS": "false"}):
+    with patch.dict(
+        os.environ, {"FOOTBALL_API_KEY": "fake_key", "USE_SAMPLE_ODDS": "false"}
+    ):
         # This will try to connect to a non-existent .local domain, which should fail
         odds_data = fetch_odds(start_date="2024-01-01", end_date="2024-01-02")
         # Expect an empty list on failure

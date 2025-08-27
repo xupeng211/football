@@ -29,7 +29,10 @@ REQUEST_COUNT = Counter(
 )
 
 REQUEST_DURATION = Histogram(
-    "api_request_duration_seconds", "API请求耗时", ["method", "endpoint"], registry=registry
+    "api_request_duration_seconds",
+    "API请求耗时",
+    ["method", "endpoint"],
+    registry=registry,
 )
 
 SYSTEM_UPTIME = Gauge("system_uptime_seconds", "系统启动时间", registry=registry)

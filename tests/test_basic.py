@@ -39,7 +39,13 @@ def test_config_files():
     """测试配置文件存在性"""
     root = Path(".")
 
-    config_files = ["pyproject.toml", ".env.example", "Makefile", "requirements.txt", "README.md"]
+    config_files = [
+        "pyproject.toml",
+        ".env.example",
+        "Makefile",
+        "requirements.txt",
+        "README.md",
+    ]
 
     for config_file in config_files:
         assert (root / config_file).exists(), f"配置文件 {config_file} 不存在"

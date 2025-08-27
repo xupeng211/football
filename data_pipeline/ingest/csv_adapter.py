@@ -60,9 +60,13 @@ class CSVMatchDataSource(MatchDataSource):
         except pd.errors.EmptyDataError as e:
             raise DataSourceError(f"CSV文件为空: {self.file_path}") from e
         except pd.errors.ParserError as e:
-            raise DataSourceError(f"CSV文件解析失败: {self.file_path}, 错误: {e}") from e
+            raise DataSourceError(
+                f"CSV文件解析失败: {self.file_path}, 错误: {e}"
+            ) from e
         except Exception as e:
-            raise DataSourceError(f"读取CSV文件失败: {self.file_path}, 错误: {e}") from e
+            raise DataSourceError(
+                f"读取CSV文件失败: {self.file_path}, 错误: {e}"
+            ) from e
 
 
 class CSVOddsDataSource(OddsDataSource):
@@ -116,9 +120,13 @@ class CSVOddsDataSource(OddsDataSource):
         except pd.errors.EmptyDataError as e:
             raise DataSourceError(f"CSV文件为空: {self.file_path}") from e
         except pd.errors.ParserError as e:
-            raise DataSourceError(f"CSV文件解析失败: {self.file_path}, 错误: {e}") from e
+            raise DataSourceError(
+                f"CSV文件解析失败: {self.file_path}, 错误: {e}"
+            ) from e
         except Exception as e:
-            raise DataSourceError(f"读取CSV文件失败: {self.file_path}, 错误: {e}") from e
+            raise DataSourceError(
+                f"读取CSV文件失败: {self.file_path}, 错误: {e}"
+            ) from e
 
 
 def get_sample_data_path(filename: str) -> str:

@@ -15,7 +15,9 @@ pytestmark = pytest.mark.integration
 @pytest.fixture(scope="module")
 def db_connection():
     """Provides a connection to the test database, cleaning up afterward."""
-    db_url = os.environ.get("DATABASE_URL", "postgresql://postgres:password@localhost:5432/sports")
+    db_url = os.environ.get(
+        "DATABASE_URL", "postgresql://postgres:password@localhost:5432/sports"
+    )
     conn = psycopg2.connect(db_url)
     yield conn
     # Clean up tables to ensure test isolation
@@ -53,7 +55,9 @@ def seed_initial_data(db_connection):
 
 def test_fetch_source_data(db_connection):
     """Tests that source odds data can be fetched correctly."""
-    db_url = os.environ.get("DATABASE_URL", "postgresql://postgres:password@localhost:5432/sports")
+    db_url = os.environ.get(
+        "DATABASE_URL", "postgresql://postgres:password@localhost:5432/sports"
+    )
     df = fetch_source_data(db_url)
     assert not df.empty
     assert len(df) == 3
@@ -64,7 +68,9 @@ def test_ingest_features_and_idempotency(db_connection):
     """Tests the full feature ingestion pipeline and its idempotency."""
     from data_pipeline.transforms.feature_engineer import generate_features
 
-    db_url = os.environ.get("DATABASE_URL", "postgresql://postgres:password@localhost:5432/sports")
+    db_url = os.environ.get(
+        "DATABASE_URL", "postgresql://postgres:password@localhost:5432/sports"
+    )
 
     # 1. Fetch and generate features
     source_df = fetch_source_data(db_url)

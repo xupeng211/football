@@ -25,7 +25,10 @@ def calculate_implied_probabilities(df: pd.DataFrame) -> pd.DataFrame:
 
     # Calculate bookie margin
     result["bookie_margin"] = (
-        result["implied_prob_home"] + result["implied_prob_draw"] + result["implied_prob_away"] - 1
+        result["implied_prob_home"]
+        + result["implied_prob_draw"]
+        + result["implied_prob_away"]
+        - 1
     )
 
     return result

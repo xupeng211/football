@@ -29,7 +29,12 @@ def fetch_odds(start_date: str, end_date: str) -> list[dict[str, Any]]:
 
     if use_sample or not api_key:
         logger.info("Using local sample data for odds.")
-        sample_path = Path(__file__).parent.parent.parent / "data" / "samples" / "odds_sample.json"
+        sample_path = (
+            Path(__file__).parent.parent.parent
+            / "data"
+            / "samples"
+            / "odds_sample.json"
+        )
         if not sample_path.exists():
             logger.error(f"Sample data not found at {sample_path}")
             return []
@@ -52,7 +57,9 @@ def fetch_odds(start_date: str, end_date: str) -> list[dict[str, Any]]:
     http.mount("http://", adapter)
 
     try:
-        logger.info(f"Fetching odds from {base_url} for dates {start_date} to {end_date}")
+        logger.info(
+            f"Fetching odds from {base_url} for dates {start_date} to {end_date}"
+        )
         response = http.get(base_url, headers=headers, params=params, timeout=8)
         response.raise_for_status()
         data = response.json()

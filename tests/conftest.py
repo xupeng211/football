@@ -49,7 +49,9 @@ def db_available():
 
 def pytest_configure(config):
     """注册自定义标记"""
-    config.addinivalue_line("markers", "integration: tests requiring live database connection")
+    config.addinivalue_line(
+        "markers", "integration: tests requiring live database connection"
+    )
 
 
 def pytest_collection_modifyitems(config, items):

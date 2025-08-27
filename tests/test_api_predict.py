@@ -42,7 +42,12 @@ def test_predict_smoke(monkeypatch):
 
         def predict_batch(self, matches):
             return [
-                {"home_win": 0.4, "draw": 0.3, "away_win": 0.3, "model_version": "test_v1"}
+                {
+                    "home_win": 0.4,
+                    "draw": 0.3,
+                    "away_win": 0.3,
+                    "model_version": "test_v1",
+                }
                 for _ in matches
             ]
 
@@ -87,7 +92,13 @@ def test_predict_empty_list():
 def test_predict_too_many_matches():
     """测试过多比赛请求"""
     matches = [
-        {"home": f"Team{i}", "away": f"Team{i+1}", "odds_h": 2.0, "odds_d": 3.0, "odds_a": 3.0}
+        {
+            "home": f"Team{i}",
+            "away": f"Team{i+1}",
+            "odds_h": 2.0,
+            "odds_d": 3.0,
+            "odds_a": 3.0,
+        }
         for i in range(101)  # 超过100场
     ]
 

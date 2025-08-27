@@ -28,7 +28,15 @@ class TestCSVMatchDataSource:
         # 验证数据结构
         assert isinstance(df, pd.DataFrame)
         assert not df.empty
-        required_cols = ["id", "date", "home", "away", "home_goals", "away_goals", "result"]
+        required_cols = [
+            "id",
+            "date",
+            "home",
+            "away",
+            "home_goals",
+            "away_goals",
+            "result",
+        ]
         assert all(col in df.columns for col in required_cols)
 
         # 验证数据类型

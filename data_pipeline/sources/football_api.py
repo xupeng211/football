@@ -87,7 +87,10 @@ class FootballAPICollector:
             raise RuntimeError("需要在async with语句中使用")
 
         logger.info(
-            "开始收集比赛数据", start_date=str(start_date), end_date=str(end_date), leagues=leagues
+            "开始收集比赛数据",
+            start_date=str(start_date),
+            end_date=str(end_date),
+            leagues=leagues,
         )
 
         matches = []
@@ -134,7 +137,10 @@ class FootballAPICollector:
             for team_id in team_ids:
                 # TODO: 替换为真实的API调用
                 team_info = Team(
-                    team_id=team_id, name=f"Team_{team_id}", league="PL", season="2023-24"
+                    team_id=team_id,
+                    name=f"Team_{team_id}",
+                    league="PL",
+                    season="2023-24",
                 )
                 teams.append(team_info)
 
@@ -145,7 +151,9 @@ class FootballAPICollector:
         logger.info(f"成功收集{len(teams)}个球队信息")
         return teams
 
-    def _generate_mock_matches(self, league: str, start_date: date, end_date: date) -> list[Match]:
+    def _generate_mock_matches(
+        self, league: str, start_date: date, end_date: date
+    ) -> list[Match]:
         """生成模拟比赛数据(仅用于开发阶段)"""
         matches = []
 

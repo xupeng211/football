@@ -58,7 +58,9 @@ class BatchPredictionResponse(BaseModel):
 
 # API路由
 @router.post("/predict/single", response_model=PredictionResponse)
-async def predict_single_match(request: SingleMatchPredictionRequest) -> PredictionResponse:
+async def predict_single_match(
+    request: SingleMatchPredictionRequest,
+) -> PredictionResponse:
     """
     单场比赛预测
     """
@@ -95,7 +97,9 @@ async def predict_single_match(request: SingleMatchPredictionRequest) -> Predict
 
 
 @router.post("/predict/batch", response_model=BatchPredictionResponse)
-async def predict_batch_matches(request: BatchMatchPredictionRequest) -> BatchPredictionResponse:
+async def predict_batch_matches(
+    request: BatchMatchPredictionRequest,
+) -> BatchPredictionResponse:
     """
     批量比赛预测
     """
@@ -120,7 +124,9 @@ async def predict_batch_matches(request: BatchMatchPredictionRequest) -> BatchPr
             predictions.append(prediction)
 
         response = BatchPredictionResponse(
-            predictions=predictions, total_matches=len(request.matches), processed_at=datetime.now()
+            predictions=predictions,
+            total_matches=len(request.matches),
+            processed_at=datetime.now(),
         )
 
         logger.info("批量预测完成", total_matches=len(request.matches))

@@ -10,7 +10,9 @@ pytestmark = pytest.mark.integration
 @pytest.fixture(scope="module")
 def db_engine():
     """Provides a SQLAlchemy engine for the test session."""
-    db_url = os.environ.get("DATABASE_URL", "postgresql://postgres:password@localhost:5432/sports")
+    db_url = os.environ.get(
+        "DATABASE_URL", "postgresql://postgres:password@localhost:5432/sports"
+    )
     engine = create_engine(db_url)
     yield engine
     engine.dispose()

@@ -53,7 +53,9 @@ def test_cors_middleware():
     from apps.api.main import app
 
     # MVP版本可能没有CORS中间件,这是可接受的
-    middleware_types = [getattr(m.cls, "__name__", str(m.cls)) for m in app.user_middleware]
+    middleware_types = [
+        getattr(m.cls, "__name__", str(m.cls)) for m in app.user_middleware
+    ]
     # MVP版本允许没有CORS中间件
     assert isinstance(middleware_types, list)
 

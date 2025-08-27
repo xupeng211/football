@@ -73,7 +73,9 @@ class Predictor:
                 with open(metrics_file, encoding="utf-8") as f:
                     metrics = json.load(f)
                     if "feature_importance" in metrics:
-                        self.feature_columns = list(metrics["feature_importance"].keys())
+                        self.feature_columns = list(
+                            metrics["feature_importance"].keys()
+                        )
 
             print(f"模型加载成功: {self.model_version}")
 
@@ -112,7 +114,9 @@ class Predictor:
             raise RuntimeError("模型未加载")
 
         # 创建特征向量
-        features = create_feature_vector(home_team, away_team, odds_h, odds_d, odds_a, team_stats)
+        features = create_feature_vector(
+            home_team, away_team, odds_h, odds_d, odds_a, team_stats
+        )
 
         # 转换为DataFrame
         feature_df = pd.DataFrame([features])

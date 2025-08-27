@@ -10,7 +10,9 @@ from data_pipeline.features.rolling import add_form
 
 def test_add_form_ok():
     """测试添加状态特征成功"""
-    df = pd.DataFrame({"team": ["A", "A", "A", "B", "B", "B"], "pts": [3, 0, 1, 1, 3, 0]})
+    df = pd.DataFrame(
+        {"team": ["A", "A", "A", "B", "B", "B"], "pts": [3, 0, 1, 1, 3, 0]}
+    )
 
     result = add_form(df, "team", "pts", window=3)
 

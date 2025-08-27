@@ -77,7 +77,15 @@ class MatchDataSource(DataSource):
 
     def validate(self, df: pd.DataFrame) -> bool:
         """验证比赛数据格式"""
-        required_columns = ["id", "date", "home", "away", "home_goals", "away_goals", "result"]
+        required_columns = [
+            "id",
+            "date",
+            "home",
+            "away",
+            "home_goals",
+            "away_goals",
+            "result",
+        ]
         return all(col in df.columns for col in required_columns)
 
 

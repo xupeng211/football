@@ -41,19 +41,31 @@ async def health_check() -> HealthResponse:
 
         # 检查数据库连接
         # TODO: 实现数据库连接检查
-        components["database"] = {"status": "unknown", "message": "TODO: 实现数据库连接检查"}
+        components["database"] = {
+            "status": "unknown",
+            "message": "TODO: 实现数据库连接检查",
+        }
 
         # 检查Redis连接
         # TODO: 实现Redis连接检查
-        components["redis"] = {"status": "unknown", "message": "TODO: 实现Redis连接检查"}
+        components["redis"] = {
+            "status": "unknown",
+            "message": "TODO: 实现Redis连接检查",
+        }
 
         # 检查模型注册表
         # TODO: 实现模型注册表检查
-        components["model_registry"] = {"status": "unknown", "message": "TODO: 实现模型注册表检查"}
+        components["model_registry"] = {
+            "status": "unknown",
+            "message": "TODO: 实现模型注册表检查",
+        }
 
         # 检查Prefect连接
         # TODO: 实现Prefect连接检查
-        components["prefect"] = {"status": "unknown", "message": "TODO: 实现Prefect连接检查"}
+        components["prefect"] = {
+            "status": "unknown",
+            "message": "TODO: 实现Prefect连接检查",
+        }
 
         # 如果任何组件不健康,整体状态为不健康
         if any(comp.get("status") == "unhealthy" for comp in components.values()):

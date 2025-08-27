@@ -29,7 +29,9 @@ def fetch_source_data(db_conn_str: str) -> pd.DataFrame:
         return pd.DataFrame()
 
 
-def ingest_features_data(features_df: pd.DataFrame, db_conn_str: str) -> tuple[int, int]:
+def ingest_features_data(
+    features_df: pd.DataFrame, db_conn_str: str
+) -> tuple[int, int]:
     """
     Ingests features into the features table using an UPSERT operation.
 
@@ -64,10 +66,14 @@ def ingest_features_data(features_df: pd.DataFrame, db_conn_str: str) -> tuple[i
     try:
         with psycopg2.connect(db_conn_str) as conn:
             with conn.cursor() as cur:
-                execute_batch(cur, upsert_sql, features_df.to_records(index=False).tolist())
+                execute_batch(
+                    cur, upsert_sql, features_df.to_records(index=False).tolist()
+                )
                 affected_rows = cur.rowcount
             conn.commit()
-            logger.info(f"Successfully ingested/updated {affected_rows} feature records.")
+            logger.info(
+                f"Successfully ingested/updated {affected_rows} feature records."
+            )
             return affected_rows, 0
     except psycopg2.Error as e:
         logger.error(f"Database error during feature ingestion: {e}")

@@ -14,7 +14,9 @@ pytestmark = pytest.mark.integration
 @pytest.fixture(scope="module")
 def db_connection():
     """Provides and sets up the test database connection."""
-    db_url = os.environ.get("DATABASE_URL", "postgresql://postgres:password@localhost:5432/sports")
+    db_url = os.environ.get(
+        "DATABASE_URL", "postgresql://postgres:password@localhost:5432/sports"
+    )
     conn = psycopg2.connect(db_url)
 
     # Seed required matches data before tests run
@@ -41,7 +43,9 @@ def db_connection():
 @pytest.fixture(scope="module")
 def sample_odds_data():
     """Loads odds data from the sample JSON file."""
-    sample_path = Path(__file__).parent.parent.parent / "data" / "samples" / "odds_sample.json"
+    sample_path = (
+        Path(__file__).parent.parent.parent / "data" / "samples" / "odds_sample.json"
+    )
     with open(sample_path) as f:
         return json.load(f)
 
@@ -76,7 +80,9 @@ def test_validate_odds():
 
 def test_ingest_odds_and_idempotency(db_connection, sample_odds_data):
     """Tests both the initial ingestion and the idempotency of the operation."""
-    db_url = os.environ.get("DATABASE_URL", "postgresql://postgres:password@localhost:5432/sports")
+    db_url = os.environ.get(
+        "DATABASE_URL", "postgresql://postgres:password@localhost:5432/sports"
+    )
 
     # --- First run (initial insertion) ---
     ingest_data(sample_odds_data, db_url)

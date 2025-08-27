@@ -8,7 +8,11 @@ import pandas as pd
 
 
 def add_form(
-    df: pd.DataFrame, team_col: str, points_col: str, window: int = 5, min_periods: int = 1
+    df: pd.DataFrame,
+    team_col: str,
+    points_col: str,
+    window: int = 5,
+    min_periods: int = 1,
 ) -> pd.DataFrame:
     """
     计算球队状态(滚动积分平均)
@@ -43,7 +47,11 @@ def add_form(
 
 
 def add_goal_diff(
-    df: pd.DataFrame, team_col: str, goals_for_col: str, goals_against_col: str, window: int = 5
+    df: pd.DataFrame,
+    team_col: str,
+    goals_for_col: str,
+    goals_against_col: str,
+    window: int = 5,
 ) -> pd.DataFrame:
     """
     计算滚动净胜球
@@ -112,7 +120,9 @@ def add_rolling_stats(
 
     for stat in stats:
         col_name = (
-            f"{prefix}{value_col}_{stat}_{window}" if prefix else f"{value_col}_{stat}_{window}"
+            f"{prefix}{value_col}_{stat}_{window}"
+            if prefix
+            else f"{value_col}_{stat}_{window}"
         )
 
         if stat == "mean":
@@ -191,12 +201,16 @@ def add_recent_form(df: pd.DataFrame, window: int = 5) -> pd.DataFrame:
     # 创建主队数据
     home_data = df[["home", "result"]].copy()
     home_data["team"] = home_data["home"]
-    home_data["points"] = home_data["result"].apply(lambda x: calculate_points(x, is_home=True))
+    home_data["points"] = home_data["result"].apply(
+        lambda x: calculate_points(x, is_home=True)
+    )
 
     # 创建客队数据
     away_data = df[["away", "result"]].copy()
     away_data["team"] = away_data["away"]
-    away_data["points"] = away_data["result"].apply(lambda x: calculate_points(x, is_home=False))
+    away_data["points"] = away_data["result"].apply(
+        lambda x: calculate_points(x, is_home=False)
+    )
 
     # 合并所有球队数据
     all_team_data = pd.concat(
@@ -209,12 +223,16 @@ def add_recent_form(df: pd.DataFrame, window: int = 5) -> pd.DataFrame:
     # 将状态合并回原数据
     # 为主队添加状态
     home_form_data = all_team_data[all_team_data["team"].isin(df["home"])]
-    home_form_map = dict(zip(home_form_data.index, home_form_data["form"], strict=False))
+    home_form_map = dict(
+        zip(home_form_data.index, home_form_data["form"], strict=False)
+    )
     df["home_form"] = df.index.map(home_form_map)
 
     # 为客队添加状态
     away_form_data = all_team_data[all_team_data["team"].isin(df["away"])]
-    away_form_map = dict(zip(away_form_data.index, away_form_data["form"], strict=False))
+    away_form_map = dict(
+        zip(away_form_data.index, away_form_data["form"], strict=False)
+    )
     df["away_form"] = df.index.map(away_form_map)
 
     # 填充缺失值
