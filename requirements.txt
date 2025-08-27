@@ -70,7 +70,7 @@ fastapi==0.110.3
 fastapi-cli==0.0.8
 fastjsonschema==2.21.2
 filelock==3.16.1
-flake8==7.0.0
+flake8>=7.3.0
 Flask==3.0.2
 flask-cors==6.0.1
 Flask-Limiter==3.5.1
