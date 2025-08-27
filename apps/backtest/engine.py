@@ -61,7 +61,7 @@ class BacktestEngine:
         strategy_name: str = "default",
         min_confidence: float = 0.6,  # 最低置信度阈值
         stake_per_bet: float = 10.0,  # 每注金额
-    ) -> BacktestResult:
+    ) -> None:
         """
         运行回测
 
@@ -292,7 +292,7 @@ class BacktestEngine:
 
         # 如果没有比分数据,生成随机结果用于演示
         if pd.isna(home_score) or pd.isna(away_score):
-            return np.random.choice([0, 1, 2])  # 随机结果
+            return int(np.random.choice([0, 1, 2]))  # 随机结果
 
         if home_score > away_score:
             return 2  # 主胜

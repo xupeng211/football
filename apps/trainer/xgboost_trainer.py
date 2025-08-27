@@ -249,7 +249,7 @@ class XGBoostTrainer:
         if self.model is None:
             raise ValueError("模型未训练,请先调用train()方法")
 
-        return self.model.predict(features)
+        return self.model.predict(features)  # type: ignore[no-any-return]
 
     def get_feature_importance(self, top_k: int = 20) -> dict[str, float]:
         """

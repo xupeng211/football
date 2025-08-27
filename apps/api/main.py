@@ -71,7 +71,7 @@ async def startup_event() -> None:
 
 
 @app.get("/health", response_model=HealthResponse)
-async def health_check():
+async def health_check() -> HealthResponse:
     """健康检查接口"""
     model_loaded = predictor is not None and predictor.model is not None
 
@@ -166,7 +166,7 @@ async def predict_matches(matches: list[MatchInput]) -> list[PredictionOutput]:
 
 
 @app.get("/")
-async def root():
+async def root() -> dict[str, str]:
     """根路径"""
     return {
         "message": "足球预测API服务",
