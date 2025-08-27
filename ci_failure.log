@@ -1,0 +1,1328 @@
+test	Set up job	﻿2025-08-27T09:13:49.1090640Z Current runner version: '2.328.0'
+test	Set up job	2025-08-27T09:13:49.1123085Z ##[group]Runner Image Provisioner
+test	Set up job	2025-08-27T09:13:49.1124609Z Hosted Compute Agent
+test	Set up job	2025-08-27T09:13:49.1125472Z Version: 20250825.382
+test	Set up job	2025-08-27T09:13:49.1126513Z Commit: 7109f2abf901479dac39397456e363ac0cca0730
+test	Set up job	2025-08-27T09:13:49.1127701Z Build Date: 2025-08-25T22:55:50Z
+test	Set up job	2025-08-27T09:13:49.1128917Z ##[endgroup]
+test	Set up job	2025-08-27T09:13:49.1129799Z ##[group]Operating System
+test	Set up job	2025-08-27T09:13:49.1130645Z Ubuntu
+test	Set up job	2025-08-27T09:13:49.1131542Z 22.04.5
+test	Set up job	2025-08-27T09:13:49.1132303Z LTS
+test	Set up job	2025-08-27T09:13:49.1133091Z ##[endgroup]
+test	Set up job	2025-08-27T09:13:49.1134263Z ##[group]Runner Image
+test	Set up job	2025-08-27T09:13:49.1135209Z Image: ubuntu-22.04
+test	Set up job	2025-08-27T09:13:49.1136043Z Version: 20250818.1.0
+test	Set up job	2025-08-27T09:13:49.1137936Z Included Software: https://github.com/actions/runner-images/blob/ubuntu22/20250818.1/images/ubuntu/Ubuntu2204-Readme.md
+test	Set up job	2025-08-27T09:13:49.1140327Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu22%2F20250818.1
+test	Set up job	2025-08-27T09:13:49.1142342Z ##[endgroup]
+test	Set up job	2025-08-27T09:13:49.1144234Z ##[group]GITHUB_TOKEN Permissions
+test	Set up job	2025-08-27T09:13:49.1146866Z Contents: read
+test	Set up job	2025-08-27T09:13:49.1147736Z Metadata: read
+test	Set up job	2025-08-27T09:13:49.1148646Z ##[endgroup]
+test	Set up job	2025-08-27T09:13:49.1151517Z Secret source: Actions
+test	Set up job	2025-08-27T09:13:49.1152653Z Prepare workflow directory
+test	Set up job	2025-08-27T09:13:49.1724597Z Prepare all required actions
+test	Set up job	2025-08-27T09:13:49.1779772Z Getting action download info
+test	Set up job	2025-08-27T09:13:49.5530742Z Download action repository 'actions/checkout@v5' (SHA:08c6903cd8c0fde910a37f88322edcfb5dd907a8)
+test	Set up job	2025-08-27T09:13:49.6687268Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+test	Set up job	2025-08-27T09:13:49.7494748Z Download action repository 'actions/cache@v4' (SHA:0400d5f644dc74513175e3cd8d07132dd4860809)
+test	Set up job	2025-08-27T09:13:49.8992188Z Download action repository 'gitleaks/gitleaks-action@v2' (SHA:ff98106e4c7b2bc287b24eaf42907196329070c7)
+test	Set up job	2025-08-27T09:13:50.1535750Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+test	Set up job	2025-08-27T09:13:50.3662626Z Complete job name: test
+test	Checkout code	﻿2025-08-27T09:13:50.4545674Z ##[group]Run actions/checkout@v5
+test	Checkout code	2025-08-27T09:13:50.4547041Z with:
+test	Checkout code	2025-08-27T09:13:50.4547749Z   fetch-depth: 0
+test	Checkout code	2025-08-27T09:13:50.4548548Z   repository: xupeng211/football
+test	Checkout code	2025-08-27T09:13:50.4549835Z   token: ***
+test	Checkout code	2025-08-27T09:13:50.4550560Z   ssh-strict: true
+test	Checkout code	2025-08-27T09:13:50.4551316Z   ssh-user: git
+test	Checkout code	2025-08-27T09:13:50.4552076Z   persist-credentials: true
+test	Checkout code	2025-08-27T09:13:50.4552935Z   clean: true
+test	Checkout code	2025-08-27T09:13:50.4553896Z   sparse-checkout-cone-mode: true
+test	Checkout code	2025-08-27T09:13:50.4554845Z   fetch-tags: false
+test	Checkout code	2025-08-27T09:13:50.4555600Z   show-progress: true
+test	Checkout code	2025-08-27T09:13:50.4556365Z   lfs: false
+test	Checkout code	2025-08-27T09:13:50.4557072Z   submodules: false
+test	Checkout code	2025-08-27T09:13:50.4557848Z   set-safe-directory: true
+test	Checkout code	2025-08-27T09:13:50.4558952Z env:
+test	Checkout code	2025-08-27T09:13:50.4559684Z   PIP_DISABLE_PIP_VERSION_CHECK: 1
+test	Checkout code	2025-08-27T09:13:50.4560657Z   PIP_DEFAULT_TIMEOUT: 60
+test	Checkout code	2025-08-27T09:13:50.4561513Z   UV_SYSTEM_PYTHON: 1
+test	Checkout code	2025-08-27T09:13:50.4562276Z ##[endgroup]
+test	Checkout code	2025-08-27T09:13:50.5531408Z Syncing repository: xupeng211/football
+test	Checkout code	2025-08-27T09:13:50.5534311Z ##[group]Getting Git version info
+test	Checkout code	2025-08-27T09:13:50.5535654Z Working directory is '/home/runner/work/football/football'
+test	Checkout code	2025-08-27T09:13:50.5537556Z [command]/usr/bin/git version
+test	Checkout code	2025-08-27T09:13:50.5559224Z git version 2.51.0
+test	Checkout code	2025-08-27T09:13:50.5581660Z ##[endgroup]
+test	Checkout code	2025-08-27T09:13:50.5599462Z Temporarily overriding HOME='/home/runner/work/_temp/f1021566-3a34-4e0c-a623-b8ea0471c0b8' before making global git config changes
+test	Checkout code	2025-08-27T09:13:50.5604241Z Adding repository directory to the temporary git global config as a safe directory
+test	Checkout code	2025-08-27T09:13:50.5607798Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/football/football
+test	Checkout code	2025-08-27T09:13:50.5639816Z Deleting the contents of '/home/runner/work/football/football'
+test	Checkout code	2025-08-27T09:13:50.5643453Z ##[group]Initializing the repository
+test	Checkout code	2025-08-27T09:13:50.5648748Z [command]/usr/bin/git init /home/runner/work/football/football
+test	Checkout code	2025-08-27T09:13:50.5722286Z hint: Using 'master' as the name for the initial branch. This default branch name
+test	Checkout code	2025-08-27T09:13:50.5725579Z hint: is subject to change. To configure the initial branch name to use in all
+test	Checkout code	2025-08-27T09:13:50.5727415Z hint: of your new repositories, which will suppress this warning, call:
+test	Checkout code	2025-08-27T09:13:50.5728695Z hint:
+test	Checkout code	2025-08-27T09:13:50.5729968Z hint: 	git config --global init.defaultBranch <name>
+test	Checkout code	2025-08-27T09:13:50.5731717Z hint:
+test	Checkout code	2025-08-27T09:13:50.5733313Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+test	Checkout code	2025-08-27T09:13:50.5735983Z hint: 'development'. The just-created branch can be renamed via this command:
+test	Checkout code	2025-08-27T09:13:50.5737414Z hint:
+test	Checkout code	2025-08-27T09:13:50.5738113Z hint: 	git branch -m <name>
+test	Checkout code	2025-08-27T09:13:50.5738937Z hint:
+test	Checkout code	2025-08-27T09:13:50.5740037Z hint: Disable this message with "git config set advice.defaultBranchName false"
+test	Checkout code	2025-08-27T09:13:50.5741851Z Initialized empty Git repository in /home/runner/work/football/football/.git/
+test	Checkout code	2025-08-27T09:13:50.5745032Z [command]/usr/bin/git remote add origin https://github.com/xupeng211/football
+test	Checkout code	2025-08-27T09:13:50.5769965Z ##[endgroup]
+test	Checkout code	2025-08-27T09:13:50.5771315Z ##[group]Disabling automatic garbage collection
+test	Checkout code	2025-08-27T09:13:50.5772949Z [command]/usr/bin/git config --local gc.auto 0
+test	Checkout code	2025-08-27T09:13:50.5800250Z ##[endgroup]
+test	Checkout code	2025-08-27T09:13:50.5801713Z ##[group]Setting up auth
+test	Checkout code	2025-08-27T09:13:50.5805691Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+test	Checkout code	2025-08-27T09:13:50.5836341Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+test	Checkout code	2025-08-27T09:13:50.6152329Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+test	Checkout code	2025-08-27T09:13:50.6183445Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+test	Checkout code	2025-08-27T09:13:50.6401878Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+test	Checkout code	2025-08-27T09:13:50.6437403Z ##[endgroup]
+test	Checkout code	2025-08-27T09:13:50.6439553Z ##[group]Fetching the repository
+test	Checkout code	2025-08-27T09:13:50.6448610Z [command]/usr/bin/git -c protocol.version=2 fetch --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/* +21629b468725e01c6e10e90d9a90bfb1d2e7fdb8:refs/remotes/pull/29/merge
+test	Checkout code	2025-08-27T09:13:50.9173172Z From https://github.com/xupeng211/football
+test	Checkout code	2025-08-27T09:13:50.9176487Z  * [new branch]      dependabot/pip/fastapi-0.116.1           -> origin/dependabot/pip/fastapi-0.116.1
+test	Checkout code	2025-08-27T09:13:50.9178933Z  * [new branch]      dependabot/pip/pydantic-2.11.7           -> origin/dependabot/pip/pydantic-2.11.7
+test	Checkout code	2025-08-27T09:13:50.9181277Z  * [new branch]      dependabot/pip/pydantic-settings-2.10.1  -> origin/dependabot/pip/pydantic-settings-2.10.1
+test	Checkout code	2025-08-27T09:13:50.9183566Z  * [new branch]      dependabot/pip/ruff-0.12.10              -> origin/dependabot/pip/ruff-0.12.10
+test	Checkout code	2025-08-27T09:13:50.9185931Z  * [new branch]      dependabot/pip/scikit-learn-1.7.1        -> origin/dependabot/pip/scikit-learn-1.7.1
+test	Checkout code	2025-08-27T09:13:50.9187721Z  * [new branch]      dev                                      -> origin/dev
+test	Checkout code	2025-08-27T09:13:50.9189299Z  * [new branch]      feat/ci-uv-lock                          -> origin/feat/ci-uv-lock
+test	Checkout code	2025-08-27T09:13:50.9191183Z  * [new branch]      feat/local-verification-tools            -> origin/feat/local-verification-tools
+test	Checkout code	2025-08-27T09:13:50.9193132Z  * [new branch]      feat/p1-hardening                        -> origin/feat/p1-hardening
+test	Checkout code	2025-08-27T09:13:50.9195365Z  * [new branch]      feature/devops-infrastructure-final      -> origin/feature/devops-infrastructure-final
+test	Checkout code	2025-08-27T09:13:50.9197363Z  * [new branch]      fix/ci-db-guard                          -> origin/fix/ci-db-guard
+test	Checkout code	2025-08-27T09:13:50.9199401Z  * [new branch]      fix/ci-formatting-issue                  -> origin/fix/ci-formatting-issue
+test	Checkout code	2025-08-27T09:13:50.9201225Z  * [new branch]      fix/ci-pytest-dup                        -> origin/fix/ci-pytest-dup
+test	Checkout code	2025-08-27T09:13:50.9203142Z  * [new branch]      fix/final-dependabot-sync                -> origin/fix/final-dependabot-sync
+test	Checkout code	2025-08-27T09:13:50.9205351Z  * [new branch]      fix/final-formatting-sync                -> origin/fix/final-formatting-sync
+test	Checkout code	2025-08-27T09:13:50.9207265Z  * [new branch]      fix/workflow-failures                    -> origin/fix/workflow-failures
+test	Checkout code	2025-08-27T09:13:50.9208902Z  * [new branch]      main                                     -> origin/main
+test	Checkout code	2025-08-27T09:13:50.9210334Z  * [new tag]         mvp-p0-done                              -> mvp-p0-done
+test	Checkout code	2025-08-27T09:13:50.9211658Z  * [new tag]         v0.1.0                                   -> v0.1.0
+test	Checkout code	2025-08-27T09:13:50.9213003Z  * [new tag]         v0.1.0-ci-upgrade                        -> v0.1.0-ci-upgrade
+test	Checkout code	2025-08-27T09:13:50.9214847Z  * [new ref]         21629b468725e01c6e10e90d9a90bfb1d2e7fdb8 -> pull/29/merge
+test	Checkout code	2025-08-27T09:13:50.9298995Z ##[endgroup]
+test	Checkout code	2025-08-27T09:13:50.9301628Z ##[group]Determining the checkout info
+test	Checkout code	2025-08-27T09:13:50.9304239Z ##[endgroup]
+test	Checkout code	2025-08-27T09:13:50.9305229Z [command]/usr/bin/git sparse-checkout disable
+test	Checkout code	2025-08-27T09:13:50.9307756Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+test	Checkout code	2025-08-27T09:13:50.9311101Z ##[group]Checking out the ref
+test	Checkout code	2025-08-27T09:13:50.9314704Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/29/merge
+test	Checkout code	2025-08-27T09:13:50.9452895Z Note: switching to 'refs/remotes/pull/29/merge'.
+test	Checkout code	2025-08-27T09:13:50.9454009Z 
+test	Checkout code	2025-08-27T09:13:50.9454730Z You are in 'detached HEAD' state. You can look around, make experimental
+test	Checkout code	2025-08-27T09:13:50.9456777Z changes and commit them, and you can discard any commits you make in this
+test	Checkout code	2025-08-27T09:13:50.9459795Z state without impacting any branches by switching back to a branch.
+test	Checkout code	2025-08-27T09:13:50.9461555Z 
+test	Checkout code	2025-08-27T09:13:50.9462811Z If you want to create a new branch to retain commits you create, you may
+test	Checkout code	2025-08-27T09:13:50.9466127Z do so (now or later) by using -c with the switch command. Example:
+test	Checkout code	2025-08-27T09:13:50.9467848Z 
+test	Checkout code	2025-08-27T09:13:50.9468511Z   git switch -c <new-branch-name>
+test	Checkout code	2025-08-27T09:13:50.9469573Z 
+test	Checkout code	2025-08-27T09:13:50.9470169Z Or undo this operation with:
+test	Checkout code	2025-08-27T09:13:50.9471111Z 
+test	Checkout code	2025-08-27T09:13:50.9471618Z   git switch -
+test	Checkout code	2025-08-27T09:13:50.9472307Z 
+test	Checkout code	2025-08-27T09:13:50.9473456Z Turn off this advice by setting config variable advice.detachedHead to false
+test	Checkout code	2025-08-27T09:13:50.9475060Z 
+test	Checkout code	2025-08-27T09:13:50.9476272Z HEAD is now at 21629b4 Merge 5fef90b518aba8b8f0f86ea491f06e60f09d8421 into 1d0c09f9b060ad49c3a8c0e0e65fd08bbb2be971
+test	Checkout code	2025-08-27T09:13:50.9480376Z ##[endgroup]
+test	Checkout code	2025-08-27T09:13:50.9501989Z [command]/usr/bin/git log -1 --format=%H
+test	Checkout code	2025-08-27T09:13:50.9524717Z 21629b468725e01c6e10e90d9a90bfb1d2e7fdb8
+test	Set up Python 3.11.9	﻿2025-08-27T09:13:50.9817587Z ##[group]Run actions/setup-python@v5
+test	Set up Python 3.11.9	2025-08-27T09:13:50.9818644Z with:
+test	Set up Python 3.11.9	2025-08-27T09:13:50.9819363Z   python-version: 3.11.9
+test	Set up Python 3.11.9	2025-08-27T09:13:50.9820214Z   check-latest: false
+test	Set up Python 3.11.9	2025-08-27T09:13:50.9821272Z   token: ***
+test	Set up Python 3.11.9	2025-08-27T09:13:50.9822038Z   update-environment: true
+test	Set up Python 3.11.9	2025-08-27T09:13:50.9822937Z   allow-prereleases: false
+test	Set up Python 3.11.9	2025-08-27T09:13:50.9823990Z   freethreaded: false
+test	Set up Python 3.11.9	2025-08-27T09:13:50.9824765Z env:
+test	Set up Python 3.11.9	2025-08-27T09:13:50.9825497Z   PIP_DISABLE_PIP_VERSION_CHECK: 1
+test	Set up Python 3.11.9	2025-08-27T09:13:50.9826458Z   PIP_DEFAULT_TIMEOUT: 60
+test	Set up Python 3.11.9	2025-08-27T09:13:50.9827309Z   UV_SYSTEM_PYTHON: 1
+test	Set up Python 3.11.9	2025-08-27T09:13:50.9828083Z ##[endgroup]
+test	Set up Python 3.11.9	2025-08-27T09:13:51.1628313Z ##[group]Installed versions
+test	Set up Python 3.11.9	2025-08-27T09:13:51.1641173Z Version 3.11.9 was not found in the local cache
+test	Set up Python 3.11.9	2025-08-27T09:13:51.5614497Z Version 3.11.9 is available for downloading
+test	Set up Python 3.11.9	2025-08-27T09:13:51.5617316Z Download from "https://github.com/actions/python-versions/releases/download/3.11.9-9947079978/python-3.11.9-linux-22.04-x64.tar.gz"
+test	Set up Python 3.11.9	2025-08-27T09:13:52.3512842Z Extract downloaded archive
+test	Set up Python 3.11.9	2025-08-27T09:13:52.3636952Z [command]/usr/bin/tar xz --warning=no-unknown-keyword --overwrite -C /home/runner/work/_temp/0cbb602a-0cf0-4e19-8c8a-7432946d20d0 -f /home/runner/work/_temp/301c03ca-ef3e-4c4f-8055-a99d91f773c3
+test	Set up Python 3.11.9	2025-08-27T09:13:54.3477453Z Execute installation script
+test	Set up Python 3.11.9	2025-08-27T09:13:54.3564511Z Check if Python hostedtoolcache folder exist...
+test	Set up Python 3.11.9	2025-08-27T09:13:54.3565272Z Create Python 3.11.9 folder
+test	Set up Python 3.11.9	2025-08-27T09:13:54.3580228Z Copy Python binaries to hostedtoolcache folder
+test	Set up Python 3.11.9	2025-08-27T09:13:54.9541002Z Create additional symlinks (Required for the UsePythonVersion Azure Pipelines task and the setup-python GitHub Action)
+test	Set up Python 3.11.9	2025-08-27T09:13:54.9584531Z Upgrading pip...
+test	Set up Python 3.11.9	2025-08-27T09:13:57.2300203Z Looking in links: /tmp/tmpgxdw_2dv
+test	Set up Python 3.11.9	2025-08-27T09:13:57.2309978Z Requirement already satisfied: setuptools in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (65.5.0)
+test	Set up Python 3.11.9	2025-08-27T09:13:57.2319342Z Requirement already satisfied: pip in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (24.0)
+test	Set up Python 3.11.9	2025-08-27T09:13:58.5185314Z Collecting pip
+test	Set up Python 3.11.9	2025-08-27T09:13:58.5704745Z Downloading pip-25.2-py3-none-any.whl.metadata (4.7 kB)
+test	Set up Python 3.11.9	2025-08-27T09:13:58.5827705Z Downloading pip-25.2-py3-none-any.whl (1.8 MB)
+test	Set up Python 3.11.9	2025-08-27T09:13:58.6681075Z ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.8/1.8 MB 21.6 MB/s eta 0:00:00
+test	Set up Python 3.11.9	2025-08-27T09:13:58.6681658Z 
+test	Set up Python 3.11.9	2025-08-27T09:13:58.7099684Z Installing collected packages: pip
+test	Set up Python 3.11.9	2025-08-27T09:13:58.7100305Z Attempting uninstall: pip
+test	Set up Python 3.11.9	2025-08-27T09:13:58.7120278Z Found existing installation: pip 24.0
+test	Set up Python 3.11.9	2025-08-27T09:13:58.7508265Z Uninstalling pip-24.0:
+test	Set up Python 3.11.9	2025-08-27T09:13:58.7569158Z Successfully uninstalled pip-24.0
+test	Set up Python 3.11.9	2025-08-27T09:13:59.5707283Z Successfully installed pip-25.2
+test	Set up Python 3.11.9	2025-08-27T09:13:59.6274204Z Create complete file
+test	Set up Python 3.11.9	2025-08-27T09:13:59.6310297Z Successfully set up CPython (3.11.9)
+test	Set up Python 3.11.9	2025-08-27T09:13:59.6311335Z ##[endgroup]
+test	Cache pip packages	﻿2025-08-27T09:13:59.7371541Z ##[group]Run actions/cache@v4
+test	Cache pip packages	2025-08-27T09:13:59.7371985Z with:
+test	Cache pip packages	2025-08-27T09:13:59.7372288Z   path: ~/.cache/pip
+test	Cache pip packages	2025-08-27T09:13:59.7372882Z   key: Linux-pip-aac74dabbaf8d6c596cc733990228cc2dd0dbee0822c71d4848d52c8ee6b6501
+test	Cache pip packages	2025-08-27T09:13:59.7373534Z   restore-keys: Linux-pip-
+test	Cache pip packages	
+test	Cache pip packages	2025-08-27T09:13:59.7374125Z   enableCrossOsArchive: false
+test	Cache pip packages	2025-08-27T09:13:59.7374523Z   fail-on-cache-miss: false
+test	Cache pip packages	2025-08-27T09:13:59.7374849Z   lookup-only: false
+test	Cache pip packages	2025-08-27T09:13:59.7375161Z   save-always: false
+test	Cache pip packages	2025-08-27T09:13:59.7375464Z env:
+test	Cache pip packages	2025-08-27T09:13:59.7375746Z   PIP_DISABLE_PIP_VERSION_CHECK: 1
+test	Cache pip packages	2025-08-27T09:13:59.7376137Z   PIP_DEFAULT_TIMEOUT: 60
+test	Cache pip packages	2025-08-27T09:13:59.7376366Z   UV_SYSTEM_PYTHON: 1
+test	Cache pip packages	2025-08-27T09:13:59.7376644Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Cache pip packages	2025-08-27T09:13:59.7377050Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.9/x64/lib/pkgconfig
+test	Cache pip packages	2025-08-27T09:13:59.7377439Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Cache pip packages	2025-08-27T09:13:59.7377785Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Cache pip packages	2025-08-27T09:13:59.7378185Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Cache pip packages	2025-08-27T09:13:59.7378540Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.9/x64/lib
+test	Cache pip packages	2025-08-27T09:13:59.7378834Z ##[endgroup]
+test	Cache pip packages	2025-08-27T09:14:00.0115003Z Cache hit for: Linux-pip-aac74dabbaf8d6c596cc733990228cc2dd0dbee0822c71d4848d52c8ee6b6501
+test	Cache pip packages	2025-08-27T09:14:01.0649636Z Received 130023424 of 489055357 (26.6%), 124.0 MBs/sec
+test	Cache pip packages	2025-08-27T09:14:02.0661527Z Received 130023424 of 489055357 (26.6%), 62.0 MBs/sec
+test	Cache pip packages	2025-08-27T09:14:03.0674370Z Received 130023424 of 489055357 (26.6%), 41.3 MBs/sec
+test	Cache pip packages	2025-08-27T09:14:04.0685831Z Received 130023424 of 489055357 (26.6%), 31.0 MBs/sec
+test	Cache pip packages	2025-08-27T09:14:05.0690605Z Received 130023424 of 489055357 (26.6%), 24.8 MBs/sec
+test	Cache pip packages	2025-08-27T09:14:06.0722726Z Received 285212672 of 489055357 (58.3%), 45.3 MBs/sec
+test	Cache pip packages	2025-08-27T09:14:07.0726530Z Received 482344960 of 489055357 (98.6%), 65.6 MBs/sec
+test	Cache pip packages	2025-08-27T09:14:07.1643899Z Received 489055357 of 489055357 (100.0%), 65.7 MBs/sec
+test	Cache pip packages	2025-08-27T09:14:07.1647032Z Cache Size: ~466 MB (489055357 B)
+test	Cache pip packages	2025-08-27T09:14:07.1756710Z [command]/usr/bin/tar -xf /home/runner/work/_temp/d36b2f45-fa59-41c7-88fa-36007477027e/cache.tzst -P -C /home/runner/work/football/football --use-compress-program unzstd
+test	Cache pip packages	2025-08-27T09:14:07.9753379Z Cache restored successfully
+test	Cache pip packages	2025-08-27T09:14:08.0862015Z Cache restored from key: Linux-pip-aac74dabbaf8d6c596cc733990228cc2dd0dbee0822c71d4848d52c8ee6b6501
+test	Install system dependencies	﻿2025-08-27T09:14:08.0987661Z ##[group]Run sudo apt-get update
+test	Install system dependencies	2025-08-27T09:14:08.0988093Z [36;1msudo apt-get update[0m
+test	Install system dependencies	2025-08-27T09:14:08.0988484Z [36;1msudo apt-get install -y --no-install-recommends build-essential[0m
+test	Install system dependencies	2025-08-27T09:14:08.1023547Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+test	Install system dependencies	2025-08-27T09:14:08.1024182Z env:
+test	Install system dependencies	2025-08-27T09:14:08.1024400Z   PIP_DISABLE_PIP_VERSION_CHECK: 1
+test	Install system dependencies	2025-08-27T09:14:08.1024666Z   PIP_DEFAULT_TIMEOUT: 60
+test	Install system dependencies	2025-08-27T09:14:08.1024906Z   UV_SYSTEM_PYTHON: 1
+test	Install system dependencies	2025-08-27T09:14:08.1025200Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Install system dependencies	2025-08-27T09:14:08.1025635Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.9/x64/lib/pkgconfig
+test	Install system dependencies	2025-08-27T09:14:08.1026043Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Install system dependencies	2025-08-27T09:14:08.1026414Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Install system dependencies	2025-08-27T09:14:08.1026785Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Install system dependencies	2025-08-27T09:14:08.1027142Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.9/x64/lib
+test	Install system dependencies	2025-08-27T09:14:08.1027498Z ##[endgroup]
+test	Install system dependencies	2025-08-27T09:14:08.2067221Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+test	Install system dependencies	2025-08-27T09:14:08.2554809Z Hit:2 http://azure.archive.ubuntu.com/ubuntu jammy InRelease
+test	Install system dependencies	2025-08-27T09:14:08.2556071Z Hit:6 https://packages.microsoft.com/repos/azure-cli jammy InRelease
+test	Install system dependencies	2025-08-27T09:14:08.2566049Z Get:3 http://azure.archive.ubuntu.com/ubuntu jammy-updates InRelease [128 kB]
+test	Install system dependencies	2025-08-27T09:14:08.2609037Z Get:4 http://azure.archive.ubuntu.com/ubuntu jammy-backports InRelease [127 kB]
+test	Install system dependencies	2025-08-27T09:14:08.2610730Z Get:7 https://packages.microsoft.com/ubuntu/22.04/prod jammy InRelease [3632 B]
+test	Install system dependencies	2025-08-27T09:14:08.2642544Z Get:5 http://azure.archive.ubuntu.com/ubuntu jammy-security InRelease [129 kB]
+test	Install system dependencies	2025-08-27T09:14:08.4845233Z Get:8 http://azure.archive.ubuntu.com/ubuntu jammy-updates/main amd64 Packages [2873 kB]
+test	Install system dependencies	2025-08-27T09:14:08.5143235Z Get:9 http://azure.archive.ubuntu.com/ubuntu jammy-updates/main Translation-en [451 kB]
+test	Install system dependencies	2025-08-27T09:14:08.5165780Z Get:10 http://azure.archive.ubuntu.com/ubuntu jammy-updates/restricted amd64 Packages [4340 kB]
+test	Install system dependencies	2025-08-27T09:14:08.5445969Z Get:11 http://azure.archive.ubuntu.com/ubuntu jammy-updates/restricted Translation-en [793 kB]
+test	Install system dependencies	2025-08-27T09:14:08.5486202Z Get:12 http://azure.archive.ubuntu.com/ubuntu jammy-updates/universe amd64 Packages [1227 kB]
+test	Install system dependencies	2025-08-27T09:14:08.5559820Z Get:14 https://packages.microsoft.com/ubuntu/22.04/prod jammy/main arm64 Packages [76.7 kB]
+test	Install system dependencies	2025-08-27T09:14:08.5572265Z Get:13 http://azure.archive.ubuntu.com/ubuntu jammy-updates/universe Translation-en [304 kB]
+test	Install system dependencies	2025-08-27T09:14:08.5631647Z Get:15 https://packages.microsoft.com/ubuntu/22.04/prod jammy/main armhf Packages [20.8 kB]
+test	Install system dependencies	2025-08-27T09:14:08.5660466Z Get:16 https://packages.microsoft.com/ubuntu/22.04/prod jammy/main amd64 Packages [243 kB]
+test	Install system dependencies	2025-08-27T09:14:08.7190337Z Get:17 http://azure.archive.ubuntu.com/ubuntu jammy-security/main amd64 Packages [2595 kB]
+test	Install system dependencies	2025-08-27T09:14:08.7316409Z Get:18 http://azure.archive.ubuntu.com/ubuntu jammy-security/main Translation-en [383 kB]
+test	Install system dependencies	2025-08-27T09:14:08.7345618Z Get:19 http://azure.archive.ubuntu.com/ubuntu jammy-security/restricted amd64 Packages [4118 kB]
+test	Install system dependencies	2025-08-27T09:14:08.7580376Z Get:20 http://azure.archive.ubuntu.com/ubuntu jammy-security/restricted Translation-en [751 kB]
+test	Install system dependencies	2025-08-27T09:14:08.8042849Z Get:21 http://azure.archive.ubuntu.com/ubuntu jammy-security/universe amd64 Packages [994 kB]
+test	Install system dependencies	2025-08-27T09:14:08.8096724Z Get:22 http://azure.archive.ubuntu.com/ubuntu jammy-security/universe Translation-en [217 kB]
+test	Install system dependencies	2025-08-27T09:14:18.1497797Z Fetched 19.8 MB in 2s (8529 kB/s)
+test	Install system dependencies	2025-08-27T09:14:19.0502416Z Reading package lists...
+test	Install system dependencies	2025-08-27T09:14:19.1105390Z Reading package lists...
+test	Install system dependencies	2025-08-27T09:14:19.3214481Z Building dependency tree...
+test	Install system dependencies	2025-08-27T09:14:19.3226448Z Reading state information...
+test	Install system dependencies	2025-08-27T09:14:19.5234144Z build-essential is already the newest version (12.9ubuntu3).
+test	Install system dependencies	2025-08-27T09:14:19.5234698Z build-essential set to manually installed.
+test	Install system dependencies	2025-08-27T09:14:19.5235143Z 0 upgraded, 0 newly installed, 0 to remove and 83 not upgraded.
+test	Install Python dependencies with uv priority	﻿2025-08-27T09:14:19.5284472Z ##[group]Run echo "::group::Dependency Installation"
+test	Install Python dependencies with uv priority	2025-08-27T09:14:19.5284914Z [36;1mecho "::group::Dependency Installation"[0m
+test	Install Python dependencies with uv priority	2025-08-27T09:14:19.5285228Z [36;1mpython -m pip install -U pip uv[0m
+test	Install Python dependencies with uv priority	2025-08-27T09:14:19.5285491Z [36;1m[0m
+test	Install Python dependencies with uv priority	2025-08-27T09:14:19.5285778Z [36;1m# Priority 1: Use uv.lock if available for exact CI reproducibility[0m
+test	Install Python dependencies with uv priority	2025-08-27T09:14:19.5286145Z [36;1mif [ -f "uv.lock" ]; then[0m
+test	Install Python dependencies with uv priority	2025-08-27T09:14:19.5286492Z [36;1m  echo "🚀 Using uv.lock for exact dependency reproduction..."[0m
+test	Install Python dependencies with uv priority	2025-08-27T09:14:19.5287209Z [36;1m  uv pip sync --frozen uv.lock || {[0m
+test	Install Python dependencies with uv priority	2025-08-27T09:14:19.5287562Z [36;1m    echo "⚠️ uv.lock sync failed, falling back to requirements.txt"[0m
+test	Install Python dependencies with uv priority	2025-08-27T09:14:19.5287918Z [36;1m    pip install -r requirements.txt[0m
+test	Install Python dependencies with uv priority	2025-08-27T09:14:19.5288177Z [36;1m  }[0m
+test	Install Python dependencies with uv priority	2025-08-27T09:14:19.5288390Z [36;1melif [ -f "requirements.txt" ]; then[0m
+test	Install Python dependencies with uv priority	2025-08-27T09:14:19.5288683Z [36;1m  echo "📦 Using requirements.txt..."[0m
+test	Install Python dependencies with uv priority	2025-08-27T09:14:19.5288967Z [36;1m  pip install -r requirements.txt[0m
+test	Install Python dependencies with uv priority	2025-08-27T09:14:19.5289252Z [36;1melse[0m
+test	Install Python dependencies with uv priority	2025-08-27T09:14:19.5289461Z [36;1m  echo "❌ No dependency file found"[0m
+test	Install Python dependencies with uv priority	2025-08-27T09:14:19.5289716Z [36;1m  exit 1[0m
+test	Install Python dependencies with uv priority	2025-08-27T09:14:19.5289896Z [36;1mfi[0m
+test	Install Python dependencies with uv priority	2025-08-27T09:14:19.5290069Z [36;1m[0m
+test	Install Python dependencies with uv priority	2025-08-27T09:14:19.5290263Z [36;1m# Install project in editable mode[0m
+test	Install Python dependencies with uv priority	2025-08-27T09:14:19.5290524Z [36;1mpip install -e .[0m
+test	Install Python dependencies with uv priority	2025-08-27T09:14:19.5290733Z [36;1m[0m
+test	Install Python dependencies with uv priority	2025-08-27T09:14:19.5290921Z [36;1m# Install additional dev tools[0m
+test	Install Python dependencies with uv priority	2025-08-27T09:14:19.5291599Z [36;1mpip install pre-commit ruff mypy pytest pytest-cov bandit diff-cover[0m
+test	Install Python dependencies with uv priority	2025-08-27T09:14:19.5291971Z [36;1mecho "::endgroup::"[0m
+test	Install Python dependencies with uv priority	2025-08-27T09:14:19.5320159Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+test	Install Python dependencies with uv priority	2025-08-27T09:14:19.5320481Z env:
+test	Install Python dependencies with uv priority	2025-08-27T09:14:19.5320690Z   PIP_DISABLE_PIP_VERSION_CHECK: 1
+test	Install Python dependencies with uv priority	2025-08-27T09:14:19.5320951Z   PIP_DEFAULT_TIMEOUT: 60
+test	Install Python dependencies with uv priority	2025-08-27T09:14:19.5321170Z   UV_SYSTEM_PYTHON: 1
+test	Install Python dependencies with uv priority	2025-08-27T09:14:19.5321447Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Install Python dependencies with uv priority	2025-08-27T09:14:19.5321863Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.9/x64/lib/pkgconfig
+test	Install Python dependencies with uv priority	2025-08-27T09:14:19.5322252Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Install Python dependencies with uv priority	2025-08-27T09:14:19.5322592Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Install Python dependencies with uv priority	2025-08-27T09:14:19.5322935Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Install Python dependencies with uv priority	2025-08-27T09:14:19.5323286Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.9/x64/lib
+test	Install Python dependencies with uv priority	2025-08-27T09:14:19.5323584Z ##[endgroup]
+test	Install Python dependencies with uv priority	2025-08-27T09:14:19.5371622Z ##[group]Dependency Installation
+test	Install Python dependencies with uv priority	2025-08-27T09:14:19.9269528Z Requirement already satisfied: pip in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (25.2)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:20.1903053Z Collecting uv
+test	Install Python dependencies with uv priority	2025-08-27T09:14:20.1920750Z   Using cached uv-0.8.13-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (11 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:20.1965168Z Using cached uv-0.8.13-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (19.5 MB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:20.2369390Z Installing collected packages: uv
+test	Install Python dependencies with uv priority	2025-08-27T09:14:20.4970790Z Successfully installed uv-0.8.13
+test	Install Python dependencies with uv priority	2025-08-27T09:14:20.5627332Z 🚀 Using uv.lock for exact dependency reproduction...
+test	Install Python dependencies with uv priority	2025-08-27T09:14:20.5671521Z error: unexpected argument '--frozen' found
+test	Install Python dependencies with uv priority	2025-08-27T09:14:20.5671922Z 
+test	Install Python dependencies with uv priority	2025-08-27T09:14:20.5672119Z   tip: to pass '--frozen' as a value, use '-- --frozen'
+test	Install Python dependencies with uv priority	2025-08-27T09:14:20.5672361Z 
+test	Install Python dependencies with uv priority	2025-08-27T09:14:20.5672480Z Usage: uv pip sync [OPTIONS] <SRC_FILE>...
+test	Install Python dependencies with uv priority	2025-08-27T09:14:20.5673174Z 
+test	Install Python dependencies with uv priority	2025-08-27T09:14:20.5673285Z For more information, try '--help'.
+test	Install Python dependencies with uv priority	2025-08-27T09:14:20.5677914Z ⚠️ uv.lock sync failed, falling back to requirements.txt
+test	Install Python dependencies with uv priority	2025-08-27T09:14:21.0166712Z Collecting fastapi==0.110.3 (from -r requirements.txt (line 2))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:21.0183879Z   Using cached fastapi-0.110.3-py3-none-any.whl.metadata (24 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:21.0478230Z Collecting uvicorn==0.30.1 (from uvicorn[standard]==0.30.1->-r requirements.txt (line 3))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:21.0494006Z   Using cached uvicorn-0.30.1-py3-none-any.whl.metadata (6.3 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:21.1643557Z Collecting pydantic==2.8.2 (from -r requirements.txt (line 4))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:21.1660014Z   Using cached pydantic-2.8.2-py3-none-any.whl.metadata (125 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:21.1884414Z Collecting pydantic-settings==2.3.3 (from -r requirements.txt (line 5))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:21.1900245Z   Using cached pydantic_settings-2.3.3-py3-none-any.whl.metadata (3.3 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:21.3557543Z Collecting numpy==1.26.4 (from -r requirements.txt (line 8))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:21.3573268Z   Using cached numpy-1.26.4-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (61 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:21.4719040Z Collecting pandas==2.2.2 (from -r requirements.txt (line 9))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:21.4734940Z   Using cached pandas-2.2.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (19 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:21.6184280Z Collecting scipy==1.13.1 (from -r requirements.txt (line 10))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:21.6199915Z   Using cached scipy-1.13.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (60 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:21.7105165Z Collecting scikit-learn==1.4.2 (from -r requirements.txt (line 11))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:21.7120659Z   Using cached scikit_learn-1.4.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (11 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:21.7472145Z Collecting xgboost==2.0.3 (from -r requirements.txt (line 12))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:21.7487620Z   Using cached xgboost-2.0.3-py3-none-manylinux2014_x86_64.whl.metadata (2.0 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:21.9982009Z Collecting SQLAlchemy==2.0.31 (from -r requirements.txt (line 15))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:21.9998156Z   Using cached SQLAlchemy-2.0.31-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (9.6 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:22.0610959Z Collecting alembic==1.13.1 (from -r requirements.txt (line 16))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:22.0626128Z   Using cached alembic-1.13.1-py3-none-any.whl.metadata (7.4 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:22.1236645Z Collecting psycopg2-binary==2.9.9 (from -r requirements.txt (line 17))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:22.1252338Z   Using cached psycopg2_binary-2.9.9-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.4 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:22.1390475Z Collecting aiosqlite==0.20.0 (from -r requirements.txt (line 18))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:22.1404289Z   Using cached aiosqlite-0.20.0-py3-none-any.whl.metadata (4.3 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:22.1589009Z Collecting python-dotenv==1.0.1 (from -r requirements.txt (line 21))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:22.1602533Z   Using cached python_dotenv-1.0.1-py3-none-any.whl.metadata (23 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:22.1816486Z Collecting httpx==0.27.0 (from -r requirements.txt (line 22))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:22.1829978Z   Using cached httpx-0.27.0-py3-none-any.whl.metadata (7.2 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:22.2096746Z Collecting requests==2.32.3 (from -r requirements.txt (line 23))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:22.2109845Z   Using cached requests-2.32.3-py3-none-any.whl.metadata (4.6 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:22.2398464Z Collecting types-requests==2.32.0.20240712 (from -r requirements.txt (line 24))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:22.2412781Z   Using cached types_requests-2.32.0.20240712-py3-none-any.whl.metadata (1.9 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:22.2573987Z Collecting types-urllib3==1.26.25.14 (from -r requirements.txt (line 25))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:22.2587983Z   Using cached types_urllib3-1.26.25.14-py3-none-any.whl.metadata (1.7 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:22.2916974Z Collecting pytest==8.2.1 (from -r requirements.txt (line 28))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:22.2931419Z   Using cached pytest-8.2.1-py3-none-any.whl.metadata (7.6 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:22.3109467Z Collecting pytest-cov==5.0.0 (from -r requirements.txt (line 29))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:22.3123878Z   Using cached pytest_cov-5.0.0-py3-none-any.whl.metadata (27 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:22.4059004Z Collecting mypy==1.10.0 (from -r requirements.txt (line 30))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:22.4074290Z   Using cached mypy-1.10.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (1.9 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:22.7579661Z Collecting ruff==0.5.5 (from -r requirements.txt (line 31))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:22.7594294Z   Using cached ruff-0.5.5-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (24 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:22.7776910Z Collecting bandit==1.7.9 (from -r requirements.txt (line 32))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:22.7789738Z   Using cached bandit-1.7.9-py3-none-any.whl.metadata (6.7 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:22.8110742Z Collecting starlette<0.38.0,>=0.37.2 (from fastapi==0.110.3->-r requirements.txt (line 2))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:22.8125112Z   Using cached starlette-0.37.2-py3-none-any.whl.metadata (5.9 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:22.8635389Z Collecting typing-extensions>=4.8.0 (from fastapi==0.110.3->-r requirements.txt (line 2))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:22.8636491Z   Using cached typing_extensions-4.15.0-py3-none-any.whl.metadata (3.3 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:22.8769815Z Collecting annotated-types>=0.4.0 (from pydantic==2.8.2->-r requirements.txt (line 4))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:22.8783020Z   Using cached annotated_types-0.7.0-py3-none-any.whl.metadata (15 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:23.5297725Z Collecting pydantic-core==2.20.1 (from pydantic==2.8.2->-r requirements.txt (line 4))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:23.5312797Z   Using cached pydantic_core-2.20.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.6 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:23.5557971Z Collecting click>=7.0 (from uvicorn==0.30.1->uvicorn[standard]==0.30.1->-r requirements.txt (line 3))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:23.5571278Z   Using cached click-8.2.1-py3-none-any.whl.metadata (2.5 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:23.5704092Z Collecting h11>=0.8 (from uvicorn==0.30.1->uvicorn[standard]==0.30.1->-r requirements.txt (line 3))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:23.5717007Z   Using cached h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:23.6203210Z Collecting python-dateutil>=2.8.2 (from pandas==2.2.2->-r requirements.txt (line 9))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:23.6217521Z   Using cached python_dateutil-2.9.0.post0-py2.py3-none-any.whl.metadata (8.4 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:23.6582672Z Collecting pytz>=2020.1 (from pandas==2.2.2->-r requirements.txt (line 9))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:23.6597277Z   Using cached pytz-2025.2-py2.py3-none-any.whl.metadata (22 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:23.6760099Z Collecting tzdata>=2022.7 (from pandas==2.2.2->-r requirements.txt (line 9))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:23.6773878Z   Using cached tzdata-2025.2-py2.py3-none-any.whl.metadata (1.4 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:23.7204120Z Collecting joblib>=1.2.0 (from scikit-learn==1.4.2->-r requirements.txt (line 11))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:23.7217500Z   Using cached joblib-1.5.1-py3-none-any.whl.metadata (5.6 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:23.7349904Z Collecting threadpoolctl>=2.0.0 (from scikit-learn==1.4.2->-r requirements.txt (line 11))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:23.7363061Z   Using cached threadpoolctl-3.6.0-py3-none-any.whl.metadata (13 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:23.9154646Z Collecting greenlet!=0.4.17 (from SQLAlchemy==2.0.31->-r requirements.txt (line 15))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:23.9170432Z   Using cached greenlet-3.2.4-cp311-cp311-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl.metadata (4.1 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:23.9455269Z Collecting Mako (from alembic==1.13.1->-r requirements.txt (line 16))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:23.9470871Z   Using cached mako-1.3.10-py3-none-any.whl.metadata (2.9 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:23.9772156Z Collecting anyio (from httpx==0.27.0->-r requirements.txt (line 22))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:23.9786950Z   Using cached anyio-4.10.0-py3-none-any.whl.metadata (4.0 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:24.0001282Z Collecting certifi (from httpx==0.27.0->-r requirements.txt (line 22))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:24.0016400Z   Using cached certifi-2025.8.3-py3-none-any.whl.metadata (2.4 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:24.0224812Z Collecting httpcore==1.* (from httpx==0.27.0->-r requirements.txt (line 22))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:24.0239935Z   Using cached httpcore-1.0.9-py3-none-any.whl.metadata (21 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:24.0406252Z Collecting idna (from httpx==0.27.0->-r requirements.txt (line 22))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:24.0420085Z   Using cached idna-3.10-py3-none-any.whl.metadata (10 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:24.0554423Z Collecting sniffio (from httpx==0.27.0->-r requirements.txt (line 22))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:24.0568787Z   Using cached sniffio-1.3.1-py3-none-any.whl.metadata (3.9 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:24.1392162Z Collecting charset-normalizer<4,>=2 (from requests==2.32.3->-r requirements.txt (line 23))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:24.1408378Z   Using cached charset_normalizer-3.4.3-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (36 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:24.1756286Z Collecting urllib3<3,>=1.21.1 (from requests==2.32.3->-r requirements.txt (line 23))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:24.1771574Z   Using cached urllib3-2.5.0-py3-none-any.whl.metadata (6.5 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:24.2057809Z Collecting iniconfig (from pytest==8.2.1->-r requirements.txt (line 28))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:24.2071999Z   Using cached iniconfig-2.1.0-py3-none-any.whl.metadata (2.7 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:24.2259200Z Collecting packaging (from pytest==8.2.1->-r requirements.txt (line 28))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:24.2274182Z   Using cached packaging-25.0-py3-none-any.whl.metadata (3.3 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:24.2417197Z Collecting pluggy<2.0,>=1.5 (from pytest==8.2.1->-r requirements.txt (line 28))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:24.2430858Z   Using cached pluggy-1.6.0-py3-none-any.whl.metadata (4.8 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:24.5598678Z Collecting coverage>=5.2.1 (from coverage[toml]>=5.2.1->pytest-cov==5.0.0->-r requirements.txt (line 29))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:24.5614140Z   Using cached coverage-7.10.5-cp311-cp311-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl.metadata (8.9 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:24.5812981Z Collecting mypy-extensions>=1.0.0 (from mypy==1.10.0->-r requirements.txt (line 30))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:24.5826679Z   Using cached mypy_extensions-1.1.0-py3-none-any.whl.metadata (1.1 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:24.6244536Z Collecting PyYAML>=5.3.1 (from bandit==1.7.9->-r requirements.txt (line 32))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:24.6258895Z   Using cached PyYAML-6.0.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (2.1 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:24.6495602Z Collecting stevedore>=1.20.0 (from bandit==1.7.9->-r requirements.txt (line 32))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:24.6508639Z   Using cached stevedore-5.5.0-py3-none-any.whl.metadata (2.2 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:24.7703197Z Collecting rich (from bandit==1.7.9->-r requirements.txt (line 32))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:24.7718232Z   Using cached rich-14.1.0-py3-none-any.whl.metadata (18 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:24.8116532Z Collecting httptools>=0.5.0 (from uvicorn[standard]==0.30.1->-r requirements.txt (line 3))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:24.8131484Z   Using cached httptools-0.6.4-cp311-cp311-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (3.6 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:24.8598066Z Collecting uvloop!=0.15.0,!=0.15.1,>=0.14.0 (from uvicorn[standard]==0.30.1->-r requirements.txt (line 3))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:24.8614405Z   Using cached uvloop-0.21.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.9 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:24.9328412Z Collecting watchfiles>=0.13 (from uvicorn[standard]==0.30.1->-r requirements.txt (line 3))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:24.9344020Z   Using cached watchfiles-1.1.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.9 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.0225257Z Collecting websockets>=10.4 (from uvicorn[standard]==0.30.1->-r requirements.txt (line 3))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.0241020Z   Using cached websockets-15.0.1-cp311-cp311-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.8 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.0754993Z Collecting six>=1.5 (from python-dateutil>=2.8.2->pandas==2.2.2->-r requirements.txt (line 9))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.0769236Z   Using cached six-1.17.0-py2.py3-none-any.whl.metadata (1.7 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.1500291Z Collecting MarkupSafe>=0.9.2 (from Mako->alembic==1.13.1->-r requirements.txt (line 16))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.1515860Z   Using cached MarkupSafe-3.0.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.0 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.1730577Z Collecting markdown-it-py>=2.2.0 (from rich->bandit==1.7.9->-r requirements.txt (line 32))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.1744113Z   Using cached markdown_it_py-4.0.0-py3-none-any.whl.metadata (7.3 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.1994889Z Collecting pygments<3.0.0,>=2.13.0 (from rich->bandit==1.7.9->-r requirements.txt (line 32))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.2009322Z   Using cached pygments-2.19.2-py3-none-any.whl.metadata (2.5 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.2163616Z Collecting mdurl~=0.1 (from markdown-it-py>=2.2.0->rich->bandit==1.7.9->-r requirements.txt (line 32))
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.2177382Z   Using cached mdurl-0.1.2-py3-none-any.whl.metadata (1.6 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.2230683Z Using cached fastapi-0.110.3-py3-none-any.whl (91 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.2244967Z Using cached pydantic-2.8.2-py3-none-any.whl (423 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.2261279Z Using cached uvicorn-0.30.1-py3-none-any.whl (62 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.2274779Z Using cached pydantic_settings-2.3.3-py3-none-any.whl (22 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.2288455Z Using cached numpy-1.26.4-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (18.3 MB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.2443307Z Using cached pandas-2.2.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (13.0 MB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.2558393Z Using cached scipy-1.13.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (38.6 MB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.2865482Z Using cached scikit_learn-1.4.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (12.1 MB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.2973063Z Using cached xgboost-2.0.3-py3-none-manylinux2014_x86_64.whl (297.1 MB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.5198493Z Using cached SQLAlchemy-2.0.31-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (3.2 MB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.5236689Z Using cached alembic-1.13.1-py3-none-any.whl (233 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.5252660Z Using cached psycopg2_binary-2.9.9-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (3.0 MB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.5288579Z Using cached aiosqlite-0.20.0-py3-none-any.whl (15 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.5301537Z Using cached python_dotenv-1.0.1-py3-none-any.whl (19 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.5314641Z Using cached httpx-0.27.0-py3-none-any.whl (75 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.5328393Z Using cached requests-2.32.3-py3-none-any.whl (64 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.5341534Z Using cached types_requests-2.32.0.20240712-py3-none-any.whl (15 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.5354258Z Using cached types_urllib3-1.26.25.14-py3-none-any.whl (15 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.5367317Z Using cached pytest-8.2.1-py3-none-any.whl (339 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.5382508Z Using cached pytest_cov-5.0.0-py3-none-any.whl (21 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.5395728Z Using cached mypy-1.10.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (12.6 MB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.5501834Z Using cached ruff-0.5.5-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (10.1 MB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.5589262Z Using cached bandit-1.7.9-py3-none-any.whl (127 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.5603032Z Using cached pydantic_core-2.20.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (2.1 MB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.5631520Z Using cached charset_normalizer-3.4.3-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (150 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.5645736Z Using cached httpcore-1.0.9-py3-none-any.whl (78 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.5660950Z Using cached idna-3.10-py3-none-any.whl (70 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.5672805Z Using cached pluggy-1.6.0-py3-none-any.whl (20 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.5686336Z Using cached starlette-0.37.2-py3-none-any.whl (71 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.5699884Z Using cached anyio-4.10.0-py3-none-any.whl (107 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.5713601Z Using cached urllib3-2.5.0-py3-none-any.whl (129 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.5727801Z Using cached annotated_types-0.7.0-py3-none-any.whl (13 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.5741018Z Using cached certifi-2025.8.3-py3-none-any.whl (161 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.5755213Z Using cached click-8.2.1-py3-none-any.whl (102 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.5769471Z Using cached coverage-7.10.5-cp311-cp311-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (249 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.5784734Z Using cached greenlet-3.2.4-cp311-cp311-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl (587 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.5802044Z Using cached h11-0.16.0-py3-none-any.whl (37 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.5816252Z Using cached httptools-0.6.4-cp311-cp311-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl (459 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.5832263Z Using cached joblib-1.5.1-py3-none-any.whl (307 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.5847861Z Using cached mypy_extensions-1.1.0-py3-none-any.whl (5.0 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.5860978Z Using cached python_dateutil-2.9.0.post0-py2.py3-none-any.whl (229 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.5875773Z Using cached pytz-2025.2-py2.py3-none-any.whl (509 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.5893015Z Using cached PyYAML-6.0.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (762 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.5911840Z Using cached six-1.17.0-py2.py3-none-any.whl (11 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.5925014Z Using cached sniffio-1.3.1-py3-none-any.whl (10 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.5938238Z Using cached stevedore-5.5.0-py3-none-any.whl (49 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.5951398Z Using cached threadpoolctl-3.6.0-py3-none-any.whl (18 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.5964830Z Using cached typing_extensions-4.15.0-py3-none-any.whl (44 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.5978179Z Using cached tzdata-2025.2-py2.py3-none-any.whl (347 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.5994218Z Using cached uvloop-0.21.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (4.0 MB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.6037967Z Using cached watchfiles-1.1.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (453 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.6054795Z Using cached websockets-15.0.1-cp311-cp311-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl (182 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.6069072Z Using cached iniconfig-2.1.0-py3-none-any.whl (6.0 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.6082660Z Using cached mako-1.3.10-py3-none-any.whl (78 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.6097002Z Using cached MarkupSafe-3.0.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (23 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.6110225Z Using cached packaging-25.0-py3-none-any.whl (66 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.6123925Z Using cached rich-14.1.0-py3-none-any.whl (243 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.6139813Z Using cached pygments-2.19.2-py3-none-any.whl (1.2 MB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.6162073Z Using cached markdown_it_py-4.0.0-py3-none-any.whl (87 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:25.6176185Z Using cached mdurl-0.1.2-py3-none-any.whl (10.0 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:26.1121449Z Installing collected packages: types-urllib3, pytz, websockets, uvloop, urllib3, tzdata, typing-extensions, threadpoolctl, stevedore, sniffio, six, ruff, PyYAML, python-dotenv, pygments, psycopg2-binary, pluggy, packaging, numpy, mypy-extensions, mdurl, MarkupSafe, joblib, iniconfig, idna, httptools, h11, greenlet, coverage, click, charset-normalizer, certifi, annotated-types, uvicorn, types-requests, SQLAlchemy, scipy, requests, python-dateutil, pytest, pydantic-core, mypy, markdown-it-py, Mako, httpcore, anyio, aiosqlite, xgboost, watchfiles, starlette, scikit-learn, rich, pytest-cov, pydantic, pandas, httpx, alembic, pydantic-settings, fastapi, bandit
+test	Install Python dependencies with uv priority	2025-08-27T09:14:45.5351024Z 
+test	Install Python dependencies with uv priority	2025-08-27T09:14:45.5386583Z Successfully installed Mako-1.3.10 MarkupSafe-3.0.2 PyYAML-6.0.2 SQLAlchemy-2.0.31 aiosqlite-0.20.0 alembic-1.13.1 annotated-types-0.7.0 anyio-4.10.0 bandit-1.7.9 certifi-2025.8.3 charset-normalizer-3.4.3 click-8.2.1 coverage-7.10.5 fastapi-0.110.3 greenlet-3.2.4 h11-0.16.0 httpcore-1.0.9 httptools-0.6.4 httpx-0.27.0 idna-3.10 iniconfig-2.1.0 joblib-1.5.1 markdown-it-py-4.0.0 mdurl-0.1.2 mypy-1.10.0 mypy-extensions-1.1.0 numpy-1.26.4 packaging-25.0 pandas-2.2.2 pluggy-1.6.0 psycopg2-binary-2.9.9 pydantic-2.8.2 pydantic-core-2.20.1 pydantic-settings-2.3.3 pygments-2.19.2 pytest-8.2.1 pytest-cov-5.0.0 python-dateutil-2.9.0.post0 python-dotenv-1.0.1 pytz-2025.2 requests-2.32.3 rich-14.1.0 ruff-0.5.5 scikit-learn-1.4.2 scipy-1.13.1 six-1.17.0 sniffio-1.3.1 starlette-0.37.2 stevedore-5.5.0 threadpoolctl-3.6.0 types-requests-2.32.0.20240712 types-urllib3-1.26.25.14 typing-extensions-4.15.0 tzdata-2025.2 urllib3-2.5.0 uvicorn-0.30.1 uvloop-0.21.0 watchfiles-1.1.0 websockets-15.0.1 xgboost-2.0.3
+test	Install Python dependencies with uv priority	2025-08-27T09:14:46.6116939Z Obtaining file:///home/runner/work/football/football
+test	Install Python dependencies with uv priority	2025-08-27T09:14:46.6143565Z   Installing build dependencies: started
+test	Install Python dependencies with uv priority	2025-08-27T09:14:47.4119887Z   Installing build dependencies: finished with status 'done'
+test	Install Python dependencies with uv priority	2025-08-27T09:14:47.4125612Z   Checking if build backend supports build_editable: started
+test	Install Python dependencies with uv priority	2025-08-27T09:14:47.6855260Z   Checking if build backend supports build_editable: finished with status 'done'
+test	Install Python dependencies with uv priority	2025-08-27T09:14:47.6864050Z   Getting requirements to build editable: started
+test	Install Python dependencies with uv priority	2025-08-27T09:14:47.9882927Z   Getting requirements to build editable: finished with status 'done'
+test	Install Python dependencies with uv priority	2025-08-27T09:14:47.9893224Z   Preparing editable metadata (pyproject.toml): started
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.1686541Z   Preparing editable metadata (pyproject.toml): finished with status 'done'
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.1727812Z Requirement already satisfied: fastapi in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from football-predictor==0.1.0) (0.110.3)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.1731885Z Requirement already satisfied: uvicorn in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from football-predictor==0.1.0) (0.30.1)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.1736270Z Requirement already satisfied: pydantic in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from football-predictor==0.1.0) (2.8.2)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.1740296Z Requirement already satisfied: pydantic-settings in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from football-predictor==0.1.0) (2.3.3)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.1744293Z Requirement already satisfied: xgboost in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from football-predictor==0.1.0) (2.0.3)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.1748329Z Requirement already satisfied: pandas in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from football-predictor==0.1.0) (2.2.2)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.1752264Z Requirement already satisfied: numpy in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from football-predictor==0.1.0) (1.26.4)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.2202899Z Collecting psycopg[binary] (from football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.2218826Z   Using cached psycopg-3.2.9-py3-none-any.whl.metadata (4.5 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.2277816Z Requirement already satisfied: sqlalchemy in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from football-predictor==0.1.0) (2.0.31)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.3461860Z Collecting prefect (from football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.3477672Z   Using cached prefect-3.4.14-py3-none-any.whl.metadata (13 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.3748766Z Collecting prometheus-client (from football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.3762568Z   Using cached prometheus_client-0.22.1-py3-none-any.whl.metadata (1.9 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.3777424Z Requirement already satisfied: httpx in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from football-predictor==0.1.0) (0.27.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.3952889Z Collecting beautifulsoup4 (from football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.3967926Z   Using cached beautifulsoup4-4.13.5-py3-none-any.whl.metadata (3.8 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.4212768Z Collecting structlog (from football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.4227363Z   Using cached structlog-25.4.0-py3-none-any.whl.metadata (7.6 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.4245852Z Requirement already satisfied: pytest in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from football-predictor==0.1.0) (8.2.1)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.4249451Z Requirement already satisfied: pytest-cov in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from football-predictor==0.1.0) (5.0.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.4433436Z Collecting soupsieve>1.2 (from beautifulsoup4->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.4448295Z   Using cached soupsieve-2.7-py3-none-any.whl.metadata (4.6 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.4465354Z Requirement already satisfied: typing-extensions>=4.0.0 in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from beautifulsoup4->football-predictor==0.1.0) (4.15.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.4488407Z Requirement already satisfied: starlette<0.38.0,>=0.37.2 in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from fastapi->football-predictor==0.1.0) (0.37.2)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.4531179Z Requirement already satisfied: annotated-types>=0.4.0 in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from pydantic->football-predictor==0.1.0) (0.7.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.4536634Z Requirement already satisfied: pydantic-core==2.20.1 in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from pydantic->football-predictor==0.1.0) (2.20.1)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.4565940Z Requirement already satisfied: anyio<5,>=3.4.0 in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from starlette<0.38.0,>=0.37.2->fastapi->football-predictor==0.1.0) (4.10.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.4582852Z Requirement already satisfied: idna>=2.8 in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from anyio<5,>=3.4.0->starlette<0.38.0,>=0.37.2->fastapi->football-predictor==0.1.0) (3.10)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.4588484Z Requirement already satisfied: sniffio>=1.1 in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from anyio<5,>=3.4.0->starlette<0.38.0,>=0.37.2->fastapi->football-predictor==0.1.0) (1.3.1)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.4635480Z Requirement already satisfied: certifi in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from httpx->football-predictor==0.1.0) (2025.8.3)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.4640823Z Requirement already satisfied: httpcore==1.* in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from httpx->football-predictor==0.1.0) (1.0.9)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.4664422Z Requirement already satisfied: h11>=0.16 in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from httpcore==1.*->httpx->football-predictor==0.1.0) (0.16.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.4730684Z Requirement already satisfied: python-dateutil>=2.8.2 in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from pandas->football-predictor==0.1.0) (2.9.0.post0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.4736258Z Requirement already satisfied: pytz>=2020.1 in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from pandas->football-predictor==0.1.0) (2025.2)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.4741329Z Requirement already satisfied: tzdata>=2022.7 in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from pandas->football-predictor==0.1.0) (2025.2)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.4830479Z Requirement already satisfied: six>=1.5 in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from python-dateutil>=2.8.2->pandas->football-predictor==0.1.0) (1.17.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.4864241Z Requirement already satisfied: aiosqlite<1.0.0,>=0.17.0 in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from prefect->football-predictor==0.1.0) (0.20.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.4868889Z Requirement already satisfied: alembic<2.0.0,>=1.7.5 in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from prefect->football-predictor==0.1.0) (1.13.1)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.5075340Z Collecting apprise<2.0.0,>=1.1.0 (from prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.5089421Z   Using cached apprise-1.9.4-py3-none-any.whl.metadata (55 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.5305988Z Collecting asgi-lifespan<3.0,>=1.0 (from prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.5319973Z   Using cached asgi_lifespan-2.1.0-py3-none-any.whl.metadata (10 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.5745110Z Collecting asyncpg<1.0.0,>=0.23 (from prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.5760670Z   Using cached asyncpg-0.30.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (5.0 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.5972037Z Collecting cachetools<7.0,>=5.3 (from prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.5985997Z   Using cached cachetools-6.2.0-py3-none-any.whl.metadata (5.4 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.6002281Z Requirement already satisfied: click<9,>=8.0 in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from prefect->football-predictor==0.1.0) (8.2.1)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.6161458Z Collecting cloudpickle<4.0,>=2.0 (from prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.6175737Z   Using cached cloudpickle-3.1.1-py3-none-any.whl.metadata (7.1 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.6302168Z Collecting coolname<3.0.0,>=1.0.4 (from prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.6316221Z   Using cached coolname-2.2.0-py2.py3-none-any.whl.metadata (6.2 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.8035537Z Collecting cryptography>=36.0.1 (from prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.8052137Z   Using cached cryptography-45.0.6-cp311-abi3-manylinux_2_34_x86_64.whl.metadata (5.7 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.8272169Z Collecting dateparser<2.0.0,>=1.1.1 (from prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.8286858Z   Using cached dateparser-1.2.2-py3-none-any.whl.metadata (29 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.8540105Z Collecting docker<8.0,>=4.0 (from prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.8559437Z   Using cached docker-7.1.0-py3-none-any.whl.metadata (3.8 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.8769871Z Collecting exceptiongroup>=1.0.0 (from prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.8784889Z   Using cached exceptiongroup-1.3.0-py3-none-any.whl.metadata (6.7 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.9266109Z Collecting fastapi (from football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.9281825Z   Using cached fastapi-0.116.1-py3-none-any.whl.metadata (28 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.9557630Z Collecting fsspec>=2022.5.0 (from prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.9572444Z   Using cached fsspec-2025.7.0-py3-none-any.whl.metadata (12 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.9971583Z Collecting graphviz>=0.20.1 (from prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:48.9986066Z   Using cached graphviz-0.21-py3-none-any.whl.metadata (12 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:49.0334830Z Collecting griffe<2.0.0,>=0.49.0 (from prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:49.0350042Z   Using cached griffe-1.13.0-py3-none-any.whl.metadata (5.1 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:49.0559117Z Collecting humanize<5.0.0,>=4.9.0 (from prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:49.0573430Z   Using cached humanize-4.13.0-py3-none-any.whl.metadata (7.8 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:49.0709419Z Collecting jinja2-humanize-extension>=0.4.0 (from prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:49.0723484Z   Using cached jinja2_humanize_extension-0.4.0-py3-none-any.whl.metadata (3.6 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:49.0899373Z Collecting jinja2<4.0.0,>=3.1.6 (from prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:49.0915031Z   Using cached jinja2-3.1.6-py3-none-any.whl.metadata (2.9 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:49.1070249Z Collecting jsonpatch<2.0,>=1.32 (from prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:49.1084477Z   Using cached jsonpatch-1.33-py2.py3-none-any.whl.metadata (3.0 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:49.1359617Z Collecting jsonschema<5.0.0,>=4.18.0 (from prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:49.1374793Z   Using cached jsonschema-4.25.1-py3-none-any.whl.metadata (7.6 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:49.1809691Z Collecting opentelemetry-api<2.0.0,>=1.27.0 (from prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:49.1824434Z   Using cached opentelemetry_api-1.36.0-py3-none-any.whl.metadata (1.5 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:49.4281495Z Collecting orjson<4.0,>=3.7 (from prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:49.4530759Z   Downloading orjson-3.11.3-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (41 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:49.4640253Z Requirement already satisfied: packaging<25.1,>=21.3 in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from prefect->football-predictor==0.1.0) (25.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:49.4771557Z Collecting pathspec>=0.8.0 (from prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:49.4785712Z   Using cached pathspec-0.12.1-py3-none-any.whl.metadata (21 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:49.5242646Z Collecting pendulum<4,>=3.0.0 (from prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:49.5258224Z   Using cached pendulum-3.1.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.8 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:49.6510635Z Collecting pydantic (from football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:49.6526057Z   Using cached pydantic-2.11.7-py3-none-any.whl.metadata (67 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:49.6695949Z Collecting pydantic-extra-types<3.0.0,>=2.8.2 (from prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:49.6709558Z   Using cached pydantic_extra_types-2.10.5-py3-none-any.whl.metadata (3.9 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:49.6905098Z Collecting python-slugify<9.0,>=5.0 (from prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:49.6918524Z   Using cached python_slugify-8.0.4-py2.py3-none-any.whl.metadata (8.5 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:49.7086467Z Collecting python-socks<3.0,>=2.5.3 (from python-socks[asyncio]<3.0,>=2.5.3->prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:49.7099838Z   Using cached python_socks-2.7.2-py3-none-any.whl.metadata (8.0 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:49.7129222Z Requirement already satisfied: pyyaml<7.0.0,>=5.4.1 in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from prefect->football-predictor==0.1.0) (6.0.2)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:49.7276319Z Collecting readchar<5.0.0,>=4.0.0 (from prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:49.7289714Z   Using cached readchar-4.2.1-py3-none-any.whl.metadata (7.5 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:49.7404478Z Collecting rfc3339-validator<0.2.0,>=0.1.4 (from prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:49.7418929Z   Using cached rfc3339_validator-0.1.4-py2.py3-none-any.whl.metadata (1.5 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:49.7432640Z Requirement already satisfied: rich<15.0,>=11.0 in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from prefect->football-predictor==0.1.0) (14.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:49.9069364Z Collecting ruamel-yaml>=0.17.0 (from prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:49.9084101Z   Using cached ruamel.yaml-0.18.15-py3-none-any.whl.metadata (25 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:49.9257786Z Collecting semver>=3.0.4 (from prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:49.9270764Z   Using cached semver-3.0.4-py3-none-any.whl.metadata (6.8 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:49.9402840Z Collecting toml>=0.10.0 (from prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:49.9416309Z   Using cached toml-0.10.2-py2.py3-none-any.whl.metadata (7.1 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:49.9614604Z Collecting typer!=0.12.2,<0.17.0,>=0.12.0 (from prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:49.9628834Z   Using cached typer-0.16.1-py3-none-any.whl.metadata (15 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:49.9656330Z Requirement already satisfied: uv>=0.6.0 in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from prefect->football-predictor==0.1.0) (0.8.13)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:49.9661577Z Requirement already satisfied: websockets<16.0,>=13.0 in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from prefect->football-predictor==0.1.0) (15.0.1)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:49.9715619Z Requirement already satisfied: Mako in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from alembic<2.0.0,>=1.7.5->prefect->football-predictor==0.1.0) (1.3.10)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:49.9736982Z Requirement already satisfied: requests in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from apprise<2.0.0,>=1.1.0->prefect->football-predictor==0.1.0) (2.32.3)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:49.9870539Z Collecting requests-oauthlib (from apprise<2.0.0,>=1.1.0->prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:49.9884129Z   Using cached requests_oauthlib-2.0.0-py2.py3-none-any.whl.metadata (11 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:50.0070156Z Collecting markdown (from apprise<2.0.0,>=1.1.0->prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:50.0083336Z   Using cached markdown-3.8.2-py3-none-any.whl.metadata (5.1 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:50.3559698Z Collecting regex>=2024.9.11 (from dateparser<2.0.0,>=1.1.1->prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:50.3575746Z   Using cached regex-2025.7.34-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (40 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:50.3759454Z Collecting tzlocal>=0.2 (from dateparser<2.0.0,>=1.1.1->prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:50.3773921Z   Using cached tzlocal-5.3.1-py3-none-any.whl.metadata (7.6 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:50.3814639Z Requirement already satisfied: urllib3>=1.26.0 in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from docker<8.0,>=4.0->prefect->football-predictor==0.1.0) (2.5.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:50.4102385Z Collecting starlette<0.48.0,>=0.40.0 (from fastapi->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:50.4117801Z   Using cached starlette-0.47.3-py3-none-any.whl.metadata (6.2 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:50.4340336Z Collecting colorama>=0.4 (from griffe<2.0.0,>=0.49.0->prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:50.4354339Z   Using cached colorama-0.4.6-py2.py3-none-any.whl.metadata (17 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:50.4403250Z Requirement already satisfied: MarkupSafe>=2.0 in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from jinja2<4.0.0,>=3.1.6->prefect->football-predictor==0.1.0) (3.0.2)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:50.4550265Z Collecting jsonpointer>=1.9 (from jsonpatch<2.0,>=1.32->prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:50.4563984Z   Using cached jsonpointer-3.0.0-py2.py3-none-any.whl.metadata (2.3 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:50.4735241Z Collecting attrs>=22.2.0 (from jsonschema<5.0.0,>=4.18.0->prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:50.4748805Z   Using cached attrs-25.3.0-py3-none-any.whl.metadata (10 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:50.4952544Z Collecting jsonschema-specifications>=2023.03.6 (from jsonschema<5.0.0,>=4.18.0->prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:50.4966502Z   Using cached jsonschema_specifications-2025.4.1-py3-none-any.whl.metadata (2.9 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:50.5218485Z Collecting referencing>=0.28.4 (from jsonschema<5.0.0,>=4.18.0->prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:50.5231963Z   Using cached referencing-0.36.2-py3-none-any.whl.metadata (2.8 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:50.7607592Z Collecting rpds-py>=0.7.1 (from jsonschema<5.0.0,>=4.18.0->prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:50.7622716Z   Using cached rpds_py-0.27.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.2 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:50.7969372Z Collecting importlib-metadata<8.8.0,>=6.0 (from opentelemetry-api<2.0.0,>=1.27.0->prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:50.7983878Z   Using cached importlib_metadata-8.7.0-py3-none-any.whl.metadata (4.8 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:50.8222353Z Collecting zipp>=3.20 (from importlib-metadata<8.8.0,>=6.0->opentelemetry-api<2.0.0,>=1.27.0->prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:50.8236303Z   Using cached zipp-3.23.0-py3-none-any.whl.metadata (3.6 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:51.5390900Z Collecting pydantic-core<3.0.0,>=2.12.0 (from prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:51.5406432Z   Using cached pydantic_core-2.33.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.8 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:51.5532206Z Collecting typing-inspection>=0.4.0 (from pydantic->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:51.5545863Z   Using cached typing_inspection-0.4.1-py3-none-any.whl.metadata (2.6 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:51.6120114Z Requirement already satisfied: python-dotenv>=0.21.0 in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from pydantic-settings->football-predictor==0.1.0) (1.0.1)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:51.6260033Z Collecting text-unidecode>=1.3 (from python-slugify<9.0,>=5.0->prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:51.6273606Z   Using cached text_unidecode-1.3-py2.py3-none-any.whl.metadata (2.4 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:51.6388952Z Requirement already satisfied: markdown-it-py>=2.2.0 in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from rich<15.0,>=11.0->prefect->football-predictor==0.1.0) (4.0.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:51.6395866Z Requirement already satisfied: pygments<3.0.0,>=2.13.0 in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from rich<15.0,>=11.0->prefect->football-predictor==0.1.0) (2.19.2)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:51.6441484Z Requirement already satisfied: greenlet!=0.4.17 in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from sqlalchemy->football-predictor==0.1.0) (3.2.4)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:51.6686670Z Collecting shellingham>=1.3.0 (from typer!=0.12.2,<0.17.0,>=0.12.0->prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:51.6700668Z   Using cached shellingham-1.5.4-py2.py3-none-any.whl.metadata (3.5 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:51.7794640Z Collecting cffi>=1.14 (from cryptography>=36.0.1->prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:51.7810562Z   Using cached cffi-1.17.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (1.5 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:51.7968525Z Collecting pycparser (from cffi>=1.14->cryptography>=36.0.1->prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:51.7982101Z   Using cached pycparser-2.22-py3-none-any.whl.metadata (943 bytes)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:51.8302080Z Collecting h2<5,>=3 (from httpx[http2]!=0.23.2,>=0.23->prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:51.8315471Z   Using cached h2-4.3.0-py3-none-any.whl.metadata (5.1 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:51.8493428Z Collecting hyperframe<7,>=6.1 (from h2<5,>=3->httpx[http2]!=0.23.2,>=0.23->prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:51.8506659Z   Using cached hyperframe-6.1.0-py3-none-any.whl.metadata (4.3 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:51.8635310Z Collecting hpack<5,>=4.1 (from h2<5,>=3->httpx[http2]!=0.23.2,>=0.23->prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:51.8648270Z   Using cached hpack-4.1.0-py3-none-any.whl.metadata (4.6 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:51.8911491Z Requirement already satisfied: mdurl~=0.1 in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from markdown-it-py>=2.2.0->rich<15.0,>=11.0->prefect->football-predictor==0.1.0) (0.1.2)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:51.9177637Z Requirement already satisfied: charset-normalizer<4,>=2 in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from requests->apprise<2.0.0,>=1.1.0->prefect->football-predictor==0.1.0) (3.4.3)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:51.9582772Z Collecting ruamel.yaml.clib>=0.2.7 (from ruamel-yaml>=0.17.0->prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:51.9597032Z   Using cached ruamel.yaml.clib-0.2.12-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (2.7 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.1287920Z Collecting psycopg-binary==3.2.9 (from psycopg[binary]->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.1302495Z   Using cached psycopg_binary-3.2.9-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (2.9 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.1436897Z Requirement already satisfied: iniconfig in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from pytest->football-predictor==0.1.0) (2.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.1449787Z Requirement already satisfied: pluggy<2.0,>=1.5 in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from pytest->football-predictor==0.1.0) (1.6.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.1517952Z Requirement already satisfied: coverage>=5.2.1 in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from coverage[toml]>=5.2.1->pytest-cov->football-predictor==0.1.0) (7.10.5)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.1727928Z Collecting oauthlib>=3.0.0 (from requests-oauthlib->apprise<2.0.0,>=1.1.0->prefect->football-predictor==0.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.1741495Z   Using cached oauthlib-3.3.1-py3-none-any.whl.metadata (7.9 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.1845348Z Requirement already satisfied: scipy in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from xgboost->football-predictor==0.1.0) (1.13.1)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.1957693Z Using cached beautifulsoup4-4.13.5-py3-none-any.whl (105 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.1970958Z Using cached soupsieve-2.7-py3-none-any.whl (36 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.1983813Z Using cached prefect-3.4.14-py3-none-any.whl (6.1 MB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2044441Z Using cached apprise-1.9.4-py3-none-any.whl (1.4 MB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2068082Z Using cached asgi_lifespan-2.1.0-py3-none-any.whl (10 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2080850Z Using cached asyncpg-0.30.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (3.1 MB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2117083Z Using cached cachetools-6.2.0-py3-none-any.whl (11 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2129574Z Using cached cloudpickle-3.1.1-py3-none-any.whl (20 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2142158Z Using cached coolname-2.2.0-py2.py3-none-any.whl (37 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2155004Z Using cached dateparser-1.2.2-py3-none-any.whl (315 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2169604Z Using cached docker-7.1.0-py3-none-any.whl (147 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2182977Z Using cached fastapi-0.116.1-py3-none-any.whl (95 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2196244Z Using cached griffe-1.13.0-py3-none-any.whl (139 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2209668Z Using cached humanize-4.13.0-py3-none-any.whl (128 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2223044Z Using cached jinja2-3.1.6-py3-none-any.whl (134 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2236443Z Using cached jsonpatch-1.33-py2.py3-none-any.whl (12 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2248822Z Using cached jsonschema-4.25.1-py3-none-any.whl (90 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2261876Z Using cached opentelemetry_api-1.36.0-py3-none-any.whl (65 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2274855Z Using cached importlib_metadata-8.7.0-py3-none-any.whl (27 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2350894Z Downloading orjson-3.11.3-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (132 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2459634Z Using cached pendulum-3.1.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (353 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2474940Z Using cached pydantic-2.11.7-py3-none-any.whl (444 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2491043Z Using cached pydantic_core-2.33.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (2.0 MB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2518854Z Using cached pydantic_extra_types-2.10.5-py3-none-any.whl (38 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2531631Z Using cached python_slugify-8.0.4-py2.py3-none-any.whl (10 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2544720Z Using cached python_socks-2.7.2-py3-none-any.whl (55 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2557436Z Using cached readchar-4.2.1-py3-none-any.whl (9.3 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2570115Z Using cached rfc3339_validator-0.1.4-py2.py3-none-any.whl (3.5 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2582657Z Using cached starlette-0.47.3-py3-none-any.whl (72 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2595615Z Using cached typer-0.16.1-py3-none-any.whl (46 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2608355Z Using cached attrs-25.3.0-py3-none-any.whl (63 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2621315Z Using cached colorama-0.4.6-py2.py3-none-any.whl (25 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2634606Z Using cached cryptography-45.0.6-cp311-abi3-manylinux_2_34_x86_64.whl (4.5 MB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2685043Z Using cached cffi-1.17.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (467 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2699928Z Using cached exceptiongroup-1.3.0-py3-none-any.whl (16 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2712754Z Using cached fsspec-2025.7.0-py3-none-any.whl (199 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2726651Z Using cached graphviz-0.21-py3-none-any.whl (47 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2739483Z Using cached h2-4.3.0-py3-none-any.whl (61 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2752171Z Using cached hpack-4.1.0-py3-none-any.whl (34 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2765013Z Using cached hyperframe-6.1.0-py3-none-any.whl (13 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2778019Z Using cached jinja2_humanize_extension-0.4.0-py3-none-any.whl (4.8 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2790316Z Using cached jsonpointer-3.0.0-py2.py3-none-any.whl (7.6 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2802722Z Using cached jsonschema_specifications-2025.4.1-py3-none-any.whl (18 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2815427Z Using cached pathspec-0.12.1-py3-none-any.whl (31 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2828319Z Using cached prometheus_client-0.22.1-py3-none-any.whl (58 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2841161Z Using cached referencing-0.36.2-py3-none-any.whl (26 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2854538Z Using cached regex-2025.7.34-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (798 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2873095Z Using cached rpds_py-0.27.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (383 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2888736Z Using cached ruamel.yaml-0.18.15-py3-none-any.whl (119 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2902325Z Using cached ruamel.yaml.clib-0.2.12-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (739 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2920795Z Using cached semver-3.0.4-py3-none-any.whl (17 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2933486Z Using cached shellingham-1.5.4-py2.py3-none-any.whl (9.8 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2946377Z Using cached text_unidecode-1.3-py2.py3-none-any.whl (78 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2959433Z Using cached toml-0.10.2-py2.py3-none-any.whl (16 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2972025Z Using cached typing_inspection-0.4.1-py3-none-any.whl (14 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.2985036Z Using cached tzlocal-5.3.1-py3-none-any.whl (18 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.3000588Z Using cached zipp-3.23.0-py3-none-any.whl (10 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.3013474Z Using cached markdown-3.8.2-py3-none-any.whl (106 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.3027409Z Using cached psycopg-3.2.9-py3-none-any.whl (202 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.3041652Z Using cached psycopg_binary-3.2.9-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (4.5 MB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.3088053Z Using cached pycparser-2.22-py3-none-any.whl (117 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.3101573Z Using cached requests_oauthlib-2.0.0-py2.py3-none-any.whl (24 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.3114339Z Using cached oauthlib-3.3.1-py3-none-any.whl (160 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.3128133Z Using cached structlog-25.4.0-py3-none-any.whl (68 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.3786337Z Building wheels for collected packages: football-predictor
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.3794300Z   Building editable for football-predictor (pyproject.toml): started
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.5914252Z   Building editable for football-predictor (pyproject.toml): finished with status 'done'
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.5919674Z   Created wheel for football-predictor: filename=football_predictor-0.1.0-0.editable-py3-none-any.whl size=3057 sha256=f87df279a30818dc0c08230e345762ed91bc5924236c3d84de30ed2574b873e2
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.5921018Z   Stored in directory: /tmp/pip-ephem-wheel-cache-7ljqtmos/wheels/68/e7/ef/72323d3541a6f1777dfb372c7bac7167f097953b09119e49ab
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.5935621Z Successfully built football-predictor
+test	Install Python dependencies with uv priority	2025-08-27T09:14:52.7239454Z Installing collected packages: text-unidecode, coolname, zipp, tzlocal, typing-inspection, toml, structlog, soupsieve, shellingham, semver, ruamel.yaml.clib, rpds-py, rfc3339-validator, regex, readchar, python-socks, python-slugify, pydantic-core, pycparser, psycopg-binary, psycopg, prometheus-client, pathspec, orjson, oauthlib, markdown, jsonpointer, jinja2, hyperframe, humanize, hpack, graphviz, fsspec, exceptiongroup, colorama, cloudpickle, cachetools, attrs, asyncpg, asgi-lifespan, starlette, ruamel-yaml, requests-oauthlib, referencing, pydantic, pendulum, jsonpatch, jinja2-humanize-extension, importlib-metadata, h2, griffe, docker, dateparser, cffi, beautifulsoup4, typer, pydantic-extra-types, opentelemetry-api, jsonschema-specifications, fastapi, cryptography, apprise, jsonschema, prefect, football-predictor
+test	Install Python dependencies with uv priority	2025-08-27T09:14:53.0572577Z   Attempting uninstall: pydantic-core
+test	Install Python dependencies with uv priority	2025-08-27T09:14:53.0598315Z     Found existing installation: pydantic_core 2.20.1
+test	Install Python dependencies with uv priority	2025-08-27T09:14:53.0616380Z     Uninstalling pydantic_core-2.20.1:
+test	Install Python dependencies with uv priority	2025-08-27T09:14:53.0624055Z       Successfully uninstalled pydantic_core-2.20.1
+test	Install Python dependencies with uv priority	2025-08-27T09:14:54.1428420Z   Attempting uninstall: starlette
+test	Install Python dependencies with uv priority	2025-08-27T09:14:54.1457273Z     Found existing installation: starlette 0.37.2
+test	Install Python dependencies with uv priority	2025-08-27T09:14:54.1495065Z     Uninstalling starlette-0.37.2:
+test	Install Python dependencies with uv priority	2025-08-27T09:14:54.1504621Z       Successfully uninstalled starlette-0.37.2
+test	Install Python dependencies with uv priority	2025-08-27T09:14:54.3515264Z   Attempting uninstall: pydantic
+test	Install Python dependencies with uv priority	2025-08-27T09:14:54.3559913Z     Found existing installation: pydantic 2.8.2
+test	Install Python dependencies with uv priority	2025-08-27T09:14:54.3647714Z     Uninstalling pydantic-2.8.2:
+test	Install Python dependencies with uv priority	2025-08-27T09:14:54.3662129Z       Successfully uninstalled pydantic-2.8.2
+test	Install Python dependencies with uv priority	2025-08-27T09:14:55.4109733Z   Attempting uninstall: fastapi
+test	Install Python dependencies with uv priority	2025-08-27T09:14:55.4144286Z     Found existing installation: fastapi 0.110.3
+test	Install Python dependencies with uv priority	2025-08-27T09:14:55.4191219Z     Uninstalling fastapi-0.110.3:
+test	Install Python dependencies with uv priority	2025-08-27T09:14:55.4202759Z       Successfully uninstalled fastapi-0.110.3
+test	Install Python dependencies with uv priority	2025-08-27T09:14:57.1247418Z 
+test	Install Python dependencies with uv priority	2025-08-27T09:14:57.1304625Z Successfully installed apprise-1.9.4 asgi-lifespan-2.1.0 asyncpg-0.30.0 attrs-25.3.0 beautifulsoup4-4.13.5 cachetools-6.2.0 cffi-1.17.1 cloudpickle-3.1.1 colorama-0.4.6 coolname-2.2.0 cryptography-45.0.6 dateparser-1.2.2 docker-7.1.0 exceptiongroup-1.3.0 fastapi-0.116.1 football-predictor-0.1.0 fsspec-2025.7.0 graphviz-0.21 griffe-1.13.0 h2-4.3.0 hpack-4.1.0 humanize-4.13.0 hyperframe-6.1.0 importlib-metadata-8.7.0 jinja2-3.1.6 jinja2-humanize-extension-0.4.0 jsonpatch-1.33 jsonpointer-3.0.0 jsonschema-4.25.1 jsonschema-specifications-2025.4.1 markdown-3.8.2 oauthlib-3.3.1 opentelemetry-api-1.36.0 orjson-3.11.3 pathspec-0.12.1 pendulum-3.1.0 prefect-3.4.14 prometheus-client-0.22.1 psycopg-3.2.9 psycopg-binary-3.2.9 pycparser-2.22 pydantic-2.11.7 pydantic-core-2.33.2 pydantic-extra-types-2.10.5 python-slugify-8.0.4 python-socks-2.7.2 readchar-4.2.1 referencing-0.36.2 regex-2025.7.34 requests-oauthlib-2.0.0 rfc3339-validator-0.1.4 rpds-py-0.27.0 ruamel-yaml-0.18.15 ruamel.yaml.clib-0.2.12 semver-3.0.4 shellingham-1.5.4 soupsieve-2.7 starlette-0.47.3 structlog-25.4.0 text-unidecode-1.3 toml-0.10.2 typer-0.16.1 typing-inspection-0.4.1 tzlocal-5.3.1 zipp-3.23.0
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.1354546Z Collecting pre-commit
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.1374029Z   Using cached pre_commit-4.3.0-py2.py3-none-any.whl.metadata (1.2 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.1403872Z Requirement already satisfied: ruff in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (0.5.5)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.1408239Z Requirement already satisfied: mypy in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (1.10.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.1411908Z Requirement already satisfied: pytest in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (8.2.1)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.1416237Z Requirement already satisfied: pytest-cov in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (5.0.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.1420406Z Requirement already satisfied: bandit in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (1.7.9)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.1763105Z Collecting diff-cover
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.2045581Z   Downloading diff_cover-9.6.0-py3-none-any.whl.metadata (18 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.2243070Z Collecting cfgv>=2.0.0 (from pre-commit)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.2259166Z   Using cached cfgv-3.4.0-py2.py3-none-any.whl.metadata (8.5 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.2815032Z Collecting identify>=1.0.0 (from pre-commit)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.2830618Z   Using cached identify-2.6.13-py2.py3-none-any.whl.metadata (4.4 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.3047055Z Collecting nodeenv>=0.11.1 (from pre-commit)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.3060951Z   Using cached nodeenv-1.9.1-py2.py3-none-any.whl.metadata (21 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.3085940Z Requirement already satisfied: pyyaml>=5.1 in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from pre-commit) (6.0.2)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.3507543Z Collecting virtualenv>=20.10.0 (from pre-commit)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.3520872Z   Using cached virtualenv-20.34.0-py3-none-any.whl.metadata (4.6 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.3580531Z Requirement already satisfied: typing-extensions>=4.1.0 in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from mypy) (4.15.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.3586045Z Requirement already satisfied: mypy-extensions>=1.0.0 in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from mypy) (1.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.3599824Z Requirement already satisfied: iniconfig in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from pytest) (2.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.3603653Z Requirement already satisfied: packaging in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from pytest) (25.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.3609849Z Requirement already satisfied: pluggy<2.0,>=1.5 in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from pytest) (1.6.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.3644764Z Requirement already satisfied: coverage>=5.2.1 in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from coverage[toml]>=5.2.1->pytest-cov) (7.10.5)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.3664179Z Requirement already satisfied: stevedore>=1.20.0 in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from bandit) (5.5.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.3667710Z Requirement already satisfied: rich in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from bandit) (14.1.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.3690749Z Requirement already satisfied: Jinja2>=2.7.1 in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from diff-cover) (3.1.6)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.3696215Z Requirement already satisfied: Pygments<3.0.0,>=2.19.1 in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from diff-cover) (2.19.2)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.3825024Z Collecting chardet>=3.0.0 (from diff-cover)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.3899964Z   Downloading chardet-5.2.0-py3-none-any.whl.metadata (3.4 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.3979949Z Requirement already satisfied: MarkupSafe>=2.0 in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from Jinja2>=2.7.1->diff-cover) (3.0.2)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.4151892Z Collecting distlib<1,>=0.3.7 (from virtualenv>=20.10.0->pre-commit)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.4169228Z   Using cached distlib-0.4.0-py2.py3-none-any.whl.metadata (5.2 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.4381154Z Collecting filelock<4,>=3.12.2 (from virtualenv>=20.10.0->pre-commit)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.4394161Z   Using cached filelock-3.19.1-py3-none-any.whl.metadata (2.1 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.4584487Z Collecting platformdirs<5,>=3.9.1 (from virtualenv>=20.10.0->pre-commit)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.4597527Z   Using cached platformdirs-4.4.0-py3-none-any.whl.metadata (12 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.4672487Z Requirement already satisfied: markdown-it-py>=2.2.0 in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from rich->bandit) (4.0.0)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.4689126Z Requirement already satisfied: mdurl~=0.1 in /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages (from markdown-it-py>=2.2.0->rich->bandit) (0.1.2)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.4736065Z Using cached pre_commit-4.3.0-py2.py3-none-any.whl (220 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.4815023Z Downloading diff_cover-9.6.0-py3-none-any.whl (55 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.4903015Z Using cached cfgv-3.4.0-py2.py3-none-any.whl (7.2 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.5043933Z Downloading chardet-5.2.0-py3-none-any.whl (199 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.5139164Z Using cached identify-2.6.13-py2.py3-none-any.whl (99 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.5152675Z Using cached nodeenv-1.9.1-py2.py3-none-any.whl (22 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.5165826Z Using cached virtualenv-20.34.0-py3-none-any.whl (6.0 MB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.5228058Z Using cached distlib-0.4.0-py2.py3-none-any.whl (469 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.5244899Z Using cached filelock-3.19.1-py3-none-any.whl (15 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.5257845Z Using cached platformdirs-4.4.0-py3-none-any.whl (18 kB)
+test	Install Python dependencies with uv priority	2025-08-27T09:14:58.6767208Z Installing collected packages: distlib, platformdirs, nodeenv, identify, filelock, chardet, cfgv, virtualenv, diff-cover, pre-commit
+test	Install Python dependencies with uv priority	2025-08-27T09:14:59.2241577Z 
+test	Install Python dependencies with uv priority	2025-08-27T09:14:59.2295302Z Successfully installed cfgv-3.4.0 chardet-5.2.0 diff-cover-9.6.0 distlib-0.4.0 filelock-3.19.1 identify-2.6.13 nodeenv-1.9.1 platformdirs-4.4.0 pre-commit-4.3.0 virtualenv-20.34.0
+test	Install Python dependencies with uv priority	2025-08-27T09:14:59.2993479Z ##[endgroup]
+test	Cache pre-commit	﻿2025-08-27T09:14:59.3556689Z ##[group]Run actions/cache@v4
+test	Cache pre-commit	2025-08-27T09:14:59.3556964Z with:
+test	Cache pre-commit	2025-08-27T09:14:59.3557162Z   path: ~/.cache/pre-commit
+test	Cache pre-commit	2025-08-27T09:14:59.3557564Z   key: Linux-pre-commit-588e1aaed9e4b8119cf05729282591cdcfa2be4e82eab9942605b8dcbd1d54ac
+test	Cache pre-commit	2025-08-27T09:14:59.3558015Z   enableCrossOsArchive: false
+test	Cache pre-commit	2025-08-27T09:14:59.3558440Z   fail-on-cache-miss: false
+test	Cache pre-commit	2025-08-27T09:14:59.3558666Z   lookup-only: false
+test	Cache pre-commit	2025-08-27T09:14:59.3558870Z   save-always: false
+test	Cache pre-commit	2025-08-27T09:14:59.3559061Z env:
+test	Cache pre-commit	2025-08-27T09:14:59.3559256Z   PIP_DISABLE_PIP_VERSION_CHECK: 1
+test	Cache pre-commit	2025-08-27T09:14:59.3559500Z   PIP_DEFAULT_TIMEOUT: 60
+test	Cache pre-commit	2025-08-27T09:14:59.3559718Z   UV_SYSTEM_PYTHON: 1
+test	Cache pre-commit	2025-08-27T09:14:59.3559982Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Cache pre-commit	2025-08-27T09:14:59.3560371Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.9/x64/lib/pkgconfig
+test	Cache pre-commit	2025-08-27T09:14:59.3560757Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Cache pre-commit	2025-08-27T09:14:59.3561112Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Cache pre-commit	2025-08-27T09:14:59.3561490Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Cache pre-commit	2025-08-27T09:14:59.3561842Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.9/x64/lib
+test	Cache pre-commit	2025-08-27T09:14:59.3562146Z ##[endgroup]
+test	Cache pre-commit	2025-08-27T09:14:59.6031318Z Cache not found for input keys: Linux-pre-commit-588e1aaed9e4b8119cf05729282591cdcfa2be4e82eab9942605b8dcbd1d54ac
+test	Validate Configs (syntax + single-source)	﻿2025-08-27T09:14:59.6107347Z ##[group]Run echo "::group::Config Validation"
+test	Validate Configs (syntax + single-source)	2025-08-27T09:14:59.6107733Z [36;1mecho "::group::Config Validation"[0m
+test	Validate Configs (syntax + single-source)	2025-08-27T09:14:59.6108008Z [36;1m# Validate TOML syntax[0m
+test	Validate Configs (syntax + single-source)	2025-08-27T09:14:59.6108540Z [36;1mpython -c "import tomllib; [tomllib.load(open(f,'rb')) for f in ['pyproject.toml', '.gitleaks.toml'] if __import__('os').path.exists(f)]"[0m
+test	Validate Configs (syntax + single-source)	2025-08-27T09:14:59.6109073Z [36;1m# Validate YAML syntax[0m
+test	Validate Configs (syntax + single-source)	2025-08-27T09:14:59.6109560Z [36;1mpython -c "import yaml; [yaml.safe_load(open(f)) for f in ['.github/workflows/ci.yml'] if __import__('os').path.exists(f)]"[0m
+test	Validate Configs (syntax + single-source)	2025-08-27T09:14:59.6110125Z [36;1mecho "✅ Configuration syntax validation passed"[0m
+test	Validate Configs (syntax + single-source)	2025-08-27T09:14:59.6110441Z [36;1mecho "::endgroup::"[0m
+test	Validate Configs (syntax + single-source)	2025-08-27T09:14:59.6138925Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+test	Validate Configs (syntax + single-source)	2025-08-27T09:14:59.6139255Z env:
+test	Validate Configs (syntax + single-source)	2025-08-27T09:14:59.6139897Z   PIP_DISABLE_PIP_VERSION_CHECK: 1
+test	Validate Configs (syntax + single-source)	2025-08-27T09:14:59.6140200Z   PIP_DEFAULT_TIMEOUT: 60
+test	Validate Configs (syntax + single-source)	2025-08-27T09:14:59.6140430Z   UV_SYSTEM_PYTHON: 1
+test	Validate Configs (syntax + single-source)	2025-08-27T09:14:59.6140743Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Validate Configs (syntax + single-source)	2025-08-27T09:14:59.6141161Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.9/x64/lib/pkgconfig
+test	Validate Configs (syntax + single-source)	2025-08-27T09:14:59.6141566Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Validate Configs (syntax + single-source)	2025-08-27T09:14:59.6142014Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Validate Configs (syntax + single-source)	2025-08-27T09:14:59.6142355Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Validate Configs (syntax + single-source)	2025-08-27T09:14:59.6142704Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.9/x64/lib
+test	Validate Configs (syntax + single-source)	2025-08-27T09:14:59.6143007Z ##[endgroup]
+test	Validate Configs (syntax + single-source)	2025-08-27T09:14:59.6192791Z ##[group]Config Validation
+test	Validate Configs (syntax + single-source)	2025-08-27T09:14:59.7049931Z ✅ Configuration syntax validation passed
+test	Validate Configs (syntax + single-source)	2025-08-27T09:14:59.7050665Z ##[endgroup]
+test	Run code formatting check	﻿2025-08-27T09:14:59.7075589Z ##[group]Run echo "::group::Code Formatting"
+test	Run code formatting check	2025-08-27T09:14:59.7075941Z [36;1mecho "::group::Code Formatting"[0m
+test	Run code formatting check	2025-08-27T09:14:59.7076221Z [36;1mruff format --check .[0m
+test	Run code formatting check	2025-08-27T09:14:59.7076492Z [36;1mecho "::endgroup::"[0m
+test	Run code formatting check	2025-08-27T09:14:59.7104039Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+test	Run code formatting check	2025-08-27T09:14:59.7104369Z env:
+test	Run code formatting check	2025-08-27T09:14:59.7104572Z   PIP_DISABLE_PIP_VERSION_CHECK: 1
+test	Run code formatting check	2025-08-27T09:14:59.7104826Z   PIP_DEFAULT_TIMEOUT: 60
+test	Run code formatting check	2025-08-27T09:14:59.7105059Z   UV_SYSTEM_PYTHON: 1
+test	Run code formatting check	2025-08-27T09:14:59.7105333Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Run code formatting check	2025-08-27T09:14:59.7105730Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.9/x64/lib/pkgconfig
+test	Run code formatting check	2025-08-27T09:14:59.7106122Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Run code formatting check	2025-08-27T09:14:59.7106476Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Run code formatting check	2025-08-27T09:14:59.7106817Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Run code formatting check	2025-08-27T09:14:59.7107164Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.9/x64/lib
+test	Run code formatting check	2025-08-27T09:14:59.7107505Z ##[endgroup]
+test	Run code formatting check	2025-08-27T09:14:59.7154617Z ##[group]Code Formatting
+test	Run code formatting check	2025-08-27T09:14:59.7289272Z 70 files already formatted
+test	Run code formatting check	2025-08-27T09:14:59.7301250Z ##[endgroup]
+test	Run linting	﻿2025-08-27T09:14:59.7326344Z ##[group]Run echo "::group::Linting"
+test	Run linting	2025-08-27T09:14:59.7326683Z [36;1mecho "::group::Linting"[0m
+test	Run linting	2025-08-27T09:14:59.7326929Z [36;1mruff check .[0m
+test	Run linting	2025-08-27T09:14:59.7327152Z [36;1mecho "::endgroup::"[0m
+test	Run linting	2025-08-27T09:14:59.7354886Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+test	Run linting	2025-08-27T09:14:59.7355220Z env:
+test	Run linting	2025-08-27T09:14:59.7355415Z   PIP_DISABLE_PIP_VERSION_CHECK: 1
+test	Run linting	2025-08-27T09:14:59.7355674Z   PIP_DEFAULT_TIMEOUT: 60
+test	Run linting	2025-08-27T09:14:59.7355900Z   UV_SYSTEM_PYTHON: 1
+test	Run linting	2025-08-27T09:14:59.7356175Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Run linting	2025-08-27T09:14:59.7356590Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.9/x64/lib/pkgconfig
+test	Run linting	2025-08-27T09:14:59.7356986Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Run linting	2025-08-27T09:14:59.7357337Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Run linting	2025-08-27T09:14:59.7357691Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Run linting	2025-08-27T09:14:59.7358065Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.9/x64/lib
+test	Run linting	2025-08-27T09:14:59.7358394Z ##[endgroup]
+test	Run linting	2025-08-27T09:14:59.7405223Z ##[group]Linting
+test	Run linting	2025-08-27T09:14:59.7546302Z All checks passed!
+test	Run linting	2025-08-27T09:14:59.7558611Z ##[endgroup]
+test	Run type checking (core modules - strict)	﻿2025-08-27T09:14:59.7584063Z ##[group]Run echo "::group::Type Checking - Core Modules"
+test	Run type checking (core modules - strict)	2025-08-27T09:14:59.7584514Z [36;1mecho "::group::Type Checking - Core Modules"[0m
+test	Run type checking (core modules - strict)	2025-08-27T09:14:59.7584830Z [36;1m# Check core modules strictly[0m
+test	Run type checking (core modules - strict)	2025-08-27T09:14:59.7585133Z [36;1mfor dir in apps data_pipeline trainer; do[0m
+test	Run type checking (core modules - strict)	2025-08-27T09:14:59.7585422Z [36;1m  if [ -d "$dir" ]; then[0m
+test	Run type checking (core modules - strict)	2025-08-27T09:14:59.7585691Z [36;1m    echo "🔍 Strict type checking: $dir/"[0m
+test	Run type checking (core modules - strict)	2025-08-27T09:14:59.7585969Z [36;1m    mypy "$dir/"[0m
+test	Run type checking (core modules - strict)	2025-08-27T09:14:59.7586185Z [36;1m  fi[0m
+test	Run type checking (core modules - strict)	2025-08-27T09:14:59.7586364Z [36;1mdone[0m
+test	Run type checking (core modules - strict)	2025-08-27T09:14:59.7586556Z [36;1mecho "::endgroup::"[0m
+test	Run type checking (core modules - strict)	2025-08-27T09:14:59.7614239Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+test	Run type checking (core modules - strict)	2025-08-27T09:14:59.7614566Z env:
+test	Run type checking (core modules - strict)	2025-08-27T09:14:59.7614765Z   PIP_DISABLE_PIP_VERSION_CHECK: 1
+test	Run type checking (core modules - strict)	2025-08-27T09:14:59.7615016Z   PIP_DEFAULT_TIMEOUT: 60
+test	Run type checking (core modules - strict)	2025-08-27T09:14:59.7615247Z   UV_SYSTEM_PYTHON: 1
+test	Run type checking (core modules - strict)	2025-08-27T09:14:59.7615526Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Run type checking (core modules - strict)	2025-08-27T09:14:59.7615960Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.9/x64/lib/pkgconfig
+test	Run type checking (core modules - strict)	2025-08-27T09:14:59.7616350Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Run type checking (core modules - strict)	2025-08-27T09:14:59.7616707Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Run type checking (core modules - strict)	2025-08-27T09:14:59.7617054Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Run type checking (core modules - strict)	2025-08-27T09:14:59.7617408Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.9/x64/lib
+test	Run type checking (core modules - strict)	2025-08-27T09:14:59.7617707Z ##[endgroup]
+test	Run type checking (core modules - strict)	2025-08-27T09:14:59.7664592Z ##[group]Type Checking - Core Modules
+test	Run type checking (core modules - strict)	2025-08-27T09:14:59.7665335Z 🔍 Strict type checking: apps/
+test	Run type checking (core modules - strict)	2025-08-27T09:15:35.6491426Z Success: no issues found in 24 source files
+test	Run type checking (core modules - strict)	2025-08-27T09:15:35.6933501Z 🔍 Strict type checking: data_pipeline/
+test	Run type checking (core modules - strict)	2025-08-27T09:15:38.9301375Z Success: no issues found in 14 source files
+test	Run type checking (core modules - strict)	2025-08-27T09:15:38.9463468Z 🔍 Strict type checking: trainer/
+test	Run type checking (core modules - strict)	2025-08-27T09:15:39.7770839Z Success: no issues found in 1 source file
+test	Run type checking (core modules - strict)	2025-08-27T09:15:39.7863518Z ##[endgroup]
+test	Run type checking (other modules - advisory)	﻿2025-08-27T09:15:39.7893477Z ##[group]Run echo "::group::Type Checking - Other Modules (Advisory)"
+test	Run type checking (other modules - advisory)	2025-08-27T09:15:39.7894238Z [36;1mecho "::group::Type Checking - Other Modules (Advisory)"[0m
+test	Run type checking (other modules - advisory)	2025-08-27T09:15:39.7894654Z [36;1mecho "🔍 Advisory type checking for remaining modules..."[0m
+test	Run type checking (other modules - advisory)	2025-08-27T09:15:39.7895031Z [36;1mfor dir in tests scripts models infra docs; do[0m
+test	Run type checking (other modules - advisory)	2025-08-27T09:15:39.7895337Z [36;1m  if [ -d "$dir" ]; then[0m
+test	Run type checking (other modules - advisory)	2025-08-27T09:15:39.7895586Z [36;1m    echo "Advisory check: $dir/"[0m
+test	Run type checking (other modules - advisory)	2025-08-27T09:15:39.7895911Z [36;1m    mypy "$dir/" || echo "⚠️ Type issues in $dir/ (advisory only)"[0m
+test	Run type checking (other modules - advisory)	2025-08-27T09:15:39.7896224Z [36;1m  fi[0m
+test	Run type checking (other modules - advisory)	2025-08-27T09:15:39.7896612Z [36;1mdone[0m
+test	Run type checking (other modules - advisory)	2025-08-27T09:15:39.7896810Z [36;1mecho "::endgroup::"[0m
+test	Run type checking (other modules - advisory)	2025-08-27T09:15:39.7924541Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+test	Run type checking (other modules - advisory)	2025-08-27T09:15:39.7924864Z env:
+test	Run type checking (other modules - advisory)	2025-08-27T09:15:39.7925089Z   PIP_DISABLE_PIP_VERSION_CHECK: 1
+test	Run type checking (other modules - advisory)	2025-08-27T09:15:39.7925343Z   PIP_DEFAULT_TIMEOUT: 60
+test	Run type checking (other modules - advisory)	2025-08-27T09:15:39.7925566Z   UV_SYSTEM_PYTHON: 1
+test	Run type checking (other modules - advisory)	2025-08-27T09:15:39.7925880Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Run type checking (other modules - advisory)	2025-08-27T09:15:39.7926283Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.9/x64/lib/pkgconfig
+test	Run type checking (other modules - advisory)	2025-08-27T09:15:39.7926684Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Run type checking (other modules - advisory)	2025-08-27T09:15:39.7927031Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Run type checking (other modules - advisory)	2025-08-27T09:15:39.7927377Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Run type checking (other modules - advisory)	2025-08-27T09:15:39.7927730Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.9/x64/lib
+test	Run type checking (other modules - advisory)	2025-08-27T09:15:39.7928030Z ##[endgroup]
+test	Run type checking (other modules - advisory)	2025-08-27T09:15:39.7977193Z ##[group]Type Checking - Other Modules (Advisory)
+test	Run type checking (other modules - advisory)	2025-08-27T09:15:39.7980662Z 🔍 Advisory type checking for remaining modules...
+test	Run type checking (other modules - advisory)	2025-08-27T09:15:39.7982255Z Advisory check: tests/
+test	Run type checking (other modules - advisory)	2025-08-27T09:15:52.1324480Z Success: no issues found in 22 source files
+test	Run type checking (other modules - advisory)	2025-08-27T09:15:52.1575759Z Advisory check: scripts/
+test	Run type checking (other modules - advisory)	2025-08-27T09:15:52.4354618Z Success: no issues found in 2 source files
+test	Run type checking (other modules - advisory)	2025-08-27T09:15:52.4409016Z Advisory check: models/
+test	Run type checking (other modules - advisory)	2025-08-27T09:15:52.9024696Z Success: no issues found in 4 source files
+test	Run type checking (other modules - advisory)	2025-08-27T09:15:52.9093104Z Advisory check: infra/
+test	Run type checking (other modules - advisory)	2025-08-27T09:15:53.1717078Z Success: no issues found in 1 source file
+test	Run type checking (other modules - advisory)	2025-08-27T09:15:53.1770236Z Advisory check: docs/
+test	Run type checking (other modules - advisory)	2025-08-27T09:15:53.2831340Z There are no .py[i] files in directory 'docs'
+test	Run type checking (other modules - advisory)	2025-08-27T09:15:53.2998281Z ⚠️ Type issues in docs/ (advisory only)
+test	Run type checking (other modules - advisory)	2025-08-27T09:15:53.2999183Z ##[endgroup]
+test	Run security scan	﻿2025-08-27T09:15:53.3025982Z ##[group]Run echo "::group::Security Scan"
+test	Run security scan	2025-08-27T09:15:53.3026326Z [36;1mecho "::group::Security Scan"[0m
+test	Run security scan	2025-08-27T09:15:53.3026628Z [36;1mbandit -r . --configfile pyproject.toml[0m
+test	Run security scan	2025-08-27T09:15:53.3026940Z [36;1mecho "::endgroup::"[0m
+test	Run security scan	2025-08-27T09:15:53.3054465Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+test	Run security scan	2025-08-27T09:15:53.3054792Z env:
+test	Run security scan	2025-08-27T09:15:53.3054997Z   PIP_DISABLE_PIP_VERSION_CHECK: 1
+test	Run security scan	2025-08-27T09:15:53.3055251Z   PIP_DEFAULT_TIMEOUT: 60
+test	Run security scan	2025-08-27T09:15:53.3055472Z   UV_SYSTEM_PYTHON: 1
+test	Run security scan	2025-08-27T09:15:53.3055745Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Run security scan	2025-08-27T09:15:53.3056135Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.9/x64/lib/pkgconfig
+test	Run security scan	2025-08-27T09:15:53.3056519Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Run security scan	2025-08-27T09:15:53.3056862Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Run security scan	2025-08-27T09:15:53.3057206Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Run security scan	2025-08-27T09:15:53.3057559Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.9/x64/lib
+test	Run security scan	2025-08-27T09:15:53.3057898Z ##[endgroup]
+test	Run security scan	2025-08-27T09:15:53.3105134Z ##[group]Security Scan
+test	Run security scan	2025-08-27T09:15:53.4792011Z [main]	INFO	profile include tests: None
+test	Run security scan	2025-08-27T09:15:53.4792729Z [main]	INFO	profile exclude tests: B101,B601,B104,B602,B603,B108,B404
+test	Run security scan	2025-08-27T09:15:53.4793309Z [main]	INFO	cli include tests: None
+test	Run security scan	2025-08-27T09:15:53.4794007Z [main]	INFO	cli exclude tests: None
+test	Run security scan	2025-08-27T09:15:53.4795055Z [main]	INFO	using config: pyproject.toml
+test	Run security scan	2025-08-27T09:15:53.4795554Z [main]	INFO	running on Python 3.11.9
+test	Run security scan	2025-08-27T09:15:53.7252196Z Run started:2025-08-27 09:15:53.724971
+test	Run security scan	2025-08-27T09:15:53.7252670Z 
+test	Run security scan	2025-08-27T09:15:53.7252819Z Test results:
+test	Run security scan	2025-08-27T09:15:53.7253211Z 	No issues identified.
+test	Run security scan	2025-08-27T09:15:53.7253458Z 
+test	Run security scan	2025-08-27T09:15:53.7253620Z Code scanned:
+test	Run security scan	2025-08-27T09:15:53.7254432Z 	Total lines of code: 2273
+test	Run security scan	2025-08-27T09:15:53.7254928Z 	Total lines skipped (#nosec): 0
+test	Run security scan	2025-08-27T09:15:53.7255771Z 	Total potential issues skipped due to specifically being disabled (e.g., #nosec BXXX): 5
+test	Run security scan	2025-08-27T09:15:53.7256517Z 
+test	Run security scan	2025-08-27T09:15:53.7256684Z Run metrics:
+test	Run security scan	2025-08-27T09:15:53.7257510Z 	Total issues (by severity):
+test	Run security scan	2025-08-27T09:15:53.7257932Z 		Undefined: 0
+test	Run security scan	2025-08-27T09:15:53.7258276Z 		Low: 0
+test	Run security scan	2025-08-27T09:15:53.7258574Z 		Medium: 0
+test	Run security scan	2025-08-27T09:15:53.7258900Z 		High: 0
+test	Run security scan	2025-08-27T09:15:53.7259301Z 	Total issues (by confidence):
+test	Run security scan	2025-08-27T09:15:53.7259767Z 		Undefined: 0
+test	Run security scan	2025-08-27T09:15:53.7260129Z 		Low: 0
+test	Run security scan	2025-08-27T09:15:53.7260468Z 		Medium: 0
+test	Run security scan	2025-08-27T09:15:53.7260797Z 		High: 0
+test	Run security scan	2025-08-27T09:15:53.7261145Z Files skipped (0):
+test	Run security scan	2025-08-27T09:15:53.7566386Z ##[endgroup]
+test	Run gitleaks (strict)	﻿2025-08-27T09:15:53.7601134Z ##[group]Run gitleaks/gitleaks-action@v2
+test	Run gitleaks (strict)	2025-08-27T09:15:53.7601467Z env:
+test	Run gitleaks (strict)	2025-08-27T09:15:53.7601679Z   PIP_DISABLE_PIP_VERSION_CHECK: 1
+test	Run gitleaks (strict)	2025-08-27T09:15:53.7601946Z   PIP_DEFAULT_TIMEOUT: 60
+test	Run gitleaks (strict)	2025-08-27T09:15:53.7602174Z   UV_SYSTEM_PYTHON: 1
+test	Run gitleaks (strict)	2025-08-27T09:15:53.7602460Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Run gitleaks (strict)	2025-08-27T09:15:53.7602874Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.9/x64/lib/pkgconfig
+test	Run gitleaks (strict)	2025-08-27T09:15:53.7603280Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Run gitleaks (strict)	2025-08-27T09:15:53.7603868Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Run gitleaks (strict)	2025-08-27T09:15:53.7604329Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Run gitleaks (strict)	2025-08-27T09:15:53.7604710Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.9/x64/lib
+test	Run gitleaks (strict)	2025-08-27T09:15:53.7605637Z   GITHUB_TOKEN: ***
+test	Run gitleaks (strict)	2025-08-27T09:15:53.7605886Z   GITLEAKS_CONFIG: .gitleaks.toml
+test	Run gitleaks (strict)	2025-08-27T09:15:53.7606140Z ##[endgroup]
+test	Run gitleaks (strict)	2025-08-27T09:15:54.1056557Z [xupeng211] is an individual user. No license key is required.
+test	Run gitleaks (strict)	2025-08-27T09:15:54.1057756Z gitleaks version: 8.24.3
+test	Run gitleaks (strict)	2025-08-27T09:15:54.1061320Z Version to install: 8.24.3 (target directory: /tmp/gitleaks-8.24.3)
+test	Run gitleaks (strict)	2025-08-27T09:15:54.2431609Z Cache hit for: gitleaks-cache-8.24.3-linux-x64
+test	Run gitleaks (strict)	2025-08-27T09:15:54.4329332Z Received 5712898 of 5712898 (100.0%), 39.5 MBs/sec
+test	Run gitleaks (strict)	2025-08-27T09:15:54.4331576Z Cache Size: ~5 MB (5712898 B)
+test	Run gitleaks (strict)	2025-08-27T09:15:54.4358953Z [command]/usr/bin/tar -xf /home/runner/work/_temp/5ff062dc-65e5-4724-998d-902dded8fe2c/cache.tzst -P -C /home/runner/work/football/football --use-compress-program unzstd
+test	Run gitleaks (strict)	2025-08-27T09:15:54.4688744Z Cache restored successfully
+test	Run gitleaks (strict)	2025-08-27T09:15:54.4704857Z Gitleaks restored from cache
+test	Run gitleaks (strict)	2025-08-27T09:15:54.4708064Z event type: pull_request
+test	Run gitleaks (strict)	2025-08-27T09:15:54.6495892Z gitleaks cmd: gitleaks detect --redact -v --exit-code=2 --report-format=sarif --report-path=results.sarif --log-level=debug --log-opts=--no-merges --first-parent d6362553224d7f7bd22558fd26ca044d0ec6d5be^..5fef90b518aba8b8f0f86ea491f06e60f09d8421
+test	Run gitleaks (strict)	2025-08-27T09:15:54.6511587Z [command]/tmp/gitleaks-8.24.3/gitleaks detect --redact -v --exit-code=2 --report-format=sarif --report-path=results.sarif --log-level=debug --log-opts=--no-merges --first-parent d6362553224d7f7bd22558fd26ca044d0ec6d5be^..5fef90b518aba8b8f0f86ea491f06e60f09d8421
+test	Run gitleaks (strict)	2025-08-27T09:15:54.9142899Z 
+test	Run gitleaks (strict)	2025-08-27T09:15:54.9143994Z     ○
+test	Run gitleaks (strict)	2025-08-27T09:15:54.9144472Z     │╲
+test	Run gitleaks (strict)	2025-08-27T09:15:54.9144785Z     │ ○
+test	Run gitleaks (strict)	2025-08-27T09:15:54.9145069Z     ○ ░
+test	Run gitleaks (strict)	2025-08-27T09:15:54.9145421Z     ░    gitleaks
+test	Run gitleaks (strict)	2025-08-27T09:15:54.9145632Z 
+test	Run gitleaks (strict)	2025-08-27T09:15:54.9146023Z [90m9:15AM[0m DBG using github.com/wasilibs/go-re2 regex engine
+test	Run gitleaks (strict)	2025-08-27T09:15:54.9146575Z [90m9:15AM[0m DBG using gitleaks config from GITLEAKS_CONFIG env var: .gitleaks.toml
+test	Run gitleaks (strict)	2025-08-27T09:15:55.0509176Z [90m9:15AM[0m DBG extending config with default config
+test	Run gitleaks (strict)	2025-08-27T09:15:55.0519460Z [90m9:15AM[0m DBG executing: /usr/bin/git -C . log -p -U0 --no-merges --first-parent d6362553224d7f7bd22558fd26ca044d0ec6d5be^..5fef90b518aba8b8f0f86ea491f06e60f09d8421
+test	Run gitleaks (strict)	2025-08-27T09:15:55.0564740Z [90m9:15AM[0m DBG SCM platform parsed from host [36mhost=[0mgithub.com [36mplatform=[0mgithub
+test	Run gitleaks (strict)	2025-08-27T09:15:55.0580657Z [90m9:15AM[0m [32mINF[0m [1m2 commits scanned.[0m
+test	Run gitleaks (strict)	2025-08-27T09:15:55.0581529Z [90m9:15AM[0m DBG Note: this number might be smaller than expected due to commits with no additions
+test	Run gitleaks (strict)	2025-08-27T09:15:55.0582290Z [90m9:15AM[0m [32mINF[0m [1mscanned ~1050 bytes (1.05 KB) in 144ms[0m
+test	Run gitleaks (strict)	2025-08-27T09:15:55.0583069Z [90m9:15AM[0m [32mINF[0m [1mno leaks found[0m
+test	Run gitleaks (strict)	2025-08-27T09:15:55.0615845Z Artifact name is valid!
+test	Run gitleaks (strict)	2025-08-27T09:15:55.0617943Z Root directory input is valid!
+test	Run gitleaks (strict)	2025-08-27T09:15:55.1626344Z Beginning upload of artifact content to blob storage
+test	Run gitleaks (strict)	2025-08-27T09:15:55.2185069Z Uploaded bytes 6754
+test	Run gitleaks (strict)	2025-08-27T09:15:55.2381055Z Finished uploading artifact content to blob storage!
+test	Run gitleaks (strict)	2025-08-27T09:15:55.2384264Z SHA256 digest of uploaded artifact zip is 0955c16d78a427e61983be3391d0bf81f94234fa9c5081e1c29cbcfacad20336
+test	Run gitleaks (strict)	2025-08-27T09:15:55.2385858Z Finalizing artifact upload
+test	Run gitleaks (strict)	2025-08-27T09:15:55.3413515Z Artifact gitleaks-results.sarif.zip successfully finalized. Artifact ID 3861724131
+test	Run gitleaks (strict)	2025-08-27T09:15:55.3428529Z ✅ No leaks detected
+test	Run tests with coverage gate (single run)	﻿2025-08-27T09:15:55.3616996Z ##[group]Run echo "::group::Tests with Coverage Gate"
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:55.3617433Z [36;1mecho "::group::Tests with Coverage Gate"[0m
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:55.3617739Z [36;1mset -euo pipefail[0m
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:55.3617975Z [36;1m[0m
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:55.3618215Z [36;1m# Dynamic coverage directory detection[0m
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:55.3618492Z [36;1mCOV_ARGS=""[0m
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:55.3618761Z [36;1mfor d in apps data_pipeline models trainer; do[0m
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:55.3619095Z [36;1m  [ -d "$d" ] && COV_ARGS="$COV_ARGS --cov=$d"[0m
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:55.3619369Z [36;1mdone[0m
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:55.3619558Z [36;1m[0m
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:55.3619807Z [36;1m# Fallback to root if no specific directories found[0m
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:55.3620133Z [36;1mif [ -z "$COV_ARGS" ]; then[0m
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:55.3620476Z [36;1m  echo "📁 No specific coverage directories found, using root"[0m
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:55.3620825Z [36;1m  COV_ARGS="--cov=."[0m
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:55.3621061Z [36;1melse[0m
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:55.3621295Z [36;1m  echo "📁 Coverage directories: $COV_ARGS"[0m
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:55.3621604Z [36;1mfi[0m
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:55.3621788Z [36;1m[0m
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:55.3622025Z [36;1m# Single comprehensive test run with all reports[0m
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:55.3622345Z [36;1mpytest -v ${COV_ARGS} \[0m
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:55.3622605Z [36;1m  --cov-report=xml \[0m
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:55.3622857Z [36;1m  --cov-report=term-missing \[0m
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:55.3623136Z [36;1m  --cov-report=html \[0m
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:55.3623390Z [36;1m  --cov-report=json \[0m
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:55.3623656Z [36;1m  --cov-fail-under="${COV_MIN}" \[0m
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:55.3624073Z [36;1m  tests/ || {[0m
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:55.3624411Z [36;1m    echo "❌ Tests failed or coverage below threshold (${COV_MIN}%)"[0m
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:55.3624759Z [36;1m    exit 1[0m
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:55.3624967Z [36;1m  }[0m
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:55.3625156Z [36;1m[0m
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:55.3625416Z [36;1mecho "✅ Tests passed with coverage above ${COV_MIN}%"[0m
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:55.3625766Z [36;1mecho "::endgroup::"[0m
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:55.3653337Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:55.3653931Z env:
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:55.3654174Z   PIP_DISABLE_PIP_VERSION_CHECK: 1
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:55.3654456Z   PIP_DEFAULT_TIMEOUT: 60
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:55.3654690Z   UV_SYSTEM_PYTHON: 1
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:55.3654974Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:55.3655393Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.9/x64/lib/pkgconfig
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:55.3655800Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:55.3656169Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:55.3656536Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:55.3656904Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.9/x64/lib
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:55.3657212Z   COV_MIN: 15
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:55.3657409Z   TEST_SEED: 42
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:55.3657610Z ##[endgroup]
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:55.3704902Z ##[group]Tests with Coverage Gate
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:55.3705982Z 📁 Coverage directories:  --cov=apps --cov=data_pipeline --cov=models --cov=trainer
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:57.2553509Z ============================= test session starts ==============================
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:57.2554878Z platform linux -- Python 3.11.9, pytest-8.2.1, pluggy-1.6.0
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:57.2555487Z rootdir: /home/runner/work/football/football
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:57.2555970Z configfile: pyproject.toml
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:57.2556380Z plugins: anyio-4.10.0, cov-5.0.0
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:57.2556788Z collected 60 items
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:57.2556994Z 
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:57.2577744Z tests/auto/test_apps_api_main.py .                                       [  1%]
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:57.2593277Z tests/auto/test_data_pipeline_features_build.py .                        [  3%]
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:57.2608756Z tests/auto/test_data_pipeline_features_rolling.py .                      [  5%]
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:57.2624264Z tests/auto/test_data_pipeline_ingest_base.py .                           [  6%]
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:57.2639458Z tests/auto/test_data_pipeline_ingest_csv_adapter.py .                    [  8%]
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:57.2654459Z tests/auto/test_models_predictor.py .                                    [ 10%]
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:57.8957773Z tests/auto/test_trainer_fit_xgb.py .                                     [ 11%]
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:57.9159573Z tests/data_pipeline/test_feature_engineer.py ...                         [ 16%]
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:57.9184114Z tests/data_pipeline/test_ingest_features.py ss                           [ 20%]
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:57.9205027Z tests/data_pipeline/test_ingest_odds.py ss                               [ 23%]
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:00.9706561Z tests/data_pipeline/test_odds_fetcher.py ..                              [ 26%]
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:00.9728911Z tests/infra/test_db.py ss                                                [ 30%]
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:01.0647010Z tests/test_api_predict.py .......                                        [ 41%]
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:01.1374744Z tests/test_api_simple.py ........                                        [ 55%]
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:01.1782595Z tests/test_basic.py .........                                            [ 70%]
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:01.1846410Z tests/test_features_rolling.py ..                                        [ 73%]
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:01.2107167Z tests/test_ingest_csv.py ........                                        [ 86%]
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:01.2227371Z tests/test_models.py ..ss                                                [ 93%]
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7020493Z tests/test_settings.py ....                                              [100%]
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7021094Z 
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7021318Z =============================== warnings summary ===============================
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7021790Z apps/api/main.py:61
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7022350Z   /home/runner/work/football/football/apps/api/main.py:61: DeprecationWarning: 
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7023142Z           on_event is deprecated, use lifespan event handlers instead.
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7024019Z   
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7024337Z           Read more about it in the
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7024972Z           [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7025589Z           
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7025870Z     @app.on_event("startup")
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7026097Z 
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7026574Z ../../../../../opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/fastapi/applications.py:4495
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7027714Z   /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/fastapi/applications.py:4495: DeprecationWarning: 
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7028610Z           on_event is deprecated, use lifespan event handlers instead.
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7029078Z   
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7029339Z           Read more about it in the
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7029928Z           [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7030506Z           
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7030811Z     return self.router.on_event(event_type)
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7031085Z 
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7031297Z tests/test_basic.py::test_api_module_import
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7033123Z   /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/pydantic/_internal/_config.py:323: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7035472Z     warnings.warn(DEPRECATION_MESSAGE, DeprecationWarning)
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7035839Z 
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7036005Z tests/test_basic.py::test_api_module_import
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7037182Z   /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/pydantic/_internal/_fields.py:158: UserWarning: Field "model_version" in Settings has conflict with protected namespace "model_".
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7038333Z   
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7038876Z   You may be able to resolve this warning by setting `model_config['protected_namespaces'] = ('settings_',)`.
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7039792Z     warnings.warn(
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7039996Z 
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7040159Z tests/test_basic.py::test_api_module_import
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7041419Z   /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/pydantic/_internal/_fields.py:158: UserWarning: Field "model_registry_path" in Settings has conflict with protected namespace "model_".
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7042610Z   
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7043179Z   You may be able to resolve this warning by setting `model_config['protected_namespaces'] = ('settings_',)`.
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7043997Z     warnings.warn(
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7044187Z 
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7044350Z tests/test_basic.py::test_api_module_import
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7045546Z   /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/pydantic/_internal/_fields.py:158: UserWarning: Field "model_cache_size" in Settings has conflict with protected namespace "model_".
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7046751Z   
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7047309Z   You may be able to resolve this warning by setting `model_config['protected_namespaces'] = ('settings_',)`.
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7047990Z     warnings.warn(
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7048186Z 
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7048485Z -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7048913Z 
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7049180Z ---------- coverage: platform linux, python 3.11.9-final-0 -----------
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7049778Z Name                                           Stmts   Miss Branch BrPart   Cover   Missing
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7050378Z -------------------------------------------------------------------------------------------
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7050993Z apps/__init__.py                                   0      0      0      0 100.00%
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7051566Z apps/api/__init__.py                               0      0      0      0 100.00%
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7052157Z apps/api/core/__init__.py                          0      0      0      0 100.00%
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7052850Z apps/api/core/logging.py                          19      6      2      1  66.67%   26, 51, 56-57, 64-65
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7053533Z apps/api/core/settings.py                         27      0      0      0 100.00%
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7054365Z apps/api/dependencies/__init__.py                  0      0      0      0 100.00%
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7055032Z apps/api/main.py                                  73     13     16      2  78.65%   65-70, 92-93, 134-136, 154-155
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7055681Z apps/api/routers/__init__.py                       0      0      0      0 100.00%
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7056345Z apps/api/routers/health.py                        27     13      2      0  48.28%   38-71
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7057048Z apps/api/routers/metrics.py                       26     11      0      0  57.69%   53-71
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7057802Z apps/api/routers/predictions.py                   63     28      2      0  53.85%   65-94, 102-132, 143-184
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7058523Z apps/backtest/__init__.py                          0      0      0      0 100.00%
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7059311Z apps/backtest/engine.py                          152    115     34      0  19.89%   81-156, 164-168, 172-211, 215-269, 280-292, 296-334, 342-361, 365-393
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7060360Z apps/backtest/reports/__init__.py                  0      0      0      0 100.00%
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7061082Z apps/backtest/strategies/__init__.py               0      0      0      0 100.00%
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7061754Z apps/trainer/__init__.py                           0      0      0      0 100.00%
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7062396Z apps/trainer/features/__init__.py                  0      0      0      0 100.00%
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7063095Z apps/trainer/models/__init__.py                    0      0      0      0 100.00%
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7063978Z apps/trainer/pipelines/__init__.py                 0      0      0      0 100.00%
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7064878Z apps/trainer/xgboost_trainer.py                  102     55     14      0  40.52%   82-111, 116-129, 150-214, 226-229, 241-244, 256-263, 272-276, 285-287, 300-314
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7065882Z apps/workers/__init__.py                           0      0      0      0 100.00%
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7066529Z apps/workers/flows/__init__.py                     0      0      0      0 100.00%
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7067264Z apps/workers/flows/data_collection_flow.py        75     75      6      0   0.00%   5-298
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7067999Z apps/workers/tasks/__init__.py                     0      0      0      0 100.00%
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7068624Z data_pipeline/__init__.py                          0      0      0      0 100.00%
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7069288Z data_pipeline/feature_store/__init__.py            0      0      0      0 100.00%
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7070112Z data_pipeline/features/build.py                  109     97      8      0  10.26%   29-53, 58, 69-87, 92-155, 160-182, 187-201, 206-218, 243-287
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7070987Z data_pipeline/features/rolling.py                 60     49     24      0  15.48%   61-80, 105-156, 170-175, 189-224
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7071757Z data_pipeline/ingest/base.py                      16      0      0      0 100.00%
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7072534Z data_pipeline/ingest/csv_adapter.py               66     10     14      3  83.75%   46, 63, 99, 102, 117, 119, 143-144, 149-150
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7073299Z data_pipeline/loaders/__init__.py                  0      0      0      0 100.00%
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7074115Z data_pipeline/sources/__init__.py                  0      0      0      0 100.00%
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7074878Z data_pipeline/sources/football_api.py             89     52     20      0  33.94%   56-65, 69-70, 86-113, 125-146, 150-195
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7075711Z data_pipeline/sources/ingest_odds.py              56     44     14      0  17.14%   21-36, 46-91, 95-118
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7076512Z data_pipeline/sources/odds_fetcher.py             39      6      4      1  83.72%   34-35, 57-60
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7077253Z data_pipeline/transforms/__init__.py               0      0      0      0 100.00%
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7077972Z data_pipeline/transforms/feature_engineer.py      22      0      0      0 100.00%
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7078778Z data_pipeline/transforms/ingest_features.py       51     39      6      0  21.05%   21-29, 39-74, 79-103
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7079489Z models/__init__.py                                 0      0      0      0 100.00%
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7080083Z models/artifacts/__init__.py                       0      0      0      0 100.00%
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7080811Z models/predictor.py                               86     70     26      0  14.29%   26-34, 38-54, 63-86, 111-130, 147-173, 177-186, 191, 197-199, 204-213
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7081719Z models/registry.py                               154     99     54      1  26.92%   51-52, 88-93, 97-98, 117-160, 165-176, 189-213, 217, 221-224, 228-245, 249-270, 274-291, 297-305
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7082565Z trainer/fit_xgb.py                                90     73      2      0  18.48%   25-31, 36-63, 70-85, 93-114, 122-144, 149-191
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7083238Z -------------------------------------------------------------------------------------------
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7083933Z TOTAL                                           1402    855    248      8  34.85%
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7084581Z Coverage HTML written to dir htmlcov
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7084997Z Coverage XML written to file coverage.xml
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7085438Z Coverage JSON written to file coverage.json
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7085731Z 
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7085975Z Required test coverage of 15% reached. Total coverage: 34.85%
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7086537Z =========================== short test summary info ============================
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7087372Z SKIPPED [2] tests/data_pipeline/test_ingest_features.py: Integration tests disabled, set ENABLE_DB_TESTS=1 to enable
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7088439Z SKIPPED [2] tests/data_pipeline/test_ingest_odds.py: Integration tests disabled, set ENABLE_DB_TESTS=1 to enable
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7089603Z SKIPPED [2] tests/infra/test_db.py: Integration tests disabled, set ENABLE_DB_TESTS=1 to enable
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7093089Z SKIPPED [1] tests/test_models.py:35: load_model函数不在当前registry模块中
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7094272Z SKIPPED [1] tests/test_models.py:40: load_model函数不在当前registry模块中
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7094898Z ================== 52 passed, 8 skipped, 6 warnings in 6.77s ===================
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:03.1161956Z ✅ Tests passed with coverage above 15%
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:03.1162828Z ##[endgroup]
+test	Collect changed files	﻿2025-08-27T09:16:03.1191675Z ##[group]Run set -euo pipefail
+test	Collect changed files	2025-08-27T09:16:03.1192021Z [36;1mset -euo pipefail[0m
+test	Collect changed files	2025-08-27T09:16:03.1192304Z [36;1mbase_ref="${GITHUB_BASE_REF:-main}"[0m
+test	Collect changed files	2025-08-27T09:16:03.1192643Z [36;1mgit fetch origin "${base_ref}" --depth=1 || true[0m
+test	Collect changed files	2025-08-27T09:16:03.1193051Z [36;1mfiles=$(git diff --name-only "origin/${base_ref}...HEAD" || true)[0m
+test	Collect changed files	2025-08-27T09:16:03.1193442Z [36;1mecho "files=${files}" >> "$GITHUB_OUTPUT"[0m
+test	Collect changed files	2025-08-27T09:16:03.1194047Z [36;1mif echo "${files}" | grep -E '\.(py|pyi)$' > /dev/null; then[0m
+test	Collect changed files	2025-08-27T09:16:03.1194457Z [36;1m  echo "has_python_files=true" >> "$GITHUB_OUTPUT"[0m
+test	Collect changed files	2025-08-27T09:16:03.1194763Z [36;1melse[0m
+test	Collect changed files	2025-08-27T09:16:03.1195043Z [36;1m  echo "has_python_files=false" >> "$GITHUB_OUTPUT"[0m
+test	Collect changed files	2025-08-27T09:16:03.1195339Z [36;1mfi[0m
+test	Collect changed files	2025-08-27T09:16:03.1222926Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+test	Collect changed files	2025-08-27T09:16:03.1223256Z env:
+test	Collect changed files	2025-08-27T09:16:03.1223464Z   PIP_DISABLE_PIP_VERSION_CHECK: 1
+test	Collect changed files	2025-08-27T09:16:03.1223996Z   PIP_DEFAULT_TIMEOUT: 60
+test	Collect changed files	2025-08-27T09:16:03.1224237Z   UV_SYSTEM_PYTHON: 1
+test	Collect changed files	2025-08-27T09:16:03.1224519Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Collect changed files	2025-08-27T09:16:03.1224937Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.9/x64/lib/pkgconfig
+test	Collect changed files	2025-08-27T09:16:03.1225350Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Collect changed files	2025-08-27T09:16:03.1225725Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Collect changed files	2025-08-27T09:16:03.1226091Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Collect changed files	2025-08-27T09:16:03.1226459Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.9/x64/lib
+test	Collect changed files	2025-08-27T09:16:03.1226773Z ##[endgroup]
+test	Collect changed files	2025-08-27T09:16:03.3444981Z From https://github.com/xupeng211/football
+test	Collect changed files	2025-08-27T09:16:03.3445629Z  * branch            main       -> FETCH_HEAD
+test	Collect changed files	2025-08-27T09:16:03.3539997Z ##[error]Unable to process file command 'output' successfully.
+test	Collect changed files	2025-08-27T09:16:03.3548412Z ##[error]Invalid format 'models/predictor.py'
+test	Upload coverage artifacts	﻿2025-08-27T09:16:03.3684029Z ##[group]Run actions/upload-artifact@v4
+test	Upload coverage artifacts	2025-08-27T09:16:03.3684349Z with:
+test	Upload coverage artifacts	2025-08-27T09:16:03.3684548Z   name: ci-artifacts
+test	Upload coverage artifacts	2025-08-27T09:16:03.3685002Z   path: .coverage
+test	Upload coverage artifacts	coverage.xml
+test	Upload coverage artifacts	coverage.json
+test	Upload coverage artifacts	htmlcov/**
+test	Upload coverage artifacts	pytestdebug.log
+test	Upload coverage artifacts	diff-coverage.html
+test	Upload coverage artifacts	diff-coverage.md
+test	Upload coverage artifacts	
+test	Upload coverage artifacts	2025-08-27T09:16:03.3685490Z   if-no-files-found: ignore
+test	Upload coverage artifacts	2025-08-27T09:16:03.3685733Z   retention-days: 30
+test	Upload coverage artifacts	2025-08-27T09:16:03.3685953Z   compression-level: 6
+test	Upload coverage artifacts	2025-08-27T09:16:03.3686175Z   overwrite: false
+test	Upload coverage artifacts	2025-08-27T09:16:03.3686397Z   include-hidden-files: false
+test	Upload coverage artifacts	2025-08-27T09:16:03.3686634Z env:
+test	Upload coverage artifacts	2025-08-27T09:16:03.3686834Z   PIP_DISABLE_PIP_VERSION_CHECK: 1
+test	Upload coverage artifacts	2025-08-27T09:16:03.3687100Z   PIP_DEFAULT_TIMEOUT: 60
+test	Upload coverage artifacts	2025-08-27T09:16:03.3687546Z   UV_SYSTEM_PYTHON: 1
+test	Upload coverage artifacts	2025-08-27T09:16:03.3687829Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Upload coverage artifacts	2025-08-27T09:16:03.3688251Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.9/x64/lib/pkgconfig
+test	Upload coverage artifacts	2025-08-27T09:16:03.3688865Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Upload coverage artifacts	2025-08-27T09:16:03.3689392Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Upload coverage artifacts	2025-08-27T09:16:03.3689761Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.9/x64
+test	Upload coverage artifacts	2025-08-27T09:16:03.3690128Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.9/x64/lib
+test	Upload coverage artifacts	2025-08-27T09:16:03.3690440Z ##[endgroup]
+test	Upload coverage artifacts	2025-08-27T09:16:03.6050399Z Multiple search paths detected. Calculating the least common ancestor of all paths
+test	Upload coverage artifacts	2025-08-27T09:16:03.6054981Z The least common ancestor is /home/runner/work/football/football. This will be the root directory of the artifact
+test	Upload coverage artifacts	2025-08-27T09:16:03.6056014Z With the provided path, there will be 55 files uploaded
+test	Upload coverage artifacts	2025-08-27T09:16:03.6061301Z Artifact name is valid!
+test	Upload coverage artifacts	2025-08-27T09:16:03.6062063Z Root directory input is valid!
+test	Upload coverage artifacts	2025-08-27T09:16:03.7093266Z Beginning upload of artifact content to blob storage
+test	Upload coverage artifacts	2025-08-27T09:16:03.8817058Z Uploaded bytes 215671
+test	Upload coverage artifacts	2025-08-27T09:16:03.9007374Z Finished uploading artifact content to blob storage!
+test	Upload coverage artifacts	2025-08-27T09:16:03.9010640Z SHA256 digest of uploaded artifact zip is 11b447ca218b157e6159b32088e918959455196ab760b2a16b05544923f86701
+test	Upload coverage artifacts	2025-08-27T09:16:03.9012687Z Finalizing artifact upload
+test	Upload coverage artifacts	2025-08-27T09:16:04.0261985Z Artifact ci-artifacts.zip successfully finalized. Artifact ID 3861725340
+test	Upload coverage artifacts	2025-08-27T09:16:04.0263045Z Artifact ci-artifacts has been successfully uploaded! Final size is 215671 bytes. Artifact ID is 3861725340
+test	Upload coverage artifacts	2025-08-27T09:16:04.0269867Z Artifact download URL: https://github.com/xupeng211/football/actions/runs/17262525381/artifacts/3861725340
+test	Post Checkout code	﻿2025-08-27T09:16:04.0420307Z Post job cleanup.
+test	Post Checkout code	2025-08-27T09:16:04.1232480Z [command]/usr/bin/git version
+test	Post Checkout code	2025-08-27T09:16:04.1269958Z git version 2.51.0
+test	Post Checkout code	2025-08-27T09:16:04.1306578Z Temporarily overriding HOME='/home/runner/work/_temp/7e3d6244-2bdf-4970-8009-b47aa4f41b5e' before making global git config changes
+test	Post Checkout code	2025-08-27T09:16:04.1307540Z Adding repository directory to the temporary git global config as a safe directory
+test	Post Checkout code	2025-08-27T09:16:04.1311955Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/football/football
+test	Post Checkout code	2025-08-27T09:16:04.1347869Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+test	Post Checkout code	2025-08-27T09:16:04.1379651Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+test	Post Checkout code	2025-08-27T09:16:04.1647209Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+test	Post Checkout code	2025-08-27T09:16:04.1671490Z http.https://github.com/.extraheader
+test	Post Checkout code	2025-08-27T09:16:04.1683428Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+test	Post Checkout code	2025-08-27T09:16:04.1714640Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+test	Complete job	﻿2025-08-27T09:16:04.2052176Z Cleaning up orphan processes
