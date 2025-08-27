@@ -183,7 +183,9 @@ jobs:
           base_ref="${GITHUB_BASE_REF:-main}"
           git fetch origin "${base_ref}" --depth=1 || true
           files=$(git diff --name-only "origin/${base_ref}...HEAD" || true)
-          echo "files=${files}" >> "$GITHUB_OUTPUT"
+          # Convert multiline to single line with space separation
+          files_single_line=$(echo "${files}" | tr '\n' ' ' | xargs)
+          echo "files=${files_single_line}" >> "$GITHUB_OUTPUT"
           if echo "${files}" | grep -E '\.(py|pyi)$' > /dev/null; then
             echo "has_python_files=true" >> "$GITHUB_OUTPUT"
           else
