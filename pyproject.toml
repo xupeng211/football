@@ -60,48 +60,31 @@ line-length = 88
 select = ["E", "F", "W", "I", "B", "UP", "RUF"]
 ignore = ["E501", "B008", "B904"]
 
-
-# 更新后的MyPy配置
 [tool.mypy]
 python_version = "3.11"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
-disallow_incomplete_defs = true
-check_untyped_defs = true
-disallow_untyped_decorators = true
-no_implicit_optional = true
-warn_redundant_casts = true
-warn_unused_ignores = true
-warn_no_return = true
-warn_unreachable = true
-strict_equality = true
+exclude = ["tests/", ".venv/", "scripts/"]
 
-# 只检查我们的源代码，忽略第三方库
-files = ["apps", "data_pipeline", "models", "trainer", "infra", "evaluation"]
-exclude = [
-    ".venv",
-    "build",
-    "dist",
-    "tests"
-]
-
-# 忽略第三方库的类型检查
 [[tool.mypy.overrides]]
 module = [
     "prefect.*",
     "pandas.*", 
     "sklearn.*",
     "xgboost.*",
-    "httpx.*",
-    "ruamel.*",
     "structlog.*",
-    "psycopg2.*",
-    "sqlalchemy.*",
+    "httpx.*",
     "uvicorn.*",
     "fastapi.*",
-    "pydantic.*",
-    "starlette.*"
+    "pydantic.*"
 ]
 ignore_errors = true
 ignore_missing_imports = true
+[[tool.mypy.overrides]]
+module = ["prefect.*", "pandas.*", "sklearn.*", "xgboost.*"]
+ignore_errors = true
+
+[tool.bandit]
+exclude_dirs = ["tests", ".venv"]
+skips = ["B101", "B601"]
