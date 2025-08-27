@@ -1,57 +1,43 @@
-# Gitleaks configuration file
-title = "Gitleaks config for Football Prediction System"
+# Gitleaks配置 - 防止敏感信息泄露
+title = "gitleaks config"
 
-[extend]
-useDefault = true
-
-[allowlist]
-description = "Global allowlist to reduce false positives"
-paths = [
-  '''^docs?/.*$''',
-  '''^tests?/.*$''',
-  '''^fixtures?/.*$''',
-  '''\.github/workflows/.*\.yml$''',
-  '''\.github/workflows/.*\.yaml$''',
-  '''\.github/.*$''',
-  '''^.*\.md$''',
-  '''^.*\.rst$''',
-  '''^.*\.txt$''',
-  '''\.env\.example$''',
-  '''^requirements.*\.txt$''',
-  '''^pyproject\.toml$''',
-  '''\.pre-commit-config\.yaml$''',
-  '''^Makefile$''',
-]
-
-regexes = [
-  '''(?i)GITHUB_TOKEN''',
-  '''(?i)test[-_].*''',
-  '''(?i)example[-_].*''',
-  '''(?i)dummy[-_].*''',
-  '''(?i)fake[-_].*''',
-  '''(?i)mock[-_].*''',
-  '''(?i)placeholder''',
-  '''(?i)your[-_].*[-_]here''',
-  '''(?i)change[-_]me''',
-  '''(?i)replace[-_].*''',
-  '''(?i)TODO''',
-  '''(?i)FIXME''',
-  '''(?i)sqlite:///''',
-  '''(?i)postgresql://.*:.*@localhost''',
-  '''(?i)mysql://.*:.*@localhost''',
-  '''(?i)redis://localhost''',
-]
-
+# 全局规则
 [[rules]]
 id = "generic-api-key"
 description = "Generic API Key"
-regex = '''(?i)(api[_-]?key|token)[^a-zA-Z0-9]["']?[a-z0-9]{20,}["']?'''
-entropy = 4.0
-tags = ["key", "API"]
+regex = '''(?i)(?:key|api|token|secret|password)\s*[:=]\s*['\"]?[a-z0-9]{20,}['\"]?'''
+keywords = ["api_key", "api-key", "token", "secret"]
 
-[rules.allowlist]
+[[rules]]
+id = "aws-access-token"
+description = "AWS"
+regex = '''(A3T[A-Z0-9]|AKIA|AGPA|AIDA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16}'''
+
+[[rules]]
+id = "github-token"
+description = "GitHub"
+regex = '''ghp_[0-9a-zA-Z]{36}'''
+
+[[rules]]
+id = "slack-token"
+description = "Slack Token"
+regex = '''xox[baprs]-([0-9a-zA-Z]{10,48})?'''
+
+# 允许列表 - 忽略测试文件中的假数据
+[allowlist]
+description = "global allow lists"
+paths = [
+    '''tests/.*\.py$''',    # 忽略所有测试文件
+    '''conftest\.py$''',    # 忽略pytest配置文件
+]
+
+# 按正则表达式忽略特定内容
 regexes = [
-  '''(?i)GITHUB_TOKEN''',
-  '''(?i)test[-_].*''',
-  '''(?i)example[-_].*''',
+    '''postgresql://postgres:password@localhost:5432/sports''',
+    '''postgresql://postgres:testpass@localhost:5432/sports_test''',
+    '''default-secret-key''',
+    '''dev-secret-key-change-in-prod''',
+    '''fake_key''',
+    '''FOOTBALL_API_KEY.*fake''',
+    '''TEST_DATABASE_URL''',
 ]

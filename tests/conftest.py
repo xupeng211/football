@@ -40,7 +40,11 @@ def db_available() -> bool:
     if psycopg2 is None:
         return False
     try:
-        default_url = "postgresql://postgres:password@localhost:5432/sports"
+        # Use environment variable or safe default for testing
+        default_url = os.environ.get(
+            "TEST_DATABASE_URL",
+            "postgresql://postgres:testpass@localhost:5432/sports_test",
+        )
         db_url = os.environ.get("DATABASE_URL", default_url)
         conn = psycopg2.connect(db_url, connect_timeout=1)
         conn.close()

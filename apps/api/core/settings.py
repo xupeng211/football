@@ -1,5 +1,6 @@
 # apps/api/core/settings.py
 
+from pydantic import Field
 from pydantic_settings import BaseSettings
 
 
@@ -8,7 +9,10 @@ class Settings(BaseSettings):
     app_port: int = 8000
     api_host: str = "127.0.0.1"  # nosec B104
     api_debug: bool = False
-    api_secret_key: str = "default-secret-key"
+    api_secret_key: str = Field(
+        default="dev-secret-key-change-in-prod",
+        description="API secret key - MUST be changed in production",
+    )
 
     # 数据库配置
     database_url: str = "postgresql://postgres:postgres@localhost:5432/sports"

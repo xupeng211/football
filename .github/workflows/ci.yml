@@ -2,7 +2,7 @@
 name: CI
 on:
   push:
-    branches: [main, dev, feat/ci-foundation, feat/ci-tighten]
+    branches: [main, dev, feat/ci-foundation, feat/ci-tighten, feat/p1-hardening]
   pull_request:
     branches: [main, dev]
 
@@ -50,16 +50,16 @@ jobs:
           echo "::group::Dependency Installation"
           python -m pip install -U pip uv
 
-          # Priority 1: Use uv.lock if available for exact CI reproducibility
-          if [ -f "uv.lock" ]; then
-            echo "🚀 Using uv.lock for exact dependency reproduction..."
-            uv pip sync --frozen uv.lock || {
-              echo "⚠️ uv.lock sync failed, falling back to requirements.txt"
-              pip install -r requirements.txt
-            }
-          elif [ -f "requirements.txt" ]; then
+          # Priority 1: Use requirements.txt (most reliable)
+          if [ -f "requirements.txt" ]; then
             echo "📦 Using requirements.txt..."
             pip install -r requirements.txt
+          elif [ -f "uv.lock" ]; then
+            echo "🚀 Trying uv.lock for exact dependency reproduction..."
+            uv pip sync --frozen uv.lock || {
+              echo "⚠️ uv.lock sync failed, fallback to requirements.txt"
+              pip install -r requirements.txt
+            }
           else
             echo "❌ No dependency file found"
             exit 1
