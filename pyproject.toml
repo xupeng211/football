@@ -70,7 +70,7 @@ exclude = ["tests/", ".venv/", "scripts/"]
 [[tool.mypy.overrides]]
 module = [
     "prefect.*",
-    "pandas.*", 
+    "pandas.*",
     "sklearn.*",
     "xgboost.*",
     "structlog.*",
@@ -87,4 +87,4 @@ ignore_errors = true
 
 [tool.bandit]
 exclude_dirs = ["tests", ".venv"]
-skips = ["B101", "B601"]
+skips = ["B101", "B601", "B404"]

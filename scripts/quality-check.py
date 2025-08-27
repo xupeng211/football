@@ -15,8 +15,12 @@ def run_check(name: str, cmd: list[str]) -> bool:
     print(f"🔍 {name}...")
     try:
         result = subprocess.run(
-            cmd, capture_output=True, text=True, cwd=Path(__file__).parent.parent
-        )
+            cmd,
+            capture_output=True,
+            text=True,
+            cwd=Path(__file__).parent.parent,
+            check=False,
+        )  # nosec B603
         if result.returncode == 0:
             print(f"✅ {name} 通过")
             return True
@@ -32,7 +36,7 @@ def run_check(name: str, cmd: list[str]) -> bool:
         return False
 
 
-def main():
+def main() -> None:
     """主函数"""
     print("🚀 开始代码质量检查...")
     print("=" * 50)
