@@ -1,83 +1,73 @@
-[project]
-name = "football-predictor"
-version = "0.1.0"
-requires-python = ">=3.11"
-dependencies = [ "fastapi", "uvicorn", "pydantic", "pydantic-settings", "xgboost", "pandas", "numpy", "psycopg[binary]", "sqlalchemy", "prefect", "prometheus-client", "httpx", "beautifulsoup4", "structlog", "pytest", "pytest-cov",]
-
 [build-system]
-requires = [ "setuptools", "wheel",]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
-[tool.black]
-line-length = 100
-target-version = [ "py311",]
+[project]
+name = "football-predict-system"
+version = "0.1.0"
+description = "Football match outcome prediction system"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "fastapi>=0.100.0",
+    "uvicorn[standard]>=0.23.0",
+    "pydantic>=2.0.0",
+    "pandas>=2.0.0",
+    "numpy>=1.24.0",
+    "scikit-learn>=1.3.0",
+    "xgboost>=1.7.0",
+    "psycopg2-binary>=2.9.0",
+    "sqlalchemy>=2.0.0",
+    "prefect>=2.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-asyncio>=0.21.0",
+    "ruff>=0.4.0",
+    "mypy>=1.5.0",
+    "bandit>=1.7.0",
+    "pre-commit>=3.0.0",
+    "types-setuptools",
+    "diff-cover>=7.0.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q -ra -m 'not slow'"
+markers = [
+    "slow: marks tests as slow (deselected by default)",
+    "integration: marks tests as integration tests",
+]
+
+[tool.coverage.run]
+source = ["."]
+omit = ["tests/*", ".venv/*", "*/site-packages/*"]
+
+[tool.coverage.report]
+exclude_lines = ["pragma: no cover"]
 
 [tool.ruff]
-line-length = 100
-target-version = "py311"
-exclude = [ ".git", ".mypy_cache", ".pytest_cache", ".ruff_cache", ".venv", "__pycache__", "build", "dist",]
+target-version = "py38"
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "RUF"]
+ignore = ["E501", "B008", "B904"]
 
 [tool.mypy]
 python_version = "3.11"
-warn_return_any = false
+warn_return_any = true
 warn_unused_configs = true
-disallow_incomplete_defs = true
-check_untyped_defs = true
-disallow_untyped_decorators = false
-no_implicit_optional = true
-warn_redundant_casts = true
-warn_unused_ignores = true
-warn_no_return = true
-warn_unreachable = true
-strict_equality = true
-ignore_missing_imports = true
-show_error_codes = true
-disallow_untyped_defs = false
+disallow_untyped_defs = true
+exclude = ["tests/", ".venv/"]
+
 [[tool.mypy.overrides]]
-module = "tests.*"
-disallow_untyped_defs = false
-disallow_incomplete_defs = false
+module = ["prefect.*", "pandas.*", "sklearn.*", "xgboost.*"]
+ignore_errors = true
 
 [tool.bandit]
-exclude_dirs = [ "tests", "test", ".venv", "venv", "build", "dist",]
-skips = [ "B101", "B104", "B108", "B404", "B601", "B602", "B603",]
-
-[tool.ai-development]
-enforce_venv = true
-python_version = "3.11.9"
-required_tools = [ "ruff", "mypy", "pytest", "bandit",]
-
-[tool.ruff.lint]
-select = [ "E", "F", "W", "C90", "I", "B", "UP", "ARG", "SIM", "RUF",]
-ignore = [ "E501", "B008", "ARG001", "ARG002",]
-
-[tool.ruff.format]
-quote-style = "double"
-indent-style = "space"
-skip-magic-trailing-comma = false
-line-ending = "auto"
-
-[tool.ai-development.rules]
-virtual_env_required = true
-system_python_forbidden = true
-global_package_install_forbidden = true
-
-[tool.ai-development.messages]
-venv_not_active = "❌ AI开发工具必须在虚拟环境中运行！请运行: source scripts/activate-venv.sh"
-wrong_python_version = "❌ Python版本不正确，需要3.11.9"
-missing_tools = "❌ 缺少开发工具，请运行: make install"
-
-[tool.coverage.run]
-source = [ "apps", "data_pipeline", "models",]
-omit = [ "*/tests/*", "*/test_*.py", "*/__pycache__/*", "*/.*", "setup.py", "*/venv/*", "*/.venv/*",]
-branch = true
-
-[tool.coverage.report]
-fail_under = 5
-precision = 2
-show_missing = true
-skip_covered = false
-exclude_lines = [ "pragma: no cover", "def __repr__", "if self.debug:", "if settings.DEBUG", "raise AssertionError", "raise NotImplementedError", "if 0:", "if __name__ == .__main__.:", "class .*\\bProtocol\\):", "@(abc\\.)?abstractmethod",]
-
-[tool.pytest.ini_options]
-addopts = "-q -ra -m 'not slow'"
+exclude_dirs = ["tests", ".venv"]
+skips = ["B101", "B601"]

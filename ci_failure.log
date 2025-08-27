@@ -119,22 +119,22 @@ test	Checkout code	2025-08-27T09:13:50.9307756Z [command]/usr/bin/git config --l
 test	Checkout code	2025-08-27T09:13:50.9311101Z ##[group]Checking out the ref
 test	Checkout code	2025-08-27T09:13:50.9314704Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/29/merge
 test	Checkout code	2025-08-27T09:13:50.9452895Z Note: switching to 'refs/remotes/pull/29/merge'.
-test	Checkout code	2025-08-27T09:13:50.9454009Z 
+test	Checkout code	2025-08-27T09:13:50.9454009Z
 test	Checkout code	2025-08-27T09:13:50.9454730Z You are in 'detached HEAD' state. You can look around, make experimental
 test	Checkout code	2025-08-27T09:13:50.9456777Z changes and commit them, and you can discard any commits you make in this
 test	Checkout code	2025-08-27T09:13:50.9459795Z state without impacting any branches by switching back to a branch.
-test	Checkout code	2025-08-27T09:13:50.9461555Z 
+test	Checkout code	2025-08-27T09:13:50.9461555Z
 test	Checkout code	2025-08-27T09:13:50.9462811Z If you want to create a new branch to retain commits you create, you may
 test	Checkout code	2025-08-27T09:13:50.9466127Z do so (now or later) by using -c with the switch command. Example:
-test	Checkout code	2025-08-27T09:13:50.9467848Z 
+test	Checkout code	2025-08-27T09:13:50.9467848Z
 test	Checkout code	2025-08-27T09:13:50.9468511Z   git switch -c <new-branch-name>
-test	Checkout code	2025-08-27T09:13:50.9469573Z 
+test	Checkout code	2025-08-27T09:13:50.9469573Z
 test	Checkout code	2025-08-27T09:13:50.9470169Z Or undo this operation with:
-test	Checkout code	2025-08-27T09:13:50.9471111Z 
+test	Checkout code	2025-08-27T09:13:50.9471111Z
 test	Checkout code	2025-08-27T09:13:50.9471618Z   git switch -
-test	Checkout code	2025-08-27T09:13:50.9472307Z 
+test	Checkout code	2025-08-27T09:13:50.9472307Z
 test	Checkout code	2025-08-27T09:13:50.9473456Z Turn off this advice by setting config variable advice.detachedHead to false
-test	Checkout code	2025-08-27T09:13:50.9475060Z 
+test	Checkout code	2025-08-27T09:13:50.9475060Z
 test	Checkout code	2025-08-27T09:13:50.9476272Z HEAD is now at 21629b4 Merge 5fef90b518aba8b8f0f86ea491f06e60f09d8421 into 1d0c09f9b060ad49c3a8c0e0e65fd08bbb2be971
 test	Checkout code	2025-08-27T09:13:50.9480376Z ##[endgroup]
 test	Checkout code	2025-08-27T09:13:50.9501989Z [command]/usr/bin/git log -1 --format=%H
@@ -171,7 +171,7 @@ test	Set up Python 3.11.9	2025-08-27T09:13:58.5185314Z Collecting pip
 test	Set up Python 3.11.9	2025-08-27T09:13:58.5704745Z Downloading pip-25.2-py3-none-any.whl.metadata (4.7 kB)
 test	Set up Python 3.11.9	2025-08-27T09:13:58.5827705Z Downloading pip-25.2-py3-none-any.whl (1.8 MB)
 test	Set up Python 3.11.9	2025-08-27T09:13:58.6681075Z ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.8/1.8 MB 21.6 MB/s eta 0:00:00
-test	Set up Python 3.11.9	2025-08-27T09:13:58.6681658Z 
+test	Set up Python 3.11.9	2025-08-27T09:13:58.6681658Z
 test	Set up Python 3.11.9	2025-08-27T09:13:58.7099684Z Installing collected packages: pip
 test	Set up Python 3.11.9	2025-08-27T09:13:58.7100305Z Attempting uninstall: pip
 test	Set up Python 3.11.9	2025-08-27T09:13:58.7120278Z Found existing installation: pip 24.0
@@ -186,7 +186,7 @@ test	Cache pip packages	2025-08-27T09:13:59.7371985Z with:
 test	Cache pip packages	2025-08-27T09:13:59.7372288Z   path: ~/.cache/pip
 test	Cache pip packages	2025-08-27T09:13:59.7372882Z   key: Linux-pip-aac74dabbaf8d6c596cc733990228cc2dd0dbee0822c71d4848d52c8ee6b6501
 test	Cache pip packages	2025-08-27T09:13:59.7373534Z   restore-keys: Linux-pip-
-test	Cache pip packages	
+test	Cache pip packages
 test	Cache pip packages	2025-08-27T09:13:59.7374125Z   enableCrossOsArchive: false
 test	Cache pip packages	2025-08-27T09:13:59.7374523Z   fail-on-cache-miss: false
 test	Cache pip packages	2025-08-27T09:13:59.7374849Z   lookup-only: false
@@ -306,11 +306,11 @@ test	Install Python dependencies with uv priority	2025-08-27T09:14:20.2369390Z I
 test	Install Python dependencies with uv priority	2025-08-27T09:14:20.4970790Z Successfully installed uv-0.8.13
 test	Install Python dependencies with uv priority	2025-08-27T09:14:20.5627332Z 🚀 Using uv.lock for exact dependency reproduction...
 test	Install Python dependencies with uv priority	2025-08-27T09:14:20.5671521Z error: unexpected argument '--frozen' found
-test	Install Python dependencies with uv priority	2025-08-27T09:14:20.5671922Z 
+test	Install Python dependencies with uv priority	2025-08-27T09:14:20.5671922Z
 test	Install Python dependencies with uv priority	2025-08-27T09:14:20.5672119Z   tip: to pass '--frozen' as a value, use '-- --frozen'
-test	Install Python dependencies with uv priority	2025-08-27T09:14:20.5672361Z 
+test	Install Python dependencies with uv priority	2025-08-27T09:14:20.5672361Z
 test	Install Python dependencies with uv priority	2025-08-27T09:14:20.5672480Z Usage: uv pip sync [OPTIONS] <SRC_FILE>...
-test	Install Python dependencies with uv priority	2025-08-27T09:14:20.5673174Z 
+test	Install Python dependencies with uv priority	2025-08-27T09:14:20.5673174Z
 test	Install Python dependencies with uv priority	2025-08-27T09:14:20.5673285Z For more information, try '--help'.
 test	Install Python dependencies with uv priority	2025-08-27T09:14:20.5677914Z ⚠️ uv.lock sync failed, falling back to requirements.txt
 test	Install Python dependencies with uv priority	2025-08-27T09:14:21.0166712Z Collecting fastapi==0.110.3 (from -r requirements.txt (line 2))
@@ -494,7 +494,7 @@ test	Install Python dependencies with uv priority	2025-08-27T09:14:25.6139813Z U
 test	Install Python dependencies with uv priority	2025-08-27T09:14:25.6162073Z Using cached markdown_it_py-4.0.0-py3-none-any.whl (87 kB)
 test	Install Python dependencies with uv priority	2025-08-27T09:14:25.6176185Z Using cached mdurl-0.1.2-py3-none-any.whl (10.0 kB)
 test	Install Python dependencies with uv priority	2025-08-27T09:14:26.1121449Z Installing collected packages: types-urllib3, pytz, websockets, uvloop, urllib3, tzdata, typing-extensions, threadpoolctl, stevedore, sniffio, six, ruff, PyYAML, python-dotenv, pygments, psycopg2-binary, pluggy, packaging, numpy, mypy-extensions, mdurl, MarkupSafe, joblib, iniconfig, idna, httptools, h11, greenlet, coverage, click, charset-normalizer, certifi, annotated-types, uvicorn, types-requests, SQLAlchemy, scipy, requests, python-dateutil, pytest, pydantic-core, mypy, markdown-it-py, Mako, httpcore, anyio, aiosqlite, xgboost, watchfiles, starlette, scikit-learn, rich, pytest-cov, pydantic, pandas, httpx, alembic, pydantic-settings, fastapi, bandit
-test	Install Python dependencies with uv priority	2025-08-27T09:14:45.5351024Z 
+test	Install Python dependencies with uv priority	2025-08-27T09:14:45.5351024Z
 test	Install Python dependencies with uv priority	2025-08-27T09:14:45.5386583Z Successfully installed Mako-1.3.10 MarkupSafe-3.0.2 PyYAML-6.0.2 SQLAlchemy-2.0.31 aiosqlite-0.20.0 alembic-1.13.1 annotated-types-0.7.0 anyio-4.10.0 bandit-1.7.9 certifi-2025.8.3 charset-normalizer-3.4.3 click-8.2.1 coverage-7.10.5 fastapi-0.110.3 greenlet-3.2.4 h11-0.16.0 httpcore-1.0.9 httptools-0.6.4 httpx-0.27.0 idna-3.10 iniconfig-2.1.0 joblib-1.5.1 markdown-it-py-4.0.0 mdurl-0.1.2 mypy-1.10.0 mypy-extensions-1.1.0 numpy-1.26.4 packaging-25.0 pandas-2.2.2 pluggy-1.6.0 psycopg2-binary-2.9.9 pydantic-2.8.2 pydantic-core-2.20.1 pydantic-settings-2.3.3 pygments-2.19.2 pytest-8.2.1 pytest-cov-5.0.0 python-dateutil-2.9.0.post0 python-dotenv-1.0.1 pytz-2025.2 requests-2.32.3 rich-14.1.0 ruff-0.5.5 scikit-learn-1.4.2 scipy-1.13.1 six-1.17.0 sniffio-1.3.1 starlette-0.37.2 stevedore-5.5.0 threadpoolctl-3.6.0 types-requests-2.32.0.20240712 types-urllib3-1.26.25.14 typing-extensions-4.15.0 tzdata-2025.2 urllib3-2.5.0 uvicorn-0.30.1 uvloop-0.21.0 watchfiles-1.1.0 websockets-15.0.1 xgboost-2.0.3
 test	Install Python dependencies with uv priority	2025-08-27T09:14:46.6116939Z Obtaining file:///home/runner/work/football/football
 test	Install Python dependencies with uv priority	2025-08-27T09:14:46.6143565Z   Installing build dependencies: started
@@ -767,7 +767,7 @@ test	Install Python dependencies with uv priority	2025-08-27T09:14:55.4109733Z  
 test	Install Python dependencies with uv priority	2025-08-27T09:14:55.4144286Z     Found existing installation: fastapi 0.110.3
 test	Install Python dependencies with uv priority	2025-08-27T09:14:55.4191219Z     Uninstalling fastapi-0.110.3:
 test	Install Python dependencies with uv priority	2025-08-27T09:14:55.4202759Z       Successfully uninstalled fastapi-0.110.3
-test	Install Python dependencies with uv priority	2025-08-27T09:14:57.1247418Z 
+test	Install Python dependencies with uv priority	2025-08-27T09:14:57.1247418Z
 test	Install Python dependencies with uv priority	2025-08-27T09:14:57.1304625Z Successfully installed apprise-1.9.4 asgi-lifespan-2.1.0 asyncpg-0.30.0 attrs-25.3.0 beautifulsoup4-4.13.5 cachetools-6.2.0 cffi-1.17.1 cloudpickle-3.1.1 colorama-0.4.6 coolname-2.2.0 cryptography-45.0.6 dateparser-1.2.2 docker-7.1.0 exceptiongroup-1.3.0 fastapi-0.116.1 football-predictor-0.1.0 fsspec-2025.7.0 graphviz-0.21 griffe-1.13.0 h2-4.3.0 hpack-4.1.0 humanize-4.13.0 hyperframe-6.1.0 importlib-metadata-8.7.0 jinja2-3.1.6 jinja2-humanize-extension-0.4.0 jsonpatch-1.33 jsonpointer-3.0.0 jsonschema-4.25.1 jsonschema-specifications-2025.4.1 markdown-3.8.2 oauthlib-3.3.1 opentelemetry-api-1.36.0 orjson-3.11.3 pathspec-0.12.1 pendulum-3.1.0 prefect-3.4.14 prometheus-client-0.22.1 psycopg-3.2.9 psycopg-binary-3.2.9 pycparser-2.22 pydantic-2.11.7 pydantic-core-2.33.2 pydantic-extra-types-2.10.5 python-slugify-8.0.4 python-socks-2.7.2 readchar-4.2.1 referencing-0.36.2 regex-2025.7.34 requests-oauthlib-2.0.0 rfc3339-validator-0.1.4 rpds-py-0.27.0 ruamel-yaml-0.18.15 ruamel.yaml.clib-0.2.12 semver-3.0.4 shellingham-1.5.4 soupsieve-2.7 starlette-0.47.3 structlog-25.4.0 text-unidecode-1.3 toml-0.10.2 typer-0.16.1 typing-inspection-0.4.1 tzlocal-5.3.1 zipp-3.23.0
 test	Install Python dependencies with uv priority	2025-08-27T09:14:58.1354546Z Collecting pre-commit
 test	Install Python dependencies with uv priority	2025-08-27T09:14:58.1374029Z   Using cached pre_commit-4.3.0-py2.py3-none-any.whl.metadata (1.2 kB)
@@ -819,7 +819,7 @@ test	Install Python dependencies with uv priority	2025-08-27T09:14:58.5228058Z U
 test	Install Python dependencies with uv priority	2025-08-27T09:14:58.5244899Z Using cached filelock-3.19.1-py3-none-any.whl (15 kB)
 test	Install Python dependencies with uv priority	2025-08-27T09:14:58.5257845Z Using cached platformdirs-4.4.0-py3-none-any.whl (18 kB)
 test	Install Python dependencies with uv priority	2025-08-27T09:14:58.6767208Z Installing collected packages: distlib, platformdirs, nodeenv, identify, filelock, chardet, cfgv, virtualenv, diff-cover, pre-commit
-test	Install Python dependencies with uv priority	2025-08-27T09:14:59.2241577Z 
+test	Install Python dependencies with uv priority	2025-08-27T09:14:59.2241577Z
 test	Install Python dependencies with uv priority	2025-08-27T09:14:59.2295302Z Successfully installed cfgv-3.4.0 chardet-5.2.0 diff-cover-9.6.0 distlib-0.4.0 filelock-3.19.1 identify-2.6.13 nodeenv-1.9.1 platformdirs-4.4.0 pre-commit-4.3.0 virtualenv-20.34.0
 test	Install Python dependencies with uv priority	2025-08-27T09:14:59.2993479Z ##[endgroup]
 test	Cache pre-commit	﻿2025-08-27T09:14:59.3556689Z ##[group]Run actions/cache@v4
@@ -993,15 +993,15 @@ test	Run security scan	2025-08-27T09:15:53.4794007Z [main]	INFO	cli exclude test
 test	Run security scan	2025-08-27T09:15:53.4795055Z [main]	INFO	using config: pyproject.toml
 test	Run security scan	2025-08-27T09:15:53.4795554Z [main]	INFO	running on Python 3.11.9
 test	Run security scan	2025-08-27T09:15:53.7252196Z Run started:2025-08-27 09:15:53.724971
-test	Run security scan	2025-08-27T09:15:53.7252670Z 
+test	Run security scan	2025-08-27T09:15:53.7252670Z
 test	Run security scan	2025-08-27T09:15:53.7252819Z Test results:
 test	Run security scan	2025-08-27T09:15:53.7253211Z 	No issues identified.
-test	Run security scan	2025-08-27T09:15:53.7253458Z 
+test	Run security scan	2025-08-27T09:15:53.7253458Z
 test	Run security scan	2025-08-27T09:15:53.7253620Z Code scanned:
 test	Run security scan	2025-08-27T09:15:53.7254432Z 	Total lines of code: 2273
 test	Run security scan	2025-08-27T09:15:53.7254928Z 	Total lines skipped (#nosec): 0
 test	Run security scan	2025-08-27T09:15:53.7255771Z 	Total potential issues skipped due to specifically being disabled (e.g., #nosec BXXX): 5
-test	Run security scan	2025-08-27T09:15:53.7256517Z 
+test	Run security scan	2025-08-27T09:15:53.7256517Z
 test	Run security scan	2025-08-27T09:15:53.7256684Z Run metrics:
 test	Run security scan	2025-08-27T09:15:53.7257510Z 	Total issues (by severity):
 test	Run security scan	2025-08-27T09:15:53.7257932Z 		Undefined: 0
@@ -1041,13 +1041,13 @@ test	Run gitleaks (strict)	2025-08-27T09:15:54.4704857Z Gitleaks restored from c
 test	Run gitleaks (strict)	2025-08-27T09:15:54.4708064Z event type: pull_request
 test	Run gitleaks (strict)	2025-08-27T09:15:54.6495892Z gitleaks cmd: gitleaks detect --redact -v --exit-code=2 --report-format=sarif --report-path=results.sarif --log-level=debug --log-opts=--no-merges --first-parent d6362553224d7f7bd22558fd26ca044d0ec6d5be^..5fef90b518aba8b8f0f86ea491f06e60f09d8421
 test	Run gitleaks (strict)	2025-08-27T09:15:54.6511587Z [command]/tmp/gitleaks-8.24.3/gitleaks detect --redact -v --exit-code=2 --report-format=sarif --report-path=results.sarif --log-level=debug --log-opts=--no-merges --first-parent d6362553224d7f7bd22558fd26ca044d0ec6d5be^..5fef90b518aba8b8f0f86ea491f06e60f09d8421
-test	Run gitleaks (strict)	2025-08-27T09:15:54.9142899Z 
+test	Run gitleaks (strict)	2025-08-27T09:15:54.9142899Z
 test	Run gitleaks (strict)	2025-08-27T09:15:54.9143994Z     ○
 test	Run gitleaks (strict)	2025-08-27T09:15:54.9144472Z     │╲
 test	Run gitleaks (strict)	2025-08-27T09:15:54.9144785Z     │ ○
 test	Run gitleaks (strict)	2025-08-27T09:15:54.9145069Z     ○ ░
 test	Run gitleaks (strict)	2025-08-27T09:15:54.9145421Z     ░    gitleaks
-test	Run gitleaks (strict)	2025-08-27T09:15:54.9145632Z 
+test	Run gitleaks (strict)	2025-08-27T09:15:54.9145632Z
 test	Run gitleaks (strict)	2025-08-27T09:15:54.9146023Z [90m9:15AM[0m DBG using github.com/wasilibs/go-re2 regex engine
 test	Run gitleaks (strict)	2025-08-27T09:15:54.9146575Z [90m9:15AM[0m DBG using gitleaks config from GITLEAKS_CONFIG env var: .gitleaks.toml
 test	Run gitleaks (strict)	2025-08-27T09:15:55.0509176Z [90m9:15AM[0m DBG extending config with default config
@@ -1120,7 +1120,7 @@ test	Run tests with coverage gate (single run)	2025-08-27T09:15:57.2555487Z root
 test	Run tests with coverage gate (single run)	2025-08-27T09:15:57.2555970Z configfile: pyproject.toml
 test	Run tests with coverage gate (single run)	2025-08-27T09:15:57.2556380Z plugins: anyio-4.10.0, cov-5.0.0
 test	Run tests with coverage gate (single run)	2025-08-27T09:15:57.2556788Z collected 60 items
-test	Run tests with coverage gate (single run)	2025-08-27T09:15:57.2556994Z 
+test	Run tests with coverage gate (single run)	2025-08-27T09:15:57.2556994Z
 test	Run tests with coverage gate (single run)	2025-08-27T09:15:57.2577744Z tests/auto/test_apps_api_main.py .                                       [  1%]
 test	Run tests with coverage gate (single run)	2025-08-27T09:15:57.2593277Z tests/auto/test_data_pipeline_features_build.py .                        [  3%]
 test	Run tests with coverage gate (single run)	2025-08-27T09:15:57.2608756Z tests/auto/test_data_pipeline_features_rolling.py .                      [  5%]
@@ -1140,50 +1140,50 @@ test	Run tests with coverage gate (single run)	2025-08-27T09:16:01.1846410Z test
 test	Run tests with coverage gate (single run)	2025-08-27T09:16:01.2107167Z tests/test_ingest_csv.py ........                                        [ 86%]
 test	Run tests with coverage gate (single run)	2025-08-27T09:16:01.2227371Z tests/test_models.py ..ss                                                [ 93%]
 test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7020493Z tests/test_settings.py ....                                              [100%]
-test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7021094Z 
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7021094Z
 test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7021318Z =============================== warnings summary ===============================
 test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7021790Z apps/api/main.py:61
-test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7022350Z   /home/runner/work/football/football/apps/api/main.py:61: DeprecationWarning: 
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7022350Z   /home/runner/work/football/football/apps/api/main.py:61: DeprecationWarning:
 test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7023142Z           on_event is deprecated, use lifespan event handlers instead.
-test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7024019Z   
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7024019Z
 test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7024337Z           Read more about it in the
 test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7024972Z           [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
-test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7025589Z           
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7025589Z
 test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7025870Z     @app.on_event("startup")
-test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7026097Z 
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7026097Z
 test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7026574Z ../../../../../opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/fastapi/applications.py:4495
-test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7027714Z   /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/fastapi/applications.py:4495: DeprecationWarning: 
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7027714Z   /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/fastapi/applications.py:4495: DeprecationWarning:
 test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7028610Z           on_event is deprecated, use lifespan event handlers instead.
-test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7029078Z   
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7029078Z
 test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7029339Z           Read more about it in the
 test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7029928Z           [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
-test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7030506Z           
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7030506Z
 test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7030811Z     return self.router.on_event(event_type)
-test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7031085Z 
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7031085Z
 test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7031297Z tests/test_basic.py::test_api_module_import
 test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7033123Z   /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/pydantic/_internal/_config.py:323: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
 test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7035472Z     warnings.warn(DEPRECATION_MESSAGE, DeprecationWarning)
-test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7035839Z 
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7035839Z
 test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7036005Z tests/test_basic.py::test_api_module_import
 test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7037182Z   /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/pydantic/_internal/_fields.py:158: UserWarning: Field "model_version" in Settings has conflict with protected namespace "model_".
-test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7038333Z   
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7038333Z
 test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7038876Z   You may be able to resolve this warning by setting `model_config['protected_namespaces'] = ('settings_',)`.
 test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7039792Z     warnings.warn(
-test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7039996Z 
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7039996Z
 test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7040159Z tests/test_basic.py::test_api_module_import
 test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7041419Z   /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/pydantic/_internal/_fields.py:158: UserWarning: Field "model_registry_path" in Settings has conflict with protected namespace "model_".
-test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7042610Z   
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7042610Z
 test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7043179Z   You may be able to resolve this warning by setting `model_config['protected_namespaces'] = ('settings_',)`.
 test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7043997Z     warnings.warn(
-test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7044187Z 
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7044187Z
 test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7044350Z tests/test_basic.py::test_api_module_import
 test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7045546Z   /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/pydantic/_internal/_fields.py:158: UserWarning: Field "model_cache_size" in Settings has conflict with protected namespace "model_".
-test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7046751Z   
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7046751Z
 test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7047309Z   You may be able to resolve this warning by setting `model_config['protected_namespaces'] = ('settings_',)`.
 test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7047990Z     warnings.warn(
-test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7048186Z 
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7048186Z
 test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7048485Z -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
-test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7048913Z 
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7048913Z
 test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7049180Z ---------- coverage: platform linux, python 3.11.9-final-0 -----------
 test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7049778Z Name                                           Stmts   Miss Branch BrPart   Cover   Missing
 test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7050378Z -------------------------------------------------------------------------------------------
@@ -1235,7 +1235,7 @@ test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7083933Z TOTA
 test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7084581Z Coverage HTML written to dir htmlcov
 test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7084997Z Coverage XML written to file coverage.xml
 test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7085438Z Coverage JSON written to file coverage.json
-test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7085731Z 
+test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7085731Z
 test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7085975Z Required test coverage of 15% reached. Total coverage: 34.85%
 test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7086537Z =========================== short test summary info ============================
 test	Run tests with coverage gate (single run)	2025-08-27T09:16:02.7087372Z SKIPPED [2] tests/data_pipeline/test_ingest_features.py: Integration tests disabled, set ENABLE_DB_TESTS=1 to enable
@@ -1283,7 +1283,7 @@ test	Upload coverage artifacts	htmlcov/**
 test	Upload coverage artifacts	pytestdebug.log
 test	Upload coverage artifacts	diff-coverage.html
 test	Upload coverage artifacts	diff-coverage.md
-test	Upload coverage artifacts	
+test	Upload coverage artifacts
 test	Upload coverage artifacts	2025-08-27T09:16:03.3685490Z   if-no-files-found: ignore
 test	Upload coverage artifacts	2025-08-27T09:16:03.3685733Z   retention-days: 30
 test	Upload coverage artifacts	2025-08-27T09:16:03.3685953Z   compression-level: 6
