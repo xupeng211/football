@@ -71,7 +71,7 @@ async def startup_event() -> None:
 
 
 @app.get("/health", response_model=HealthResponse)
-async def health_check() -> dict[str, str]:
+async def health_check():
     """健康检查接口"""
     model_loaded = predictor is not None and predictor.model is not None
 

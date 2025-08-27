@@ -51,7 +51,7 @@ class FootballAPICollector:
         self.base_url = "https://api.football-data.org/v4"  # 示例API
         self.session: httpx.AsyncClient | None = None
 
-    async def __aenter__(self) -> "FootballDataAPI":
+    async def __aenter__(self):
         """异步上下文管理器入口"""
         headers = {}
         if self.api_key:
