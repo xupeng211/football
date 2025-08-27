@@ -23,9 +23,9 @@ class Predictor:
         Args:
             model_path: 模型文件路径,如果为None则加载最新模型
         """
-        self.model = None
-        self.model_version = None
-        self.feature_columns = None
+        self.model: Any = None
+        self.model_version: str | None = None
+        self.feature_columns: list[str] | None = None
 
         if model_path is None:
             model_path = self._find_latest_model()
@@ -53,7 +53,7 @@ class Predictor:
 
         return None
 
-    def load_model(self, model_path: str):
+    def load_model(self, model_path: str) -> None:
         """
         加载模型
 
@@ -83,6 +83,7 @@ class Predictor:
 
             warnings.warn(f"模型加载失败,使用默认模型: {e}", stacklevel=2)
             self.model = _StubModel()
+            self.model_version = "stub-default"
 
     def predict_single(
         self,
@@ -92,7 +93,7 @@ class Predictor:
         odds_d: float,
         odds_a: float,
         team_stats: dict | None = None,
-    ) -> dict[str, float]:
+    ) -> dict[str, Any]:
         """
         预测单场比赛结果
 
@@ -130,10 +131,10 @@ class Predictor:
             "home_win": float(proba[0]),
             "draw": float(proba[1]),
             "away_win": float(proba[2]),
-            "model_version": self.model_version,
+            "model_version": self.model_version or "unknown",
         }
 
-    def predict_batch(self, matches: list[dict[str, Any]]) -> list[dict[str, float]]:
+    def predict_batch(self, matches: list[dict[str, Any]]) -> list[dict[str, Any]]:
         """
         批量预测比赛结果
 
@@ -158,15 +159,14 @@ class Predictor:
                     team_stats=match.get("team_stats"),
                 )
                 results.append(result)
-            except Exception as e:
+            except Exception:
                 # 返回默认预测(平均分布)
                 results.append(
                     {
                         "home_win": 0.33,
                         "draw": 0.34,
                         "away_win": 0.33,
-                        "model_version": self.model_version,
-                        "error": str(e),
+                        "model_version": self.model_version or "unknown",
                     }
                 )
 
@@ -182,11 +182,6 @@ class Predictor:
             "model_type": type(self.model).__name__,
             "is_loaded": True,
         }
-
-        # 如果有特征列信息
-        if self.feature_columns:
-            info["n_features"] = len(self.feature_columns)
-            info["feature_columns"] = self.feature_columns
 
         return info
 
@@ -204,7 +199,7 @@ class _StubModel:
         return np.array([[0.34, 0.33, 0.33] for _ in range(len(X))])
 
 
-def _safe_load_or_stub(path: str):
+def _safe_load_or_stub(path: str) -> Any:
     """安全加载模型,失败时返回stub"""
     try:
         import pickle

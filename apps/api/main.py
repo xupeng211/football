@@ -83,9 +83,9 @@ async def health_check():
 
 
 @app.get("/version", response_model=VersionResponse)
-async def get_version():
+async def get_version() -> VersionResponse:
     """获取版本信息"""
-    model_info = {}
+    model_info: dict[str, Any] = {}
     model_version = "unknown"
 
     if predictor and predictor.model is not None:
@@ -96,7 +96,7 @@ async def get_version():
 
 
 @app.post("/predict", response_model=list[PredictionOutput])
-async def predict_matches(matches: list[MatchInput]):
+async def predict_matches(matches: list[MatchInput]) -> list[PredictionOutput]:
     """
     批量预测比赛结果
 
@@ -142,10 +142,10 @@ async def predict_matches(matches: list[MatchInput]):
         for pred in predictions:
             results.append(
                 PredictionOutput(
-                    home_win=pred["home_win"],
-                    draw=pred["draw"],
-                    away_win=pred["away_win"],
-                    model_version=pred.get("model_version", "unknown"),
+                    home_win=float(pred["home_win"]),
+                    draw=float(pred["draw"]),
+                    away_win=float(pred["away_win"]),
+                    model_version=str(pred.get("model_version", "unknown")),
                 )
             )
 
