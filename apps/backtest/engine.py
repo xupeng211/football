@@ -47,7 +47,7 @@ class BacktestResult:
 class BacktestEngine:
     """回测引擎"""
 
-    def __init__(self):
+    def __init__(self) -> dict[str, Any]:
         """初始化回测引擎"""
         self.results_history: list[BacktestResult] = []
 

@@ -196,7 +196,7 @@ def main() -> None:
         version = save_model_and_metrics(model, metrics)
 
         print("训练完成!")
-        return version
+        # return version
 
     except Exception as e:
         print(f"训练失败: {e}")
