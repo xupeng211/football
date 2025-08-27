@@ -14,6 +14,7 @@ from apps.api.core.settings import settings
 
 logger = structlog.get_logger()
 
+
 @dataclass
 class Match:
     """比赛数据模型"""
