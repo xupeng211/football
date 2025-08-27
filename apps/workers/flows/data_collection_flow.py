@@ -306,7 +306,7 @@ if __name__ == "__main__":
     import asyncio
 
     # 测试运行
-    async def test_flow():
+    async def test_flow() -> None:
         result = await daily_data_collection_flow()
         print(f"Flow result: {result}")
 
