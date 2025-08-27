@@ -180,7 +180,7 @@ py-cpuinfo==9.0.0
 py-serializable==1.1.2
 pyasn1==0.6.1
 pyasn1_modules==0.4.2
-pycodestyle==2.11.1
+pycodestyle>=2.12.0
 pycparser==2.22
 pydantic==2.8.2
 pydantic-extra-types==2.10.5
