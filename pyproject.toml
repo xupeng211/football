@@ -34,6 +34,9 @@ dev = [
     "diff-cover>=7.0.0",
 ]
 
+[tool.hatch.build.targets.wheel]
+packages = ["apps", "data_pipeline", "models", "trainer", "infra", "evaluation"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q -ra -m 'not slow'"
