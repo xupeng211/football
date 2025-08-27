@@ -221,7 +221,7 @@ class XGBoostTrainer:
 
         return result
 
-    def predict_proba(self, features: pd.DataFrame) -> np.ndarray:
+    def predict_proba(self, features: pd.DataFrame) -> np.ndarray[Any, Any]:
         """
         预测概率
 
@@ -236,7 +236,7 @@ class XGBoostTrainer:
 
         return self.model.predict_proba(features)
 
-    def predict(self, features: pd.DataFrame) -> np.ndarray:
+    def predict(self, features: pd.DataFrame) -> np.ndarray[Any, Any]:
         """
         预测类别
 

@@ -47,7 +47,7 @@ class BacktestResult:
 class BacktestEngine:
     """回测引擎"""
 
-    def __init__(self) -> dict[str, Any]:
+    def __init__(self) -> None:
         """初始化回测引擎"""
         self.results_history: list[BacktestResult] = []
 
@@ -61,7 +61,7 @@ class BacktestEngine:
         strategy_name: str = "default",
         min_confidence: float = 0.6,  # 最低置信度阈值
         stake_per_bet: float = 10.0,  # 每注金额
-    ) -> None:
+    ) -> BacktestResult:
         """
         运行回测
 
@@ -143,7 +143,7 @@ class BacktestEngine:
             avg_odds=risk_metrics["avg_odds"],
             # 详细数据
             daily_pnl=pnl_results["daily_pnl"],
-            prediction_details=confident_predictions.to_dict("records"),
+            prediction_details=[{str(k): v for k, v in record.items()} for record in confident_predictions.to_dict("records")],
         )
 
         self.results_history.append(result)
