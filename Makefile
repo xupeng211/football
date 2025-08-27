@@ -259,3 +259,65 @@ mvp-clean: ## 清理MVP环境和数据
 	docker-compose -f docker-compose.mvp.yml down -v
 	docker system prune -f
 	@echo "$(GREEN)✅ MVP环境已清理$(NC)"
+
+# 测试相关命令
+.PHONY: test test-unit test-integration test-regression test-e2e test-all
+.PHONY: test-quick test-full test-ci test-smoke test-coverage
+
+# 基本测试命令
+test: test-quick
+	@echo "✅ 快速测试完成"
+
+test-unit:
+	@echo "🧪 运行单元测试..."
+	python scripts/run_tests.py unit
+
+test-integration:
+	@echo "🔗 运行集成测试..."
+	python scripts/run_tests.py integration
+
+test-regression:
+	@echo "🔄 运行回归测试..."
+	python scripts/run_tests.py regression
+
+test-e2e:
+	@echo "🎯 运行端到端测试..."
+	python scripts/run_tests.py e2e
+
+test-all:
+	@echo "🚀 运行所有测试..."
+	python scripts/run_tests.py all
+
+# 特殊测试套件
+test-quick:
+	@echo "⚡ 运行快速测试套件..."
+	python scripts/run_tests.py quick
+
+test-full:
+	@echo "🔄 运行完整测试套件..."
+	python scripts/run_tests.py full
+
+test-ci:
+	@echo "🤖 运行CI测试套件..."
+	python scripts/run_tests.py ci
+
+test-smoke:
+	@echo "💨 运行冒烟测试..."
+	python scripts/run_tests.py smoke
+
+# 覆盖率相关
+test-coverage:
+	@echo "📊 运行测试并生成覆盖率报告..."
+	python scripts/run_tests.py unit
+	@echo "📈 覆盖率报告已生成到 htmlcov/ 目录"
+
+# 测试环境清理
+test-clean:
+	@echo "🧹 清理测试相关文件..."
+	rm -rf htmlcov/
+	rm -rf .coverage
+	rm -rf coverage.xml
+	rm -rf .pytest_cache/
+	find . -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true
+	find . -name "*.pyc" -delete 2>/dev/null || true
+	@echo "✅ 测试文件清理完成"
