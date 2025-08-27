@@ -33,7 +33,7 @@ class CIDashboard:
     def get_coverage(self):
         """获取测试覆盖率"""
         try:
-            subprocess.run(  # nosec B603 B607 - 内部工具，已知命令
+            subprocess.run(  # nosec B603 B607 - 内部工具, 已知命令
                 [
                     "python",
                     "-m",

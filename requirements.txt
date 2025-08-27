@@ -76,8 +76,6 @@ flask-cors==6.0.1
 Flask-Limiter==3.5.1
 Flask-Login==0.6.3
 flask-talisman==1.1.0
--e git+ssh://git@github.com/xupeng211/football.git@b0b67aae16db946edae9c3af0d49bfceacaf7ae6#egg=football_predict_system
--e git+ssh://git@github.com/xupeng211/football.git@b0b67aae16db946edae9c3af0d49bfceacaf7ae6#egg=football_predictor
 frozenlist==1.7.0
 fsspec==2025.7.0
 gevent==25.5.1
