@@ -3,6 +3,7 @@
 """
 
 from datetime import date, datetime, timedelta
+from typing import Any
 
 import structlog
 from prefect import flow, task
@@ -17,7 +18,7 @@ logger = structlog.get_logger()
 @task(name="收集比赛数据")
 async def collect_matches_task(
     start_date: date, end_date: date, leagues: list[str] | None = None
-) -> list[dict]:
+) -> list[dict[str, Any]]:
     """
     收集比赛数据任务
 
@@ -66,7 +67,7 @@ async def collect_matches_task(
 
 
 @task(name="收集赔率数据")
-async def collect_odds_task(match_ids: list[str]) -> list[dict]:
+async def collect_odds_task(match_ids: list[str]) -> list[dict[str, Any]]:
     """
     收集赔率数据任务
 
@@ -106,7 +107,9 @@ async def collect_odds_task(match_ids: list[str]) -> list[dict]:
 
 
 @task(name="数据验证和清洗")
-def validate_and_clean_data(matches: list[dict], odds: list[dict]) -> dict:
+def validate_and_clean_data(
+    matches: list[dict[str, Any]], odds: list[dict[str, Any]]
+) -> dict[str, Any]:
     """
     数据验证和清洗任务
 
@@ -139,7 +142,9 @@ def validate_and_clean_data(matches: list[dict], odds: list[dict]) -> dict:
 
 
 @task(name="数据存储")
-async def store_data_task(matches: list[dict], odds: list[dict]) -> dict:
+async def store_data_task(
+    matches: list[dict[str, Any]], odds: list[dict[str, Any]]
+) -> dict[str, Any]:
     """
     数据存储任务
 
@@ -188,7 +193,7 @@ async def store_data_task(matches: list[dict], odds: list[dict]) -> dict:
 )
 async def daily_data_collection_flow(
     target_date: date | None = None, leagues: list[str] | None = None
-) -> dict:
+) -> dict[str, Any]:
     """
     每日数据采集工作流
 
@@ -240,7 +245,7 @@ async def daily_data_collection_flow(
 @flow(name="历史数据回填", description="回填指定时间范围的历史数据")
 async def historical_data_backfill_flow(
     start_date: date, end_date: date, leagues: list[str] | None = None
-) -> dict:
+) -> dict[str, Any]:
     """
     历史数据回填工作流
 
