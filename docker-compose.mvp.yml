@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  # PostgreSQL数据库
+  db:
+    image: postgres:15
+    container_name: football_mvp_db
+    environment:
+      POSTGRES_DB: football_predict
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./sql/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+    networks:
+      - football_net
+
+  # API服务
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: football_mvp_api
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@db:5432/football_predict
+    depends_on:
+      - db
+    volumes:
+      - ./models:/app/models
+      - ./data:/app/data
+      - ./sql/sample:/app/sql/sample
+    networks:
+      - football_net
+
+volumes:
+  postgres_data:
+
+networks:
+  football_net:
+    driver: bridge

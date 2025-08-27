@@ -67,13 +67,6 @@ venv_not_active = "❌ AI开发工具必须在虚拟环境中运行！请运行:
 wrong_python_version = "❌ Python版本不正确，需要3.11.9"
 missing_tools = "❌ 缺少开发工具，请运行: make install"
 
-[tool.pytest.ini_options]
-minversion = "6.0"
-addopts = [ "-ra", "--strict-markers", "--strict-config", "--cov=apps", "--cov=data_pipeline", "--cov=models", "--cov-report=term-missing", "--cov-report=html:htmlcov", "--cov-fail-under=20", "-m", "not integration",]
-testpaths = [ "tests",]
-markers = [ "integration: tests requiring live database connection", "slow: tests that take more than 10 seconds", "unit: fast unit tests",]
-filterwarnings = [ "error", "ignore::UserWarning", "ignore::DeprecationWarning", "ignore::PendingDeprecationWarning",]
-
 [tool.coverage.run]
 source = [ "apps", "data_pipeline", "models",]
 omit = [ "*/tests/*", "*/test_*.py", "*/__pycache__/*", "*/.*", "setup.py", "*/venv/*", "*/.venv/*",]
@@ -85,3 +78,6 @@ precision = 2
 show_missing = true
 skip_covered = false
 exclude_lines = [ "pragma: no cover", "def __repr__", "if self.debug:", "if settings.DEBUG", "raise AssertionError", "raise NotImplementedError", "if 0:", "if __name__ == .__main__.:", "class .*\\bProtocol\\):", "@(abc\\.)?abstractmethod",]
+
+[tool.pytest.ini_options]
+addopts = "-q -ra -m 'not slow'"

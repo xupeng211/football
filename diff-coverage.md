@@ -1,0 +1,4 @@
+# Diff Coverage
+## Diff: origin/main...HEAD, staged and unstaged changes
+
+No lines with coverage information in this diff.

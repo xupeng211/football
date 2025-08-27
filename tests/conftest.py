@@ -1,9 +1,14 @@
 import os
 import random
 
-import psycopg2
 import pytest
-from psycopg2 import OperationalError
+
+try:
+    import psycopg2
+    from psycopg2 import OperationalError
+except ImportError:
+    psycopg2 = None
+    OperationalError = Exception
 
 # 设置固定种子确保测试可重现
 SEED = int(os.getenv("TEST_SEED", "42"))
@@ -19,6 +24,8 @@ except ImportError:
 
 def db_available():
     """检测数据库是否可用,1秒超时"""
+    if psycopg2 is None:
+        return False
     try:
         default_url = "postgresql://postgres:password@localhost:5432/sports"
         db_url = os.environ.get("DATABASE_URL", default_url)
