@@ -193,7 +193,7 @@ def main() -> None:
         metrics = evaluate_model(model, X_test, y_test)
 
         # 6. 保存模型
-        version = save_model_and_metrics(model, metrics)
+        # version = save_model_and_metrics(model, metrics)
 
         print("训练完成!")
         # return version

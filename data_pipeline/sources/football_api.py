@@ -1,5 +1,3 @@
-from typing import Any
-
 """
 足球数据采集器 - 从外部API获取比赛数据
 """
@@ -7,6 +5,7 @@ from typing import Any
 import asyncio
 from dataclasses import dataclass
 from datetime import date, datetime
+from typing import Any
 
 import httpx
 import structlog
@@ -14,8 +13,6 @@ import structlog
 from apps.api.core.settings import settings
 
 logger = structlog.get_logger()
-# settings imported above
-
 
 @dataclass
 class Match:
