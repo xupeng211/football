@@ -73,7 +73,7 @@ jobs:
           pip install -e .
 
           # Install additional dev tools
-          pip install pre-commit ruff mypy pytest pytest-cov bandit diff-cover types-requests
+          pip install pre-commit ruff mypy pytest pytest-cov bandit diff-cover types-requests pytest-asyncio
           echo "::endgroup::"
 
       - name: Cache pre-commit
