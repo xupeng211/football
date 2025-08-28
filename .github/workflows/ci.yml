@@ -56,7 +56,9 @@ jobs:
 
           set -euo pipefail
           # Priority 1: Use uv.lock for exact dependency reproduction
-          if [ -f[object Object]            uv pip sync --frozen uv.lock
+          if [ -f "uv.lock" ]; then
+            echo "🚀 Using uv.lock for exact dependency reproduction..."
+            uv pip sync --frozen uv.lock
           # Priority 2: Fallback to requirements.txt
           elif [ -f "requirements.txt" ]; then
             echo "📦 uv.lock not found, falling back to requirements.txt..."
