@@ -55,6 +55,7 @@ jobs:
           python -m pip install -U pip uv
 
           set -euo pipefail
+
           # Priority 1: Use uv.lock for exact dependency reproduction
           if [ -f "uv.lock" ]; then
             echo "🚀 Using uv.lock for exact dependency reproduction..."
