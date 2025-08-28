@@ -4,13 +4,19 @@
 提供足球比赛结果预测的REST API接口
 """
 
+import time
+import uuid
 from typing import Any
 
 import uvicorn
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
+from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
+from starlette.requests import Request
+from starlette.responses import Response
 
 from apps.api.routers import health, metrics, predictions
+from apps.api.routers.metrics import MODEL_VERSION, REQUEST_COUNT, REQUEST_DURATION
 from models.predictor import create_predictor
 
 
@@ -45,15 +51,41 @@ class PredictionOutput(BaseModel):
 class VersionResponse(BaseModel):
     """版本信息响应"""
 
-    model_config = {"protected_namespaces": ()}
-
     api_version: str
     model_version: str
     model_info: dict[str, Any]
 
 
+class LoggingMiddleware(BaseHTTPMiddleware):
+    async def dispatch(
+        self, request: Request, call_next: RequestResponseEndpoint
+    ) -> Response:
+        trace_id = str(uuid.uuid4())
+        request.state.trace_id = trace_id
+
+        start_time = time.time()
+
+        response = await call_next(request)
+
+        process_time = time.time() - start_time
+        response.headers["X-Trace-ID"] = trace_id
+
+        REQUEST_DURATION.labels(
+            method=request.method, endpoint=request.url.path
+        ).observe(process_time)
+        REQUEST_COUNT.labels(method=request.method, endpoint=request.url.path).inc()
+
+        print(
+            f"trace_id={trace_id} method={request.method} path='{request.url.path}' "
+            f"status_code={response.status_code} process_time={process_time:.4f}s"
+        )
+
+        return response
+
+
 # 创建FastAPI应用
 app = FastAPI(title="足球预测API", description="足球比赛结果预测服务", version="1.0.0")
+app.add_middleware(LoggingMiddleware)
 app.include_router(predictions.router)
 app.include_router(health.router)
 app.include_router(metrics.router)
@@ -68,7 +100,10 @@ async def startup_event() -> None:
     global predictor
     try:
         predictor = create_predictor()
-        if predictor.model is None:
+        if predictor.model is not None:
+            model_version = predictor.model_version or "unknown"
+            MODEL_VERSION.labels(version=model_version).set(1)
+        else:
             print("警告: 未找到模型文件,API将使用默认预测")
     except Exception as e:
         print(f"预测器初始化失败: {e}")
@@ -85,8 +120,25 @@ async def get_version() -> VersionResponse:
         model_version = predictor.model_version or "unknown"
 
     return VersionResponse(
-        api_version="1.0.0", model_version=model_version, model_info=model_info
+        api_version="1.0.0",
+        model_version=model_version,
+        model_info=model_info,
     )
+
+
+@app.get("/livez", tags=["health"])
+async def livez() -> dict[str, str]:
+    """Liveness probe to check if the application is running."""
+    return {"status": "ok"}
+
+
+@app.get("/readyz", tags=["health"])
+async def readyz() -> dict[str, str]:
+    """Readiness probe to check if the application is ready to serve traffic."""
+    if predictor and predictor.model is not None:
+        return {"status": "ok"}
+    else:
+        raise HTTPException(status_code=503, detail="Model not loaded yet")
 
 
 @app.post("/predict", response_model=list[PredictionOutput])

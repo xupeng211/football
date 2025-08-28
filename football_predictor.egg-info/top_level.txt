@@ -1,6 +1,0 @@
-apps
-data_pipeline
-evaluation
-infra
-models
-tests

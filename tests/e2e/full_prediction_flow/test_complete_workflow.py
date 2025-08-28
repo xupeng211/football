@@ -108,14 +108,14 @@ class TestCompleteUserWorkflow:
             total_prob = (
                 prediction["home_win"] + prediction["draw"] + prediction["away_win"]
             )
-            assert abs(total_prob - 1.0) < 0.01, (
-                f"Probabilities don't sum to 1: {total_prob}"
-            )
+            assert (
+                abs(total_prob - 1.0) < 0.01
+            ), f"Probabilities don't sum to 1: {total_prob}"
 
             # 验证置信度范围
-            assert 0 <= prediction["confidence"] <= 1, (
-                f"Invalid confidence: {prediction['confidence']}"
-            )
+            assert (
+                0 <= prediction["confidence"] <= 1
+            ), f"Invalid confidence: {prediction['confidence']}"
 
         print("\n✅ 完整工作流程测试通过!")
 

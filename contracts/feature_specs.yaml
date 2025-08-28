@@ -1,0 +1,47 @@
+# contracts/feature_specs.yaml
+#
+# This file defines the data contract for features used in both training and inference.
+# It ensures that the feature set remains consistent across the ML lifecycle.
+#
+# Data Types:
+# - numeric: int64, float64
+# - categorical: object, category
+# - boolean: bool
+# - datetime: datetime64[ns]
+
+features:
+  - name: home_team_goal_avg_l30d
+    dtype: float64
+    description: "Home team's average goals scored in the last 30 days."
+  - name: away_team_goal_avg_l30d
+    dtype: float64
+    description: "Away team's average goals scored in the last 30 days."
+  - name: home_team_conceded_avg_l30d
+    dtype: float64
+    description: "Home team's average goals conceded in the last 30 days."
+  - name: away_team_conceded_avg_l30d
+    dtype: float64
+    description: "Away team's average goals conceded in the last 30 days."
+  - name: home_team_win_rate_l10g
+    dtype: float64
+    description: "Home team's win rate in their last 10 games."
+  - name: away_team_win_rate_l10g
+    dtype: float64
+    description: "Away team's win rate in their last 10 games."
+  - name: odds_h
+    dtype: float64
+    description: "Bookmaker odds for a home team win."
+  - name: odds_d
+    dtype: float64
+    description: "Bookmaker odds for a draw."
+  - name: odds_a
+    dtype: float64
+    description: "Bookmaker odds for an away team win."
+  - name: league_id
+    dtype: int64
+    description: "Identifier for the league."
+
+metadata:
+  version: "1.0.0"
+  owner: "ml-platform-team"
+  updated_at: "2025-08-28T15:00:00Z"

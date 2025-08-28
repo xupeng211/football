@@ -1,8 +1,0 @@
-api
-backtest
-data_pipeline
-evaluation
-infra
-models
-trainer
-workers
