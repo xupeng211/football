@@ -291,7 +291,8 @@ class TestCompleteUserWorkflow:
             time_per_prediction = response_time / batch_size
 
             print(
-                f"   批量大小 {batch_size}: {response_time:.3f}s 总时间, {time_per_prediction:.3f}s/预测"
+                f"   批量大小 {batch_size}: {response_time:.3f}s 总时间, "
+                f"{time_per_prediction:.3f}s/预测"
             )
 
             assert response.status_code == 200
@@ -349,7 +350,7 @@ class TestUserDataIntegration:
             print(f"\n🔄 测试格式变体 {i + 1}")
             response = api_client.post("/predict", json=[format_test])
 
-            assert response.status_code == 200, f"Format variation {i + 1} failed"
+            assert response.status_code == 200, f"格式变体 {i + 1} 失败"
 
             result = response.json()[0]
             assert "predicted_outcome" in result
@@ -450,7 +451,8 @@ class TestEndToEndMonitoring:
         for endpoint in endpoints:
             response = api_client.get(endpoint)
             availability_results[endpoint] = response.status_code == 200
-            print(f"   {endpoint}: {'✅' if availability_results[endpoint] else '❌'}")
+            status = "✅" if availability_results[endpoint] else "❌"
+            print(f"   {endpoint}: {status}")
 
         overall_availability = sum(availability_results.values()) / len(
             availability_results
