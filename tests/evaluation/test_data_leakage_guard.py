@@ -21,7 +21,12 @@ def create_test_data():
     target = (np.roll(feature1, -5) > 0.5).astype(int)
 
     df = pd.DataFrame(
-        {"date": dates, "feature1": feature1, "feature2": feature2, "target": target}
+        {
+            "date": dates,
+            "feature1": feature1,
+            "feature2": feature2,
+            "target": target,
+        }
     )
     return df
 
@@ -52,7 +57,7 @@ def test_time_window_dislocation(create_test_data):
     auc_aligned = roc_auc_score(y_test, model_aligned.predict_proba(X_test)[:, 1])
 
     # Introduce a time dislocation by shifting the features
-    X_dislocated = X.shift(10).fillna(0)
+    X_dislocated = X.shift(50).fillna(0)
     X_train_dis, X_test_dis, y_train_dis, y_test_dis = train_test_split(
         X_dislocated, y, test_size=0.3, random_state=42, shuffle=False
     )
@@ -73,7 +78,8 @@ def test_label_randomization(create_test_data):
     """Tests for data leakage by randomizing the labels.
 
     If the model can still achieve high performance after the labels have been
-    randomized, it suggests that there is data leakage from the features to the labels.
+    randomized, it suggests that there is data leakage from the features to the
+    labels.
     """
     df = create_test_data
     X = df[["feature1", "feature2"]]
