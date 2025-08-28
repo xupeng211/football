@@ -68,11 +68,14 @@ class CIProblemDetector:
                         "type": "problematic_file",
                         "path": str(match),
                         "description": description,
-                        "severity": "high"
-                        if any(
-                            x in pattern for x in ["report", "security", "templates"]
-                        )
-                        else "medium",
+                        "severity": (
+                            "high"
+                            if any(
+                                x in pattern
+                                for x in ["report", "security", "templates"]
+                            )
+                            else "medium"
+                        ),
                         "solution": f"删除文件: rm -rf {match}",
                     }
                 )
@@ -160,7 +163,7 @@ class CIProblemDetector:
         if requirements_file.exists():
             try:
                 # 快速检测已知问题模式
-                result = subprocess.run(
+                result = subprocess.run(  # nosec B603,B607
                     ["pip", "install", "--dry-run", "-r", str(requirements_file)],
                     capture_output=True,
                     text=True,
@@ -279,7 +282,7 @@ class CIProblemDetector:
 
         try:
             # 检测未跟踪的大文件
-            result = subprocess.run(
+            result = subprocess.run(  # nosec B603,B607
                 ["git", "status", "--porcelain"],
                 capture_output=True,
                 text=True,
