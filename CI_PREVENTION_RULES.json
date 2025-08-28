@@ -1,0 +1,24 @@
+{
+  "pre_commit_hooks": [
+    "check-added-large-files",
+    "check-case-conflict",
+    "check-merge-conflict",
+    "trailing-whitespace",
+    "end-of-file-fixer"
+  ],
+  "gitignore_additions": [
+    "*_report.json",
+    "bandit_report.json",
+    "security_report.json",
+    "src/aiculture-kit/",
+    "templates/",
+    "temp/",
+    "tmp/"
+  ],
+  "ci_checks": [
+    "dependency-conflict-check",
+    "security-scan",
+    "template-pollution-check",
+    "large-file-check"
+  ]
+}
