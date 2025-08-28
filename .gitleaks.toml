@@ -7,111 +7,91 @@ title = "Gitleaks 安全扫描配置"
 # 扩展基础规则
 useDefault = true
 
-# 定义白名单路径和模式
-[[rules]]
-description = "忽略测试文件中的假敏感信息"
-allowlist.paths = [
-  '''src/aiculture-kit/.*''',
-  '''external/.*''',
-  '''vendor/.*''',
-    '''tests/.*''',
-    '''test_.*\.py''',
-    '''.*_test\.py''',
-    '''conftest\.py''',
-    '''.*\.md''',
-    '''.*\.txt''',
-    '''.*\.json''',
-]
-
-[[rules]]
-description = "忽略开发和示例配置"
-allowlist.regexes = [
-    '''(password|secret|key|token)\s*[:=]\s*["\']?(test|example|demo|placeholder|dummy|fake|sample)["\']?''',
-    '''your-secret-key-here''',
-    '''replace-with-actual-key''',
-    '''development-only''',
-    '''test-api-key''',
-    '''dummy-password''',
-    '''placeholder-secret''',
-]
-
-[[rules]]
-description = "忽略文档和注释中的示例"
-allowlist.regexes = [
-    '''#\s*(password|secret|key|token)''',
-    '''/\*.*?(password|secret|key|token).*?\*/''',
-    '''""".*?(password|secret|key|token).*?"""''',
-    '''".*?示例.*?"''',
-    '''".*?example.*?"''',
-]
-
-[[rules]]
-description = "忽略CI/CD环境变量模板"
-allowlist.regexes = [
-    '''\$\{\{.*?\}\}''',
-    '''\$\{[A-Z_]+\}''',
-    '''env\.[A-Z_]+''',
-    '''process\.env\.[A-Z_]+''',
-]
-
-[[rules]]
-description = "忽略默认开发配置"
-allowlist.regexes = [
-    '''django-insecure-''',
-    '''sk-test-''',
-    '''pk_test_''',
-    '''DEVELOPMENT_SECRET''',
-    '''LOCAL_SECRET_KEY''',
-]
-
-# 文件类型白名单
-[[rules]]
-description = "忽略特定文件类型"
-paths = [
-  '''src/aiculture-kit/.*''',
-  '''external/.*''',
-  '''vendor/.*''',
-    '''.*\.lock''',
-    '''.*\.log''',
-    '''.*\.coverage''',
-    '''.*\.cache.*''',
-    '''.*node_modules.*''',
-    '''.*\.git.*''',
-    '''.*\.pyc''',
-    '''.*__pycache__.*''',
-]
-
-# 特定于项目的白名单
-[[rules]]
-description = "足球预测系统特定排除"
-allowlist.regexes = [
-    '''football-predict-system''',
-    '''apps\.api\.core\.settings''',
-    '''your-api-secret-key''',
-    '''test-database-url''',
-]
-
-[[rules]]
-description = "忽略git历史中的旧配置"
-commits = [
-    '''deb05005860aeaeff83e5bf77c927e415102d043''',
-]
-
-[[rules]]
-description = "忽略报告文件中的误报"
-paths = [
-  '''src/aiculture-kit/.*''',
-  '''external/.*''',
-  '''vendor/.*''',
-    '''.*_report\.json''',
-    '''bandit_report\.json''',
-    '''security_report\.json''',
-    '''coverage\.json''',
-    '''ci-metrics\.json''',
-]
-
+# 白名单配置
 [allowlist]
+description = "项目白名单配置"
+
+# 忽略的文件路径
 paths = [
   '''src/aiculture-kit/.*''',
   '''external/.*''',
-  '''vendor/.*''',]
+  '''vendor/.*''',
+  '''tests/.*''',
+  '''test_.*\.py''',
+  '''.*_test\.py''',
+  '''conftest\.py''',
+  '''.*\.md''',
+  '''.*\.txt''',
+  '''.*\.json''',
+  '''.*\.yml''',
+  '''.*\.yaml''',
+  '''requirements.*''',
+  '''pyproject\.toml''',
+  '''setup\.py''',
+  '''coverage\.xml''',
+  '''\.pytest_cache/.*''',
+  '''\.venv/.*''',
+  '''\.git/.*''',
+  '''node_modules/.*''',
+  '''__pycache__/.*''',
+  '''\.mypy_cache/.*''',
+  '''\.ruff_cache/.*''',
+  '''htmlcov/.*''',
+]
+
+# 忽略的正则表达式
+regexes = [
+  # 测试和示例密钥
+  '''(password|secret|key|token)\s*[:=]\s*["\']?(test|example|demo|placeholder|dummy|fake|sample)["\']?''',
+  '''your-secret-key-here''',
+  '''replace-with-actual-key''',
+  '''development-only''',
+  '''test-api-key''',
+  '''dummy-password''',
+  '''placeholder-secret''',
+  
+  # 文档和注释
+  '''#\s*(password|secret|key|token)''',
+  '''/\*.*?(password|secret|key|token).*?\*/''',
+  '''""".*?(password|secret|key|token).*?"""''',
+  '''".*?示例.*?"''',
+  '''".*?example.*?"''',
+  
+  # CI/CD环境变量模板
+  '''GITHUB_TOKEN\s*[:=]\s*\$\{\{\s*secrets\.''',
+  '''API_KEY\s*[:=]\s*\$\{\{\s*vars\.''',
+  '''\$\{\{\s*env\.''',
+  
+  # 开发工具配置
+  '''pre-commit''',
+  '''pytest''',
+  '''coverage''',
+  '''mypy''',
+  '''ruff''',
+  '''black''',
+  '''flake8''',
+  
+  # 常见的非敏感字符串
+  '''localhost''',
+  '''127\.0\.0\.1''',
+  '''0\.0\.0\.0''',
+  '''debug''',
+  '''trace''',
+  '''info''',
+  '''warning''',
+  '''error''',
+]
+
+# 忽略的提交SHA（如果需要）
+commits = []
+
+# 停用词列表
+stopwords = [
+  "password",
+  "secret", 
+  "key",
+  "token",
+  "api",
+  "credential",
+  "auth",
+]
