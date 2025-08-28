@@ -27,6 +27,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Repo hygiene — no nested git
+        run: python .tools/guard/no_nested_git.py
+
       - name: Set up Python 3.11.9
         uses: actions/setup-python@v5
         with:

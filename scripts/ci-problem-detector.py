@@ -387,7 +387,7 @@ class CIProblemDetector:
     def generate_report(self, results: Dict[str, Any]) -> str:
         """生成检测报告"""
         all_problems = []
-        for category, problems in results.items():
+        for _category, problems in results.items():
             all_problems.extend(problems)
 
         critical_count = sum(1 for p in all_problems if p.get("severity") == "critical")
@@ -409,13 +409,13 @@ class CIProblemDetector:
         for category, problems in results.items():
             if problems:
                 report += f"\n### {category.replace('_', ' ').title()}\n"
-                for i, problem in enumerate(problems, 1):
+                for _, problem in enumerate(problems, 1):
                     severity_emoji = {
                         "critical": "🚨",
                         "high": "⚠️",
                         "medium": "📝",
                     }.get(problem.get("severity", ""), "i")
-                    report += f"{i}. {severity_emoji} **{problem['description']}**\n"
+                    report += f"• {severity_emoji} **{problem['description']}**\n"
                     if "path" in problem:
                         report += f"   - 路径: `{problem['path']}`\n"
                     if "solution" in problem:
@@ -453,9 +453,7 @@ def main():
         f.write(report)
 
     # 询问是否自动修复
-    critical_problems = [
-        p for p in all_problems if p.get("severity") == "critical"
-    ]
+    critical_problems = [p for p in all_problems if p.get("severity") == "critical"]
     if critical_problems:
         print(f"🚨 发现 {len(critical_problems)} 个关键问题,需要手动处理!")
         return 1

@@ -84,7 +84,7 @@ class TestCompleteUserWorkflow:
 
         # 步骤4: 用户验证预测结果
         print("\n📝 步骤4: 验证预测结果")
-        for i, prediction in enumerate(predictions):
+        for _, prediction in enumerate(predictions):
             match_data = sample_user_data[i]
             print(f"\n🏈 比赛 {i+1}: {match_data['home']} vs {match_data['away']}")
             print(f"   预测结果: {prediction['predicted_outcome']}")
@@ -345,7 +345,7 @@ class TestUserDataIntegration:
             },
         ]
 
-        for i, format_test in enumerate(format_variations):
+        for _, format_test in enumerate(format_variations):
             print(f"\n🔄 测试格式变体 {i+1}")
             response = api_client.post("/predict", json=[format_test])
 
@@ -394,7 +394,7 @@ class TestUserDataIntegration:
             },
         ]
 
-        for i, edge_case in enumerate(edge_cases):
+        for _, edge_case in enumerate(edge_cases):
             print(f"\n🚨 测试边界情况 {i+1}")
             response = api_client.post("/predict", json=[edge_case])
 
@@ -428,7 +428,7 @@ class TestEndToEndMonitoring:
 
         # 连续多次健康检查
         health_checks = []
-        for _ in range(5):
+        for i in range(5):
             response = api_client.get("/health")
             health_checks.append(response.status_code == 200)
             time.sleep(0.1)

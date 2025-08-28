@@ -37,3 +37,11 @@ repos:
     hooks:
       - id: bandit
         args: ["-c", "pyproject.toml"]
+
+  - repo: local
+    hooks:
+      - id: no_nested_git
+        name: Block nested Git repositories
+        entry: python .tools/guard/no_nested_git.py
+        language: system
+        pass_filenames: false

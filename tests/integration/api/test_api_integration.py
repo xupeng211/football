@@ -353,7 +353,7 @@ class TestAPIPerformance:
 
         # 创建多个并发请求
         threads = []
-        for _ in range(5):
+        for i in range(5):
             thread = threading.Thread(target=make_request)
             threads.append(thread)
             thread.start()

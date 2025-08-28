@@ -153,7 +153,7 @@ class TestModelPerformanceRegression:
 
         # 多次预测相同输入
         predictions = []
-        for _ in range(10):
+        for i in range(10):
             result = predictor.predict_single(**test_match)
             predictions.append(result)
 

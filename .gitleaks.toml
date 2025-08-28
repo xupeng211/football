@@ -11,6 +11,9 @@ useDefault = true
 [[rules.allowlist]]
 description = "忽略测试文件中的假敏感信息"
 paths = [
+  '''src/aiculture-kit/.*''',
+  '''external/.*''',
+  '''vendor/.*''',
     '''tests/.*''',
     '''test_.*\.py''',
     '''.*_test\.py''',
@@ -65,6 +68,9 @@ regexes = [
 [[rules.allowlist]]
 description = "忽略特定文件类型"
 paths = [
+  '''src/aiculture-kit/.*''',
+  '''external/.*''',
+  '''vendor/.*''',
     '''.*\.lock''',
     '''.*\.log''',
     '''.*\.coverage''',
@@ -94,9 +100,18 @@ commits = [
 [[rules.allowlist]]
 description = "忽略报告文件中的误报"
 paths = [
+  '''src/aiculture-kit/.*''',
+  '''external/.*''',
+  '''vendor/.*''',
     '''.*_report\.json''',
     '''bandit_report\.json''',
     '''security_report\.json''',
     '''coverage\.json''',
     '''ci-metrics\.json''',
 ]
+
+[allowlist]
+paths = [
+  '''src/aiculture-kit/.*''',
+  '''external/.*''',
+  '''vendor/.*''',]

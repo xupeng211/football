@@ -213,3 +213,8 @@ data/interim/
 .docker/
 docker-compose.override.yml
 .dockerignore.bak
+# third-party-vendor START
+src/aiculture-kit/
+external/
+vendor/
+# third-party-vendor END

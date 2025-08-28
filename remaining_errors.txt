@@ -4,7 +4,7 @@ trainer/fit_xgb.py:193:9: F841 Local variable `metrics` is assigned to but never
 192 |         print("评估模型...")
 193 |         metrics = evaluate_model(model, X_test, y_test)
     |         ^^^^^^^ F841
-194 | 
+194 |
 195 |         # 6. 保存模型
     |
     = help: Remove assignment to unused variable `metrics`

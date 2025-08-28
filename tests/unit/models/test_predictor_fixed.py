@@ -275,7 +275,7 @@ class TestPredictorIntegration:
 
         # 多次预测
         results = []
-        for _ in range(3):
+        for i in range(3):
             result = predictor.predict_single(**match_data)
             results.append(result["predicted_outcome"])
 

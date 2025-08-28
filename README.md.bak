@@ -1,3 +1,64 @@
+# 🤖 AI 开发工具使用规则
+
+**⚠️ 重要：所有 AI 编程工具必须在虚拟环境中开发！**
+
+```bash
+# 🚀 快速开始（AI工具必读）
+source scripts/activate-venv.sh  # 自动激活虚拟环境
+make ci                          # 验证环境并运行完整检查
+```
+
+**详细规则**: 📋 [AI_DEVELOPMENT_RULES.md](docs/AI_DEVELOPMENT_RULES.md)
+
+---
+
+## 🚀 本地开发快速开始
+
+### 环境要求
+
+- Python 3.11.9
+- uv (自动安装)
+
+### 本地 = CI 一致性命令
+
+```bash
+# 1. 安装依赖（与CI完全一致，推荐首选）
+make install  # 🚀 uv优先策略，自动回退到requirements.txt
+
+# 等价手动方式（高级用户）：
+# uv pip sync --frozen uv.lock              # 精确依赖复现
+# uv pip install -r requirements.txt        # 回退方案
+
+# 2. 运行完整CI检查
+make ci
+
+# 3. 单独运行各项检查
+make format   # 代码格式化
+make lint     # 代码风格检查
+make type     # 类型检查
+make security # 安全扫描
+make test     # 测试
+```
+
+**💡 依赖安装策略说明：**
+
+- CI使用 `uv.lock` 优先，`requirements.txt` 回退
+- `make install` 与CI保持完全一致的安装逻辑
+- 自动创建虚拟环境，无需手动配置
+
+### Pre-commit 钩子
+
+```bash
+# 安装pre-commit钩子（一次性）
+pip install pre-commit
+pre-commit install
+
+# 手动运行所有检查
+pre-commit run --all-files
+```
+
+---
+
 # ⚽ 足球赛果预测系统
 
 一个基于机器学习的足球比赛结果预测系统，采用现代化的Python技术栈，支持数据采集、特征工程、模型训练、实时预测和回测分析。
@@ -12,19 +73,23 @@
 > **👋 第一次接触本项目？** 无论你是开发者、AI助手还是项目维护者，这个指南将帮你最快速度了解项目全貌！
 
 ### ⚡ 一键获取项目完整情况（最重要！）
+
 ```bash
 make show.context  # 🔥 这个命令会给你项目的"说明书"：架构图、技术栈、开发流程、已知问题等
 ```
 
 ### ✅ 验证开发环境是否就绪
+
 ```bash
 make ci            # 运行完整检查：代码格式、类型检查、安全扫描、测试执行
 ```
+
 **如果这两个命令都成功，恭喜！你已经掌握了80%的项目信息，可以开始开发了。**
 
 > 📖 **需要更详细的指南？** 查看 [QUICKSTART.md](./QUICKSTART.md) 获取完整的上手指南，包括常见问题解答和开发工作流。
 
 ### 📚 深入了解（可选）
+
 ```bash
 # 项目演进历程
 head -50 docs/dev_log.md
@@ -37,6 +102,7 @@ git status
 ```
 
 ### 📁 重要文件导航
+
 ```
 📂 必读文档（按优先级）
 ├── 📋 context/_pack.md           # 🔥 项目完整上下文（最重要！）
@@ -54,6 +120,7 @@ git status
 ```
 
 ### 💡 关键优势
+
 - ⚡ **零依赖启动**：无需配置数据库，集成测试自动跳过
 - 📖 **SSOT文档**：单一数据源，信息永远最新
 - 🤖 **AI友好**：完善的上下文打包和自动化验证
@@ -301,7 +368,7 @@ make clean
 
 - API健康状态: `GET /api/v1/health`
 - 系统指标: `GET /api/v1/metrics`
-- Prefect监控面板: http://localhost:4200
+- Prefect监控面板: <http://localhost:4200>
 
 ### 日志查看
 
@@ -359,8 +426,8 @@ pytest tests/ --cov=. --cov-report=html
 ## 📞 联系方式
 
 - 项目维护者: Development Team
-- 邮箱: dev@example.com
-- 项目地址: https://github.com/your-org/football-predict-system
+- 邮箱: <dev@example.com>
+- 项目地址: <https://github.com/your-org/football-predict-system>
 
 ## 🙏 致谢
 
@@ -372,4 +439,5 @@ pytest tests/ --cov=. --cov-report=html
 ---
 
 ⭐ **如果这个项目对你有帮助，请给它一个星标！**
+
 # CI Fix Applied Tue Aug 26 08:11:25 CST 2025
