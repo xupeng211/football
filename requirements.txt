@@ -186,7 +186,7 @@ pydantic==2.8.2
 pydantic-extra-types==2.10.5
 pydantic-settings==2.3.3
 pydantic_core==2.20.1
-pyflakes==3.2.0
+pyflakes>=3.4.0,<3.5.0
 pygame==2.5.2
 Pygments==2.19.2
 pylint==3.3.8

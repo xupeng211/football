@@ -1,15 +1,15 @@
 {
-  "timestamp": "2025-08-28T02:41:48.024240",
-  "coverage": 78.32,
+  "timestamp": "2025-08-28T08:39:38.649752",
+  "coverage": 30.81,
   "test_count": 0,
-  "test_passed": 225,
+  "test_passed": 0,
   "security_issues": -1,
-  "code_quality": 98,
+  "code_quality": 100,
   "dependencies": {
     "requirements.txt": {
       "exists": true,
-      "size": 5530,
-      "modified": "2025-08-28T02:27:56.285485"
+      "size": 5311,
+      "modified": "2025-08-28T08:38:31.183250"
     },
     "uv.lock": {
       "exists": true,
