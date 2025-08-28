@@ -13,12 +13,12 @@ def create_test_data():
     """Creates a sample DataFrame for testing data leakage."""
     # Generate synthetic data that has a clear time dependency
     dates = pd.to_datetime(pd.date_range(start="2023-01-01", periods=200, freq="D"))
-    # Feature that is highly correlated with the target, but with a time lag
-    feature1 = np.sin(np.arange(200) / 20) + np.random.normal(0, 0.1, 200)
+    # A non-stationary feature to make time shifts more impactful
+    feature1 = np.random.randn(200).cumsum() + np.sin(np.arange(200) / 20)
     # A noisy feature
     feature2 = np.random.rand(200)
     # Target variable that depends on the future value of feature1
-    target = (np.roll(feature1, -5) > 0.5).astype(int)
+    target = (np.roll(feature1, -5) > feature1).astype(int)
 
     df = pd.DataFrame(
         {
