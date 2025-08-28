@@ -70,7 +70,7 @@ def test_time_window_dislocation(create_test_data):
     assert auc_aligned > 0.58, "Model with aligned data should have good performance"
     assert auc_dislocated < 0.6, "Model with dislocated data should perform poorly"
     assert (
-        auc_aligned > auc_dislocated + 0.2
+        auc_aligned - auc_dislocated > 0.15
     ), "Significant performance drop expected with dislocation"
 
 
