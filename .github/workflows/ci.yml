@@ -73,7 +73,7 @@ jobs:
           pip install -e .
 
           # Install additional dev tools
-          pip install pre-commit ruff mypy pytest pytest-cov bandit diff-cover
+          pip install pre-commit ruff mypy pytest pytest-cov bandit diff-cover types-requests
           echo "::endgroup::"
 
       - name: Cache pre-commit
@@ -133,7 +133,7 @@ jobs:
       - name: Run security scan
         run: |
           echo "::group::Security Scan"
-          bandit -r . --configfile pyproject.toml
+          bandit -r . --configfile pyproject.toml -ll
           echo "::endgroup::"
 
       - name: Run gitleaks (strict)
