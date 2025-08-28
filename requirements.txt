@@ -102,7 +102,7 @@ importlib_metadata==8.7.0
 importlib_resources==6.4.5
 iniconfig==2.1.0
 ipython==8.12.3
-isort==5.13.0
+isort>=5.12.0,!=5.13.0
 itsdangerous==2.2.0
 jedi==0.19.2
 Jinja2==3.1.6
