@@ -58,7 +58,7 @@ jobs:
           # Priority 1: Use uv.lock for exact dependency reproduction
           if [ -f "uv.lock" ]; then
             echo "🚀 Using uv.lock for exact dependency reproduction..."
-            uv pip sync uv.lock
+            uv sync
           # Priority 2: Fallback to requirements.txt
           elif [ -f "requirements.txt" ]; then
             echo "📦 uv.lock not found, falling back to requirements.txt..."
