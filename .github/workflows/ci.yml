@@ -108,7 +108,9 @@ jobs:
         run: |
           echo "::group::Type Checking - Core Modules"
           # Check core modules strictly
-          for dir in apps data_pipeline[object Object]: $dir/"
+          for dir in apps data_pipeline trainer; do
+            if [ -d "$dir" ]; then
+              echo "🔍 Advisory type checking: $dir/"
               mypy "$dir/" --ignore-missing-imports --no-strict-optional || echo "⚠️ Type issues in $dir/ (advisory only)"
             fi
           done
