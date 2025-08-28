@@ -428,7 +428,7 @@ class TestEndToEndMonitoring:
 
         # 连续多次健康检查
         health_checks = []
-        for i in range(5):
+        for _ in range(5):
             response = api_client.get("/health")
             health_checks.append(response.status_code == 200)
             time.sleep(0.1)

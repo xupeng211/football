@@ -8,9 +8,9 @@ title = "Gitleaks 安全扫描配置"
 useDefault = true
 
 # 定义白名单路径和模式
-[[rules.allowlist]]
+[[rules]]
 description = "忽略测试文件中的假敏感信息"
-paths = [
+allowlist.paths = [
   '''src/aiculture-kit/.*''',
   '''external/.*''',
   '''vendor/.*''',
@@ -23,9 +23,9 @@ paths = [
     '''.*\.json''',
 ]
 
-[[rules.allowlist]]
+[[rules]]
 description = "忽略开发和示例配置"
-regexes = [
+allowlist.regexes = [
     '''(password|secret|key|token)\s*[:=]\s*["\']?(test|example|demo|placeholder|dummy|fake|sample)["\']?''',
     '''your-secret-key-here''',
     '''replace-with-actual-key''',
@@ -35,9 +35,9 @@ regexes = [
     '''placeholder-secret''',
 ]
 
-[[rules.allowlist]]
+[[rules]]
 description = "忽略文档和注释中的示例"
-regexes = [
+allowlist.regexes = [
     '''#\s*(password|secret|key|token)''',
     '''/\*.*?(password|secret|key|token).*?\*/''',
     '''""".*?(password|secret|key|token).*?"""''',
@@ -45,18 +45,18 @@ regexes = [
     '''".*?example.*?"''',
 ]
 
-[[rules.allowlist]]
+[[rules]]
 description = "忽略CI/CD环境变量模板"
-regexes = [
+allowlist.regexes = [
     '''\$\{\{.*?\}\}''',
     '''\$\{[A-Z_]+\}''',
     '''env\.[A-Z_]+''',
     '''process\.env\.[A-Z_]+''',
 ]
 
-[[rules.allowlist]]
+[[rules]]
 description = "忽略默认开发配置"
-regexes = [
+allowlist.regexes = [
     '''django-insecure-''',
     '''sk-test-''',
     '''pk_test_''',
@@ -65,7 +65,7 @@ regexes = [
 ]
 
 # 文件类型白名单
-[[rules.allowlist]]
+[[rules]]
 description = "忽略特定文件类型"
 paths = [
   '''src/aiculture-kit/.*''',
@@ -82,22 +82,22 @@ paths = [
 ]
 
 # 特定于项目的白名单
-[[rules.allowlist]]
+[[rules]]
 description = "足球预测系统特定排除"
-regexes = [
+allowlist.regexes = [
     '''football-predict-system''',
     '''apps\.api\.core\.settings''',
     '''your-api-secret-key''',
     '''test-database-url''',
 ]
 
-[[rules.allowlist]]
+[[rules]]
 description = "忽略git历史中的旧配置"
 commits = [
     '''deb05005860aeaeff83e5bf77c927e415102d043''',
 ]
 
-[[rules.allowlist]]
+[[rules]]
 description = "忽略报告文件中的误报"
 paths = [
   '''src/aiculture-kit/.*''',
