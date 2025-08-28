@@ -86,7 +86,7 @@ class TestCompleteUserWorkflow:
         print("\n📝 步骤4: 验证预测结果")
         for i, prediction in enumerate(predictions):
             match_data = sample_user_data[i]
-            print(f"\n🏈 比赛 {i+1}: {match_data['home']} vs {match_data['away']}")
+            print(f"\n🏈 比赛 {i + 1}: {match_data['home']} vs {match_data['away']}")
             print(f"   预测结果: {prediction['predicted_outcome']}")
             print(f"   主胜概率: {prediction['home_win']:.2%}")
             print(f"   平局概率: {prediction['draw']:.2%}")
@@ -108,14 +108,14 @@ class TestCompleteUserWorkflow:
             total_prob = (
                 prediction["home_win"] + prediction["draw"] + prediction["away_win"]
             )
-            assert (
-                abs(total_prob - 1.0) < 0.01
-            ), f"Probabilities don't sum to 1: {total_prob}"
+            assert abs(total_prob - 1.0) < 0.01, (
+                f"Probabilities don't sum to 1: {total_prob}"
+            )
 
             # 验证置信度范围
-            assert (
-                0 <= prediction["confidence"] <= 1
-            ), f"Invalid confidence: {prediction['confidence']}"
+            assert 0 <= prediction["confidence"] <= 1, (
+                f"Invalid confidence: {prediction['confidence']}"
+            )
 
         print("\n✅ 完整工作流程测试通过!")
 
@@ -346,14 +346,14 @@ class TestUserDataIntegration:
         ]
 
         for i, format_test in enumerate(format_variations):
-            print(f"\n🔄 测试格式变体 {i+1}")
+            print(f"\n🔄 测试格式变体 {i + 1}")
             response = api_client.post("/predict", json=[format_test])
 
-            assert response.status_code == 200, f"Format variation {i+1} failed"
+            assert response.status_code == 200, f"Format variation {i + 1} failed"
 
             result = response.json()[0]
             assert "predicted_outcome" in result
-            print(f"✅ 格式变体 {i+1} 通过")
+            print(f"✅ 格式变体 {i + 1} 通过")
 
         print("\n✅ 所有数据格式兼容性测试通过!")
 
@@ -395,7 +395,7 @@ class TestUserDataIntegration:
         ]
 
         for i, edge_case in enumerate(edge_cases):
-            print(f"\n🚨 测试边界情况 {i+1}")
+            print(f"\n🚨 测试边界情况 {i + 1}")
             response = api_client.post("/predict", json=[edge_case])
 
             # 边界情况应该被优雅处理,不应该导致服务器错误
@@ -403,14 +403,14 @@ class TestUserDataIntegration:
                 200,
                 400,
                 422,
-            ], f"Edge case {i+1} caused server error: {response.status_code}"
+            ], f"Edge case {i + 1} caused server error: {response.status_code}"
 
             if response.status_code == 200:
                 result = response.json()[0]
                 assert "predicted_outcome" in result
-                print(f"✅ 边界情况 {i+1} 成功处理")
+                print(f"✅ 边界情况 {i + 1} 成功处理")
             else:
-                print(f"⚠️ 边界情况 {i+1} 被正确拒绝")
+                print(f"⚠️ 边界情况 {i + 1} 被正确拒绝")
 
         print("\n✅ 边界情况处理测试通过!")
 

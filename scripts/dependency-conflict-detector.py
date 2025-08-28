@@ -87,8 +87,8 @@ class DependencyConflictDetector:
             ) as tmp_file:
                 tmp_path = tmp_file.name
 
-            # 使用pip的依赖解析器检测冲突  # nosec B603,B607
-            result = subprocess.run(
+            # 使用pip的依赖解析器检测冲突
+            result = subprocess.run(  # nosec B603 B607
                 [
                     "pip",
                     "install",
@@ -206,7 +206,7 @@ class DependencyConflictDetector:
                 if result.returncode == 0:
                     print(f"   ✅ {solution['package']} 修复成功")
                 else:
-                    print(f"   ❌ {solution['package']} 修复失败: " f"{result.stderr}")
+                    print(f"   ❌ {solution['package']} 修复失败: {result.stderr}")
                     return False
 
             except Exception as e:
@@ -219,8 +219,8 @@ class DependencyConflictDetector:
         """验证修复是否成功"""
         print("\n🔍 验证修复效果...")
         try:
-            # 尝试解析依赖  # nosec B603,B607
-            result = subprocess.run(
+            # 尝试解析依赖
+            result = subprocess.run(  # nosec B603 B607
                 ["pip", "install", "--dry-run", "-r", self.requirements_file],
                 capture_output=True,
                 text=True,

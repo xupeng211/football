@@ -99,7 +99,7 @@ class TestAPIMainCoverage:
         large_request = [
             {
                 "home": f"Team{i}",
-                "away": f"Team{i+1}",
+                "away": f"Team{i + 1}",
                 "home_form": 1.5,
                 "away_form": 1.5,
                 "odds_h": 2.0,

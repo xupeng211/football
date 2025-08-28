@@ -114,9 +114,9 @@ class TestRunner:
         results = {}
 
         for test_type, description in test_sequence:
-            print(f"\n{'='*50}")
+            print(f"\n{'=' * 50}")
             print(f"🎯 开始 {description}")
-            print(f"{'='*50}")
+            print(f"{'=' * 50}")
 
             result = self.run_tests(test_type, coverage=(test_type == "unit"))
             results[test_type] = result
@@ -127,9 +127,9 @@ class TestRunner:
                 break
 
         # 输出总结
-        print(f"\n{'='*50}")
+        print(f"\n{'=' * 50}")
         print("📊 测试结果总结")
-        print(f"{'='*50}")
+        print(f"{'=' * 50}")
 
         for test_type, description in test_sequence:
             if test_type in results:

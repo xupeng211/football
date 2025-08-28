@@ -94,7 +94,7 @@ def test_predict_too_many_matches():
     matches = [
         {
             "home": f"Team{i}",
-            "away": f"Team{i+1}",
+            "away": f"Team{i + 1}",
             "odds_h": 2.0,
             "odds_d": 3.0,
             "odds_a": 3.0,
