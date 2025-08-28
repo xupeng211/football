@@ -59,6 +59,12 @@ services:
       - postgres
       - redis
       - prefect-server
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/livez"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
     volumes:
       - .:/app
       - ./models/artifacts:/app/models/artifacts

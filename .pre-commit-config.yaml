@@ -23,7 +23,7 @@ repos:
     rev: v1.11.2
     hooks:
       - id: mypy
-        additional_dependencies: ["pydantic"]
+        additional_dependencies: ["pydantic", "types-PyYAML", "types-requests"]
         exclude: ^(tests/|build/|dist/)
 
   - repo: https://github.com/gitleaks/gitleaks

@@ -36,6 +36,9 @@ REQUEST_DURATION = Histogram(
 )
 
 SYSTEM_UPTIME = Gauge("system_uptime_seconds", "系统启动时间", registry=registry)
+MODEL_VERSION = Gauge("model_version", "当前模型版本", ["version"], registry=registry)
+CACHE_HITS = Counter("api_cache_hits_total", "API缓存命中总数", registry=registry)
+CACHE_MISSES = Counter("api_cache_misses_total", "API缓存未命中总数", registry=registry)
 
 # 设置启动时间
 _start_time = time.time()
@@ -57,10 +60,6 @@ def get_metrics() -> Response:
         # 更新运行时长指标
         uptime_seconds = time.time() - _start_time
         SYSTEM_UPTIME.set(uptime_seconds)
-
-        # 增加一些示例数据
-        REQUEST_COUNT.labels(method="GET", endpoint="/health").inc()
-        REQUEST_COUNT.labels(method="GET", endpoint="/metrics").inc()
 
         # 生成Prometheus格式的指标
         data = generate_latest(registry)

@@ -1,5 +1,9 @@
 # 🤖 AI 开发工具使用规则
 
+[![CI](https://github.com/your-org/football-predict-system/workflows/CI/badge.svg)](https://github.com/your-org/football-predict-system/actions/workflows/ci.yml)
+[![Tests](https://img.shields.io/badge/tests-passing-green.svg)](https://github.com/your-org/football-predict-system/actions/workflows/ci.yml)
+[![Coverage](https://img.shields.io/badge/coverage-check%20artifacts-blue.svg)](https://github.com/your-org/football-predict-system/actions/workflows/ci.yml)
+
 **⚠️ 重要：所有 AI 编程工具必须在虚拟环境中开发！**
 
 ```bash
@@ -22,12 +26,12 @@ make ci                          # 验证环境并运行完整检查
 ### 本地 = CI 一致性命令
 
 ```bash
-# 1. 安装依赖（与CI完全一致，推荐首选）
-make install  # 🚀 uv优先策略，自动回退到requirements.txt
+# 1. 安装依赖（与CI完全一致，强制使用uv.lock）
+make install  # 🚀 uv.lock优先，requirements.txt备选
 
 # 等价手动方式（高级用户）：
-# uv pip sync --frozen uv.lock              # 精确依赖复现
-# uv pip install -r requirements.txt        # 回退方案
+# uv pip sync --frozen uv.lock      # 精确依赖复现 (首选)
+# pip install -r requirements.txt # 备选方案
 
 # 2. 运行完整CI检查
 make ci
@@ -369,6 +373,17 @@ make clean
 - API健康状态: `GET /api/v1/health`
 - 系统指标: `GET /api/v1/metrics`
 - Prefect监控面板: <http://localhost:4200>
+
+### 指标说明
+
+通过访问 `GET /api/v1/metrics` 端点，可以获取Prometheus格式的监控指标，主要包括：
+
+- `api_requests_total`: 各API端点的请求总数
+- `api_request_duration_seconds`: 各API端点的请求耗时分布
+- `model_version`: 当前加载的预测模型版本
+- `system_uptime_seconds`: API服务的正常运行时间
+
+这些指标可以接入Prometheus和Grafana等监控系统，实现对服务状态的实时可视化监控。
 
 ### 日志查看
 

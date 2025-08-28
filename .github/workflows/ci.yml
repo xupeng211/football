@@ -54,18 +54,15 @@ jobs:
           echo "::group::Dependency Installation"
           python -m pip install -U pip uv
 
-          # Priority 1: Use requirements.txt (most reliable)
-          if [ -f "requirements.txt" ]; then
-            echo "📦 Using requirements.txt..."
+          set -euo pipefail
+          # Priority 1: Use uv.lock for exact dependency reproduction
+          if [ -f[object Object]            uv pip sync --frozen uv.lock
+          # Priority 2: Fallback to requirements.txt
+          elif [ -f "requirements.txt" ]; then
+            echo "📦 uv.lock not found, falling back to requirements.txt..."
             pip install -r requirements.txt
-          elif [ -f "uv.lock" ]; then
-            echo "🚀 Trying uv.lock for exact dependency reproduction..."
-            uv pip sync --frozen uv.lock || {
-              echo "⚠️ uv.lock sync failed, fallback to requirements.txt"
-              pip install -r requirements.txt
-            }
           else
-            echo "❌ No dependency file found"
+            echo "❌ No dependency file found (uv.lock or requirements.txt)"
             exit 1
           fi
 
@@ -73,7 +70,7 @@ jobs:
           pip install -e .
 
           # Install additional dev tools
-          pip install pre-commit ruff mypy pytest pytest-cov bandit diff-cover types-requests pytest-asyncio pytest-mock
+          pip install pre-commit ruff mypy pytest pytest-cov bandit diff-cover types-requests pytest-asyncio pytest-mock pip-audit
           echo "::endgroup::"
 
       - name: Cache pre-commit
@@ -130,14 +127,20 @@ jobs:
           done
           echo "::endgroup::"
 
-      - name: Run security scan
+      - name: Run security scans (Bandit & pip-audit)
         run: |
-          echo "::group::Security Scan"
-          bandit -r . --configfile pyproject.toml -ll
+          echo "::group::Security Scans"
+          mkdir -p reports
+          # Run bandit and save report
+          bandit -r . --configfile pyproject.toml -ll -o reports/bandit_report.txt
+          # Run pip-audit and save report, continue on failure
+          pip-audit --output reports/pip_audit_report.txt || echo "pip-audit found vulnerabilities, see report for details"
           echo "::endgroup::"
 
       - name: Run gitleaks (strict)
         uses: gitleaks/gitleaks-action@v2
+        with:
+          report_path: ${{ github.workspace }}/reports/gitleaks_report.json
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITLEAKS_CONFIG: .gitleaks.toml
@@ -215,12 +218,49 @@ jobs:
             --compare-branch "origin/${base_ref}" \
             --fail-under ${DIFF_COV_MIN}
 
-      - name: Upload coverage artifacts
+
+      - name: Run Smoke Tests
+        run: |
+          echo "::group::Smoke Tests"
+          # Start the API server in the background
+          uvicorn apps.api.main:app --host 0.0.0.0 --port 8000 &
+          API_PID=$!
+
+          # Wait for the server to be ready by polling the /livez endpoint
+          echo "Waiting for API server to start..."
+          for i in {1..10}; do
+            if curl -s -f http://localhost:8000/livez; then
+              echo "API server is up."
+              break
+            fi
+            echo "Attempt $i: API not ready yet."
+            sleep 2
+          done
+
+          # Final check to ensure server is running before tests
+          curl -s -f http://localhost:8000/livez || { echo "API server failed to start"; kill $API_PID; exit 1; }
+
+          # Run prediction smoke test
+          echo "Running minimal_predict.py smoke test..."
+          python examples/minimal_predict.py || { echo "minimal_predict.py smoke test failed"; kill $API_PID; exit 1; }
+
+          # Run backtest smoke test
+          echo "Running minimal_backtest.py smoke test..."
+          python examples/minimal_backtest.py || { echo "minimal_backtest.py smoke test failed"; kill $API_PID; exit 1; }
+
+          # Stop the API server
+          echo "Stopping API server..."
+          kill $API_PID
+
+          echo "✅ Smoke tests passed"
+          echo "::endgroup::"
+      - name: Upload CI artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: ci-artifacts
           path: |
+            reports/
             .coverage
             coverage.xml
             coverage.json
