@@ -1,3 +1,5 @@
+# Python
+# -----------------------------------------------------------------------------
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -28,8 +30,6 @@ share/python-wheels/
 MANIFEST
 
 # PyInstaller
-#  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so as to inject date/other infos into it.
 *.manifest
 *.spec
 
@@ -37,6 +37,46 @@ MANIFEST
 pip-log.txt
 pip-delete-this-directory.txt
 
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# PEP 582; used by e.g. github.com/David-OConnor/pyflow
+__pypackages__/
+
+# pipenv
+# Pipfile.lock
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+
+# Frameworks & Libraries
+# -----------------------------------------------------------------------------
+# Django
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask
+instance/
+.webassets-cache
+
+# Scrapy
+.scrapy
+
+
+# Tools
+# -----------------------------------------------------------------------------
 # Unit test / coverage reports
 htmlcov/
 .tox/
@@ -47,26 +87,15 @@ htmlcov/
 nosetests.xml
 coverage.xml
 *.cover
-*.py,cover
 .hypothesis/
 .pytest_cache/
+.ruff_cache/
 
-# Translations
-*.mo
-*.pot
-
-# Django stuff:
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
-
-# Flask stuff:
-instance/
-.webassets-cache
-
-# Scrapy stuff:
-.scrapy
+# Type checkers
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
 
 # Sphinx documentation
 docs/_build/
@@ -84,118 +113,81 @@ ipython_config.py
 # pyenv
 .python-version
 
-# pipenv
-#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
-#   However, in case of collaboration, if having platform-specific dependencies or dependencies
-#   having no cross-platform support, pipenv may install dependencies that don't work, or not
-#   install all needed dependencies.
-#Pipfile.lock
-
-# PEP 582; used by e.g. github.com/David-OConnor/pyflow
-__pypackages__/
-
-# Celery stuff
-celerybeat-schedule
-celerybeat.pid
-
-# SageMath parsed files
-*.sage.py
-
-# Environments
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-
-# Spyder project settings
-.spyderproject
-.spyproject
-
 # Rope project settings
 .ropeproject
 
 # mkdocs documentation
 /site
 
-# mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json
 
-# Pyre type checker
-.pyre/
-
-# IDEs
+# General
+# -----------------------------------------------------------------------------
+# IDEs and editors
 .idea/
 .vscode/
+.spyderproject
+.spyproject
 *.swp
 *.swo
 *~
+*.code-workspace
+.history/
 
-# OS
+# OS generated files
 .DS_Store
 Thumbs.db
 
-# Project specific
+# Translations
+*.mo
+*.pot
+
+# Databases
+*.sqlite
+*.sqlite3
+
+
+# Project Specific
+# -----------------------------------------------------------------------------
+# Logs and artifacts
+logs/
+*.log
+*.pid
+artifacts/
+
+# Data files
 *.pkl
 *.joblib
 *.model
 data/raw/
-logs/
-artifacts/
+data/processed/
+data/interim/
 
-# 🚨 新增：防止CI问题文件
-# 敏感信息和报告文件
+# Reports
 *_report.json
 bandit_report.json
 security_report.json
 **/bandit-*.json
 **/security-*.json
 
-# 模板和临时目录
-src/aiculture-kit/
-templates/
+# Temp files & directories
 temp/
 tmp/
 .temp/
 .tmp/
 
-# CI/CD 临时文件
+# CI/CD temp files
 .github/workflows/*.bak
 .github/workflows/*.backup
 .github/workflows/temp*
 ci-temp/
 ci_temp/
 
-# 工具生成的临时文件
-.ruff_cache/
-.coverage_html/
-coverage-reports/
-test-results/
-.test-results/
-
-# IDE和编辑器临时文件
-.idea/
-.vscode/
-*.code-workspace
-.history/
-
-# 依赖管理临时文件
+# Dependency management temp files
 pip-compile-multi.lock
 requirements-dev.txt.tmp
 *.lock.tmp
 
-# 数据库和日志文件
-*.sqlite
-*.sqlite3
-*.log
-logs/
-*.pid
-
-# 开发和调试文件
+# Debug files
 debug.py
 test_debug.py
 scratch.py
@@ -203,18 +195,13 @@ playground.py
 *.debug
 *.trace
 
-# 模型和数据文件
-models/artifacts/*.pkl
-models/artifacts/*.joblib
-data/processed/
-data/interim/
-
-# Docker和容器相关
-.docker/
-docker-compose.override.yml
-.dockerignore.bak
-# third-party-vendor START
+# Vendor, external dependencies
 src/aiculture-kit/
 external/
 vendor/
-# third-party-vendor END
+templates/
+
+# Docker
+.docker/
+docker-compose.override.yml
+.dockerignore.bak

@@ -139,11 +139,12 @@ class CIProblemDetector:
                 for pattern, desc in sensitive_patterns:
                     matches = re.finditer(pattern, content, re.IGNORECASE)
                     for match in matches:
+                        line_number = content[: match.start()].count("\n") + 1
                         problems.append(
                             {
                                 "type": "security_issue",
                                 "path": str(file_path),
-                                "line": (content[: match.start()].count("\n") + 1),
+                                "line": line_number,
                                 "description": desc,
                                 "severity": "critical",
                                 "solution": "使用环境变量或配置文件",
@@ -164,7 +165,13 @@ class CIProblemDetector:
             try:
                 # 快速检测已知问题模式
                 result = subprocess.run(  # nosec B603,B607
-                    ["pip", "install", "--dry-run", "-r", str(requirements_file)],
+                    [
+                        "pip",
+                        "install",
+                        "--dry-run",
+                        "-r",
+                        str(requirements_file),
+                    ],
                     capture_output=True,
                     text=True,
                     timeout=30,
@@ -177,7 +184,9 @@ class CIProblemDetector:
                             "description": "依赖冲突检测到问题",
                             "severity": "high",
                             "details": result.stderr[:500],
-                            "solution": "运行 python scripts/dependency-conflict-detector.py",
+                            "solution": (
+                                "运行 python " "scripts/dependency-conflict-detector.py"
+                            ),
                         }
                     )
             except subprocess.TimeoutExpired:
@@ -296,12 +305,12 @@ class CIProblemDetector:
                         file_path.exists()
                         and file_path.stat().st_size > 10 * 1024 * 1024
                     ):  # 10MB
+                        size_mb = file_path.stat().st_size / 1024 / 1024
                         problems.append(
                             {
                                 "type": "large_untracked_file",
                                 "path": str(file_path),
-                                "description": f"大型未跟踪文件 "
-                                f"({file_path.stat().st_size / 1024 / 1024:.1f}MB)",
+                                "description": (f"大型未跟踪文件 ({size_mb:.1f}MB)"),
                                 "severity": "medium",
                                 "solution": "添加到.gitignore或删除",
                             }
@@ -327,7 +336,12 @@ class CIProblemDetector:
             ".vscode/",
         ]
 
-        path_str = str(path)
+        path_str = str(path.resolve())
+        script_path = str(Path(__file__).resolve())
+
+        if path_str == script_path:
+            return True
+
         return any(pattern in path_str for pattern in ignore_patterns)
 
     def generate_prevention_rules(self, results: Dict[str, Any]) -> None:
@@ -359,7 +373,7 @@ class CIProblemDetector:
             ],
         }
 
-        with open("CI_PREVENTION_RULES.json", "w") as f:
+        with open("CI_PREVENTION_RULES.json", "w", encoding="utf-8") as f:
             json.dump(prevention_rules, f, indent=2, ensure_ascii=False)
 
     def apply_fixes(self, problems: List[Dict[str, Any]]) -> bool:
@@ -419,11 +433,14 @@ class CIProblemDetector:
                         "high": "⚠️",
                         "medium": "📝",
                     }.get(problem.get("severity", ""), "i")
-                    report += f"• {severity_emoji} **{problem['description']}**\n"
+                    desc = problem["description"]
+                    report += f"• {severity_emoji} **{desc}**\n"
                     if "path" in problem:
-                        report += f"   - 路径: `{problem['path']}`\n"
+                        path = problem["path"]
+                        report += f"   - 路径: `{path}`\n"
                     if "solution" in problem:
-                        report += f"   - 解决方案: {problem['solution']}\n"
+                        solution = problem["solution"]
+                        report += f"   - 解决方案: {solution}\n"
                     report += "\n"
 
         return report
@@ -456,17 +473,18 @@ def main() -> int:
     with open("CI_PROBLEMS_REPORT.md", "w", encoding="utf-8") as f:
         f.write(report)
 
-    # 询问是否自动修复
-    critical_problems = [p for p in all_problems if p.get("severity") == "critical"]
+        # 询问是否自动修复
+        critical_problems = [p for p in all_problems if p.get("severity") == "critical"]
     if critical_problems:
-        print(f"🚨 发现 {len(critical_problems)} 个关键问题,需要手动处理!")
+        count = len(critical_problems)
+        print(f"🚨 发现 {count} 个关键问题,需要手动处理!")
         return 1
 
     auto_fixable = [p for p in all_problems if p["type"] == "problematic_file"]
     if auto_fixable:
-        response = input(
-            f"\n🔧 发现 {len(auto_fixable)} 个可自动修复的问题,是否修复?(y/N): "
-        )
+        count = len(auto_fixable)
+        prompt = f"\n🔧 发现 {count} " "个可自动修复的问题,是否修复?(y/N): "
+        response = input(prompt)
         if response.lower() == "y":
             if detector.apply_fixes(auto_fixable):
                 print("✅ 自动修复完成!")
