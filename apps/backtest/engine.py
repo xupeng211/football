@@ -141,6 +141,34 @@ class BacktestEngine:
         actuals = predictions["actual_result"].map({"H": 0, "D": 1, "A": 2})
         return accuracy_score(actuals, predictions["predicted_class"])
 
+    def _get_actual_result(self, match_row: pd.Series) -> str:
+        """Get actual result from match data."""
+        home_score = match_row.get("home_score", 0)
+        away_score = match_row.get("away_score", 0)
+
+        if home_score > away_score:
+            return "H"
+        elif away_score > home_score:
+            return "A"
+        else:
+            return "D"
+
+    def _calculate_risk_metrics(self, pnl_results: dict[str, float]) -> dict[str, float]:
+        """Calculate risk metrics from PnL results."""
+        # Simple risk metrics calculation
+        net_profit = pnl_results.get("net_profit", 0.0)
+        roi = pnl_results.get("roi", 0.0)
+
+        # Calculate some basic risk metrics
+        max_drawdown = abs(min(0, net_profit))  # Simplified
+        sharpe_ratio = roi / max(1, abs(roi) * 0.1)  # Simplified Sharpe
+
+        return {
+            "max_drawdown": max_drawdown,
+            "sharpe_ratio": sharpe_ratio,
+            "volatility": abs(roi) * 0.1,  # Simplified volatility
+        }
+
 
 def load_historical_data(db_conn_str: str) -> pd.DataFrame:
     """Loads historical match and odds data from the database."""

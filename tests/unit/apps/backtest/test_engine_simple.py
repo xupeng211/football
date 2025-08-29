@@ -51,8 +51,8 @@ class TestBacktestEngine:
             {
                 "match_id": range(100),
                 "date": pd.date_range("2024-01-01", periods=100),
-                "home_team": [f"Team_{i%10}" for i in range(100)],
-                "away_team": [f"Team_{(i+1)%10}" for i in range(100)],
+                "home_team": [f"Team_{i % 10}" for i in range(100)],
+                "away_team": [f"Team_{(i + 1) % 10}" for i in range(100)],
                 "result": np.random.choice(["H", "D", "A"], 100),
                 "home_odds": np.random.uniform(1.5, 4.0, 100),
                 "draw_odds": np.random.uniform(2.5, 4.5, 100),

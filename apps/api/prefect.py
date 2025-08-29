@@ -3,8 +3,16 @@ import os
 
 import structlog
 from dotenv import load_dotenv
-from prefect import get_client
-from prefect.exceptions import PrefectException
+
+# Optional Prefect import - handle dependency issues gracefully
+try:
+    from prefect import get_client
+    from prefect.exceptions import PrefectException
+
+    PREFECT_AVAILABLE = True
+except ImportError as e:
+    PREFECT_AVAILABLE = False
+    _prefect_import_error = str(e)
 
 logger = structlog.get_logger(__name__)
 
@@ -15,6 +23,9 @@ PREFECT_API_URL = os.getenv("PREFECT_API_URL")
 
 async def check_prefect_connection_async() -> tuple[bool, str]:
     """Checks the Prefect API connection asynchronously."""
+    if not PREFECT_AVAILABLE:
+        return False, f"Prefect unavailable: {_prefect_import_error}"
+
     if not PREFECT_API_URL:
         return False, "Prefect client not configured. PREFECT_API_URL not set."
 
@@ -40,6 +51,9 @@ def check_prefect_connection() -> tuple[bool, str]:
     Checks the Prefect API connection.
     This is a sync wrapper for the async check.
     """
+    if not PREFECT_AVAILABLE:
+        return False, f"Prefect unavailable: {_prefect_import_error}"
+
     if os.getenv("PYTEST_CURRENT_TEST"):
         return True, "Prefect check skipped in test environment."
 

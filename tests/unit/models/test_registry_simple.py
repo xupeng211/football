@@ -34,7 +34,7 @@ class TestModelRegistry:
             mock_exists.return_value = True
             mock_is_dir.return_value = True
 
-            registry = ModelRegistry(base_path="test/models")
+            registry = ModelRegistry(registry_path="test/models")
 
             # 验证初始化
             assert registry is not None
@@ -51,12 +51,12 @@ class TestModelRegistry:
 
             # 创建临时目录
             with tempfile.TemporaryDirectory() as temp_dir:
-                registry = ModelRegistry(base_path=temp_dir)
+                registry = ModelRegistry(registry_path=temp_dir)
 
                 # 验证注册表可以正常工作
                 assert registry is not None
 
-                # 测试基本方法（如果存在）
+                # 测试基本方法(如果存在)
                 if hasattr(registry, "list_models"):
                     models = registry.list_models()
                     assert isinstance(models, (list, dict, type(None)))
@@ -83,7 +83,7 @@ class TestModelRegistry:
 
             registry = ModelRegistry()
 
-            # 测试元数据处理（如果方法存在）
+            # 测试元数据处理(如果方法存在)
             if hasattr(registry, "load_metadata"):
                 metadata = registry.load_metadata("test_model")
                 assert metadata is not None
@@ -125,7 +125,7 @@ class TestModelRegistry:
             mock_mkdir.return_value = None
             mock_copy.return_value = None
 
-            # 测试模型保存（如果方法存在）
+            # 测试模型保存(如果方法存在)
             if hasattr(registry, "save_model"):
                 registry.save_model("test_model", {"accuracy": 0.9})
                 # 验证操作不会抛出异常
@@ -164,7 +164,7 @@ class TestModelVersioning:
         }
 
         # 验证兼容性检查逻辑
-        for api_version, compatible_models in compatibility_matrix.items():
+        for _api_version, compatible_models in compatibility_matrix.items():
             assert len(compatible_models) >= 1
             assert all(isinstance(model, str) for model in compatible_models)
 
@@ -208,7 +208,7 @@ class TestModelMetrics:
         recall = performance_data["recall"]
         f1_expected = 2 * (precision * recall) / (precision + recall)
 
-        # F1分数应该接近计算值（允许小误差）
+        # F1分数应该接近计算值(允许小误差)
         assert abs(performance_data["f1_score"] - f1_expected) < 0.01
 
     def test_model_benchmarking(self):

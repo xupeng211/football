@@ -72,12 +72,13 @@ class TestMainModule:
         # 模拟instrumentation过程
         try:
             import importlib.util
+
             spec = importlib.util.find_spec("apps.api.main")
 
-            # 如果能找到模块，测试通过
+            # 如果能找到模块, 测试通过
             assert spec is not None
         except ImportError:
-            # 如果导入失败，测试prometheus配置逻辑
+            # 如果导入失败, 测试prometheus配置逻辑
             instrumentator = mock_instrumentator()
             instrumentator.instrument(FastAPI()).expose(FastAPI())
 

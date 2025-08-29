@@ -15,7 +15,7 @@ from apps.backtest.engine import BacktestEngine, BacktestResult
 def historical_data() -> pd.DataFrame:
     """Provides a sample DataFrame of historical match data."""
     data = {
-        "match_date": pd.to_datetime(["2023-01-01", "2023-01-02", "2023-01-03"]),
+        "date": pd.to_datetime(["2023-01-01", "2023-01-02", "2023-01-03"]),
         "id": [1, 2, 3],
         "home_score": [1, 2, 0],  # home_win, draw, away_win
         "away_score": [0, 2, 3],
@@ -108,9 +108,8 @@ class TestBacktestEngine:
 
         with patch.object(engine, "_generate_predictions", return_value=predictions):
             result = engine.run_backtest(
-                model=mock_model,
+                predictor=mock_model,
                 historical_data=historical_data,
-                odds_data=odds_data,
                 start_date=start_date,
                 end_date=end_date,
             )
@@ -134,9 +133,8 @@ class TestBacktestEngine:
 
         with pytest.raises(ValueError, match="没有数据"):
             engine.run_backtest(
-                model=mock_model,
+                predictor=mock_model,
                 historical_data=historical_data,
-                odds_data=odds_data,
                 start_date=start_date,
                 end_date=end_date,
             )
@@ -149,7 +147,7 @@ class TestBacktestEngine:
             "predicted_class": [0, 1, 2],  # Predicted: home, draw, away
         }
         predictions_df = pd.DataFrame(predictions_data)
-        metrics = engine._calculate_accuracy_metrics(predictions_df)
+        metrics = engine._calculate_accuracy(predictions_df)
 
         # 1 correct prediction (home win) out of 3
         assert metrics["accuracy"] == pytest.approx(1 / 3)
@@ -193,17 +191,15 @@ class TestBacktestEngine:
 
         with patch.object(engine, "_generate_predictions", return_value=predictions):
             engine.run_backtest(
-                model=mock_model,
+                predictor=mock_model,
                 historical_data=historical_data,
-                odds_data=odds_data,
                 start_date=start_date,
                 end_date=end_date,
                 strategy_name="strat1",
             )
             engine.run_backtest(
-                model=mock_model,
+                predictor=mock_model,
                 historical_data=historical_data,
-                odds_data=odds_data,
                 start_date=start_date,
                 end_date=end_date,
                 strategy_name="strat2",

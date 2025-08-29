@@ -2,7 +2,7 @@
 """
 自动化测试报告生成脚本
 
-功能：
+功能:
 - 运行完整测试套件
 - 生成测试覆盖率报告
 - 生成HTML和JSON格式报告
@@ -22,7 +22,7 @@ from typing import Dict
 class TestReportGenerator:
     """测试报告生成器"""
 
-    def __init__(self, project_root: str = None):
+    def __init__(self, project_root: str | None = None):
         self.project_root = Path(project_root) if project_root else Path.cwd()
         self.reports_dir = self.project_root / "reports"
         self.reports_dir.mkdir(exist_ok=True)
@@ -331,44 +331,44 @@ class TestReportGenerator:
 <body>
     <div class="header">
         <h1>🏆 Football Prediction System - Test Report</h1>
-        <p>Generated: {self.report_data['timestamp']}</p>
+        <p>Generated: {self.report_data["timestamp"]}</p>
     </div>
 
     <div class="summary">
         <h2>📊 Summary</h2>
         <div class="metric">
-            <strong>Quality Score:</strong> {summary.get('quality_score', 0)}/100
-            <br><strong>Grade:</strong> {summary.get('grade', 'N/A')}
+            <strong>Quality Score:</strong> {summary.get("quality_score", 0)}/100
+            <br><strong>Grade:</strong> {summary.get("grade", "N/A")}
         </div>
         <div class="metric">
-            <strong>Total Tests:</strong> {test_stats.get('total_tests', 0)}
-            <br><strong>Success Rate:</strong> {test_stats.get('success_rate', 0)}%
+            <strong>Total Tests:</strong> {test_stats.get("total_tests", 0)}
+            <br><strong>Success Rate:</strong> {test_stats.get("success_rate", 0)}%
         </div>
         <div class="metric">
-            <strong>Coverage:</strong> {coverage.get('overall_coverage', 0)}%
-            <br><strong>Execution Time:</strong> {test_stats.get('execution_time', 0):.2f}s
+            <strong>Coverage:</strong> {coverage.get("overall_coverage", 0)}%
+            <br><strong>Execution Time:</strong> {test_stats.get("execution_time", 0):.2f}s
         </div>
     </div>
 
     <h2>🎯 Test Results</h2>
     <table>
         <tr><th>Metric</th><th>Value</th></tr>
-        <tr><td>Passed Tests</td><td class="success">{test_stats.get('passed_tests', 0)}</td></tr>
-        <tr><td>Failed Tests</td><td class="error">{test_stats.get('failed_tests', 0)}</td></tr>
-        <tr><td>Skipped Tests</td><td class="warning">{test_stats.get('skipped_tests', 0)}</td></tr>
+        <tr><td>Passed Tests</td><td class="success">{test_stats.get("passed_tests", 0)}</td></tr>
+        <tr><td>Failed Tests</td><td class="error">{test_stats.get("failed_tests", 0)}</td></tr>
+        <tr><td>Skipped Tests</td><td class="warning">{test_stats.get("skipped_tests", 0)}</td></tr>
     </table>
 
     <h2>📈 Coverage Details</h2>
     <table>
         <tr><th>Metric</th><th>Value</th></tr>
-        <tr><td>Lines Covered</td><td>{coverage.get('lines_covered', 0)}</td></tr>
-        <tr><td>Total Lines</td><td>{coverage.get('lines_total', 0)}</td></tr>
-        <tr><td>Missing Lines</td><td>{coverage.get('missing_lines', 0)}</td></tr>
+        <tr><td>Lines Covered</td><td>{coverage.get("lines_covered", 0)}</td></tr>
+        <tr><td>Total Lines</td><td>{coverage.get("lines_total", 0)}</td></tr>
+        <tr><td>Missing Lines</td><td>{coverage.get("missing_lines", 0)}</td></tr>
     </table>
 
     <h2>💡 Recommendations</h2>
     <ul>
-        {"".join(f"<li>{rec}</li>" for rec in summary.get('recommendations', []))}
+        {"".join(f"<li>{rec}</li>" for rec in summary.get("recommendations", []))}
     </ul>
 </body>
 </html>
@@ -383,33 +383,33 @@ class TestReportGenerator:
 
         md = f"""# 🏆 Test Report Summary
 
-**Generated:** {self.report_data['timestamp']}
-**Project:** {self.report_data['project']}
+**Generated:** {self.report_data["timestamp"]}
+**Project:** {self.report_data["project"]}
 
 ## 📊 Overview
 
 | Metric | Value |
 |--------|-------|
-| Quality Score | {summary.get('quality_score', 0)}/100 ({summary.get('grade', 'N/A')}) |
-| Total Tests | {test_stats.get('total_tests', 0)} |
-| Success Rate | {test_stats.get('success_rate', 0)}% |
-| Coverage Rate | {coverage.get('overall_coverage', 0)}% |
-| Execution Time | {test_stats.get('execution_time', 0):.2f}s |
+| Quality Score | {summary.get("quality_score", 0)}/100 ({summary.get("grade", "N/A")}) |
+| Total Tests | {test_stats.get("total_tests", 0)} |
+| Success Rate | {test_stats.get("success_rate", 0)}% |
+| Coverage Rate | {coverage.get("overall_coverage", 0)}% |
+| Execution Time | {test_stats.get("execution_time", 0):.2f}s |
 
 ## ✅ Test Results
 
-- **Passed:** {test_stats.get('passed_tests', 0)}
-- **Failed:** {test_stats.get('failed_tests', 0)}
-- **Skipped:** {test_stats.get('skipped_tests', 0)}
+- **Passed:** {test_stats.get("passed_tests", 0)}
+- **Failed:** {test_stats.get("failed_tests", 0)}
+- **Skipped:** {test_stats.get("skipped_tests", 0)}
 
 ## 📈 Coverage Metrics
 
-- **Lines Covered:** {coverage.get('lines_covered', 0)}/{coverage.get('lines_total', 0)}
-- **Coverage Rate:** {coverage.get('overall_coverage', 0)}%
+- **Lines Covered:** {coverage.get("lines_covered", 0)}/{coverage.get("lines_total", 0)}
+- **Coverage Rate:** {coverage.get("overall_coverage", 0)}%
 
 ## 💡 Recommendations
 
-{chr(10).join(f"- {rec}" for rec in summary.get('recommendations', []))}
+{chr(10).join(f"- {rec}" for rec in summary.get("recommendations", []))}
 
 ---
 *Report generated by Football Prediction System Test Suite*

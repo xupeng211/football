@@ -82,7 +82,7 @@ class TestPredictor:
             mock_glob.return_value = []
 
             predictor = Predictor.__new__(Predictor)
-            result = predictor._find_latest_model()
+            result = predictor._find_latest_model_dir()
 
             # 根据实际实现, 可能返回None
             assert result is None
