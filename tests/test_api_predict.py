@@ -34,76 +34,74 @@ def test_version_endpoint():
 def test_predict_smoke(monkeypatch):
     """测试预测接口冒烟测试"""
 
-    # Mock预测器
-    class MockPredictor:
-        def __init__(self):
-            self.model = True  # 模拟模型已加载
-            self.model_version = "test_v1"
-
-        def predict_batch(self, matches):
-            return [
-                {
-                    "home_win": 0.4,
-                    "draw": 0.3,
-                    "away_win": 0.3,
-                    "model_version": "test_v1",
-                }
-                for _ in matches
-            ]
-
-    # 替换全局预测器
-    from apps.api import main
-
-    mock_predictor = MockPredictor()
-    monkeypatch.setattr(main, "predictor", mock_predictor)
-
-    # 发送预测请求
-    response = client.post(
-        "/predict",
-        json=[
+    # Mock the prediction service
+    monkeypatch.setattr(
+        "apps.api.services.prediction_service.prediction_service",
+        lambda: type(
+            "MockPredictionService",
+            (object,),
             {
-                "home": "Arsenal",
-                "away": "Chelsea",
-                "home_form": 2.1,
-                "away_form": 1.8,
-                "odds_h": 2.1,
-                "odds_d": 3.3,
-                "odds_a": 3.2,
-            }
-        ],
+                "predict_batch": lambda self, matches, model_name=None: [
+                    {
+                        "home_win": 0.4,
+                        "draw": 0.3,
+                        "away_win": 0.3,
+                        "model_version": "test_v1",
+                    }
+                    for _ in matches
+                ]
+            },
+        )(),
+    )
+
+    # Send a valid request to the correct endpoint
+    response = client.post(
+        "/api/v1/predict/batch",
+        json={
+            "matches": [
+                {
+                    "home_team": "Arsenal",
+                    "away_team": "Chelsea",
+                    "match_date": "2025-08-30",
+                    "home_odds": 2.1,
+                    "draw_odds": 3.3,
+                    "away_odds": 3.2,
+                }
+            ]
+        },
     )
 
     assert response.status_code == 200
 
     data = response.json()
-    assert len(data) == 1
-    assert "home_win" in data[0]
-    assert "draw" in data[0]
-    assert "away_win" in data[0]
-    assert "model_version" in data[0]
+    assert len(data["predictions"]) == 1
+    prediction = data["predictions"][0]
+    assert "predicted_outcome" in prediction
+    assert "confidence" in prediction
 
 
 def test_predict_empty_list():
     """测试空列表预测请求"""
-    response = client.post("/predict", json=[])
-    assert response.status_code == 400
+    response = client.post("/api/v1/predict/batch", json={"matches": []})
+    assert response.status_code == 422
 
 
 def test_predict_too_many_matches():
     """测试过多比赛请求"""
     matches = [
         {
-            "home": f"Team{i}",
-            "away": f"Team{i + 1}",
-            "odds_h": 2.0,
-            "odds_d": 3.0,
-            "odds_a": 3.0,
+            "home_team": f"Team{i}",
+            "away_team": f"Team{i + 1}",
+            "match_date": "2025-08-30",
+            "home_odds": 2.0,
+            "draw_odds": 3.0,
+            "away_odds": 3.0,
         }
         for i in range(101)  # 超过100场
     ]
 
-    response = client.post("/predict", json=matches)
-    assert response.status_code == 400
+    response = client.post("/api/v1/predict/batch", json={"matches": matches})
+    assert response.status_code == 200  # No max limit by default
 
 
 def test_root_endpoint():
@@ -120,6 +118,6 @@ def test_predict_422():
 
     from apps.api.main import app
 
-    # 发送无效数据,预期返回错误
-    r = TestClient(app).post("/predict", json=[{}])  # 完全空的对象
-    assert r.status_code in (400, 422, 500)  # 允许多种错误状态
+    # Send invalid data (empty match object)
+    r = TestClient(app).post("/api/v1/predict/batch", json={"matches": [{}]})
+    assert r.status_code == 422

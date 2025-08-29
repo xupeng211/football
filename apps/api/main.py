@@ -20,6 +20,7 @@ from starlette.responses import Response
 from apps.api.routers import health, metrics, predictions
 from apps.api.routers.metrics import REQUEST_COUNT, REQUEST_DURATION
 from apps.api.services.prediction_service import prediction_service
+from models.predictor import Predictor
 
 
 class VersionResponse(BaseModel):
@@ -59,6 +60,7 @@ class LoggingMiddleware(BaseHTTPMiddleware):
 
 
 logger = structlog.get_logger()
+predictor = Predictor()
 
 
 @asynccontextmanager
