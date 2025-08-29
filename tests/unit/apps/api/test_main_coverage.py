@@ -4,6 +4,7 @@ API主模块的覆盖率测试
 
 from unittest.mock import patch
 
+import numpy as np
 import pytest
 from fastapi.testclient import TestClient
 
@@ -51,62 +52,26 @@ class TestAPIMainCoverage:
         assert "message" in data
         assert "docs" in data
 
-    @patch("apps.api.main.predictor")
-    def test_predict_endpoint_coverage(self, mock_predictor, client):
+    @patch("apps.api.services.prediction_service.prediction_service.predict")
+    def test_predict_endpoint_coverage(self, mock_predict, client):
         """测试预测端点覆盖率"""
-        mock_predictor.predict_batch.return_value = [
-            {
-                "home_team": "Team A",
-                "away_team": "Team B",
-                "home_win": 0.45,
-                "draw": 0.25,
-                "away_win": 0.30,
-                "predicted_outcome": "home_win",
-                "confidence": 0.45,
-                "model_version": "test-v1.0",
-            }
-        ]
-
-        test_data = [
-            {
-                "home": "Team A",
-                "away": "Team B",
-                "home_form": 1.5,
-                "away_form": 1.5,
-                "odds_h": 2.0,
-                "odds_d": 3.2,
-                "odds_a": 3.8,
-            }
-        ]
-
-        response = client.post("/predict", json=test_data)
+        mock_predict.return_value = np.array([[0.1, 0.2, 0.7]])
+        response = client.post(
+            "/api/v1/predict/single",
+            json={
+                "home_team": "A",
+                "away_team": "B",
+                "match_date": "2025-01-01",
+                "home_odds": 2.0,
+                "draw_odds": 3.0,
+                "away_odds": 4.0,
+            },
+        )
         assert response.status_code == 200
-
-        predictions = response.json()
-        assert len(predictions) == 1
-        # The API response doesn't include team names, so we check for probability keys
-        assert "home_win" in predictions[0]
-        assert "draw" in predictions[0]
-        assert "away_win" in predictions[0]
+        assert "prediction_id" in response.json()
 
     def test_predict_endpoint_error_cases(self, client):
         """测试预测端点错误情况覆盖率"""
-        # 测试空请求
-        response = client.post("/predict", json=[])
-        assert response.status_code == 400
-
-        # 测试过大请求
-        large_request = [
-            {
-                "home": f"Team{i}",
-                "away": f"Team{i + 1}",
-                "home_form": 1.5,
-                "away_form": 1.5,
-                "odds_h": 2.0,
-                "odds_d": 3.0,
-                "odds_a": 4.0,
-            }
-            for i in range(101)
-        ]
-        response = client.post("/predict", json=large_request)
-        assert response.status_code == 400
+        # Test with missing fields
+        response = client.post("/api/v1/predict/single", json={"home_team": "A"})
+        assert response.status_code == 422

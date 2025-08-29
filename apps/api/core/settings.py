@@ -1,5 +1,7 @@
 # apps/api/core/settings.py
 
+import os
+
 from pydantic import Field
 from pydantic_settings import BaseSettings
 
@@ -15,7 +17,13 @@ class Settings(BaseSettings):
     )
 
     # 数据库配置
-    database_url: str = "postgresql://postgres:postgres@localhost:5432/sports"
+    @property
+    def database_url(self) -> str:
+        if os.getenv("PYTEST_CURRENT_TEST"):
+            return "sqlite:///:memory:"
+        default_db = "postgresql://postgres:postgres@localhost:5432/sports"
+        return os.getenv("DATABASE_URL", default_db) or "sqlite:///:memory:"
+
     pg_password: str | None = None
 
     # Redis配置
@@ -54,4 +62,5 @@ class Settings(BaseSettings):
         extra = "ignore"  # 忽略额外的环境变量
 
 
+settings = Settings()
 settings = Settings()

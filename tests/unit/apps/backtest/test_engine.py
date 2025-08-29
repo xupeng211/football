@@ -16,7 +16,7 @@ def historical_data() -> pd.DataFrame:
     """Provides a sample DataFrame of historical match data."""
     data = {
         "match_date": pd.to_datetime(["2023-01-01", "2023-01-02", "2023-01-03"]),
-        "match_id": [1, 2, 3],
+        "id": [1, 2, 3],
         "home_score": [1, 2, 0],  # home_win, draw, away_win
         "away_score": [0, 2, 3],
     }
@@ -51,9 +51,10 @@ class TestBacktestEngine:
 
     def test_get_actual_result(self, engine):
         """Tests the determination of actual match results."""
+        # 0: Home, 1: Draw, 2: Away
         assert (
             engine._get_actual_result(pd.Series({"home_score": 2, "away_score": 1}))
-            == 2
+            == 0
         )
         assert (
             engine._get_actual_result(pd.Series({"home_score": 1, "away_score": 1}))
@@ -61,7 +62,7 @@ class TestBacktestEngine:
         )
         assert (
             engine._get_actual_result(pd.Series({"home_score": 0, "away_score": 1}))
-            == 0
+            == 2
         )
         # Test with missing score data (should return a random result, so we just check if it's valid)
         assert engine._get_actual_result(pd.Series({})) in [0, 1, 2]
@@ -70,7 +71,7 @@ class TestBacktestEngine:
         """Tests the profit and loss calculation."""
         predictions_data = {
             "match_date": pd.to_datetime(["2023-01-01", "2023-01-01"]),
-            "predicted_class": [2, 0],  # Home win, Away win
+            "predicted_class": [0, 2],  # Home win, Away win
             "home_score": [2, 0],
             "away_score": [1, 2],
             "home_odds": [2.5, 1.8],
@@ -83,8 +84,8 @@ class TestBacktestEngine:
         pnl_results = engine._calculate_pnl(predictions_df, stake_per_bet=10.0)
 
         assert pnl_results["total_stakes"] == 20.0
-        # Bet 1: Win (10 * (2.5 - 1)) = 15
-        # Bet 2: Win (10 * (3.5 - 1)) = 25
+        # Bet 1 (Home Win): Win, PnL = 10 * (2.5 - 1) = 15
+        # Bet 2 (Away Win): Win, PnL = 10 * (3.5 - 1) = 25
         assert pnl_results["net_profit"] == 40.0
         assert pnl_results["roi"] == 2.0
         assert len(pnl_results["results"]) == 2
@@ -99,9 +100,11 @@ class TestBacktestEngine:
         end_date = date(2023, 1, 3)
 
         # Mock the internal prediction generation to return predictable results
-        predictions = pd.merge(historical_data, odds_data, on="match_id")
+        predictions = pd.merge(
+            historical_data, odds_data, left_on="id", right_on="match_id"
+        )
         predictions["confidence"] = 0.8
-        predictions["predicted_class"] = [2, 1, 0]  # home, draw, away
+        predictions["predicted_class"] = [0, 1, 2]  # home, draw, away
 
         with patch.object(engine, "_generate_predictions", return_value=predictions):
             result = engine.run_backtest(
@@ -143,7 +146,7 @@ class TestBacktestEngine:
         predictions_data = {
             "home_score": [2, 0, 1],  # Actual: home, away, draw
             "away_score": [1, 2, 1],
-            "predicted_class": [2, 1, 0],  # Predicted: home, draw, away
+            "predicted_class": [0, 1, 2],  # Predicted: home, draw, away
         }
         predictions_df = pd.DataFrame(predictions_data)
         metrics = engine._calculate_accuracy_metrics(predictions_df)
@@ -182,7 +185,9 @@ class TestBacktestEngine:
         start_date = date(2023, 1, 1)
         end_date = date(2023, 1, 3)
 
-        predictions = pd.merge(historical_data, odds_data, on="match_id")
+        predictions = pd.merge(
+            historical_data, odds_data, left_on="id", right_on="match_id"
+        )
         predictions["confidence"] = 0.8
         predictions["predicted_class"] = [2, 1, 0]
 

@@ -9,6 +9,7 @@ from typing import Any
 import numpy as np
 import pandas as pd
 import structlog
+from sklearn.metrics import accuracy_score, classification_report
 
 logger = structlog.get_logger()
 
@@ -115,7 +116,6 @@ class BacktestEngine:
         # 计算收益
         pnl_results = self._calculate_pnl(confident_predictions, stake_per_bet)
 
-        # 计算准确率指标
         accuracy_metrics = self._calculate_accuracy_metrics(confident_predictions)
 
         # 计算风险指标
@@ -128,20 +128,16 @@ class BacktestEngine:
             end_date=end_date,
             total_matches=len(test_data),
             total_predictions=len(confident_predictions),
-            # 准确率指标
             accuracy=accuracy_metrics["accuracy"],
             precision_by_class=accuracy_metrics["precision_by_class"],
             recall_by_class=accuracy_metrics["recall_by_class"],
-            # 收益指标
             total_stakes=pnl_results["total_stakes"],
             total_returns=pnl_results["total_returns"],
             net_profit=pnl_results["net_profit"],
             roi=pnl_results["roi"],
-            # 风险指标
             max_drawdown=risk_metrics["max_drawdown"],
             win_rate=risk_metrics["win_rate"],
             avg_odds=risk_metrics["avg_odds"],
-            # 详细数据
             daily_pnl=pnl_results["daily_pnl"],
             prediction_details=[
                 {str(k): v for k, v in record.items()}
@@ -163,96 +159,104 @@ class BacktestEngine:
     def _merge_odds_data(
         self, match_data: pd.DataFrame, odds_data: pd.DataFrame
     ) -> pd.DataFrame:
-        """合并赔率数据"""
-        # TODO: 实现赔率数据合并逻辑
-        # 按match_id和时间匹配最接近的赔率
+        """Merges historical match data with the corresponding odds."""
+        # Rename odds columns for clarity and consistency
+        odds_renamed = odds_data.rename(
+            columns={"h": "home_odds", "d": "draw_odds", "a": "away_odds"}
+        )
 
-        # 占位实现 - 添加模拟赔率
-        match_data["home_odds"] = 2.5
-        match_data["draw_odds"] = 3.2
-        match_data["away_odds"] = 2.8
+        # Merge based on match_id. The historical_data (match_data) uses 'id'.
+        merged_data = pd.merge(
+            match_data,
+            odds_renamed,
+            left_on="id",
+            right_on="match_id",
+            how="inner",
+        )
 
-        return match_data
+        # Drop the redundant match_id column from the odds table
+        return merged_data.drop(columns=["match_id"])
 
     def _generate_predictions(
         self, model: Any, test_data: pd.DataFrame
     ) -> pd.DataFrame:
-        """生成预测结果"""
-        logger.info("生成预测结果", matches=len(test_data))
+        """Generates predictions with real feature engineering."""
+        logger.info("Generating predictions", matches=len(test_data))
 
-        # 提取特征 (需要与训练时保持一致)
-        # TODO: 实现特征提取逻辑
+        # 1. Feature Engineering (consistent with training/inference)
+        features_df = test_data.copy()
+        features_df["implied_prob_home"] = 1 / features_df["home_odds"]
+        features_df["implied_prob_draw"] = 1 / features_df["draw_odds"]
+        features_df["implied_prob_away"] = 1 / features_df["away_odds"]
+        features_df["bookie_margin"] = (
+            features_df["implied_prob_home"]
+            + features_df["implied_prob_draw"]
+            + features_df["implied_prob_away"]
+            - 1
+        )
+        features_df["odds_spread_home"] = (
+            features_df["home_odds"] - features_df["home_odds"].min()
+        )
+        features_df["fav_flag"] = (
+            features_df["home_odds"] < features_df["away_odds"]
+        ).astype(int)
+        features_df["log_home"] = np.log(features_df["home_odds"])
+        features_df["log_away"] = np.log(features_df["away_odds"])
+        features_df["odds_ratio"] = features_df["home_odds"] / features_df["away_odds"]
+        features_df["prob_diff"] = (
+            features_df["implied_prob_home"] - features_df["implied_prob_away"]
+        )
+
         feature_columns = [
-            col
-            for col in test_data.columns
-            if col.startswith(("home_", "away_", "diff_"))
+            "fav_flag",
+            "log_away",
+            "log_home",
+            "prob_diff",
+            "odds_ratio",
+            "bookie_margin",
+            "odds_spread_home",
+            "implied_prob_away",
+            "implied_prob_draw",
+            "implied_prob_home",
         ]
+        features = features_df[feature_columns]
 
-        if not feature_columns:
-            # 生成模拟特征用于演示
-            feature_columns = [
-                "home_recent_form",
-                "away_recent_form",
-                "home_strength",
-                "away_strength",
-                "diff_form",
-                "home_advantage",
-            ]
-            for col in feature_columns:
-                test_data[col] = np.random.normal(0.5, 0.2, len(test_data))
-
-        features = test_data[feature_columns].fillna(0)
-
-        # 生成预测 (占位实现)
-        # TODO: 使用实际模型进行预测
-        # probabilities = model.predict_proba(features)
-
-        # 模拟预测概率
-        probabilities = np.random.dirichlet([1, 1, 1], len(features))
+        # 2. Predict using the actual model
+        probabilities = model.predict_proba(features)
         predicted_classes = np.argmax(probabilities, axis=1)
         max_probabilities = np.max(probabilities, axis=1)
 
-        # 添加预测结果到数据
+        # 3. Append results
+        # Class mapping: 0: Home, 1: Draw, 2: Away
         test_data["predicted_class"] = predicted_classes
         test_data["confidence"] = max_probabilities
-        test_data["home_win_prob"] = probabilities[:, 2]  # 主胜概率
-        test_data["draw_prob"] = probabilities[:, 1]  # 平局概率
-        test_data["away_win_prob"] = probabilities[:, 0]  # 客胜概率
+        test_data["home_win_prob"] = probabilities[:, 0]
+        test_data["draw_prob"] = probabilities[:, 1]
+        test_data["away_win_prob"] = probabilities[:, 2]
 
         return test_data
 
     def _calculate_pnl(
         self, predictions: pd.DataFrame, stake_per_bet: float
     ) -> dict[str, Any]:
-        """计算盈亏"""
+        """Calculates profit and loss."""
         results = []
-        daily_pnl = {}
+        daily_pnl: dict[str, float] = {}
+        # Class mapping: 0:Home, 1:Draw, 2:Away
+        odds_map = {0: "home_odds", 1: "draw_odds", 2: "away_odds"}
+        name_map = {0: "主胜", 1: "平局", 2: "客胜"}
 
         for _, row in predictions.iterrows():
-            # 确定实际结果
             actual_result = self._get_actual_result(row)
             predicted_result = int(row["predicted_class"])
 
-            # 获取对应的赔率
-            if predicted_result == 2:  # 预测主胜
-                odds = row["home_odds"]
-                result_name = "主胜"
-            elif predicted_result == 1:  # 预测平局
-                odds = row["draw_odds"]
-                result_name = "平局"
-            else:  # 预测客胜
-                odds = row["away_odds"]
-                result_name = "客胜"
+            odds_col = odds_map.get(predicted_result, "home_odds")
+            odds = row[odds_col]
+            result_name = name_map.get(predicted_result, "N/A")
 
-            # 计算盈亏
-            if actual_result == predicted_result:
-                pnl = stake_per_bet * (odds - 1)  # 赢了
-                win = True
-            else:
-                pnl = -stake_per_bet  # 输了
-                win = False
+            win = actual_result == predicted_result
+            pnl = stake_per_bet * (odds - 1) if win else -stake_per_bet
 
-            # 记录结果
             bet_result = {
                 "match_id": row.get("match_id", ""),
                 "match_date": row["match_date"],
@@ -267,16 +271,13 @@ class BacktestEngine:
             }
             results.append(bet_result)
 
-            # 按日汇总
             date_key = row["match_date"].date()
-            if date_key not in daily_pnl:
-                daily_pnl[date_key] = 0
+            daily_pnl.setdefault(date_key, 0)
             daily_pnl[date_key] += pnl
 
-        # 计算汇总指标
         total_stakes = len(results) * stake_per_bet
-        total_returns = sum(r["pnl"] for r in results) + total_stakes
         net_profit = sum(r["pnl"] for r in results)
+        total_returns = total_stakes + net_profit
         roi = net_profit / total_stakes if total_stakes > 0 else 0
 
         return {
@@ -289,62 +290,43 @@ class BacktestEngine:
         }
 
     def _get_actual_result(self, row: pd.Series) -> int:
-        """获取实际比赛结果"""
-        home_score = row.get("home_score", 0)
-        away_score = row.get("away_score", 0)
-
-        # 如果没有比分数据,生成随机结果用于演示
-        if pd.isna(home_score) or pd.isna(away_score):
-            return int(np.random.choice([0, 1, 2]))  # 随机结果
-
-        if home_score > away_score:
-            return 2  # 主胜
-        elif home_score == away_score:
-            return 1  # 平局
-        else:
-            return 0  # 客胜
+        """Determines the actual match outcome from scores."""
+        if "home_score" in row and "away_score" in row:
+            if row["home_score"] > row["away_score"]:
+                return 0  # Home win
+            elif row["home_score"] == row["away_score"]:
+                return 1  # Draw
+            else:
+                return 2  # Away win
+        # Fallback for safety, though data should be clean
+        return int(np.random.choice([0, 1, 2]))
 
     def _calculate_accuracy_metrics(self, predictions: pd.DataFrame) -> dict[str, Any]:
-        """计算准确率指标"""
-        actual_results = []
-        predicted_results = []
+        """Calculates accuracy metrics using sklearn."""
+        if predictions.empty:
+            return {
+                "accuracy": 0,
+                "precision_by_class": {},
+                "recall_by_class": {},
+            }
 
-        for _, row in predictions.iterrows():
-            actual = self._get_actual_result(row)
-            predicted = int(row["predicted_class"])
+        actual_results = predictions.apply(self._get_actual_result, axis=1)
+        predicted_results = predictions["predicted_class"]
 
-            actual_results.append(actual)
-            predicted_results.append(predicted)
+        accuracy = accuracy_score(actual_results, predicted_results)
 
-        # 整体准确率
-        correct_predictions = sum(
-            1 for a, p in zip(actual_results, predicted_results, strict=False) if a == p
+        # Class mapping: 0:Home, 1:Draw, 2:Away
+        class_names = ["主胜", "平局", "客胜"]
+        report = classification_report(
+            actual_results,
+            predicted_results,
+            target_names=class_names,
+            output_dict=True,
+            zero_division=0,
         )
-        accuracy = correct_predictions / len(predictions) if len(predictions) > 0 else 0
 
-        # 各类别精确率和召回率
-        class_names = ["客胜", "平局", "主胜"]
-        precision_by_class = {}
-        recall_by_class = {}
-
-        for class_idx, class_name in enumerate(class_names):
-            # 精确率:预测为该类别且正确的 / 预测为该类别的总数
-            predicted_as_class = sum(1 for p in predicted_results if p == class_idx)
-            correct_as_class = sum(
-                1
-                for a, p in zip(actual_results, predicted_results, strict=False)
-                if p == class_idx and a == class_idx
-            )
-            precision = (
-                correct_as_class / predicted_as_class if predicted_as_class > 0 else 0
-            )
-
-            # 召回率:预测为该类别且正确的 / 实际为该类别的总数
-            actual_as_class = sum(1 for a in actual_results if a == class_idx)
-            recall = correct_as_class / actual_as_class if actual_as_class > 0 else 0
-
-            precision_by_class[class_name] = precision
-            recall_by_class[class_name] = recall
+        precision_by_class = {name: report[name]["precision"] for name in class_names}
+        recall_by_class = {name: report[name]["recall"] for name in class_names}
 
         return {
             "accuracy": accuracy,

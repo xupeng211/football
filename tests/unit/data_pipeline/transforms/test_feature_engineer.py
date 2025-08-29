@@ -89,6 +89,7 @@ class TestFeatureEngineer:
             "odds_spread_home",
             "fav_flag",
             "log_home",
+            "log_away",
             "odds_ratio",
             "prob_diff",
         ]

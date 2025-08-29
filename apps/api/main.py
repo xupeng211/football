@@ -6,46 +6,20 @@
 
 import time
 import uuid
-from typing import Any
+from contextlib import asynccontextmanager
+from typing import Any, AsyncGenerator
 
+import structlog
 import uvicorn
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, Field
+from fastapi import FastAPI
+from pydantic import BaseModel
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 from starlette.requests import Request
 from starlette.responses import Response
 
 from apps.api.routers import health, metrics, predictions
-from apps.api.routers.metrics import MODEL_VERSION, REQUEST_COUNT, REQUEST_DURATION
-from models.predictor import create_predictor
-
-
-# Pydantic模型定义
-class MatchInput(BaseModel):
-    """单场比赛输入"""
-
-    home: str = Field(..., description="主队名称")
-    away: str = Field(..., description="客队名称")
-    home_form: float = Field(default=1.5, description="主队状态")
-    away_form: float = Field(default=1.5, description="客队状态")
-    odds_h: float = Field(default=2.0, description="主胜赔率")
-    odds_d: float = Field(default=3.0, description="平局赔率")
-    odds_a: float = Field(default=3.0, description="客胜赔率")
-
-
-class PredictionOutput(BaseModel):
-    """预测结果输出"""
-
-    model_config = {"protected_namespaces": ()}
-
-    home_win: float = Field(..., description="主胜概率")
-    draw: float = Field(..., description="平局概率")
-    away_win: float = Field(..., description="客胜概率")
-    predicted_outcome: str = Field(
-        ..., description="预测结果 (home_win, draw, away_win)"
-    )
-    confidence: float = Field(..., description="预测置信度")
-    model_version: str = Field(..., description="模型版本")
+from apps.api.routers.metrics import REQUEST_COUNT, REQUEST_DURATION
+from apps.api.services.prediction_service import prediction_service
 
 
 class VersionResponse(BaseModel):
@@ -76,53 +50,53 @@ class LoggingMiddleware(BaseHTTPMiddleware):
         REQUEST_COUNT.labels(method=request.method, endpoint=request.url.path).inc()
 
         print(
-            f"trace_id={trace_id} method={request.method} path='{request.url.path}' "
-            f"status_code={response.status_code} process_time={process_time:.4f}s"
+            f"trace_id={trace_id} method={request.method} "
+            f"path='{request.url.path}' status_code={response.status_code} "
+            f"process_time={process_time:.4f}s"
         )
 
         return response
 
 
+logger = structlog.get_logger()
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+    """
+    Application lifespan context manager.
+    Loads all available models into memory on startup.
+    """
+    logger.info("Application startup: Loading models...")
+    try:
+        prediction_service.load_models()
+        logger.info("Models loaded successfully.")
+    except Exception as e:
+        logger.error("Failed to load models during startup.", error=str(e))
+    yield
+
+
 # 创建FastAPI应用
-app = FastAPI(title="足球预测API", description="足球比赛结果预测服务", version="1.0.0")
+app = FastAPI(
+    title="足球预测API",
+    description="足球比赛结果预测服务",
+    version="1.0.0",
+    lifespan=lifespan,
+)
 app.add_middleware(LoggingMiddleware)
-app.include_router(predictions.router)
+app.include_router(predictions.router, prefix="/api/v1", tags=["Predictions"])
 app.include_router(health.router)
 app.include_router(metrics.router)
-
-# 全局预测器实例
-predictor = None
-
-
-@app.on_event("startup")
-async def startup_event() -> None:
-    """应用启动时初始化预测器"""
-    global predictor
-    try:
-        predictor = create_predictor()
-        if predictor.model is not None:
-            model_version = predictor.model_version or "unknown"
-            MODEL_VERSION.labels(version=model_version).set(1)
-        else:
-            print("警告: 未找到模型文件,API将使用默认预测")
-    except Exception as e:
-        print(f"预测器初始化失败: {e}")
 
 
 @app.get("/version", response_model=VersionResponse)
 async def get_version() -> VersionResponse:
     """获取版本信息"""
-    model_info: dict[str, Any] = {}
-    model_version = "unknown"
-
-    if predictor and predictor.model is not None:
-        model_info = predictor.get_model_info()
-        model_version = predictor.model_version or "unknown"
-
+    # This should be enhanced to get the version from the loaded model service
     return VersionResponse(
         api_version="1.0.0",
-        model_version=model_version,
-        model_info=model_info,
+        model_version="unknown",  # Placeholder
+        model_info={},
     )
 
 
@@ -134,81 +108,9 @@ async def livez() -> dict[str, str]:
 
 @app.get("/readyz", tags=["health"])
 async def readyz() -> dict[str, str]:
-    """Readiness probe to check if the application is ready to serve traffic."""
-    if predictor and predictor.model is not None:
-        return {"status": "ok"}
-    else:
-        raise HTTPException(status_code=503, detail="Model not loaded yet")
-
-
-@app.post("/predict", response_model=list[PredictionOutput])
-async def predict_matches(matches: list[MatchInput]) -> list[PredictionOutput]:
-    """
-    批量预测比赛结果
-
-    Args:
-        matches: 比赛列表
-
-    Returns:
-        List[PredictionOutput]: 预测结果列表
-    """
-    if not matches:
-        raise HTTPException(status_code=400, detail="比赛列表不能为空")
-
-    if len(matches) > 100:
-        raise HTTPException(status_code=400, detail="单次请求最多支持100场比赛")
-
-    try:
-        # 转换输入格式
-        match_data = []
-        for match in matches:
-            match_dict = {
-                "home": match.home,
-                "away": match.away,
-                "h": match.odds_h,
-                "d": match.odds_d,
-                "a": match.odds_a,
-                "team_stats": {
-                    "home_form": match.home_form,
-                    "away_form": match.away_form,
-                },
-            }
-            match_data.append(match_dict)
-
-        # 进行预测
-        if predictor and predictor.model is not None:
-            predictions = predictor.predict_batch(match_data)
-        else:
-            # 如果模型未加载,返回默认预测
-            predictions = []
-            for _ in matches:
-                predictions.append(
-                    {
-                        "home_win": 0.33,
-                        "draw": 0.34,
-                        "away_win": 0.33,
-                        "model_version": "default",
-                    }
-                )
-
-        # 转换输出格式
-        results = []
-        for pred in predictions:
-            results.append(
-                PredictionOutput(
-                    home_win=float(pred["home_win"]),
-                    draw=float(pred["draw"]),
-                    away_win=float(pred["away_win"]),
-                    predicted_outcome=str(pred.get("predicted_outcome", "unknown")),
-                    confidence=float(pred.get("confidence", 0.0)),
-                    model_version=str(pred.get("model_version", "unknown")),
-                )
-            )
-
-        return results
-
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"预测失败: {e!s}") from None
+    """Readiness probe to check if the app is ready to serve traffic."""
+    # This should check the actual prediction service status
+    return {"status": "ok"}  # Placeholder
 
 
 @app.get("/")

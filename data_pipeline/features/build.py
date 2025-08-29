@@ -100,10 +100,10 @@ def add_form_features(df: pd.DataFrame, config: dict[str, Any]) -> pd.DataFrame:
 
     # 计算进球状态
     home_goals_data = df[["home", "home_goals", "away_goals"]].copy()
-    home_goals_data.columns = pd.Index(["team", "goals_for", "goals_against"])
+    home_goals_data.columns = ["team", "goals_for", "goals_against"]
 
     away_goals_data = df[["away", "away_goals", "home_goals"]].copy()
-    away_goals_data.columns = pd.Index(["team", "goals_for", "goals_against"])
+    away_goals_data.columns = ["team", "goals_for", "goals_against"]
 
     # 合并进球数据
     all_goals_data = pd.concat([home_goals_data, away_goals_data])
@@ -132,13 +132,22 @@ def add_form_features(df: pd.DataFrame, config: dict[str, Any]) -> pd.DataFrame:
     # 这里简化处理,实际应该基于时间窗口
     team_stats = (
         all_goals_data.groupby("team")
-        .agg({"avg_goals_for_mean_5": "last", "avg_goals_against_mean_5": "last"})
+        .agg(
+            {
+                "avg_goals_for_mean_5": "last",
+                "avg_goals_against_mean_5": "last",
+            }
+        )
         .reset_index()
     )
 
     # 为主队添加统计
     df = df.merge(
-        team_stats, left_on="home", right_on="team", how="left", suffixes=("", "_home")
+        team_stats,
+        left_on="home",
+        right_on="team",
+        how="left",
+        suffixes=("", "_home"),
     )
     df = df.rename(
         columns={
@@ -150,7 +159,11 @@ def add_form_features(df: pd.DataFrame, config: dict[str, Any]) -> pd.DataFrame:
 
     # 为客队添加统计
     df = df.merge(
-        team_stats, left_on="away", right_on="team", how="left", suffixes=("", "_away")
+        team_stats,
+        left_on="away",
+        right_on="team",
+        how="left",
+        suffixes=("", "_away"),
     )
     df = df.rename(
         columns={
@@ -255,7 +268,8 @@ def create_feature_vector(
     # 输入验证和安全检查
     def validate_team_name(name: str, field_name: str) -> str:
         if not isinstance(name, str):
-            raise ValueError(f"{field_name}必须是字符串类型")
+            msg = f"{field_name}必须是字符串类型"
+            raise ValueError(msg)
         if len(name) > 100:  # 防止DoS攻击
             raise ValueError(f"{field_name}长度不能超过100个字符")
         if not name.strip():
@@ -265,7 +279,8 @@ def create_feature_vector(
     def validate_odds(value: float, field_name: str) -> float:
         # 类型检查
         if not isinstance(value, (int, float)):
-            raise ValueError(f"{field_name}必须是数字类型,收到:{type(value)}")
+            msg = f"{field_name}必须是数字类型,收到:{type(value)}"
+            raise ValueError(msg)
 
         # 转换为float
         try:
@@ -283,7 +298,8 @@ def create_feature_vector(
         if odds_value <= 0:
             raise ValueError(f"{field_name}必须大于0,收到:{odds_value}")
         if odds_value > 1000:  # 合理的上限
-            raise ValueError(f"{field_name}过大,最大值1000,收到:{odds_value}")
+            msg = f"{field_name}过大,最大值1000,收到:{odds_value}"
+            raise ValueError(msg)
 
         return odds_value
 

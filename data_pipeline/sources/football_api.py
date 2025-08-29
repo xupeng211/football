@@ -3,9 +3,9 @@
 """
 
 import asyncio
+import types
 from dataclasses import dataclass
-from datetime import date, datetime
-from typing import Any
+from datetime import date, datetime, timedelta
 
 import httpx
 import structlog
@@ -51,7 +51,7 @@ class FootballAPICollector:
         self.base_url = "https://api.football-data.org/v4"  # 示例API
         self.session: httpx.AsyncClient | None = None
 
-    async def __aenter__(self) -> Any:
+    async def __aenter__(self) -> "FootballAPICollector":
         """异步上下文管理器入口"""
         headers = {}
         if self.api_key:
@@ -68,7 +68,7 @@ class FootballAPICollector:
         self,
         exc_type: type[BaseException] | None,
         exc_val: BaseException | None,
-        exc_tb: object,
+        exc_tb: types.TracebackType | None,
     ) -> None:
         """异步上下文管理器退出"""
         if self.session:
@@ -107,7 +107,7 @@ class FootballAPICollector:
             # TODO: 实现实际的API调用逻辑
             # 这里是占位实现
             for league in leagues or ["PL", "BL1", "SA"]:
-                logger.info(f"收集联赛数据: {league}")
+                logger.info("Collecting league data", league=league)
 
                 # 模拟API调用
                 await asyncio.sleep(0.1)  # 模拟网络延迟
@@ -117,10 +117,10 @@ class FootballAPICollector:
                 matches.extend(mock_matches)
 
         except Exception as e:
-            logger.error("收集比赛数据失败", exc=str(e))
+            logger.error("Failed to collect match data", error=str(e))
             raise
 
-        logger.info(f"成功收集{len(matches)}场比赛数据")
+        logger.info("Successfully collected match data", count=len(matches))
         return matches
 
     async def collect_team_info(self, team_ids: list[str]) -> list[Team]:
@@ -153,10 +153,10 @@ class FootballAPICollector:
                 teams.append(team_info)
 
         except Exception as e:
-            logger.error("收集球队信息失败", exc=str(e))
+            logger.error("Failed to collect team info", error=str(e))
             raise
 
-        logger.info(f"成功收集{len(teams)}个球队信息")
+        logger.info("Successfully collected team info", count=len(teams))
         return teams
 
     def _generate_mock_matches(
@@ -204,7 +204,6 @@ class FootballAPICollector:
                 match_counter += 1
 
             # 下一天
-            from datetime import timedelta
 
             current_date += timedelta(days=1)
 

@@ -9,7 +9,10 @@ import structlog
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
-# TODO: 导入数据库和Redis连接检查函数
+from apps.api.db import check_db_connection
+from apps.api.model_registry import check_model_registry
+from apps.api.prefect import check_prefect_connection
+from apps.api.redis import check_redis_connection
 
 logger = structlog.get_logger()
 router = APIRouter()
@@ -40,31 +43,31 @@ async def health_check() -> HealthResponse:
         overall_status = "healthy"
 
         # 检查数据库连接
-        # TODO: 实现数据库连接检查
+        db_ok, db_msg = check_db_connection()
         components["database"] = {
-            "status": "unknown",
-            "message": "TODO: 实现数据库连接检查",
+            "status": "healthy" if db_ok else "unhealthy",
+            "message": db_msg,
         }
 
         # 检查Redis连接
-        # TODO: 实现Redis连接检查
+        redis_ok, redis_msg = check_redis_connection()
         components["redis"] = {
-            "status": "unknown",
-            "message": "TODO: 实现Redis连接检查",
+            "status": "healthy" if redis_ok else "unhealthy",
+            "message": redis_msg,
         }
 
         # 检查模型注册表
-        # TODO: 实现模型注册表检查
+        model_ok, model_msg = check_model_registry()
         components["model_registry"] = {
-            "status": "unknown",
-            "message": "TODO: 实现模型注册表检查",
+            "status": "healthy" if model_ok else "unhealthy",
+            "message": model_msg,
         }
 
         # 检查Prefect连接
-        # TODO: 实现Prefect连接检查
+        prefect_ok, prefect_msg = check_prefect_connection()
         components["prefect"] = {
-            "status": "unknown",
-            "message": "TODO: 实现Prefect连接检查",
+            "status": "healthy" if prefect_ok else "unhealthy",
+            "message": prefect_msg,
         }
 
         # 如果任何组件不健康,整体状态为不健康

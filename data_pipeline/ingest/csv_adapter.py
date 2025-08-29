@@ -4,155 +4,65 @@ CSV数据源适配器
 实现从CSV文件读取比赛和赔率数据
 """
 
+import os
 from pathlib import Path
-from typing import Any
 
 import pandas as pd
+import structlog
+from dotenv import load_dotenv
+from sqlalchemy import create_engine
 
-from .base import DataSourceError, MatchDataSource, OddsDataSource
+from apps.api.core.logging import setup_logging
 
-
-class CSVMatchDataSource(MatchDataSource):
-    """CSV比赛数据源"""
-
-    def __init__(self, file_path: str, config: dict[str, Any] | None = None):
-        """
-        初始化CSV比赛数据源
-
-        Args:
-            file_path: CSV文件路径
-            config: 配置参数
-        """
-        super().__init__(config)
-        self.file_path = Path(file_path)
-
-    def fetch(self) -> pd.DataFrame:
-        """
-        从CSV文件读取比赛数据
-
-        Returns:
-            pd.DataFrame: 比赛数据
-
-        Raises:
-            DataSourceError: 文件不存在或读取失败时抛出
-        """
-        try:
-            if not self.file_path.exists():
-                raise DataSourceError(f"CSV文件不存在: {self.file_path}")
-
-            df = pd.read_csv(self.file_path)
-
-            if df.empty:
-                raise DataSourceError(f"CSV文件为空: {self.file_path}")
-
-            if not self.validate(df):
-                raise DataSourceError(f"CSV文件格式不正确: {self.file_path}")
-
-            # 转换数据类型
-            df["date"] = pd.to_datetime(df["date"])
-            df["home"] = df["home"].astype(int)
-            df["away"] = df["away"].astype(int)
-            df["home_goals"] = df["home_goals"].astype("Int64")  # 允许NULL
-            df["away_goals"] = df["away_goals"].astype("Int64")  # 允许NULL
-
-            return df
-
-        except pd.errors.EmptyDataError as e:
-            raise DataSourceError(f"CSV文件为空: {self.file_path}") from e
-        except pd.errors.ParserError as e:
-            raise DataSourceError(
-                f"CSV文件解析失败: {self.file_path}, 错误: {e}"
-            ) from e
-        except Exception as e:
-            raise DataSourceError(
-                f"读取CSV文件失败: {self.file_path}, 错误: {e}"
-            ) from e
+logger = structlog.get_logger()
 
 
-class CSVOddsDataSource(OddsDataSource):
-    """CSV赔率数据源"""
+def ingest_csv_data() -> None:
+    """Reads sample CSVs and ingests them into the database."""
+    load_dotenv()
+    db_url = os.getenv("DATABASE_URL")
+    if not db_url:
+        logger.error("DATABASE_URL environment variable not set.")
+        return
 
-    def __init__(self, file_path: str, config: dict[str, Any] | None = None):
-        """
-        初始化CSV赔率数据源
+    # Adjust for local execution vs. Docker
+    db_url_local = db_url.replace("@db:", "@localhost:")
+    engine = create_engine(db_url_local)
 
-        Args:
-            file_path: CSV文件路径
-            config: 配置参数
-        """
-        super().__init__(config)
-        self.file_path = Path(file_path)
+    # Define sample data paths relative to the project root
+    project_root = Path(__file__).parent.parent.parent
+    matches_path = project_root / "sql" / "sample" / "matches.csv"
+    odds_path = project_root / "sql" / "sample" / "odds.csv"
 
-    def fetch(self) -> pd.DataFrame:
-        """
-        从CSV文件读取赔率数据
+    try:
+        # Ingest matches.csv
+        logger.info(f"Reading matches data from {matches_path}...")
+        matches_df = pd.read_csv(matches_path)
+        matches_df.to_sql("matches", engine, if_exists="append", index=False)
+        logger.info(
+            "Successfully ingested records into table.",
+            records=len(matches_df),
+            table="matches",
+        )
 
-        Returns:
-            pd.DataFrame: 赔率数据
+        # Ingest odds.csv
+        logger.info(f"Reading odds data from {odds_path}...")
+        odds_df = pd.read_csv(odds_path)
+        odds_df.to_sql("odds", engine, if_exists="append", index=False)
+        logger.info(
+            "Successfully ingested records into table.",
+            records=len(odds_df),
+            table="odds",
+        )
 
-        Raises:
-            DataSourceError: 文件不存在或读取失败时抛出
-        """
-        try:
-            if not self.file_path.exists():
-                raise DataSourceError(f"CSV文件不存在: {self.file_path}")
-
-            df = pd.read_csv(self.file_path)
-
-            if df.empty:
-                raise DataSourceError(f"CSV文件为空: {self.file_path}")
-
-            if not self.validate(df):
-                raise DataSourceError(f"CSV文件格式不正确: {self.file_path}")
-
-            # 转换数据类型
-            df["match_id"] = df["match_id"].astype(int)
-            df["h"] = df["h"].astype(float)
-            df["d"] = df["d"].astype(float)
-            df["a"] = df["a"].astype(float)
-
-            # 验证赔率合理性
-            if (df["h"] <= 0).any() or (df["d"] <= 0).any() or (df["a"] <= 0).any():
-                raise DataSourceError("赔率必须为正数")
-
-            return df
-
-        except pd.errors.EmptyDataError as e:
-            raise DataSourceError(f"CSV文件为空: {self.file_path}") from e
-        except pd.errors.ParserError as e:
-            raise DataSourceError(
-                f"CSV文件解析失败: {self.file_path}, 错误: {e}"
-            ) from e
-        except Exception as e:
-            raise DataSourceError(
-                f"读取CSV文件失败: {self.file_path}, 错误: {e}"
-            ) from e
+    except FileNotFoundError as e:
+        logger.error(
+            f"CSV file not found: {e}. Make sure you are running from the project root."
+        )
+    except Exception as e:
+        logger.error(f"An error occurred during data ingestion: {e}")
 
 
-def get_sample_data_path(filename: str) -> str:
-    """
-    获取样例数据文件路径
-
-    Args:
-        filename: 文件名 (如 'matches.csv', 'odds.csv')
-
-    Returns:
-        str: 完整文件路径
-    """
-    # 从当前文件位置找到项目根目录
-    current_dir = Path(__file__).parent
-    project_root = current_dir.parent.parent  # 上两级目录
-    sample_dir = project_root / "sql" / "sample"
-    return str(sample_dir / filename)
-
-
-def create_sample_match_source() -> CSVMatchDataSource:
-    """创建样例比赛数据源"""
-    file_path = get_sample_data_path("matches.csv")
-    return CSVMatchDataSource(file_path)
-
-
-def create_sample_odds_source() -> CSVOddsDataSource:
-    """创建样例赔率数据源"""
-    file_path = get_sample_data_path("odds.csv")
-    return CSVOddsDataSource(file_path)
+if __name__ == "__main__":
+    setup_logging()
+    ingest_csv_data()

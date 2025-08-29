@@ -187,7 +187,7 @@ class Predictor:
             "model_version": self.model_version or "unknown",
         }
 
-    def predict_batch(self, matches: list[dict[str, Any]]) -> Any:
+    def predict_batch(self, matches: list[dict[str, Any]]) -> list[dict[str, Any]]:
         """
         批量预测比赛结果
 
@@ -275,6 +275,7 @@ def _safe_load_or_stub(path: str | None) -> Any:
         import warnings
 
         warnings.warn(
-            f"Predictor: model at {path} missing or corrupt, using stub", stacklevel=2
+            f"Predictor: model at {path} missing or corrupt, using stub",
+            stacklevel=2,
         )
         return _StubModel()

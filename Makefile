@@ -260,6 +260,23 @@ mvp-clean: ## 清理MVP环境和数据
 	docker system prune -f
 	@echo "$(GREEN)✅ MVP环境已清理$(NC)"
 
+
+# Data Seeding
+.PHONY: seed.sample.odds seed.sample.features seed.sample
+
+seed.sample.odds: check-venv ## Seed database with sample odds data
+	@echo "🌱 Seeding database with sample odds data..."
+	@$(PYTHON_VENV) -m data_pipeline.sources.ingest_odds --use-sample
+	@echo "✅ Sample odds data seeded."
+
+seed.sample.features: check-venv ## Seed database with sample features data
+	@echo "🌱 Seeding database with sample features data..."
+	@$(PYTHON_VENV) -m data_pipeline.transforms.ingest_features
+	@echo "✅ Sample features data seeded."
+
+seed.sample: seed.sample.odds seed.sample.features ## Seed database with all sample data
+	@echo "✅ All sample data seeded."
+
 # 测试相关命令
 .PHONY: test test-unit test-integration test-regression test-e2e test-all
 .PHONY: test-quick test-full test-ci test-smoke test-coverage
@@ -321,3 +338,24 @@ test-clean:
 	find . -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true
 	find . -name "*.pyc" -delete 2>/dev/null || true
 	@echo "✅ 测试文件清理完成"
+
+
+# ==============================================================================
+# 📖 Context Management (for AI Assistant)
+# ==============================================================================
+.PHONY: show.context regen.context
+
+show.context: ## 📜 Display the packed global context for the AI assistant
+	@if [ ! -f "context/_pack.md" ]; then \
+		echo "$(RED)❌ Global context file 'context/_pack.md' not found.$(NC)"; \
+		echo "$(YELLOW)Please run 'make regen.context' first.$(NC)"; \
+		exit 1; \
+	fi
+	@echo "$(BLUE)--- Global Project Context (context/_pack.md) ---$(NC)"
+	@cat context/_pack.md
+	@echo "$(BLUE)--- End of Context ---$(NC)"
+
+regen.context: check-venv ## 🔄 Regenerate the global context file (_pack.md)
+	@echo "$(BLUE)🔄 Regenerating global context file...$(NC)"
+	@$(PYTHON_VENV) scripts/context_pack.py
+	@echo "$(GREEN)✅ Global context file 'context/_pack.md' regenerated successfully.$(NC)"

@@ -8,6 +8,8 @@ from typing import Any
 import structlog
 from prefect import flow, task
 
+from apps.api.core.logging import setup_logging
+
 # TODO: 导入实际的数据采集模块
 # from data_pipeline.collectors.football_api import FootballAPICollector, Match
 # from data_pipeline.collectors.odds_collector import OddsCollector
@@ -58,11 +60,11 @@ async def collect_matches_task(
             for i in range(5)  # 生成5场模拟比赛
         ]
 
-        logger.info(f"成功收集{len(matches)}场比赛数据")
+        logger.info("Successfully collected match data", count=len(matches))
         return matches
 
     except Exception as e:
-        logger.error("比赛数据收集失败", exc=str(e))
+        logger.error("Failed to collect match data", error=str(e))
         raise
 
 
@@ -98,11 +100,11 @@ async def collect_odds_task(match_ids: list[str]) -> list[dict[str, Any]]:
             for match_id in match_ids
         ]
 
-        logger.info(f"成功收集{len(odds_data)}条赔率数据")
+        logger.info("Successfully collected odds data", count=len(odds_data))
         return odds_data
 
     except Exception as e:
-        logger.error("赔率数据收集失败", exc=str(e))
+        logger.error("Failed to collect odds data", error=str(e))
         raise
 
 
@@ -183,7 +185,7 @@ async def store_data_task(
         return stats
 
     except Exception as e:
-        logger.error("数据存储失败", exc=str(e))
+        logger.error("Failed to store data", error=str(e))
         raise
 
 
@@ -272,7 +274,7 @@ async def historical_data_backfill_flow(
     while current_date <= end_date:
         week_end = min(current_date + timedelta(days=6), end_date)
 
-        logger.info(f"处理时间段: {current_date} 到 {week_end}")
+        logger.info("Processing time period", start=current_date, end=week_end)
 
         # 收集该周的数据
         week_matches = await collect_matches_task(current_date, week_end, leagues)
@@ -312,7 +314,8 @@ if __name__ == "__main__":
 
     # 测试运行
     async def test_flow() -> None:
+        setup_logging()
         result = await daily_data_collection_flow()
-        print(f"Flow result: {result}")
+        logger.info("Flow finished", result=result)
 
     asyncio.run(test_flow())

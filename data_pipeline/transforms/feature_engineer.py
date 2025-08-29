@@ -39,7 +39,8 @@ def aggregate_odds(df: pd.DataFrame) -> pd.DataFrame:
     Aggregate odds across multiple bookmakers for each match.
 
     Args:
-        df: DataFrame with columns 'match_id', 'bookmaker', 'home_odds', 'draw_odds', 'away_odds'
+        df: DataFrame with columns 'match_id', 'bookmaker', 'home_odds',
+            'draw_odds', 'away_odds'
 
     Returns:
         DataFrame with aggregated odds per match
@@ -81,6 +82,7 @@ def generate_features(df: pd.DataFrame) -> pd.DataFrame:
 
     # Log odds
     result["log_home"] = np.log(result["home_odds"])
+    result["log_away"] = np.log(result["away_odds"])
 
     # Odds ratio
     result["odds_ratio"] = result["home_odds"] / result["away_odds"]
@@ -88,4 +90,22 @@ def generate_features(df: pd.DataFrame) -> pd.DataFrame:
     # Probability difference
     result["prob_diff"] = result["implied_prob_home"] - result["implied_prob_away"]
 
-    return result
+    # Select and order columns to match the features table schema
+    feature_columns = [
+        "match_id",
+        "home_odds",
+        "draw_odds",
+        "away_odds",
+        "implied_prob_home",
+        "implied_prob_draw",
+        "implied_prob_away",
+        "bookie_margin",
+        "odds_spread_home",
+        "fav_flag",
+        "log_home",
+        "log_away",
+        "odds_ratio",
+        "prob_diff",
+    ]
+
+    return result[feature_columns]

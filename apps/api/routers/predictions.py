@@ -10,8 +10,9 @@ import structlog
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field
 
+from apps.api.services.prediction_service import prediction_service
+
 logger = structlog.get_logger()
-router = APIRouter()
 router = APIRouter()
 
 
@@ -25,15 +26,20 @@ class PredictionRequest(BaseModel):
 class SingleMatchPredictionRequest(BaseModel):
     """单场比赛预测请求"""
 
-    home_team: str = Field(..., description="主队名称")
-    away_team: str = Field(..., description="客队名称")
-    match_date: date = Field(..., description="比赛日期")
+    home_team: str = Field(..., description="主队名称", examples=["Arsenal"])
+    away_team: str = Field(..., description="客队名称", examples=["Chelsea"])
+    match_date: date = Field(..., description="比赛日期", examples=["2025-08-30"])
+    home_odds: float = Field(..., description="主胜赔率", gt=1.0, examples=[2.1])
+    draw_odds: float = Field(..., description="平局赔率", gt=1.0, examples=[3.3])
+    away_odds: float = Field(..., description="客胜赔率", gt=1.0, examples=[3.2])
 
 
 class BatchMatchPredictionRequest(BaseModel):
     """批量比赛预测请求"""
 
-    matches: list[SingleMatchPredictionRequest] = Field(..., description="比赛列表")
+    matches: list[SingleMatchPredictionRequest] = Field(
+        ..., description="比赛列表", min_length=1
+    )
 
 
 class PredictionResponse(BaseModel):
@@ -60,25 +66,32 @@ class BatchPredictionResponse(BaseModel):
 @router.post("/predict/single", response_model=PredictionResponse)
 async def predict_single_match(
     request: SingleMatchPredictionRequest,
+    model_name: str | None = Query(None, description="用于预测的模型名称"),
 ) -> PredictionResponse:
     """
     单场比赛预测
     """
     try:
-        # 模拟预测逻辑
         prediction_id = str(uuid4())
 
-        # 这里应该调用实际的预测模型
-        # model_result = await prediction_service.predict(request)
+        # 1. Get Prediction
+        probabilities = prediction_service.predict(
+            request.model_dump(), model_name=model_name
+        )
+        # Probabilities are for [Home, Draw, Away]
+        outcome_map = {0: "home_win", 1: "draw", 2: "away_win"}
+        predicted_index = probabilities[0].argmax()
+        predicted_outcome = outcome_map[predicted_index]
+        confidence = float(probabilities[0].max())
 
-        # 临时返回模拟数据
+        # 3. Format Response
         response = PredictionResponse(
             prediction_id=prediction_id,
             home_team=request.home_team,
             away_team=request.away_team,
             match_date=request.match_date,
-            predicted_outcome="home_win",  # 模拟预测结果
-            confidence=0.75,  # 模拟置信度
+            predicted_outcome=predicted_outcome,
+            confidence=confidence,
             created_at=datetime.now(),
         )
 
@@ -99,26 +112,41 @@ async def predict_single_match(
 @router.post("/predict/batch", response_model=BatchPredictionResponse)
 async def predict_batch_matches(
     request: BatchMatchPredictionRequest,
+    model_name: str | None = Query(None, description="用于预测的模型名称"),
 ) -> BatchPredictionResponse:
     """
     批量比赛预测
     """
     try:
         predictions = []
+        outcome_map = {0: "home_win", 1: "draw", 2: "away_win"}
 
-        for match in request.matches:
+        matches_data = [match.model_dump() for match in request.matches]
+        if not matches_data:
+            return BatchPredictionResponse(
+                predictions=[],
+                total_matches=0,
+                processed_at=datetime.now(),
+            )
+
+        all_probabilities = prediction_service.predict_batch(
+            matches_data, model_name=model_name
+        )
+
+        for i, match in enumerate(request.matches):
             prediction_id = str(uuid4())
-
-            # 这里应该调用实际的预测模型
-            # model_result = await prediction_service.predict(match)
+            probabilities = all_probabilities[i]
+            predicted_index = probabilities.argmax()
+            predicted_outcome = outcome_map[predicted_index]
+            confidence = float(probabilities.max())
 
             prediction = PredictionResponse(
                 prediction_id=prediction_id,
                 home_team=match.home_team,
                 away_team=match.away_team,
                 match_date=match.match_date,
-                predicted_outcome="draw",  # 模拟预测结果
-                confidence=0.68,  # 模拟置信度
+                predicted_outcome=predicted_outcome,
+                confidence=confidence,
                 created_at=datetime.now(),
             )
             predictions.append(prediction)
@@ -148,7 +176,9 @@ async def get_prediction_history(
     """
     try:
         # 这里应该从数据库查询历史记录
-        # history = await prediction_service.get_history(limit=limit, offset=offset)
+        # history = await prediction_service.get_history(
+        #     limit=limit, offset=offset
+        # )
 
         # 临时返回模拟数据
         mock_history = [

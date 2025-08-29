@@ -1,31 +1,31 @@
 import argparse
-import logging
 import os
 
 import pandas as pd
 import psycopg2
+import structlog
+from dotenv import load_dotenv
 from psycopg2.extras import execute_batch
 
+from apps.api.core.logging import setup_logging
 from data_pipeline.transforms.feature_engineer import generate_features
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-)
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger()
 
 
 def fetch_source_data(db_conn_str: str) -> pd.DataFrame:
     """Fetches all odds data from the database."""
-    query = "SELECT match_id, bookmaker, home_odds, draw_odds, away_odds FROM odds;"
+    query = (
+        "SELECT match_id, provider AS bookmaker, h AS home_odds, "
+        "d AS draw_odds, a AS away_odds FROM odds;"
+    )
     try:
         with psycopg2.connect(db_conn_str) as conn:
             df = pd.read_sql_query(query, conn)  # type: ignore[call-overload]
-            logger.info(f"Fetched {len(df)} odds records from the database.")
+            logger.info("Fetched odds records from the database.", records=len(df))
             return df  # type: ignore[no-any-return]
     except psycopg2.Error as e:
-        logger.error(f"Database error during source data fetch: {e}")
+        logger.error("Database error during source data fetch", error=str(e))
         return pd.DataFrame()
 
 
@@ -33,7 +33,7 @@ def ingest_features_data(
     features_df: pd.DataFrame, db_conn_str: str
 ) -> tuple[int, int]:
     """
-    Ingests features into the features table using an UPSERT operation.
+    Ingests features into the features table using a JSONB payload.
 
     Returns:
         tuple[int, int]: (inserted/updated rows, error count)
@@ -42,55 +42,55 @@ def ingest_features_data(
         logger.info("No features to ingest.")
         return 0, 0
 
+    # Prepare data for JSONB insertion
+    records_to_insert = []
+    for _, row in features_df.iterrows():
+        match_id = row["match_id"]
+        # Convert all other columns to a JSON string
+        payload = row.drop("match_id").to_json()
+        records_to_insert.append((match_id, payload))
+
     upsert_sql = """
-    INSERT INTO features (
-        match_id, implied_prob_home, implied_prob_draw, implied_prob_away,
-        bookie_margin, odds_spread_home, fav_flag, log_home, log_away,
-        odds_ratio, prob_diff
-    )
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+    INSERT INTO features (match_id, payload_json)
+    VALUES (%s, %s)
     ON CONFLICT (match_id)
     DO UPDATE SET
-        implied_prob_home = EXCLUDED.implied_prob_home,
-        implied_prob_draw = EXCLUDED.implied_prob_draw,
-        implied_prob_away = EXCLUDED.implied_prob_away,
-        bookie_margin = EXCLUDED.bookie_margin,
-        odds_spread_home = EXCLUDED.odds_spread_home,
-        fav_flag = EXCLUDED.fav_flag,
-        log_home = EXCLUDED.log_home,
-        log_away = EXCLUDED.log_away,
-        odds_ratio = EXCLUDED.odds_ratio,
-        prob_diff = EXCLUDED.prob_diff;
+        payload_json = EXCLUDED.payload_json;
     """
 
     try:
         with psycopg2.connect(db_conn_str) as conn:
             with conn.cursor() as cur:
-                execute_batch(
-                    cur, upsert_sql, features_df.to_records(index=False).tolist()
-                )
+                execute_batch(cur, upsert_sql, records_to_insert)
                 affected_rows = cur.rowcount
             conn.commit()
             logger.info(
-                f"Successfully ingested/updated {affected_rows} feature records."
+                "Successfully ingested/updated feature records.",
+                affected_rows=affected_rows,
             )
             return affected_rows, 0
     except psycopg2.Error as e:
-        logger.error(f"Database error during feature ingestion: {e}")
+        logger.error("Database error during feature ingestion", error=str(e))
         return 0, len(features_df)
 
 
 def main() -> None:
+    load_dotenv()  # Load environment variables from .env file
     # Parser is kept for future arguments, but not used for now.
-    argparse.ArgumentParser(description="Generate and ingest features.").parse_args()
+    parser = argparse.ArgumentParser(description="Generate and ingest features.")
+    parser.parse_args()
 
-    db_conn_str = os.environ.get(
-        "DATABASE_URL", "postgresql://postgres:password@localhost:5432/sports"
-    )
+    db_conn_str = os.environ.get("DATABASE_URL")
+    if not db_conn_str:
+        raise ValueError("DATABASE_URL not found in environment variables.")
+
+    # For local script execution, connect to localhost, not the Docker service
+    # name
+    db_conn_str_local = db_conn_str.replace("@db:", "@localhost:")
 
     logger.info("Starting feature generation and ingestion process.")
     # 1. Fetch source data
-    odds_df = fetch_source_data(db_conn_str)
+    odds_df = fetch_source_data(db_conn_str_local)
     if odds_df.empty:
         logger.warning("Source data is empty. Exiting.")
         return
@@ -102,12 +102,13 @@ def main() -> None:
         return
 
     # 3. Ingest features
-    affected, discarded = ingest_features_data(features_df, db_conn_str)
+    affected, discarded = ingest_features_data(features_df, db_conn_str_local)
 
     logger.info("Feature ingestion summary:")
-    logger.info(f"  - Affected (Inserted/Updated): {affected}")
-    logger.info(f"  - Discarded: {discarded}")
+    logger.info("  - Affected (Inserted/Updated)", count=affected)
+    logger.info("  - Discarded", count=discarded)
 
 
 if __name__ == "__main__":
+    setup_logging()
     main()
