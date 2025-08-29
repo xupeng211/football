@@ -46,7 +46,7 @@ make ci                          # 验证环境并运行完整检查
 python scripts/automated_test_report.py
 
 # 📊 查看测试覆盖率报告
-make test-coverage                    
+make test-coverage
 
 # ⚡ 性能基准测试
 pytest tests/performance/ -v
@@ -495,7 +495,7 @@ make ci                               # 包含linting、类型检查的完整CI
 
 # 🆕 企业级测试套件
 pytest tests/unit/ -v                 # 单元测试
-pytest tests/integration/ -v          # 集成测试  
+pytest tests/integration/ -v          # 集成测试
 pytest tests/performance/ -v          # 性能基准测试
 ```
 
