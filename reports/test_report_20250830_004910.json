@@ -1,0 +1,330 @@
+{
+  "timestamp": "2025-08-30T00:49:10.121416",
+  "project": "football-predict-system",
+  "test_results": {
+    "exit_code": 1,
+    "stdout": "============================= test session starts ==============================\nplatform linux -- Python 3.11.9, pytest-8.4.1, pluggy-1.6.0 -- /home/user/projects/football-predict-system/.venv/bin/python3\ncachedir: .pytest_cache\nhypothesis profile 'default'\nrootdir: /home/user/projects/football-predict-system\nconfigfile: pyproject.toml\nplugins: anyio-3.7.1, cov-6.2.1, asyncio-1.1.0, xdist-3.8.0, hypothesis-6.138.7, mock-3.14.1\nasyncio: mode=Mode.AUTO, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function\ncreated: 4/4 workers\n4 workers [80 items]\n\nscheduling tests via LoadScheduling\n\ntests/unit/models/test_predictor_simple.py::TestPredictorSimple::test_create_feature_vector \ntests/unit/trainer/test_fit_xgb_simple.py::TestXGBoostTrainerSimple::test_save_model_and_metrics \ntests/unit/data_pipeline/test_feature_engineer_simple.py::TestFeatureEngineerSimple::test_aggregate_odds_single_bookmaker \ntests/unit/data_pipeline/test_sources_simple.py::TestOddsFetcher::test_odds_data_validation \n[gw3] [  1%] PASSED tests/unit/data_pipeline/test_sources_simple.py::TestOddsFetcher::test_odds_data_validation \ntests/unit/data_pipeline/test_sources_simple.py::TestFootballAPI::test_import_football_api \n[gw3] [  2%] PASSED tests/unit/data_pipeline/test_sources_simple.py::TestFootballAPI::test_import_football_api \ntests/unit/data_pipeline/test_sources_simple.py::TestFootballAPI::test_football_api_async_functionality \n[gw3] [  3%] PASSED tests/unit/data_pipeline/test_sources_simple.py::TestFootballAPI::test_football_api_async_functionality \ntests/unit/data_pipeline/test_sources_simple.py::TestFootballAPI::test_api_error_handling \n[gw2] [  5%] PASSED tests/unit/trainer/test_fit_xgb_simple.py::TestXGBoostTrainerSimple::test_save_model_and_metrics \n[gw1] [  6%] PASSED tests/unit/models/test_predictor_simple.py::TestPredictorSimple::test_create_feature_vector \ntests/unit/models/test_predictor_simple.py::TestPredictorSimple::test_predictor_missing_data_error \n[gw3] [  7%] PASSED tests/unit/data_pipeline/test_sources_simple.py::TestFootballAPI::test_api_error_handling \ntests/unit/trainer/test_fit_xgb_simple.py::TestXGBoostTrainerSimple::test_train_xgboost_model_custom_config \n[gw0] [  8%] PASSED tests/unit/data_pipeline/test_feature_engineer_simple.py::TestFeatureEngineerSimple::test_aggregate_odds_single_bookmaker \ntests/unit/data_pipeline/test_feature_engineer_simple.py::TestFeatureEngineerSimple::test_calculate_implied_probabilities \n[gw0] [ 10%] PASSED tests/unit/data_pipeline/test_feature_engineer_simple.py::TestFeatureEngineerSimple::test_calculate_implied_probabilities \ntests/unit/data_pipeline/test_feature_engineer_simple.py::TestFeatureEngineerSimple::test_calculate_implied_probabilities_edge_cases \n[gw0] [ 11%] PASSED tests/unit/data_pipeline/test_feature_engineer_simple.py::TestFeatureEngineerSimple::test_calculate_implied_probabilities_edge_cases \ntests/unit/trainer/test_fit_xgb_simple.py::TestXGBoostTrainerSimple::test_evaluate_model \ntests/unit/data_pipeline/test_sources_simple.py::TestIngestMatches::test_import_ingest_matches \n[gw3] [ 12%] PASSED tests/unit/data_pipeline/test_sources_simple.py::TestIngestMatches::test_import_ingest_matches \ntests/unit/data_pipeline/test_sources_simple.py::TestIngestMatches::test_database_connection_logic \n[gw3] [ 13%] PASSED tests/unit/data_pipeline/test_sources_simple.py::TestIngestMatches::test_database_connection_logic \ntests/unit/data_pipeline/test_sources_simple.py::TestIngestMatches::test_match_data_validation \n[gw3] [ 15%] PASSED tests/unit/data_pipeline/test_sources_simple.py::TestIngestMatches::test_match_data_validation \ntests/unit/data_pipeline/test_sources_simple.py::TestIngestOdds::test_import_ingest_odds \n[gw1] [ 16%] PASSED tests/unit/models/test_predictor_simple.py::TestPredictorSimple::test_predictor_missing_data_error \n[gw0] [ 17%] PASSED tests/unit/trainer/test_fit_xgb_simple.py::TestXGBoostTrainerSimple::test_evaluate_model \ntests/unit/models/test_predictor_simple.py::TestPredictorSimple::test_predictor_with_stub_model \n[gw1] [ 18%] PASSED tests/unit/models/test_predictor_simple.py::TestPredictorSimple::test_predictor_with_stub_model \ntests/unit/models/test_predictor_simple.py::TestPredictorSimple::test_stub_model_predict \n[gw1] [ 20%] PASSED tests/unit/models/test_predictor_simple.py::TestPredictorSimple::test_stub_model_predict \ntests/unit/data_pipeline/test_feature_engineer_simple.py::TestFeatureEngineerSimple::test_aggregate_odds \ntests/unit/trainer/test_fit_xgb_simple.py::TestXGBoostTrainerSimple::test_evaluate_model_feature_importance \n[gw1] [ 21%] PASSED tests/unit/data_pipeline/test_feature_engineer_simple.py::TestFeatureEngineerSimple::test_aggregate_odds \ntests/unit/models/test_registry_simple.py::TestModelRegistry::test_model_registry_with_temp_directory \n[gw0] [ 22%] PASSED tests/unit/trainer/test_fit_xgb_simple.py::TestXGBoostTrainerSimple::test_evaluate_model_feature_importance \ntests/unit/data_pipeline/test_sources_simple.py::TestDataPipelineIntegration::test_data_flow_structure \n[gw0] [ 23%] PASSED tests/unit/data_pipeline/test_sources_simple.py::TestDataPipelineIntegration::test_data_flow_structure \ntests/unit/data_pipeline/test_sources_simple.py::TestDataPipelineIntegration::test_error_recovery_mechanisms \n[gw0] [ 25%] PASSED tests/unit/data_pipeline/test_sources_simple.py::TestDataPipelineIntegration::test_error_recovery_mechanisms \ntests/unit/models/test_registry_simple.py::TestModelRegistry::test_import_model_registry \n[gw0] [ 26%] PASSED tests/unit/models/test_registry_simple.py::TestModelRegistry::test_import_model_registry \ntests/unit/models/test_registry_simple.py::TestModelRegistry::test_model_registry_initialization \n[gw3] [ 27%] PASSED tests/unit/data_pipeline/test_sources_simple.py::TestIngestOdds::test_import_ingest_odds \ntests/unit/data_pipeline/test_sources_simple.py::TestIngestOdds::test_odds_data_processing \n[gw3] [ 28%] PASSED tests/unit/data_pipeline/test_sources_simple.py::TestIngestOdds::test_odds_data_processing \ntests/unit/data_pipeline/test_sources_simple.py::TestIngestOdds::test_bookmaker_aggregation_logic \n[gw3] [ 30%] PASSED tests/unit/data_pipeline/test_sources_simple.py::TestIngestOdds::test_bookmaker_aggregation_logic \n[gw1] [ 31%] FAILED tests/unit/models/test_registry_simple.py::TestModelRegistry::test_model_registry_with_temp_directory \ntests/unit/models/test_registry_simple.py::TestModelMetrics::test_model_benchmarking \ntests/unit/models/test_registry_simple.py::TestModelRegistry::test_model_metadata_loading \n[gw3] [ 32%] PASSED tests/unit/models/test_registry_simple.py::TestModelMetrics::test_model_benchmarking \ntests/unit/models/test_registry_simple.py::TestModelMetrics::test_model_deployment_readiness \n[gw3] [ 33%] PASSED tests/unit/models/test_registry_simple.py::TestModelMetrics::test_model_deployment_readiness \n[gw1] [ 35%] PASSED tests/unit/models/test_registry_simple.py::TestModelRegistry::test_model_metadata_loading \ntests/unit/apps/backtest/test_engine_simple.py::TestBacktestEngine::test_import_backtest_engine \ntests/unit/models/test_registry_simple.py::TestModelRegistry::test_model_version_handling \n[gw1] [ 36%] PASSED tests/unit/models/test_registry_simple.py::TestModelRegistry::test_model_version_handling \n[gw3] [ 37%] PASSED tests/unit/apps/backtest/test_engine_simple.py::TestBacktestEngine::test_import_backtest_engine \ntests/unit/apps/backtest/test_engine_simple.py::TestBacktestEngine::test_backtest_engine_initialization \n[gw3] [ 38%] SKIPPED tests/unit/apps/backtest/test_engine_simple.py::TestBacktestEngine::test_backtest_engine_initialization \ntests/unit/models/test_registry_simple.py::TestModelRegistry::test_model_saving_logic \n[gw1] [ 40%] PASSED tests/unit/models/test_registry_simple.py::TestModelRegistry::test_model_saving_logic \ntests/unit/apps/backtest/test_engine_simple.py::TestBacktestEngine::test_risk_metrics_calculation \n[gw3] [ 41%] PASSED tests/unit/apps/backtest/test_engine_simple.py::TestBacktestEngine::test_risk_metrics_calculation \ntests/unit/apps/backtest/test_engine_simple.py::TestBacktestStrategy::test_confidence_based_strategy \n[gw3] [ 42%] PASSED tests/unit/apps/backtest/test_engine_simple.py::TestBacktestStrategy::test_confidence_based_strategy \ntests/unit/apps/backtest/test_engine_simple.py::TestBacktestStrategy::test_value_betting_strategy \n[gw3] [ 43%] PASSED tests/unit/apps/backtest/test_engine_simple.py::TestBacktestStrategy::test_value_betting_strategy \ntests/unit/apps/backtest/test_engine_simple.py::TestBacktestStrategy::test_bankroll_management \n[gw3] [ 45%] PASSED tests/unit/apps/backtest/test_engine_simple.py::TestBacktestStrategy::test_bankroll_management \ntests/unit/apps/backtest/test_engine_simple.py::TestBacktestStrategy::test_stop_loss_mechanism \n[gw3] [ 46%] PASSED tests/unit/apps/backtest/test_engine_simple.py::TestBacktestStrategy::test_stop_loss_mechanism \ntests/unit/apps/backtest/test_engine_simple.py::TestBacktestEngine::test_historical_data_processing \n[gw1] [ 47%] PASSED tests/unit/apps/backtest/test_engine_simple.py::TestBacktestEngine::test_historical_data_processing \ntests/unit/apps/backtest/test_engine_simple.py::TestBacktestReporting::test_performance_summary_generation \n[gw3] [ 48%] PASSED tests/unit/apps/backtest/test_engine_simple.py::TestBacktestReporting::test_performance_summary_generation \ntests/unit/apps/backtest/test_engine_simple.py::TestBacktestReporting::test_monthly_breakdown_analysis \n[gw3] [ 50%] PASSED tests/unit/apps/backtest/test_engine_simple.py::TestBacktestReporting::test_monthly_breakdown_analysis \ntests/unit/apps/backtest/test_engine_simple.py::TestBacktestReporting::test_risk_adjusted_metrics \n[gw3] [ 51%] PASSED tests/unit/apps/backtest/test_engine_simple.py::TestBacktestReporting::test_risk_adjusted_metrics \ntests/unit/apps/api/test_routers_comprehensive.py::TestHealthRouter::test_health_router_import \ntests/unit/apps/backtest/test_engine_simple.py::TestBacktestEngine::test_prediction_accuracy_calculation \n[gw0] [ 52%] FAILED tests/unit/models/test_registry_simple.py::TestModelRegistry::test_model_registry_initialization \ntests/unit/models/test_registry_simple.py::TestModelVersioning::test_version_comparison_logic \n[gw0] [ 53%] PASSED tests/unit/models/test_registry_simple.py::TestModelVersioning::test_version_comparison_logic \ntests/unit/models/test_registry_simple.py::TestModelVersioning::test_model_compatibility_check \n[gw0] [ 55%] PASSED tests/unit/models/test_registry_simple.py::TestModelVersioning::test_model_compatibility_check \ntests/unit/models/test_registry_simple.py::TestModelVersioning::test_model_migration_logic \n[gw0] [ 56%] PASSED tests/unit/models/test_registry_simple.py::TestModelVersioning::test_model_migration_logic \ntests/unit/models/test_registry_simple.py::TestModelMetrics::test_model_performance_tracking \n[gw0] [ 57%] PASSED tests/unit/models/test_registry_simple.py::TestModelMetrics::test_model_performance_tracking \ntests/unit/apps/api/test_routers_comprehensive.py::TestHealthRouter::test_health_endpoint_db_failure \n[gw1] [ 58%] FAILED tests/unit/apps/backtest/test_engine_simple.py::TestBacktestEngine::test_prediction_accuracy_calculation \ntests/unit/apps/backtest/test_engine_simple.py::TestBacktestEngine::test_roi_calculation \n[gw1] [ 60%] PASSED tests/unit/apps/backtest/test_engine_simple.py::TestBacktestEngine::test_roi_calculation \ntests/unit/apps/api/test_routers_comprehensive.py::TestPredictionsRouter::test_single_prediction_endpoint \n[gw1] [ 61%] PASSED tests/unit/apps/api/test_routers_comprehensive.py::TestPredictionsRouter::test_single_prediction_endpoint \ntests/unit/apps/api/test_routers_comprehensive.py::TestPredictionsRouter::test_batch_prediction_data_validation \n[gw1] [ 62%] PASSED tests/unit/apps/api/test_routers_comprehensive.py::TestPredictionsRouter::test_batch_prediction_data_validation \ntests/unit/apps/api/test_routers_comprehensive.py::TestPredictionsRouter::test_prediction_error_handling \n[gw1] [ 63%] PASSED tests/unit/apps/api/test_routers_comprehensive.py::TestPredictionsRouter::test_prediction_error_handling \ntests/unit/apps/api/test_routers_comprehensive.py::TestMetricsRouter::test_metrics_router_import \n[gw1] [ 65%] PASSED tests/unit/apps/api/test_routers_comprehensive.py::TestMetricsRouter::test_metrics_router_import \ntests/unit/apps/api/test_routers_comprehensive.py::TestMetricsRouter::test_metrics_endpoint \n[gw1] [ 66%] PASSED tests/unit/apps/api/test_routers_comprehensive.py::TestMetricsRouter::test_metrics_endpoint \ntests/unit/apps/api/test_routers_comprehensive.py::TestMetricsRouter::test_custom_metrics_collection \n[gw1] [ 67%] PASSED tests/unit/apps/api/test_routers_comprehensive.py::TestMetricsRouter::test_custom_metrics_collection \ntests/unit/apps/api/test_routers_comprehensive.py::TestMetricsRouter::test_system_metrics_collection \n[gw1] [ 68%] PASSED tests/unit/apps/api/test_routers_comprehensive.py::TestMetricsRouter::test_system_metrics_collection \ntests/unit/apps/api/test_routers_comprehensive.py::TestAPIMiddleware::test_cors_middleware_functionality \n[gw3] [ 70%] SKIPPED tests/unit/apps/api/test_routers_comprehensive.py::TestHealthRouter::test_health_router_import \ntests/unit/apps/api/test_routers_comprehensive.py::TestHealthRouter::test_health_endpoint_success \n[gw1] [ 71%] PASSED tests/unit/apps/api/test_routers_comprehensive.py::TestAPIMiddleware::test_cors_middleware_functionality \ntests/unit/apps/api/test_routers_comprehensive.py::TestAPIMiddleware::test_error_handling_middleware \n[gw1] [ 72%] PASSED tests/unit/apps/api/test_routers_comprehensive.py::TestAPIMiddleware::test_error_handling_middleware \ntests/unit/apps/api/test_routers_comprehensive.py::TestAPIDocumentation::test_openapi_schema_generation \n[gw1] [ 73%] PASSED tests/unit/apps/api/test_routers_comprehensive.py::TestAPIDocumentation::test_openapi_schema_generation \ntests/unit/apps/api/test_routers_comprehensive.py::TestAPIDocumentation::test_api_documentation_endpoints \n[gw1] [ 75%] PASSED tests/unit/apps/api/test_routers_comprehensive.py::TestAPIDocumentation::test_api_documentation_endpoints \ntests/unit/apps/api/test_routers_comprehensive.py::TestAPIDocumentation::test_api_tags_and_metadata \n[gw1] [ 76%] PASSED tests/unit/apps/api/test_routers_comprehensive.py::TestAPIDocumentation::test_api_tags_and_metadata \ntests/integration/test_api_routes_simple.py::TestAPIRoutes::test_root_endpoint \n[gw1] [ 77%] SKIPPED tests/integration/test_api_routes_simple.py::TestAPIRoutes::test_root_endpoint \ntests/integration/test_api_routes_simple.py::TestAPIRoutes::test_version_endpoint \n[gw1] [ 78%] SKIPPED tests/integration/test_api_routes_simple.py::TestAPIRoutes::test_version_endpoint \ntests/integration/test_api_routes_simple.py::TestAPIRoutes::test_livez_endpoint \n[gw1] [ 80%] SKIPPED tests/integration/test_api_routes_simple.py::TestAPIRoutes::test_livez_endpoint \ntests/integration/test_api_routes_simple.py::TestAPIRoutes::test_readyz_endpoint \n[gw1] [ 81%] SKIPPED tests/integration/test_api_routes_simple.py::TestAPIRoutes::test_readyz_endpoint \ntests/integration/test_api_routes_simple.py::TestAPIRoutes::test_health_endpoint \n[gw1] [ 82%] SKIPPED tests/integration/test_api_routes_simple.py::TestAPIRoutes::test_health_endpoint \ntests/integration/test_api_routes_simple.py::TestAPIRoutes::test_invalid_endpoint \n[gw1] [ 83%] SKIPPED tests/integration/test_api_routes_simple.py::TestAPIRoutes::test_invalid_endpoint \ntests/integration/test_api_routes_simple.py::TestAPIRoutes::test_api_cors_headers \n[gw1] [ 85%] SKIPPED tests/integration/test_api_routes_simple.py::TestAPIRoutes::test_api_cors_headers \ntests/integration/test_api_routes_simple.py::TestAPIRoutes::test_predictions_route_structure \n[gw1] [ 86%] SKIPPED tests/integration/test_api_routes_simple.py::TestAPIRoutes::test_predictions_route_structure \ntests/integration/test_api_routes_simple.py::TestAPIErrorHandling::test_malformed_json_request \n[gw1] [ 87%] SKIPPED tests/integration/test_api_routes_simple.py::TestAPIErrorHandling::test_malformed_json_request \ntests/integration/test_api_routes_simple.py::TestAPIErrorHandling::test_unsupported_method \n[gw1] [ 88%] SKIPPED tests/integration/test_api_routes_simple.py::TestAPIErrorHandling::test_unsupported_method \ntests/integration/test_api_routes_simple.py::TestAPIErrorHandling::test_large_request_body \n[gw1] [ 90%] SKIPPED tests/integration/test_api_routes_simple.py::TestAPIErrorHandling::test_large_request_body \n[gw3] [ 91%] FAILED tests/unit/apps/api/test_routers_comprehensive.py::TestHealthRouter::test_health_endpoint_success \ntests/unit/apps/api/test_routers_comprehensive.py::TestAPIMiddleware::test_request_validation_middleware \n[gw3] [ 92%] PASSED tests/unit/apps/api/test_routers_comprehensive.py::TestAPIMiddleware::test_request_validation_middleware \n[gw0] [ 93%] FAILED tests/unit/apps/api/test_routers_comprehensive.py::TestHealthRouter::test_health_endpoint_db_failure \ntests/unit/apps/api/test_routers_comprehensive.py::TestPredictionsRouter::test_predictions_router_import \n[gw0] [ 95%] PASSED tests/unit/apps/api/test_routers_comprehensive.py::TestPredictionsRouter::test_predictions_router_import \n[gw2] [ 96%] PASSED tests/unit/trainer/test_fit_xgb_simple.py::TestXGBoostTrainerSimple::test_train_xgboost_model_custom_config \ntests/unit/trainer/test_fit_xgb_simple.py::TestXGBoostTrainerSimple::test_train_xgboost_model_default_config \n[gw2] [ 97%] PASSED tests/unit/trainer/test_fit_xgb_simple.py::TestXGBoostTrainerSimple::test_train_xgboost_model_default_config \ntests/unit/data_pipeline/test_sources_simple.py::TestOddsFetcher::test_import_odds_fetcher \n[gw2] [ 98%] SKIPPED tests/unit/data_pipeline/test_sources_simple.py::TestOddsFetcher::test_import_odds_fetcher \ntests/unit/data_pipeline/test_sources_simple.py::TestOddsFetcher::test_odds_fetcher_basic_functionality \n[gw2] [100%] SKIPPED tests/unit/data_pipeline/test_sources_simple.py::TestOddsFetcher::test_odds_fetcher_basic_functionality \n\n=================================== FAILURES ===================================\n__________ TestModelRegistry.test_model_registry_with_temp_directory ___________\n[gw1] linux -- Python 3.11.9 /home/user/projects/football-predict-system/.venv/bin/python3\ntests/unit/models/test_registry_simple.py:53: in test_model_registry_with_temp_directory\n    registry = ModelRegistry(base_path=temp_dir)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE   TypeError: ModelRegistry.__init__() got an unexpected keyword argument 'base_path'\n_____________ TestModelRegistry.test_model_registry_initialization _____________\n[gw0] linux -- Python 3.11.9 /home/user/projects/football-predict-system/.venv/bin/python3\ntests/unit/models/test_registry_simple.py:36: in test_model_registry_initialization\n    registry = ModelRegistry(base_path=\"test/models\")\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE   TypeError: ModelRegistry.__init__() got an unexpected keyword argument 'base_path'\n___________ TestBacktestEngine.test_prediction_accuracy_calculation ____________\n[gw1] linux -- Python 3.11.9 /home/user/projects/football-predict-system/.venv/bin/python3\ntests/unit/apps/backtest/test_engine_simple.py:84: in test_prediction_accuracy_calculation\n    assert accuracy == expected_accuracy\nE   assert 0.7 == 0.6\n________________ TestHealthRouter.test_health_endpoint_success _________________\n[gw3] linux -- Python 3.11.9 /home/user/projects/football-predict-system/.venv/bin/python3\n../../.pyenv/versions/3.11.9/lib/python3.11/unittest/mock.py:1375: in patched\n    with self.decoration_helper(patched,\n../../.pyenv/versions/3.11.9/lib/python3.11/contextlib.py:137: in __enter__\n    return next(self.gen)\n           ^^^^^^^^^^^^^^\n../../.pyenv/versions/3.11.9/lib/python3.11/unittest/mock.py:1357: in decoration_helper\n    arg = exit_stack.enter_context(patching)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n../../.pyenv/versions/3.11.9/lib/python3.11/contextlib.py:517: in enter_context\n    result = _enter(cm)\n             ^^^^^^^^^^\n../../.pyenv/versions/3.11.9/lib/python3.11/unittest/mock.py:1430: in __enter__\n    self.target = self.getter()\n                  ^^^^^^^^^^^^^\n../../.pyenv/versions/3.11.9/lib/python3.11/pkgutil.py:715: in resolve_name\n    result = getattr(result, p)\n             ^^^^^^^^^^^^^^^^^^\nE   AttributeError: module 'apps.api.routers' has no attribute 'health'\n_______________ TestHealthRouter.test_health_endpoint_db_failure _______________\n[gw0] linux -- Python 3.11.9 /home/user/projects/football-predict-system/.venv/bin/python3\n../../.pyenv/versions/3.11.9/lib/python3.11/unittest/mock.py:1375: in patched\n    with self.decoration_helper(patched,\n../../.pyenv/versions/3.11.9/lib/python3.11/contextlib.py:137: in __enter__\n    return next(self.gen)\n           ^^^^^^^^^^^^^^\n../../.pyenv/versions/3.11.9/lib/python3.11/unittest/mock.py:1357: in decoration_helper\n    arg = exit_stack.enter_context(patching)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n../../.pyenv/versions/3.11.9/lib/python3.11/contextlib.py:517: in enter_context\n    result = _enter(cm)\n             ^^^^^^^^^^\n../../.pyenv/versions/3.11.9/lib/python3.11/unittest/mock.py:1430: in __enter__\n    self.target = self.getter()\n                  ^^^^^^^^^^^^^\n../../.pyenv/versions/3.11.9/lib/python3.11/pkgutil.py:715: in resolve_name\n    result = getattr(result, p)\n             ^^^^^^^^^^^^^^^^^^\nE   AttributeError: module 'apps.api.routers' has no attribute 'health'\n- generated xml file: /home/user/projects/football-predict-system/test-results.xml -\n================================ tests coverage ================================\n_______________ coverage: platform linux, python 3.11.9-final-0 ________________\n\nName                                           Stmts   Miss   Cover   Missing\n-----------------------------------------------------------------------------\napps/__init__.py                                   0      0 100.00%\napps/api/__init__.py                               0      0 100.00%\napps/api/core/__init__.py                          0      0 100.00%\napps/api/core/logging.py                          19     10  47.37%   18-30, 51, 56-57, 64-65\napps/api/core/settings.py                         31      4  87.10%   22-25\napps/api/db.py                                    48     32  33.33%   24, 28-31, 39, 48-69, 74-90\napps/api/dependencies/__init__.py                  0      0 100.00%\napps/api/logging_config.py                         6      6   0.00%   1-11\napps/api/main.py                                  51     51   0.00%   7-106\napps/api/model_registry.py                        17     12  29.41%   13-28\napps/api/prefect.py                               32     27  15.62%   7-50\napps/api/redis.py                                 27     27   0.00%   1-41\napps/api/routers/__init__.py                       0      0 100.00%\napps/api/routers/health.py                        35     27  22.86%   15-86\napps/api/routers/metrics.py                       43     15  65.12%   22-23, 69-70, 76-78, 90-104\napps/api/routers/predictions.py                   72     34  52.78%   74-106, 117-149, 160-203\napps/api/services/prediction_service.py           21      9  57.14%   15, 19-21, 25-26, 30-32\napps/backtest/__init__.py                          0      0 100.00%\napps/backtest/engine.py                           65     38  41.54%   49-75, 91-112, 118-134, 138-142, 147-156\napps/backtest/reports/__init__.py                  0      0 100.00%\napps/backtest/strategies/__init__.py               0      0 100.00%\napps/trainer/__init__.py                           0      0 100.00%\napps/trainer/features/__init__.py                  0      0 100.00%\napps/trainer/models/__init__.py                    0      0 100.00%\napps/trainer/pipelines/__init__.py                 0      0 100.00%\napps/trainer/xgboost_trainer.py                   84     84   0.00%   1-153\napps/workers/__init__.py                           0      0 100.00%\napps/workers/flows/__init__.py                     0      0 100.00%\napps/workers/flows/data_collection_flow.py        77     77   0.00%   5-308\napps/workers/tasks/__init__.py                     0      0 100.00%\ndata_pipeline/__init__.py                          0      0 100.00%\ndata_pipeline/contract_validator.py               28     28   0.00%   3-54\ndata_pipeline/feature_store/__init__.py            0      0 100.00%\ndata_pipeline/loaders/__init__.py                  0      0 100.00%\ndata_pipeline/sources/__init__.py                  0      0 100.00%\ndata_pipeline/sources/football_api.py             74     38  48.65%   55-64, 73-74, 93-139, 151-175\ndata_pipeline/sources/ingest_matches.py           44     35  20.45%   14-60, 66-71, 76-82\ndata_pipeline/sources/ingest_odds.py              62     49  20.97%   18-43, 56-104, 108-138\ndata_pipeline/sources/odds_fetcher.py             41     30  26.83%   17-49, 61-78\ndata_pipeline/transforms/__init__.py               0      0 100.00%\ndata_pipeline/transforms/feature_engineer.py      24     11  54.17%   71-113\ndata_pipeline/transforms/ingest_features.py       64     64   0.00%   1-111\nevaluation/__init__.py                             0      0 100.00%\ninfra/__init__.py                                  0      0 100.00%\nmodels/__init__.py                                 0      0 100.00%\nmodels/artifacts/__init__.py                       0      0 100.00%\nmodels/predictor.py                               95     18  81.05%   48, 61, 69, 94-99, 111, 121, 130-131, 135-141\nmodels/registry.py                               154     99  35.71%   51-52, 88-93, 97-98, 117-170, 175-186, 199-223, 227, 231-234, 238-257, 261-282, 286-303, 312-322\nruns_logger.py                                    26     26   0.00%   3-63\ntrainer/fit_xgb.py                                92     45  51.09%   33-69, 149, 168-215\n-----------------------------------------------------------------------------\nTOTAL                                           1332    896  32.73%\nCoverage HTML written to dir htmlcov-report\nCoverage XML written to file coverage-report.xml\nCoverage JSON written to file coverage-report.json\n=========================== short test summary info ============================\nFAILED tests/unit/models/test_registry_simple.py::TestModelRegistry::test_model_registry_with_temp_directory - TypeError: ModelRegistry.__init__() got an unexpected keyword argument 'base_path'\nFAILED tests/unit/models/test_registry_simple.py::TestModelRegistry::test_model_registry_initialization - TypeError: ModelRegistry.__init__() got an unexpected keyword argument 'base_path'\nFAILED tests/unit/apps/backtest/test_engine_simple.py::TestBacktestEngine::test_prediction_accuracy_calculation - assert 0.7 == 0.6\nFAILED tests/unit/apps/api/test_routers_comprehensive.py::TestHealthRouter::test_health_endpoint_success - AttributeError: module 'apps.api.routers' has no attribute 'health'\nFAILED tests/unit/apps/api/test_routers_comprehensive.py::TestHealthRouter::test_health_endpoint_db_failure - AttributeError: module 'apps.api.routers' has no attribute 'health'\n============= 5 failed, 60 passed, 15 skipped, 7 warnings in 5.14s =============\n",
+    "stderr": "",
+    "success": false,
+    "statistics": {
+      "total_tests": 0,
+      "passed_tests": 0,
+      "failed_tests": 0,
+      "error_tests": 0,
+      "skipped_tests": 0,
+      "execution_time": 0.0,
+      "success_rate": 0,
+      "failed_test_details": [
+        {
+          "name": "test_model_registry_with_temp_directory",
+          "classname": "tests.unit.models.test_registry_simple.TestModelRegistry",
+          "time": 0.004,
+          "error_type": null,
+          "message": "tests/unit/models/test_registry_simple.py:53: in test_model_registry_with_temp_directory\n    registry = ModelRegistry(base_path=temp_dir)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE   TypeError..."
+        },
+        {
+          "name": "test_model_registry_initialization",
+          "classname": "tests.unit.models.test_registry_simple.TestModelRegistry",
+          "time": 0.003,
+          "error_type": null,
+          "message": "tests/unit/models/test_registry_simple.py:36: in test_model_registry_initialization\n    registry = ModelRegistry(base_path=\"test/models\")\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE   Type..."
+        },
+        {
+          "name": "test_prediction_accuracy_calculation",
+          "classname": "tests.unit.apps.backtest.test_engine_simple.TestBacktestEngine",
+          "time": 0.001,
+          "error_type": null,
+          "message": "tests/unit/apps/backtest/test_engine_simple.py:84: in test_prediction_accuracy_calculation\n    assert accuracy == expected_accuracy\nE   assert 0.7 == 0.6..."
+        },
+        {
+          "name": "test_health_endpoint_db_failure",
+          "classname": "tests.unit.apps.api.test_routers_comprehensive.TestHealthRouter",
+          "time": 0.219,
+          "error_type": null,
+          "message": "../../.pyenv/versions/3.11.9/lib/python3.11/unittest/mock.py:1375: in patched\n    with self.decoration_helper(patched,\n../../.pyenv/versions/3.11.9/lib/python3.11/contextlib.py:137: in __enter__\n    r..."
+        },
+        {
+          "name": "test_health_endpoint_success",
+          "classname": "tests.unit.apps.api.test_routers_comprehensive.TestHealthRouter",
+          "time": 0.003,
+          "error_type": null,
+          "message": "../../.pyenv/versions/3.11.9/lib/python3.11/unittest/mock.py:1375: in patched\n    with self.decoration_helper(patched,\n../../.pyenv/versions/3.11.9/lib/python3.11/contextlib.py:137: in __enter__\n    r..."
+        }
+      ]
+    }
+  },
+  "coverage": {
+    "summary": {
+      "overall_coverage": 32.73,
+      "lines_covered": 436,
+      "lines_total": 1332,
+      "missing_lines": 896,
+      "excluded_lines": 77
+    },
+    "by_file": {
+      "apps/__init__.py": {
+        "coverage": 100.0,
+        "lines_covered": 0,
+        "lines_total": 0
+      },
+      "apps/api/__init__.py": {
+        "coverage": 100.0,
+        "lines_covered": 0,
+        "lines_total": 0
+      },
+      "apps/api/core/__init__.py": {
+        "coverage": 100.0,
+        "lines_covered": 0,
+        "lines_total": 0
+      },
+      "apps/api/core/logging.py": {
+        "coverage": 47.37,
+        "lines_covered": 9,
+        "lines_total": 19
+      },
+      "apps/api/core/settings.py": {
+        "coverage": 87.1,
+        "lines_covered": 27,
+        "lines_total": 31
+      },
+      "apps/api/db.py": {
+        "coverage": 33.33,
+        "lines_covered": 16,
+        "lines_total": 48
+      },
+      "apps/api/dependencies/__init__.py": {
+        "coverage": 100.0,
+        "lines_covered": 0,
+        "lines_total": 0
+      },
+      "apps/api/logging_config.py": {
+        "coverage": 0.0,
+        "lines_covered": 0,
+        "lines_total": 6
+      },
+      "apps/api/main.py": {
+        "coverage": 0.0,
+        "lines_covered": 0,
+        "lines_total": 51
+      },
+      "apps/api/model_registry.py": {
+        "coverage": 29.41,
+        "lines_covered": 5,
+        "lines_total": 17
+      },
+      "apps/api/prefect.py": {
+        "coverage": 15.62,
+        "lines_covered": 5,
+        "lines_total": 32
+      },
+      "apps/api/redis.py": {
+        "coverage": 0.0,
+        "lines_covered": 0,
+        "lines_total": 27
+      },
+      "apps/api/routers/__init__.py": {
+        "coverage": 100.0,
+        "lines_covered": 0,
+        "lines_total": 0
+      },
+      "apps/api/routers/health.py": {
+        "coverage": 22.86,
+        "lines_covered": 8,
+        "lines_total": 35
+      },
+      "apps/api/routers/metrics.py": {
+        "coverage": 65.12,
+        "lines_covered": 28,
+        "lines_total": 43
+      },
+      "apps/api/routers/predictions.py": {
+        "coverage": 52.78,
+        "lines_covered": 38,
+        "lines_total": 72
+      },
+      "apps/api/services/prediction_service.py": {
+        "coverage": 57.14,
+        "lines_covered": 12,
+        "lines_total": 21
+      },
+      "apps/backtest/__init__.py": {
+        "coverage": 100.0,
+        "lines_covered": 0,
+        "lines_total": 0
+      },
+      "apps/backtest/engine.py": {
+        "coverage": 41.54,
+        "lines_covered": 27,
+        "lines_total": 65
+      },
+      "apps/backtest/reports/__init__.py": {
+        "coverage": 100.0,
+        "lines_covered": 0,
+        "lines_total": 0
+      },
+      "apps/backtest/strategies/__init__.py": {
+        "coverage": 100.0,
+        "lines_covered": 0,
+        "lines_total": 0
+      },
+      "apps/trainer/__init__.py": {
+        "coverage": 100.0,
+        "lines_covered": 0,
+        "lines_total": 0
+      },
+      "apps/trainer/features/__init__.py": {
+        "coverage": 100.0,
+        "lines_covered": 0,
+        "lines_total": 0
+      },
+      "apps/trainer/models/__init__.py": {
+        "coverage": 100.0,
+        "lines_covered": 0,
+        "lines_total": 0
+      },
+      "apps/trainer/pipelines/__init__.py": {
+        "coverage": 100.0,
+        "lines_covered": 0,
+        "lines_total": 0
+      },
+      "apps/trainer/xgboost_trainer.py": {
+        "coverage": 0.0,
+        "lines_covered": 0,
+        "lines_total": 84
+      },
+      "apps/workers/__init__.py": {
+        "coverage": 100.0,
+        "lines_covered": 0,
+        "lines_total": 0
+      },
+      "apps/workers/flows/__init__.py": {
+        "coverage": 100.0,
+        "lines_covered": 0,
+        "lines_total": 0
+      },
+      "apps/workers/flows/data_collection_flow.py": {
+        "coverage": 0.0,
+        "lines_covered": 0,
+        "lines_total": 77
+      },
+      "apps/workers/tasks/__init__.py": {
+        "coverage": 100.0,
+        "lines_covered": 0,
+        "lines_total": 0
+      },
+      "data_pipeline/__init__.py": {
+        "coverage": 100.0,
+        "lines_covered": 0,
+        "lines_total": 0
+      },
+      "data_pipeline/contract_validator.py": {
+        "coverage": 0.0,
+        "lines_covered": 0,
+        "lines_total": 28
+      },
+      "data_pipeline/feature_store/__init__.py": {
+        "coverage": 100.0,
+        "lines_covered": 0,
+        "lines_total": 0
+      },
+      "data_pipeline/loaders/__init__.py": {
+        "coverage": 100.0,
+        "lines_covered": 0,
+        "lines_total": 0
+      },
+      "data_pipeline/sources/__init__.py": {
+        "coverage": 100.0,
+        "lines_covered": 0,
+        "lines_total": 0
+      },
+      "data_pipeline/sources/football_api.py": {
+        "coverage": 48.65,
+        "lines_covered": 36,
+        "lines_total": 74
+      },
+      "data_pipeline/sources/ingest_matches.py": {
+        "coverage": 20.45,
+        "lines_covered": 9,
+        "lines_total": 44
+      },
+      "data_pipeline/sources/ingest_odds.py": {
+        "coverage": 20.97,
+        "lines_covered": 13,
+        "lines_total": 62
+      },
+      "data_pipeline/sources/odds_fetcher.py": {
+        "coverage": 26.83,
+        "lines_covered": 11,
+        "lines_total": 41
+      },
+      "data_pipeline/transforms/__init__.py": {
+        "coverage": 100.0,
+        "lines_covered": 0,
+        "lines_total": 0
+      },
+      "data_pipeline/transforms/feature_engineer.py": {
+        "coverage": 54.17,
+        "lines_covered": 13,
+        "lines_total": 24
+      },
+      "data_pipeline/transforms/ingest_features.py": {
+        "coverage": 0.0,
+        "lines_covered": 0,
+        "lines_total": 64
+      },
+      "evaluation/__init__.py": {
+        "coverage": 100.0,
+        "lines_covered": 0,
+        "lines_total": 0
+      },
+      "infra/__init__.py": {
+        "coverage": 100.0,
+        "lines_covered": 0,
+        "lines_total": 0
+      },
+      "models/__init__.py": {
+        "coverage": 100.0,
+        "lines_covered": 0,
+        "lines_total": 0
+      },
+      "models/artifacts/__init__.py": {
+        "coverage": 100.0,
+        "lines_covered": 0,
+        "lines_total": 0
+      },
+      "models/predictor.py": {
+        "coverage": 81.05,
+        "lines_covered": 77,
+        "lines_total": 95
+      },
+      "models/registry.py": {
+        "coverage": 35.71,
+        "lines_covered": 55,
+        "lines_total": 154
+      },
+      "runs_logger.py": {
+        "coverage": 0.0,
+        "lines_covered": 0,
+        "lines_total": 26
+      },
+      "trainer/fit_xgb.py": {
+        "coverage": 51.09,
+        "lines_covered": 47,
+        "lines_total": 92
+      }
+    }
+  },
+  "summary": {
+    "quality_score": 0,
+    "grade": "D (需改进)",
+    "total_tests": 0,
+    "success_rate": 0,
+    "coverage_rate": 32.73,
+    "execution_time": 0.0,
+    "recommendations": [
+      "修复失败的测试用例",
+      "提升测试覆盖率到85%以上",
+      "增加更多测试用例"
+    ]
+  }
+}

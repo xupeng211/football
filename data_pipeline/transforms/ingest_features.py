@@ -1,4 +1,5 @@
 import argparse
+import json
 import os
 
 import pandas as pd
@@ -17,7 +18,7 @@ def fetch_source_data(db_conn_str: str) -> pd.DataFrame:
     """Fetches all odds data from the database."""
     query = (
         "SELECT match_id, provider AS bookmaker, h AS home_odds, "
-        "d AS draw_odds, a AS away_odds FROM odds;"
+        "d AS draw_odds, a AS away_odds FROM odds_raw;"
     )
     try:
         with psycopg2.connect(db_conn_str) as conn:
@@ -45,9 +46,10 @@ def ingest_features_data(
     # Prepare data for JSONB insertion
     records_to_insert = []
     for _, row in features_df.iterrows():
-        match_id = row["match_id"]
-        # Convert all other columns to a JSON string
-        payload = row.drop("match_id").to_json()
+        match_id = int(row["match_id"])
+        # Convert row to dict, which handles numpy types, then to JSON string
+        payload_dict = row.drop("match_id").to_dict()
+        payload = json.dumps(payload_dict)
         records_to_insert.append((match_id, payload))
 
     upsert_sql = """

@@ -1,281 +1,159 @@
-"""
-足球比赛结果预测器
-
-加载训练好的模型并提供预测接口
-"""
-
 import json
+import pickle
+import warnings
 from pathlib import Path
 from typing import Any
 
+import joblib
+import numpy as np
 import pandas as pd
+import structlog
 
-from data_pipeline.features.build import create_feature_vector
+logger = structlog.get_logger()
+
+
+def _create_feature_vector(data: dict[str, Any]) -> pd.DataFrame:
+    """Creates a feature vector from raw odds data for real-time prediction."""
+    df = pd.DataFrame([data])
+
+    # 1. Calculate implied probabilities and bookie margin
+    df["implied_prob_home"] = 1 / df["home_odds"]
+    df["implied_prob_draw"] = 1 / df["draw_odds"]
+    df["implied_prob_away"] = 1 / df["away_odds"]
+    df["bookie_margin"] = (
+        df["implied_prob_home"] + df["implied_prob_draw"] + df["implied_prob_away"] - 1
+    )
+
+    # 2. Add additional features (matching feature_engineer.py)
+    df["odds_spread_home"] = df["home_odds"] - df["away_odds"]
+    df["fav_flag"] = (df["home_odds"] < df["away_odds"]).astype(int)
+    df["log_home"] = np.log(df["home_odds"])
+    df["log_away"] = np.log(df["away_odds"])
+    df["odds_ratio"] = df["home_odds"] / df["away_odds"]
+    df["prob_diff"] = df["implied_prob_home"] - df["implied_prob_away"]
+
+    return df
 
 
 class Predictor:
-    """足球比赛结果预测器"""
+    """Loads a trained model and makes predictions."""
 
-    def __init__(self, model_path: str | None = None):
-        """
-        初始化预测器
-
-        Args:
-            model_path: 模型文件路径,如果为None则加载最新模型
-        """
+    def __init__(self, model_dir: str | Path | None = None):
         self.model: Any = None
+        self.label_encoder: Any = None
         self.model_version: str | None = None
-        self.feature_columns: list[str] | None = None
+        self.feature_names: list[str] = []
 
-        # 立即加载模型
-        if model_path:
-            self.model = _safe_load_or_stub(model_path)
-            self.model_version = (
-                model_path.split("/")[-1] if "/" in model_path else model_path
-            )
+        if model_dir:
+            self.load_model(Path(model_dir))
         else:
-            # 尝试加载最新模型,失败则使用stub
-            latest_model_path = self._find_latest_model()
-            if latest_model_path:
-                self.model = _safe_load_or_stub(latest_model_path)
-                self.model_version = (
-                    latest_model_path.split("/")[-1]
-                    if "/" in latest_model_path
-                    else "latest"
-                )
+            latest_model_dir = self._find_latest_model_dir()
+            if latest_model_dir:
+                self.load_model(latest_model_dir)
             else:
-                self.model = _safe_load_or_stub(None)  # 这会返回StubModel
-                self.model_version = "stub-default"
+                warnings.warn("No trained model found, using stub.", stacklevel=2)
+                self._use_stub_model()
 
-    def _find_latest_model(self) -> str | None:
-        """查找最新的模型文件"""
-        models_dir = Path("models")
-        if not models_dir.exists():
+    def _find_latest_model_dir(self) -> Path | None:
+        """Finds the directory of the latest model in models/artifacts."""
+        artifacts_dir = Path("models/artifacts")
+        if not artifacts_dir.exists():
             return None
 
-        # 查找所有模型目录
-        model_dirs = [d for d in models_dir.iterdir() if d.is_dir()]
+        model_dirs = [
+            d
+            for d in artifacts_dir.iterdir()
+            if d.is_dir() and not d.name.startswith((".", "__"))
+        ]
         if not model_dirs:
             return None
 
-        # 按创建时间排序,选择最新的
-        latest_dir = max(model_dirs, key=lambda x: x.stat().st_ctime)
+        latest_dir = max(model_dirs, key=lambda d: d.stat().st_mtime)
+        return latest_dir
 
-        model_file = latest_dir / "model.pkl"
-        if model_file.exists():
-            return str(model_file)
-
-        return None
-
-    def load_model(self, model_path: str) -> None:
-        """
-        加载模型
-
-        Args:
-            model_path: 模型文件路径
-        """
+    def load_model(self, model_dir: Path) -> None:
+        """Loads model, encoder, and feature names from a directory."""
         try:
-            self.model = _safe_load_or_stub(model_path)
+            # Load model
+            model_path = model_dir / "model.xgb"
+            self.model = joblib.load(model_path)
 
-            # 获取模型版本信息
-            model_dir = Path(model_path).parent
+            # Load label encoder
+            encoder_path = model_dir / "label_encoder.pkl"
+            with open(encoder_path, "rb") as f:
+                self.label_encoder = pickle.load(f)
+
+            # Load feature names
+            features_path = model_dir / "features.json"
+            with open(features_path) as f:
+                self.feature_names = json.load(f)
+
             self.model_version = model_dir.name
+            logger.info("Successfully loaded model", version=self.model_version)
 
-            # 尝试加载特征列信息
-            metrics_file = model_dir / "metrics.json"
-            if metrics_file.exists():
-                with open(metrics_file, encoding="utf-8") as f:
-                    metrics = json.load(f)
-                    if "feature_importance" in metrics:
-                        self.feature_columns = list(
-                            metrics["feature_importance"].keys()
-                        )
-
-            print(f"模型加载成功: {self.model_version}")
-
+        except FileNotFoundError as e:
+            warnings.warn(f"Model files not found in {model_dir}: {e}", stacklevel=2)
+            self._use_stub_model()
         except Exception as e:
-            # 如果加载失败,使用stub模型
-            import warnings
+            warnings.warn(f"Failed to load model from {model_dir}: {e}", stacklevel=2)
+            self._use_stub_model()
 
-            warnings.warn(f"模型加载失败,使用默认模型: {e}", stacklevel=2)
-            self.model = _StubModel()
-            self.model_version = "stub-default"
+    def _use_stub_model(self) -> None:
+        """Falls back to using a stub model."""
+        self.model = _StubModel()
+        self.label_encoder = None
+        self.model_version = "stub-fallback"
+        self.feature_names = []
 
-    def predict_single(
-        self,
-        home_team: str,
-        away_team: str,
-        odds_h: float,
-        odds_d: float,
-        odds_a: float,
-    ) -> dict[str, Any]:
-        """
-        预测单场比赛结果
-
-        Args:
-            home_team: 主队名称
-            away_team: 客队名称
-            odds_h: 主胜赔率
-            odds_d: 平局赔率
-            odds_a: 客胜赔率
-
-        Returns:
-            Dict[str, float]: 预测结果
-
-        Raises:
-            RuntimeError: 当模型未加载时
-            ValueError: 当输入参数无效时
-        """
+    def predict(self, data: dict[str, Any]) -> dict[str, Any]:
+        """Predicts the outcome of a single match."""
         if self.model is None:
-            raise RuntimeError("模型未加载")
+            raise RuntimeError("Predictor is not initialized.")
 
+        # 1. Create feature vector
         try:
-            # 创建特征向量(包含输入验证)
-            features = create_feature_vector(
-                home_team=home_team,
-                away_team=away_team,
-                odds_h=odds_h,
-                odds_d=odds_d,
-                odds_a=odds_a,
+            feature_df = _create_feature_vector(data)
+        except KeyError as e:
+            raise ValueError(f"Missing required field in input data: {e}") from e
+
+        # 2. Align feature columns
+        if self.feature_names:
+            feature_df = feature_df.reindex(columns=self.feature_names, fill_value=0)
+        else:
+            warnings.warn(
+                "Feature names not loaded, prediction may be inaccurate.", stacklevel=2
             )
-        except ValueError as e:
-            # 重新抛出验证错误,提供更好的错误信息
-            raise ValueError(f"输入验证失败: {e}") from e
-        except Exception as e:
-            # 捕获其他意外错误
-            raise RuntimeError(f"特征生成失败: {e}") from e
 
-        # 转换为DataFrame
-        feature_df = pd.DataFrame([features])
-
-        # 如果有特征列信息,确保列顺序一致
-        if self.feature_columns:
-            missing_cols = set(self.feature_columns) - set(feature_df.columns)
-            for col in missing_cols:
-                feature_df[col] = 0.0  # 填充缺失特征
-            feature_df = feature_df[self.feature_columns]
-
+        # 3. Predict probabilities
         try:
-            # 预测
             proba = self.model.predict_proba(feature_df)[0]
         except Exception as e:
-            raise RuntimeError(f"模型预测失败: {e}") from e
+            raise RuntimeError(f"Model prediction failed: {e}") from e
 
-        # 确定预测结果
-        prob_home = float(proba[0])
-        prob_draw = float(proba[1])
-        prob_away = float(proba[2])
-
-        # 找出最大概率对应的结果
-        max_prob = max(prob_home, prob_draw, prob_away)
-        if max_prob == prob_home:
-            predicted_outcome = "home_win"
-            confidence = prob_home
-        elif max_prob == prob_draw:
-            predicted_outcome = "draw"
-            confidence = prob_draw
-        else:
-            predicted_outcome = "away_win"
-            confidence = prob_away
+        # 4. Decode results
+        if self.label_encoder:
+            class_labels = self.label_encoder.classes_
+            probabilities = dict(zip(class_labels, proba))
+            predicted_class_index = proba.argmax()
+            predicted_outcome = self.label_encoder.inverse_transform(
+                [predicted_class_index]
+            )[0]
+            confidence = proba[predicted_class_index]
+        else:  # Stub model case
+            probabilities = {"H": proba[0], "D": proba[1], "A": proba[2]}
+            predicted_outcome = "D"  # Stub default
+            confidence = proba[1]
 
         return {
-            "home_win": prob_home,
-            "draw": prob_draw,
-            "away_win": prob_away,
+            "probabilities": probabilities,
             "predicted_outcome": predicted_outcome,
-            "confidence": confidence,
+            "confidence": float(confidence),
             "model_version": self.model_version or "unknown",
         }
 
-    def predict_batch(self, matches: list[dict[str, Any]]) -> list[dict[str, Any]]:
-        """
-        批量预测比赛结果
 
-        Args:
-            matches: 比赛列表,每个元素包含 home, away, odds_h, odds_d, odds_a 等字段
-
-        Returns:
-            List[Dict[str, float]]: 预测结果列表
-        """
-        if self.model is None:
-            raise RuntimeError("模型未加载")
-
-        results = []
-        for match in matches:
-            try:
-                result = self.predict_single(
-                    home_team=match.get("home", ""),
-                    away_team=match.get("away", ""),
-                    odds_h=match.get("odds_h", match.get("h", 2.0)),
-                    odds_d=match.get("odds_d", match.get("d", 3.0)),
-                    odds_a=match.get("odds_a", match.get("a", 3.0)),
-                )
-                results.append(result)
-            except Exception:
-                # 返回默认预测(平均分布)
-                results.append(
-                    {
-                        "home_win": 0.33,
-                        "draw": 0.34,
-                        "away_win": 0.33,
-                        "predicted_outcome": "draw",
-                        "confidence": 0.34,
-                        "model_version": self.model_version or "unknown",
-                    }
-                )
-
-        return results
-
-    def get_model_info(self) -> dict[str, Any]:
-        """获取模型信息"""
-        if self.model is None:
-            return {"status": "no_model_loaded"}
-
-        info = {
-            "model_version": self.model_version,
-            "model_type": type(self.model).__name__,
-            "is_loaded": True,
-        }
-
-        return info
-
-
-def create_predictor(model_path: str | None = None) -> Predictor:
-    """创建预测器实例"""
-    return Predictor(model_path)
-
-
-# --- Fallback: stub when no model present ---
 class _StubModel:
-    def predict_proba(self, X: pd.DataFrame) -> Any:
-        import numpy as np
+    """A fallback model that returns fixed probabilities."""
 
+    def predict_proba(self, X: pd.DataFrame) -> np.ndarray:
         return np.array([[0.34, 0.33, 0.33] for _ in range(len(X))])
-
-    def predict(self, X: pd.DataFrame) -> Any:
-        import numpy as np
-
-        proba = self.predict_proba(X)
-        return np.argmax(proba, axis=1)
-
-
-def _safe_load_or_stub(path: str | None) -> Any:
-    """安全加载模型,失败时返回stub"""
-    if path is None:
-        import warnings
-
-        warnings.warn("Predictor: model path is None, using stub", stacklevel=2)
-        return _StubModel()
-    try:
-        import pickle  # nosec B403
-
-        with open(path, "rb") as f:
-            return pickle.load(f)  # nosec B301
-    except Exception:
-        import warnings
-
-        warnings.warn(
-            f"Predictor: model at {path} missing or corrupt, using stub",
-            stacklevel=2,
-        )
-        return _StubModel()

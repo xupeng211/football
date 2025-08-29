@@ -29,14 +29,14 @@ services:
       - football_net
 
   # Prefect服务器
-  prefect-server:
-    image: prefecthq/prefect:2.14.21-python3.11
+  prefect:
+    image: prefecthq/prefect:2.19.2-python3.11
     container_name: football_prefect
     ports:
       - "4200:4200"
     environment:
       - PREFECT_SERVER_API_HOST=0.0.0.0
-      - PREFECT_API_DATABASE_CONNECTION_URL=postgresql+asyncpg://postgres:password@postgres:5432/prefect
+      - PREFECT_API_DATABASE_CONNECTION_URL=postgresql+asyncpg://postgres:password@postgres:5432/prefect_db
     depends_on:
       - postgres
     networks:
@@ -54,7 +54,7 @@ services:
     environment:
       - DATABASE_URL=postgresql+asyncpg://postgres:password@postgres:5432/football_predict
       - REDIS_URL=redis://redis:6379/0
-      - PREFECT_API_URL=http://prefect-server:4200/api
+      - PREFECT_API_URL=http://prefect:4200/api
     depends_on:
       - postgres
       - redis
@@ -101,7 +101,7 @@ services:
     environment:
       - DATABASE_URL=postgresql+asyncpg://postgres:password@postgres:5432/football_predict
       - REDIS_URL=redis://redis:6379/0
-      - PREFECT_API_URL=http://prefect-server:4200/api
+      - PREFECT_API_URL=http://prefect:4200/api
     depends_on:
       - postgres
       - redis

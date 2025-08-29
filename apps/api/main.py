@@ -13,6 +13,7 @@ from fastapi import FastAPI
 from prometheus_fastapi_instrumentator import Instrumentator
 from pydantic import BaseModel
 
+from apps.api.db import init_db
 from apps.api.logging_config import configure_logging
 from apps.api.routers import health, predictions
 from apps.api.services.prediction_service import prediction_service
@@ -31,7 +32,6 @@ class VersionResponse(BaseModel):
 
 
 logger = structlog.get_logger(__name__)
-predictor = Predictor()
 
 
 @asynccontextmanager
@@ -40,15 +40,24 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     Application lifespan context manager.
     Loads models on startup and exposes Prometheus metrics.
     """
+    logger.info("Application startup: Initializing database...")
+    init_db()
+    logger.info("Database initialized.")
+
     logger.info("Application startup: Loading models...")
+    predictor = None
     try:
-        prediction_service.load_models()
-        logger.info("Models loaded successfully.")
+        # The Predictor object is now initialized here, during startup.
+        predictor = Predictor()
+        prediction_service.set_predictor(predictor)
+        logger.info("Models loaded and predictor set successfully.")
     except Exception as e:
         logger.error("Failed to load models during startup.", error=str(e))
+        # Create a fallback predictor to prevent service failures
+        predictor = Predictor()
+        prediction_service.set_predictor(predictor)
 
-    # Instrument the app with Prometheus metrics
-    Instrumentator().instrument(app).expose(app)
+    app.state.predictor = predictor
     yield
 
 
@@ -59,6 +68,9 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan,
 )
+
+# Instrument the app with Prometheus metrics
+Instrumentator().instrument(app).expose(app)
 
 app.include_router(predictions.router, prefix="/api/v1", tags=["Predictions"])
 app.include_router(health.router)

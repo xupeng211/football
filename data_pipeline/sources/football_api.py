@@ -2,10 +2,9 @@
 足球数据采集器 - 从外部API获取比赛数据
 """
 
-import asyncio
 import types
 from dataclasses import dataclass
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 
 import httpx
 import structlog
@@ -104,17 +103,33 @@ class FootballAPICollector:
         matches = []
 
         try:
-            # TODO: 实现实际的API调用逻辑
-            # 这里是占位实现
-            for league in leagues or ["PL", "BL1", "SA"]:
-                logger.info("Collecting league data", league=league)
+            params = {
+                "dateFrom": start_date.strftime("%Y-%m-%d"),
+                "dateTo": end_date.strftime("%Y-%m-%d"),
+            }
+            if leagues:
+                params["competitions"] = ",".join(leagues)
 
-                # 模拟API调用
-                await asyncio.sleep(0.1)  # 模拟网络延迟
+            response = await self.session.get(f"{self.base_url}/matches", params=params)
+            response.raise_for_status()
+            data = response.json()
 
-                # TODO: 替换为真实的API调用
-                mock_matches = self._generate_mock_matches(league, start_date, end_date)
-                matches.extend(mock_matches)
+            for item in data.get("matches", []):
+                matches.append(
+                    Match(
+                        match_id=str(item["id"]),
+                        home_team=item["homeTeam"]["name"],
+                        away_team=item["awayTeam"]["name"],
+                        league=item["competition"]["code"],
+                        season=str(item["season"]["currentMatchday"]),
+                        match_date=datetime.fromisoformat(
+                            item["utcDate"].replace("Z", "+00:00")
+                        ),
+                        home_score=item["score"]["fullTime"]["home"],
+                        away_score=item["score"]["fullTime"]["away"],
+                        status=item["status"].lower(),
+                    )
+                )
 
         except Exception as e:
             logger.error("Failed to collect match data", error=str(e))
@@ -158,53 +173,3 @@ class FootballAPICollector:
 
         logger.info("Successfully collected team info", count=len(teams))
         return teams
-
-    def _generate_mock_matches(
-        self, league: str, start_date: date, end_date: date
-    ) -> list[Match]:
-        """生成模拟比赛数据 (仅用于开发阶段)"""
-        matches = []
-
-        # 简单的模拟数据生成
-        teams = [
-            "Manchester United",
-            "Arsenal",
-            "Chelsea",
-            "Liverpool",
-            "Manchester City",
-            "Tottenham",
-            "Newcastle",
-            "Brighton",
-        ]
-
-        current_date = start_date
-        match_counter = 1
-
-        while current_date <= end_date:
-            # 每天生成1-3场比赛
-            for _i in range(1, 3):
-                if match_counter % 7 == 0:  # 不是每天都有比赛
-                    continue
-
-                home_team = teams[match_counter % len(teams)]
-                away_team = teams[(match_counter + 1) % len(teams)]
-
-                if home_team != away_team:
-                    match = Match(
-                        match_id=f"{league}_{current_date}_{match_counter}",
-                        home_team=home_team,
-                        away_team=away_team,
-                        league=league,
-                        season="2023-24",
-                        match_date=datetime.combine(current_date, datetime.min.time()),
-                        status="scheduled",
-                    )
-                    matches.append(match)
-
-                match_counter += 1
-
-            # 下一天
-
-            current_date += timedelta(days=1)
-
-        return matches[:50]  # 限制数量

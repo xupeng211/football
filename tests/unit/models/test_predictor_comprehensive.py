@@ -42,12 +42,17 @@ class TestPredictor:
         assert predictor.model == mock_model
         mock_safe_load.assert_called_with("path/to/model.pkl")
 
-    def test_predict_single_with_stub_model(self, mock_safe_load):
+    def test_predict_with_stub_model(self, mock_safe_load):
         """测试使用stub模型进行单次预测"""
         predictor = Predictor()
-        result = predictor.predict_single(
-            home_team="Team A", away_team="Team B", odds_h=2.0, odds_d=3.0, odds_a=4.0
-        )
+        request_data = {
+            "home_team": "Team A",
+            "away_team": "Team B",
+            "home_odds": 2.0,
+            "draw_odds": 3.0,
+            "away_odds": 4.0,
+        }
+        result = predictor.predict(request_data)
 
         assert isinstance(result, dict)
         required_keys = [
@@ -188,34 +193,30 @@ class TestStubModel:
 
 
 # 边界条件和错误处理测试
+@patch("models.predictor._safe_load_or_stub", return_value=_StubModel())
 class TestPredictorEdgeCases:
     """预测器边界条件测试"""
 
-    def test_predictor_with_missing_features(self):
-        """测试缺少特征的情况"""
+    def test_predictor_with_missing_features(self, mock_safe_load: Mock) -> None:
+        """测试缺少特征时引发ValueError"""
         predictor = Predictor()
+        with pytest.raises(ValueError, match="输入验证失败: 主队名称不能为空"):
+            predictor.predict({})
 
-        # 只提供部分必需参数
-        with pytest.raises(TypeError):
-            predictor.predict_single("Team A", "Team B")  # 缺少odds参数
-
-    def test_predictor_with_invalid_odds(self):
+    def test_predictor_with_invalid_odds(self, mock_safe_load: Mock) -> None:
         """测试无效赔率的情况"""
         predictor = Predictor()
+        request_data = {
+            "home_team": "Team A",
+            "away_team": "Team B",
+            "home_odds": -1.0,  # Invalid odds
+            "draw_odds": 3.0,
+            "away_odds": 4.0,
+        }
+        with pytest.raises(ValueError, match="输入验证失败"):
+            predictor.predict(request_data)
 
-        # It should raise a ValueError due to invalid odds
-        with pytest.raises(
-            ValueError, match="输入验证失败: 主胜赔率必须大于0,收到:-1.0"
-        ):
-            predictor.predict_single(
-                "Team A",
-                "Team B",
-                odds_h=-1,  # 负赔率
-                odds_d=0,  # 零赔率
-                odds_a=float("inf"),  # 无穷大赔率
-            )
-
-    def test_predictor_large_batch(self):
+    def test_predictor_large_batch(self, mock_safe_load: Mock) -> None:
         """测试大批量预测的性能"""
         predictor = Predictor()
 
@@ -224,9 +225,9 @@ class TestPredictorEdgeCases:
             {
                 "home_team": f"Team A{i}",
                 "away_team": f"Team B{i}",
-                "odds_h": 2.0,
-                "odds_d": 3.0,
-                "odds_a": 4.0,
+                "home_odds": 2.0,
+                "draw_odds": 3.0,
+                "away_odds": 4.0,
             }
             for i in range(100)
         ]

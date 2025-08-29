@@ -9,6 +9,7 @@ description = "Football match outcome prediction system"
 readme = "README.md"
 requires-python = ">=3.8"
 dependencies = [
+
     "fastapi>=0.110.3",
     "uvicorn[standard]>=0.23.0",
     "pydantic>=2.0.0",
@@ -18,7 +19,7 @@ dependencies = [
     "xgboost>=1.7.0",
     "psycopg2-binary>=2.9.0",
     "sqlalchemy>=2.0.0",
-    "prefect>=2.0.0",
+    "prefect==2.19.2",
     "structlog>=23.0.0",
     "python-dotenv>=1.0.0",
     "requests>=2.32.4",
@@ -28,6 +29,10 @@ dependencies = [
     "prometheus-fastapi-instrumentator>=7.0.0",
     "aiculture-kit @ git+https://github.com/xupeng211/AICultureKit.git@9c776783542e5c578f692f6a51b29d285700d094",
 ]
+
+
+[tool.hatch.metadata]
+allow-direct-references = true
 
 [project.optional-dependencies]
 dev = [

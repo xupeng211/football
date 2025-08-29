@@ -71,9 +71,9 @@ class TestModelPerformanceRegression:
         accuracy = np.mean(np.array(predicted_outcomes) == np.array(actual_outcomes))
 
         # 验证准确率不低于基准
-        assert (
-            accuracy >= performance_baselines["min_accuracy"]
-        ), f"Model accuracy {accuracy:.3f} below baseline {performance_baselines['min_accuracy']}"
+        assert accuracy >= performance_baselines["min_accuracy"], (
+            f"Model accuracy {accuracy:.3f} below baseline {performance_baselines['min_accuracy']}"
+        )
 
     def test_prediction_response_time_regression(
         self, mock_safe_load, sample_test_data, performance_baselines
@@ -98,9 +98,9 @@ class TestModelPerformanceRegression:
 
         response_time = end_time - start_time
 
-        assert (
-            response_time <= performance_baselines["max_response_time"]
-        ), f"Response time {response_time:.3f}s exceeds baseline {performance_baselines['max_response_time']}s"
+        assert response_time <= performance_baselines["max_response_time"], (
+            f"Response time {response_time:.3f}s exceeds baseline {performance_baselines['max_response_time']}s"
+        )
 
         # 验证返回结果有效
         assert isinstance(result, dict)
@@ -141,9 +141,9 @@ class TestModelPerformanceRegression:
             assert len(results) == batch_size
 
         # 验证批量处理效率不退化(大批量时每个预测的时间应该更少)
-        assert (
-            time_per_prediction[-1] <= time_per_prediction[0] * 2
-        ), "Batch processing efficiency has degraded"
+        assert time_per_prediction[-1] <= time_per_prediction[0] * 2, (
+            "Batch processing efficiency has degraded"
+        )
 
     def test_prediction_consistency_regression(
         self, mock_safe_load, performance_baselines
@@ -176,9 +176,9 @@ class TestModelPerformanceRegression:
 
         consistency_rate = consistent_predictions / len(predictions)
 
-        assert (
-            consistency_rate >= performance_baselines["prediction_consistency"]
-        ), f"Prediction consistency {consistency_rate:.3f} below baseline {performance_baselines['prediction_consistency']}"
+        assert consistency_rate >= performance_baselines["prediction_consistency"], (
+            f"Prediction consistency {consistency_rate:.3f} below baseline {performance_baselines['prediction_consistency']}"
+        )
 
     def test_confidence_score_distribution_regression(
         self, mock_safe_load, sample_test_data, performance_baselines
@@ -196,18 +196,18 @@ class TestModelPerformanceRegression:
         confidences = [pred["confidence"] for pred in predictions]
 
         # 验证置信度基本统计特性
-        assert all(
-            0 <= conf <= 1 for conf in confidences
-        ), "Confidence scores outside [0,1] range"
-        assert (
-            np.std(confidences) >= performance_baselines["min_confidence_range"]
-        ), f"Confidence variance {np.std(confidences):.3f} too low, may indicate model issues"
+        assert all(0 <= conf <= 1 for conf in confidences), (
+            "Confidence scores outside [0,1] range"
+        )
+        assert np.std(confidences) >= performance_baselines["min_confidence_range"], (
+            f"Confidence variance {np.std(confidences):.3f} too low, may indicate model issues"
+        )
 
         # 验证置信度分布合理性
         mean_confidence = np.mean(confidences)
-        assert (
-            0.2 <= mean_confidence <= 0.8
-        ), f"Mean confidence {mean_confidence:.3f} outside reasonable range [0.2, 0.8]"
+        assert 0.2 <= mean_confidence <= 0.8, (
+            f"Mean confidence {mean_confidence:.3f} outside reasonable range [0.2, 0.8]"
+        )
 
     def test_probability_distribution_regression(
         self, mock_safe_load, sample_test_data
@@ -223,18 +223,18 @@ class TestModelPerformanceRegression:
         for pred in predictions:
             # 验证概率总和为1
             total_prob = pred["home_win"] + pred["draw"] + pred["away_win"]
-            assert (
-                abs(total_prob - 1.0) < 0.01
-            ), f"Probabilities don't sum to 1: {total_prob}"
+            assert abs(total_prob - 1.0) < 0.01, (
+                f"Probabilities don't sum to 1: {total_prob}"
+            )
 
             # 验证所有概率为非负
-            assert (
-                pred["home_win"] >= 0
-            ), f"Negative home_win probability: {pred['home_win']}"
+            assert pred["home_win"] >= 0, (
+                f"Negative home_win probability: {pred['home_win']}"
+            )
             assert pred["draw"] >= 0, f"Negative draw probability: {pred['draw']}"
-            assert (
-                pred["away_win"] >= 0
-            ), f"Negative away_win probability: {pred['away_win']}"
+            assert pred["away_win"] >= 0, (
+                f"Negative away_win probability: {pred['away_win']}"
+            )
 
             # 验证最高概率对应预测结果
             max_prob = max(pred["home_win"], pred["draw"], pred["away_win"])
@@ -245,9 +245,9 @@ class TestModelPerformanceRegression:
             else:
                 expected_outcome = "away_win"
 
-            assert (
-                pred["predicted_outcome"] == expected_outcome
-            ), "Predicted outcome doesn't match highest probability"
+            assert pred["predicted_outcome"] == expected_outcome, (
+                "Predicted outcome doesn't match highest probability"
+            )
 
 
 @patch("models.predictor._safe_load_or_stub", return_value=_StubModel())
@@ -304,9 +304,9 @@ class TestModelStabilityRegression:
 
                 # 验证概率仍然有效
                 total_prob = result["home_win"] + result["draw"] + result["away_win"]
-                assert (
-                    abs(total_prob - 1.0) < 0.1
-                ), "Probabilities invalid for extreme case"
+                assert abs(total_prob - 1.0) < 0.1, (
+                    "Probabilities invalid for extreme case"
+                )
 
             except Exception as e:
                 pytest.fail(f"Model failed on extreme case {case}: {e}")
@@ -360,7 +360,11 @@ class TestModelVersionCompatibility:
 
         # 验证可以执行预测
         result = predictor.predict_single(
-            "Test Team A", "Test Team B", odds_h=2.0, odds_d=3.0, odds_a=4.0
+            home_team="Test Team A",
+            away_team="Test Team B",
+            odds_h=2.0,
+            odds_d=3.0,
+            odds_a=4.0,
         )
 
         assert isinstance(result, dict)
@@ -381,9 +385,9 @@ class TestModelVersionCompatibility:
         data = response.json()
         required_fields = ["api_version"]
         for field in required_fields:
-            assert (
-                field in data
-            ), f"Required field {field} missing from version response"
+            assert field in data, (
+                f"Required field {field} missing from version response"
+            )
 
         # 测试预测接口格式稳定性
         test_request = [
@@ -411,9 +415,9 @@ class TestModelVersionCompatibility:
                     "confidence",
                 ]
                 for field in expected_fields:
-                    assert (
-                        field in pred
-                    ), f"Required field {field} missing from prediction response"
+                    assert field in pred, (
+                        f"Required field {field} missing from prediction response"
+                    )
 
 
 if __name__ == "__main__":

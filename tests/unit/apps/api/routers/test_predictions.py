@@ -4,7 +4,6 @@ Unit tests for the prediction API endpoints.
 
 from unittest.mock import patch
 
-import numpy as np
 import pytest
 from fastapi.testclient import TestClient
 
@@ -19,7 +18,7 @@ def client() -> TestClient:
 
 
 @pytest.fixture
-def single_prediction_input():
+def single_prediction_input() -> dict:
     """Provides a valid input for a single prediction."""
     return {
         "home_team": "Arsenal",
@@ -32,7 +31,7 @@ def single_prediction_input():
 
 
 @pytest.fixture
-def batch_prediction_input():
+def batch_prediction_input() -> dict:
     """Provides a valid input for batch predictions."""
     return {
         "matches": [
@@ -49,9 +48,9 @@ def batch_prediction_input():
 
 
 @patch.object(prediction_service, "predict")
-def test_predict_single_endpoint(mock_predict, client, single_prediction_input):
+def test_predict_single_endpoint(mock_predict, client, single_prediction_input) -> None:
     """Tests the /predict/single endpoint for a successful prediction."""
-    mock_predict.return_value = np.array([[0.1, 0.2, 0.7]])  # H, D, A
+    mock_predict.return_value = {"predicted_outcome": "away_win", "confidence": 0.7}
 
     response = client.post("/api/v1/predict/single", json=single_prediction_input)
 
@@ -62,10 +61,10 @@ def test_predict_single_endpoint(mock_predict, client, single_prediction_input):
     mock_predict.assert_called_once()
 
 
-@patch.object(prediction_service, "predict_batch")
-def test_predict_batch_endpoint(mock_predict_batch, client, batch_prediction_input):
+@patch.object(prediction_service, "predict")
+def test_predict_batch_endpoint(mock_predict, client, batch_prediction_input) -> None:
     """Tests the /predict/batch endpoint for successful batch predictions."""
-    mock_predict_batch.return_value = np.array([[0.6, 0.3, 0.1]])  # H, D, A
+    mock_predict.return_value = {"predicted_outcome": "home_win", "confidence": 0.6}
 
     response = client.post("/api/v1/predict/batch", json=batch_prediction_input)
 
@@ -76,11 +75,11 @@ def test_predict_batch_endpoint(mock_predict_batch, client, batch_prediction_inp
     prediction = response_data["predictions"][0]
     assert prediction["predicted_outcome"] == "home_win"
     assert prediction["confidence"] == pytest.approx(0.6)
-    mock_predict_batch.assert_called_once()
+    mock_predict.assert_called_once()
 
 
-def test_predict_single_invalid_input(client):
+def test_predict_single_invalid_input(client) -> None:
     """Tests the /predict/single endpoint with invalid input data."""
-    invalid_input = {"home_team": "Team A", "away_team": "Team B"}  # Missing fields
+    invalid_input = {"home_team": "Team A", "away_team": "Team B"}
     response = client.post("/api/v1/predict/single", json=invalid_input)
     assert response.status_code == 422  # Unprocessable Entity

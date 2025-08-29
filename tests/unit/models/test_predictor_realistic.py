@@ -12,7 +12,7 @@ from models.predictor import Predictor, _safe_load_or_stub, _StubModel
 class TestPredictorRealistic:
     """基于实际行为的预测器测试"""
 
-    def test_predictor_initialization(self):
+    def test_predictor_initialization(self) -> None:
         """测试预测器基本初始化"""
         predictor = Predictor()
         assert predictor is not None
@@ -20,18 +20,22 @@ class TestPredictorRealistic:
         assert hasattr(predictor, "model_version")
         assert hasattr(predictor, "feature_columns")
 
-    def test_predictor_with_nonexistent_path_uses_stub(self):
+    def test_predictor_with_nonexistent_path_uses_stub(self) -> None:
         """测试不存在路径时使用stub模型"""
         predictor = Predictor(model_path="/definitely/nonexistent/path")
         assert isinstance(predictor.model, _StubModel)
 
-    def test_prediction_returns_basic_probabilities(self):
+    def test_prediction_returns_basic_probabilities(self) -> None:
         """测试预测返回基本概率(基于实际格式)"""
         predictor = Predictor(model_path="/nonexistent")
-
-        result = predictor.predict_single(
-            home_team="Team A", away_team="Team B", odds_h=2.0, odds_d=3.0, odds_a=4.0
-        )
+        request_data = {
+            "home_team": "Team A",
+            "away_team": "Team B",
+            "home_odds": 2.0,
+            "draw_odds": 3.0,
+            "away_odds": 4.0,
+        }
+        result = predictor.predict(request_data)
 
         # 验证实际返回的字段
         assert isinstance(result, dict)
@@ -49,7 +53,7 @@ class TestPredictorRealistic:
         total = result["home_win"] + result["draw"] + result["away_win"]
         assert abs(total - 1.0) < 0.05
 
-    def test_batch_prediction_basic(self):
+    def test_batch_prediction_basic(self) -> None:
         """测试批量预测基本功能"""
         predictor = Predictor(model_path="/nonexistent")
 
@@ -57,16 +61,16 @@ class TestPredictorRealistic:
             {
                 "home_team": "A",
                 "away_team": "B",
-                "odds_h": 2.0,
-                "odds_d": 3.0,
-                "odds_a": 4.0,
+                "home_odds": 2.0,
+                "draw_odds": 3.0,
+                "away_odds": 4.0,
             },
             {
                 "home_team": "C",
                 "away_team": "D",
-                "odds_h": 1.8,
-                "odds_d": 3.2,
-                "odds_a": 4.5,
+                "home_odds": 1.8,
+                "draw_odds": 3.2,
+                "away_odds": 4.5,
             },
         ]
 
@@ -79,24 +83,25 @@ class TestPredictorRealistic:
             assert "draw" in result
             assert "away_win" in result
 
-    def test_empty_batch_prediction(self):
+    def test_empty_batch_prediction(self) -> None:
         """测试空批量预测"""
         predictor = Predictor(model_path="/nonexistent")
         result = predictor.predict_batch([])
         assert result == []
 
-    def test_predictor_handles_normal_odds(self):
+    def test_predictor_handles_normal_odds(self) -> None:
         """测试处理正常赔率(避免除零错误)"""
         predictor = Predictor(model_path="/nonexistent")
 
         # 使用安全的赔率值
-        result = predictor.predict_single(
-            "Team A",
-            "Team B",
-            odds_h=2.0,  # 安全值
-            odds_d=3.0,  # 安全值
-            odds_a=4.0,  # 安全值
-        )
+        request_data = {
+            "home_team": "Team A",
+            "away_team": "Team B",
+            "home_odds": 2.0,
+            "draw_odds": 3.0,
+            "away_odds": 4.0,
+        }
+        result = predictor.predict(request_data)
 
         assert isinstance(result, dict)
         assert "home_win" in result
@@ -125,28 +130,29 @@ class TestStubModelRealistic:
 class TestPredictorErrorHandling:
     """预测器错误处理测试"""
 
-    def test_missing_required_params_raises_error(self):
-        """测试缺少必需参数抛出错误"""
+    def test_missing_required_params_uses_defaults(self) -> None:
+        """测试缺少必需参数时使用默认值"""
         predictor = Predictor(model_path="/nonexistent")
+        # The new predict method uses defaults, so this should not raise a TypeError
+        request_data = {"home_team": "Team A", "away_team": "Team B"}
+        result = predictor.predict(request_data)
+        assert isinstance(result, dict)
+        assert "predicted_outcome" in result
 
-        with pytest.raises(TypeError):
-            predictor.predict_single("Team A", "Team B")  # 缺少odds
-
-    def test_invalid_odds_causes_error_gracefully(self):
+    def test_invalid_odds_causes_error_gracefully(self) -> None:
         """测试无效赔率的错误处理"""
         predictor = Predictor(model_path="/nonexistent")
+        request_data = {
+            "home_team": "Team A",
+            "away_team": "Team B",
+            "home_odds": 2.0,
+            "draw_odds": 0.0,  # Invalid odds
+            "away_odds": 4.0,
+        }
 
         # This test now expects a ValueError due to the input validation
-        with pytest.raises(
-            ValueError, match="输入验证失败: 平局赔率必须大于0,收到:0.0"
-        ):
-            predictor.predict_single(
-                "Team A",
-                "Team B",
-                odds_h=2.0,
-                odds_d=0.0,  # 这会导致除零错误
-                odds_a=4.0,
-            )
+        with pytest.raises(ValueError, match="输入验证失败"):
+            predictor.predict(request_data)
 
 
 class TestSafeLoadFunction:

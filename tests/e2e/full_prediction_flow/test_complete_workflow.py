@@ -4,7 +4,6 @@ End-to-end test for the complete user workflow.
 
 from unittest.mock import patch
 
-import numpy as np
 import pytest
 from fastapi.testclient import TestClient
 
@@ -15,8 +14,10 @@ class TestCompleteUserWorkflow:
     """E2E test for a complete user workflow."""
 
     @pytest.fixture
-    def api_client(self):
-        """Creates a test client for the API."""
+    def api_client(self, monkeypatch):
+        """Creates a test client for the API with an isolated DB."""
+        # Use monkeypatch to set the test database URL environment variable
+        monkeypatch.setenv("TEST_DATABASE_URL", "sqlite:///:memory:")
         return TestClient(app)
 
     @pytest.fixture
@@ -48,10 +49,24 @@ class TestCompleteUserWorkflow:
         self, mock_predict, api_client, sample_batch_input
     ):
         """Tests the E2E prediction workflow."""
-        # Mock the service layer to return predictable probabilities
+        # Mock the service layer to return predictable dict probabilities
         mock_predict.side_effect = [
-            np.array([[0.4, 0.3, 0.3]]),  # Corresponds to home_win
-            np.array([[0.2, 0.2, 0.6]]),  # Corresponds to away_win
+            {
+                "home_win": 0.4,
+                "draw": 0.3,
+                "away_win": 0.3,
+                "predicted_outcome": "home_win",
+                "confidence": 0.4,
+                "model_version": "test",
+            },
+            {
+                "home_win": 0.2,
+                "draw": 0.2,
+                "away_win": 0.6,
+                "predicted_outcome": "away_win",
+                "confidence": 0.6,
+                "model_version": "test",
+            },
         ]
 
         # Step 1: Check system health

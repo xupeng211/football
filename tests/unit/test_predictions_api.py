@@ -4,7 +4,6 @@ Tests for the predictions API router.
 
 from unittest.mock import MagicMock, patch
 
-import numpy as np
 import pytest
 from fastapi.testclient import TestClient
 
@@ -31,7 +30,10 @@ def test_predict_single_match_success(
         "draw_odds": 3.2,
         "away_odds": 3.5,
     }
-    mock_predict.return_value = np.array([[0.45, 0.30, 0.25]])
+    mock_predict.return_value = {
+        "predicted_outcome": "home_win",
+        "confidence": 0.45,
+    }
 
     response = client.post("/api/v1/predict/single", json=test_data)
     assert response.status_code == 200
@@ -49,9 +51,9 @@ def test_predict_invalid_data(client: TestClient) -> None:
     assert response.status_code == 422
 
 
-@patch.object(prediction_service, "predict_batch")
+@patch.object(prediction_service, "predict")
 def test_predict_batch_matches_success(
-    mock_predict_batch: MagicMock, client: TestClient
+    mock_predict: MagicMock, client: TestClient
 ) -> None:
     """Test successful batch match prediction."""
     test_data = {
@@ -66,7 +68,10 @@ def test_predict_batch_matches_success(
             }
         ]
     }
-    mock_predict_batch.return_value = np.array([[0.45, 0.30, 0.25]])
+    mock_predict.return_value = {
+        "predicted_outcome": "home_win",
+        "confidence": 0.45,
+    }
 
     response = client.post("/api/v1/predict/batch", json=test_data)
     assert response.status_code == 200

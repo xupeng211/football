@@ -5,6 +5,13 @@ FastAPI预测接口测试
 from fastapi.testclient import TestClient
 
 from apps.api.main import app
+from apps.api.services.prediction_service import prediction_service
+from models.predictor import Predictor
+
+# 确保预测服务在测试中被正确初始化
+if prediction_service._predictor is None:
+    predictor = Predictor()
+    prediction_service.set_predictor(predictor)
 
 client = TestClient(app)
 

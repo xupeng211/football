@@ -75,14 +75,11 @@ async def predict_single_match(
         prediction_id = str(uuid4())
 
         # 1. Get Prediction
-        probabilities = prediction_service.predict(
-            request.model_dump(), model_name=model_name
-        )
-        # Probabilities are for [Home, Draw, Away]
-        outcome_map = {0: "home_win", 1: "draw", 2: "away_win"}
-        predicted_index = probabilities[0].argmax()
-        predicted_outcome = outcome_map[predicted_index]
-        confidence = float(probabilities[0].max())
+        prediction_result = prediction_service.predict(request.model_dump())
+
+        # 2. Extract results from the prediction dictionary
+        predicted_outcome = prediction_result.get("predicted_outcome", "unknown")
+        confidence = prediction_result.get("confidence", 0.0)
 
         # 3. Format Response
         response = PredictionResponse(
@@ -119,26 +116,12 @@ async def predict_batch_matches(
     """
     try:
         predictions = []
-        outcome_map = {0: "home_win", 1: "draw", 2: "away_win"}
-
-        matches_data = [match.model_dump() for match in request.matches]
-        if not matches_data:
-            return BatchPredictionResponse(
-                predictions=[],
-                total_matches=0,
-                processed_at=datetime.now(),
-            )
-
-        all_probabilities = prediction_service.predict_batch(
-            matches_data, model_name=model_name
-        )
-
-        for i, match in enumerate(request.matches):
+        for match in request.matches:
             prediction_id = str(uuid4())
-            probabilities = all_probabilities[i]
-            predicted_index = probabilities.argmax()
-            predicted_outcome = outcome_map[predicted_index]
-            confidence = float(probabilities.max())
+            prediction_result = prediction_service.predict(match.model_dump())
+
+            predicted_outcome = prediction_result.get("predicted_outcome", "unknown")
+            confidence = prediction_result.get("confidence", 0.0)
 
             prediction = PredictionResponse(
                 prediction_id=prediction_id,

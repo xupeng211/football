@@ -50,8 +50,8 @@ class TestPredictor:
 
     def test_predictor_init_without_model_path(self) -> None:
         """测试不指定模型路径初始化预测器"""
-        with patch("models.predictor._safe_load_or_stub") as mock_load, patch.object(
-            Predictor, "_find_latest_model"
+        with patch.object(Predictor, "load_model") as mock_load, patch.object(
+            Predictor, "_find_latest_model_dir"
         ) as mock_find:
             mock_find.return_value = "latest_model.pkl"
             mock_load.return_value = Mock()
@@ -64,8 +64,8 @@ class TestPredictor:
 
     def test_predictor_init_no_model_found(self) -> None:
         """测试找不到模型时的初始化"""
-        with patch("models.predictor._safe_load_or_stub") as mock_load, patch.object(
-            Predictor, "_find_latest_model"
+        with patch.object(Predictor, "load_model") as mock_load, patch.object(
+            Predictor, "_find_latest_model_dir"
         ) as mock_find:
             mock_find.return_value = None
             mock_load.return_value = Mock()
@@ -98,13 +98,7 @@ class TestPredictor:
             mock_feature.return_value = pd.DataFrame([[1, 2, 3, 4, 5]])
 
             predictor = Predictor(model_path="test_model.pkl")
-            result = predictor.predict_single(
-                home_team=sample_match_data["home_team"],
-                away_team=sample_match_data["away_team"],
-                odds_h=sample_match_data["odds_h"],
-                odds_d=sample_match_data["odds_d"],
-                odds_a=sample_match_data["odds_a"],
-            )
+            result = predictor.predict(sample_match_data)
 
             assert isinstance(result, dict)
             assert "home_win" in result
@@ -125,11 +119,11 @@ class TestPredictor:
             # 构造批量输入数据
             batch_data = [
                 {
-                    "home": sample_match_data["home_team"],
-                    "away": sample_match_data["away_team"],
-                    "h": sample_match_data["odds_h"],
-                    "d": sample_match_data["odds_d"],
-                    "a": sample_match_data["odds_a"],
+                    "home_team": sample_match_data["home_team"],
+                    "away_team": sample_match_data["away_team"],
+                    "home_odds": sample_match_data["odds_h"],
+                    "draw_odds": sample_match_data["odds_d"],
+                    "away_odds": sample_match_data["odds_a"],
                 }
             ]
 
@@ -144,46 +138,30 @@ class TestPredictor:
         with patch("models.predictor._safe_load_or_stub") as mock_load, patch(
             "data_pipeline.features.build.create_feature_vector"
         ) as mock_feature:
-            # Mock返回不规范的概率
             mock_model = Mock()
             mock_model.predict_proba.return_value = np.array([[0.2, 0.3, 0.6]])
             mock_load.return_value = mock_model
             mock_feature.return_value = pd.DataFrame([[1, 2, 3, 4, 5]])
 
             predictor = Predictor(model_path="test_model.pkl")
-            result = predictor.predict_single(
-                home_team=sample_match_data["home_team"],
-                away_team=sample_match_data["away_team"],
-                odds_h=sample_match_data["odds_h"],
-                odds_d=sample_match_data["odds_d"],
-                odds_a=sample_match_data["odds_a"],
-            )
+            result = predictor.predict(sample_match_data)
 
-            # 验证概率和为1
             total_prob = result["home_win"] + result["draw"] + result["away_win"]
-            assert abs(total_prob - 1.0) < 0.15  # 进一步放宽精度要求
+            assert abs(total_prob - 1.0) < 0.15
 
     def test_predict_confidence_calculation(self, sample_match_data: dict) -> None:
         """测试置信度计算"""
         with patch("models.predictor._safe_load_or_stub") as mock_load, patch(
             "data_pipeline.features.build.create_feature_vector"
         ) as mock_feature:
-            # Mock返回明确的概率分布
             mock_model = Mock()
             mock_model.predict_proba.return_value = np.array([[0.1, 0.2, 0.7]])
             mock_load.return_value = mock_model
             mock_feature.return_value = pd.DataFrame([[1, 2, 3, 4, 5]])
 
             predictor = Predictor(model_path="test_model.pkl")
-            result = predictor.predict_single(
-                home_team=sample_match_data["home_team"],
-                away_team=sample_match_data["away_team"],
-                odds_h=sample_match_data["odds_h"],
-                odds_d=sample_match_data["odds_d"],
-                odds_a=sample_match_data["odds_a"],
-            )
+            result = predictor.predict(sample_match_data)
 
-            # 最大概率0.7应该是置信度
             assert result["confidence"] == 0.7
             assert result["predicted_outcome"] == "away_win"
 

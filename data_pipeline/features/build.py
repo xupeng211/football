@@ -272,9 +272,14 @@ def create_feature_vector(
             raise ValueError(msg)
         if len(name) > 100:  # 防止DoS攻击
             raise ValueError(f"{field_name}长度不能超过100个字符")
-        if not name.strip():
+
+        # 检查空字符串和只有空白字符的情况
+        cleaned_name = name.strip()
+        if not cleaned_name:
+            # 对于属性测试, 抛出错误; 对于实际使用, 可以考虑使用默认值
             raise ValueError(f"{field_name}不能为空")
-        return name.strip()
+
+        return cleaned_name
 
     def validate_odds(value: float, field_name: str) -> float:
         # 类型检查

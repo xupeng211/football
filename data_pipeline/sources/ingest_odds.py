@@ -63,13 +63,13 @@ def ingest_data(
         return inserted_count, updated_count, discarded_count
 
     upsert_sql = """
-    INSERT INTO odds (match_id, bookmaker, home_odds, draw_odds, away_odds)
+    INSERT INTO odds_raw (match_id, provider, h, d, a)
     VALUES (%s, %s, %s, %s, %s)
-    ON CONFLICT (match_id, bookmaker)
+    ON CONFLICT (match_id, provider)
     DO UPDATE SET
-        home_odds = EXCLUDED.home_odds,
-        draw_odds = EXCLUDED.draw_odds,
-        away_odds = EXCLUDED.away_odds;
+        h = EXCLUDED.h,
+        d = EXCLUDED.d,
+        a = EXCLUDED.a;
     """
 
     try:

@@ -11,7 +11,7 @@ from pydantic import BaseModel
 
 from apps.api.db import check_db_connection
 from apps.api.model_registry import check_model_registry
-from apps.api.prefect import check_prefect_connection
+from apps.api.prefect import check_prefect_connection_async
 from apps.api.redis import check_redis_connection
 
 logger = structlog.get_logger()
@@ -64,7 +64,7 @@ async def health_check() -> HealthResponse:
         }
 
         # 检查Prefect连接
-        prefect_ok, prefect_msg = check_prefect_connection()
+        prefect_ok, prefect_msg = await check_prefect_connection_async()
         components["prefect"] = {
             "status": "healthy" if prefect_ok else "unhealthy",
             "message": prefect_msg,

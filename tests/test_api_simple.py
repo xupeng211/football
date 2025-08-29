@@ -78,6 +78,6 @@ def test_prometheus_metrics():
     assert SYSTEM_UPTIME is not None
     assert registry is not None
 
-    # 测试指标可以操作
+    # 测试指标可以操作 - 使用正确的标签
     REQUEST_COUNT.labels(method="GET", endpoint="/test").inc()
-    SYSTEM_UPTIME.set(100)
+    SYSTEM_UPTIME.inc(100)

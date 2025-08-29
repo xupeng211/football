@@ -4,7 +4,6 @@ API主模块的覆盖率测试
 
 from unittest.mock import patch
 
-import numpy as np
 import pytest
 from fastapi.testclient import TestClient
 
@@ -55,7 +54,13 @@ class TestAPIMainCoverage:
     @patch("apps.api.services.prediction_service.prediction_service.predict")
     def test_predict_endpoint_coverage(self, mock_predict, client):
         """测试预测端点覆盖率"""
-        mock_predict.return_value = np.array([[0.1, 0.2, 0.7]])
+        mock_predict.return_value = {
+            "home_win": 0.1,
+            "draw": 0.2,
+            "away_win": 0.7,
+            "predicted_outcome": "away_win",
+            "confidence": 0.7,
+        }
         response = client.post(
             "/api/v1/predict/single",
             json={
@@ -74,4 +79,5 @@ class TestAPIMainCoverage:
         """测试预测端点错误情况覆盖率"""
         # Test with missing fields
         response = client.post("/api/v1/predict/single", json={"home_team": "A"})
+
         assert response.status_code == 422

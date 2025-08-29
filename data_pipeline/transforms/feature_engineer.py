@@ -1,6 +1,8 @@
 """
-Feature engineering module for odds data processing.
+Feature engineering module for football match prediction.
+Enhanced with advanced team performance and historical features.
 """
+
 
 import numpy as np
 import pandas as pd
@@ -108,4 +110,5 @@ def generate_features(df: pd.DataFrame) -> pd.DataFrame:
         "prob_diff",
     ]
 
+    return result[feature_columns]
     return result[feature_columns]

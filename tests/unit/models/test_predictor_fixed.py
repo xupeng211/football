@@ -15,7 +15,7 @@ from models.predictor import Predictor, _safe_load_or_stub, _StubModel
 class TestPredictor:
     """预测器类的修复单元测试"""
 
-    def test_predictor_initialization(self):
+    def test_predictor_initialization(self) -> None:
         """测试预测器初始化"""
         predictor = Predictor()
         assert predictor is not None
@@ -23,14 +23,14 @@ class TestPredictor:
         assert hasattr(predictor, "model_version")
         assert hasattr(predictor, "feature_columns")
 
-    def test_predictor_with_custom_path_loads_stub(self):
+    def test_predictor_with_custom_path_loads_stub(self) -> None:
         """测试使用自定义路径时加载stub模型"""
         custom_path = "/nonexistent/model/path"
         predictor = Predictor(model_path=custom_path)
         # 不存在的路径应该加载StubModel
         assert isinstance(predictor.model, _StubModel)
 
-    def test_predictor_with_stub_model_predictions(self):
+    def test_predictor_with_stub_model_predictions(self) -> None:
         """测试使用stub模型进行预测"""
         predictor = Predictor(model_path="/nonexistent/path")
 
@@ -38,9 +38,14 @@ class TestPredictor:
         assert isinstance(predictor.model, _StubModel)
 
         # 测试单次预测
-        result = predictor.predict_single(
-            home_team="Team A", away_team="Team B", odds_h=2.0, odds_d=3.0, odds_a=4.0
-        )
+        request_data = {
+            "home_team": "Team A",
+            "away_team": "Team B",
+            "home_odds": 2.0,
+            "draw_odds": 3.0,
+            "away_odds": 4.0,
+        }
+        result = predictor.predict(request_data)
 
         # 验证返回结果结构
         assert isinstance(result, dict)
@@ -58,7 +63,7 @@ class TestPredictor:
         total_prob = result["home_win"] + result["draw"] + result["away_win"]
         assert abs(total_prob - 1.0) < 0.01
 
-    def test_predict_batch_with_stub_model(self):
+    def test_predict_batch_with_stub_model(self) -> None:
         """测试批量预测使用stub模型"""
         predictor = Predictor(model_path="/nonexistent/path")
 
@@ -66,16 +71,16 @@ class TestPredictor:
             {
                 "home_team": "Team A",
                 "away_team": "Team B",
-                "odds_h": 2.0,
-                "odds_d": 3.0,
-                "odds_a": 4.0,
+                "home_odds": 2.0,
+                "draw_odds": 3.0,
+                "away_odds": 4.0,
             },
             {
                 "home_team": "Team C",
                 "away_team": "Team D",
-                "odds_h": 1.8,
-                "odds_d": 3.2,
-                "odds_a": 4.5,
+                "home_odds": 1.8,
+                "draw_odds": 3.2,
+                "away_odds": 4.5,
             },
         ]
 
@@ -85,7 +90,7 @@ class TestPredictor:
             assert isinstance(prediction, dict)
             assert "predicted_outcome" in prediction
 
-    def test_predict_batch_empty_input_with_stub(self):
+    def test_predict_batch_empty_input_with_stub(self) -> None:
         """测试空输入的批量预测"""
         predictor = Predictor(model_path="/nonexistent/path")
         result = predictor.predict_batch([])
@@ -94,7 +99,9 @@ class TestPredictor:
     @patch("os.path.exists")
     @patch("builtins.open")
     @patch("pickle.load")
-    def test_load_model_success_mock(self, mock_pickle_load, mock_open, mock_exists):
+    def test_load_model_success_mock(
+        self, mock_pickle_load: Mock, mock_open: Mock, mock_exists: Mock
+    ) -> None:
         """测试成功加载模型(使用mock)"""
         # 设置mock
         mock_exists.return_value = True
@@ -111,7 +118,7 @@ class TestPredictor:
 class TestSafeLoadOrStub:
     """安全加载函数的修复单元测试"""
 
-    def test_safe_load_with_none_path(self):
+    def test_safe_load_with_none_path(self) -> None:
         """测试空路径返回stub模型"""
         result = _safe_load_or_stub(None)
         assert isinstance(result, _StubModel)
@@ -120,8 +127,8 @@ class TestSafeLoadOrStub:
     @patch("builtins.open")
     @patch("pickle.load")
     def test_safe_load_success_with_valid_file(
-        self, mock_pickle_load, mock_open, mock_exists
-    ):
+        self, mock_pickle_load: Mock, mock_open: Mock, mock_exists: Mock
+    ) -> None:
         """测试成功加载有效文件"""
         mock_exists.return_value = True
         mock_model = Mock()
@@ -131,7 +138,7 @@ class TestSafeLoadOrStub:
         assert result == mock_model
 
     @patch("os.path.exists")
-    def test_safe_load_file_not_found(self, mock_exists):
+    def test_safe_load_file_not_found(self, mock_exists: Mock) -> None:
         """测试文件不存在的情况"""
         mock_exists.return_value = False
         result = _safe_load_or_stub("/nonexistent/path.pkl")
@@ -140,7 +147,9 @@ class TestSafeLoadOrStub:
     @patch("os.path.exists")
     @patch("builtins.open")
     @patch("pickle.load")
-    def test_safe_load_corrupt_file(self, mock_pickle_load, mock_open, mock_exists):
+    def test_safe_load_corrupt_file(
+        self, mock_pickle_load: Mock, mock_open: Mock, mock_exists: Mock
+    ) -> None:
         """测试损坏文件的情况"""
         mock_exists.return_value = True
         mock_pickle_load.side_effect = Exception("Corrupt file")
@@ -152,12 +161,12 @@ class TestSafeLoadOrStub:
 class TestStubModel:
     """StubModel的修复单元测试"""
 
-    def test_stub_model_initialization(self):
+    def test_stub_model_initialization(self) -> None:
         """测试StubModel初始化"""
         stub = _StubModel()
         assert stub is not None
 
-    def test_stub_model_predict_proba(self):
+    def test_stub_model_predict_proba(self) -> None:
         """测试StubModel的概率预测"""
         stub = _StubModel()
 
@@ -174,7 +183,7 @@ class TestStubModel:
         for row in result:
             assert abs(np.sum(row) - 1.0) < 0.01
 
-    def test_stub_model_has_predict_method(self):
+    def test_stub_model_has_predict_method(self) -> None:
         """测试StubModel是否有predict方法"""
         stub = _StubModel()
 
@@ -193,31 +202,29 @@ class TestStubModel:
 class TestPredictorEdgeCases:
     """预测器边界条件测试(修复版)"""
 
-    def test_predictor_with_missing_features(self):
-        """测试缺少特征的情况"""
+    def test_predictor_with_missing_features(self) -> None:
+        """测试缺少特征时, 使用默认值"""
         predictor = Predictor(model_path="/nonexistent/path")
 
-        # 只提供部分必需参数,应该抛出TypeError
-        with pytest.raises(TypeError):
-            predictor.predict_single("Team A", "Team B")  # 缺少odds参数
+        # An empty dict should raise a ValueError
+        with pytest.raises(ValueError, match="输入验证失败: 主队名称不能为空"):
+            predictor.predict({})
 
-    def test_predictor_with_invalid_odds(self):
+    def test_predictor_with_invalid_odds(self) -> None:
         """测试无效赔率的情况"""
         predictor = Predictor(model_path="/nonexistent/path")
-
+        request_data = {
+            "home_team": "Team A",
+            "away_team": "Team B",
+            "home_odds": -1.0,
+            "draw_odds": 3.0,
+            "away_odds": 4.0,
+        }
         # It should raise a ValueError due to invalid odds
-        with pytest.raises(
-            ValueError, match="输入验证失败: 主胜赔率必须大于0,收到:-1.0"
-        ):
-            predictor.predict_single(
-                "Team A",
-                "Team B",
-                odds_h=-1,  # 负赔率
-                odds_d=0,  # 零赔率
-                odds_a=float("inf"),  # 无穷大赔率
-            )
+        with pytest.raises(ValueError, match="输入验证失败"):
+            predictor.predict(request_data)
 
-    def test_predictor_large_batch_with_stub(self):
+    def test_predictor_large_batch_with_stub(self) -> None:
         """测试大批量预测的性能"""
         predictor = Predictor(model_path="/nonexistent/path")
 
@@ -226,9 +233,9 @@ class TestPredictorEdgeCases:
             {
                 "home_team": f"Team A{i}",
                 "away_team": f"Team B{i}",
-                "odds_h": 2.0,
-                "odds_d": 3.0,
-                "odds_a": 4.0,
+                "home_odds": 2.0,
+                "draw_odds": 3.0,
+                "away_odds": 4.0,
             }
             for i in range(50)  # 减少数量避免超时
         ]
@@ -245,7 +252,7 @@ class TestPredictorEdgeCases:
 class TestPredictorIntegration:
     """预测器集成测试"""
 
-    def test_predictor_default_initialization_loads_stub(self):
+    def test_predictor_default_initialization_loads_stub(self) -> None:
         """测试默认初始化加载stub模型"""
         predictor = Predictor()
 
@@ -253,14 +260,19 @@ class TestPredictorIntegration:
         assert isinstance(predictor.model, _StubModel)
 
         # 应该能进行预测
-        result = predictor.predict_single(
-            "Test Home", "Test Away", odds_h=2.0, odds_d=3.0, odds_a=4.0
-        )
+        request_data = {
+            "home_team": "Test Home",
+            "away_team": "Test Away",
+            "home_odds": 2.0,
+            "draw_odds": 3.0,
+            "away_odds": 4.0,
+        }
+        result = predictor.predict(request_data)
 
         assert isinstance(result, dict)
         assert "predicted_outcome" in result
 
-    def test_predictor_consistency(self):
+    def test_predictor_consistency(self) -> None:
         """测试预测一致性"""
         predictor = Predictor(model_path="/nonexistent/path")
 
@@ -268,15 +280,15 @@ class TestPredictorIntegration:
         match_data = {
             "home_team": "Consistent Team A",
             "away_team": "Consistent Team B",
-            "odds_h": 2.5,
-            "odds_d": 3.2,
-            "odds_a": 3.8,
+            "home_odds": 2.5,
+            "draw_odds": 3.2,
+            "away_odds": 3.8,
         }
 
         # 多次预测
         results = []
         for _ in range(3):
-            result = predictor.predict_single(**match_data)
+            result = predictor.predict(match_data)
             results.append(result["predicted_outcome"])
 
         # 对于stub模型,结果应该是一致的

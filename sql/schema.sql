@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS odds_raw (
     a DECIMAL(5,2) NOT NULL, -- 客胜赔率
     provider VARCHAR(50) NOT NULL DEFAULT 'unknown',
     ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(match_id, provider, ts)
+    UNIQUE(match_id, provider)
 );
 
 -- 特征数据表

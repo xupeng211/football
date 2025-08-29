@@ -87,10 +87,10 @@ test: check-venv ## Run tests with coverage using settings from pyproject.toml
 ci: format lint type security security-deps test validate policy-guard validate-contract ## Run complete CI pipeline locally
 	@echo "$(GREEN)🎊 All CI checks passed!$(NC)"
 
-dev: check-venv ## Start development server
+dev: ## Start development server
 	@echo "$(BLUE)🚀 Starting development server...$(NC)"
 	@if [ -f "apps/api/main.py" ]; then \
-		uvicorn apps.api.main:app --reload --host 0.0.0.0 --port 8000; \
+		ENV=development $(PYTHON_VENV) -m uvicorn apps.api.main:app --reload --host 0.0.0.0 --port 8000; \
 	else \
 		echo "$(RED)❌ API main file not found$(NC)"; \
 		exit 1; \
@@ -235,6 +235,13 @@ train: ## 训练XGBoost模型
 	@echo "$(BLUE)🤖 训练模型...$(NC)"
 	$(PYTHON_VENV) trainer/fit_xgb.py
 
+prefect-deploy: ## Deploy Prefect flows
+	@echo "$(BLUE)🚀 Deploying Prefect flows...$(NC)"
+	@echo "Waiting 10 seconds for Prefect server to initialize..."
+	@sleep 10
+	PREFECT_API_URL=http://127.0.0.1:4200/api $(PYTHON_VENV) -m flows.data_collection_flow
+	@echo "$(GREEN)✅ Prefect flows deployed$(NC)"
+
 serve: ## 启动API服务 (本地开发)
 	@echo "$(BLUE)🚀 启动API服务...$(NC)"
 	$(PYTHON_VENV) -m uvicorn apps.api.main:app --host 0.0.0.0 --port 8000 --reload
@@ -261,7 +268,7 @@ mvp-clean: ## 清理MVP环境和数据
 
 
 # Data Seeding
-.PHONY: seed.sample.odds seed.sample.features seed.sample
+.PHONY: seed.sample.odds seed.sample.features seed.sample.matches seed.sample
 
 seed.sample.odds: check-venv ## Seed database with sample odds data
 	@echo "🌱 Seeding database with sample odds data..."
@@ -273,7 +280,12 @@ seed.sample.features: check-venv ## Seed database with sample features data
 	@$(PYTHON_VENV) -m data_pipeline.transforms.ingest_features
 	@echo "✅ Sample features data seeded."
 
-seed.sample: seed.sample.odds seed.sample.features ## Seed database with all sample data
+seed.sample.matches: check-venv ## Seed database with sample matches data
+	@echo "🌱 Seeding database with sample matches data..."
+	@$(PYTHON_VENV) scripts/seed_matches.py
+	@echo "✅ Sample matches data seeded."
+
+seed.sample: seed.sample.matches seed.sample.odds seed.sample.features ## Seed database with all sample data
 	@echo "✅ All sample data seeded."
 
 # 测试相关命令
