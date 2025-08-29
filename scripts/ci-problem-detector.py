@@ -185,7 +185,7 @@ class CIProblemDetector:
                             "severity": "high",
                             "details": result.stderr[:500],
                             "solution": (
-                                "运行 python " "scripts/dependency-conflict-detector.py"
+                                "运行 python scripts/dependency-conflict-detector.py"
                             ),
                         }
                     )
@@ -483,7 +483,7 @@ def main() -> int:
     auto_fixable = [p for p in all_problems if p["type"] == "problematic_file"]
     if auto_fixable:
         count = len(auto_fixable)
-        prompt = f"\n🔧 发现 {count} " "个可自动修复的问题,是否修复?(y/N): "
+        prompt = f"\n🔧 发现 {count} 个可自动修复的问题,是否修复?(y/N): "
         response = input(prompt)
         if response.lower() == "y":
             if detector.apply_fixes(auto_fixable):

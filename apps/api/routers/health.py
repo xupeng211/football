@@ -70,7 +70,7 @@ async def health_check() -> HealthResponse:
             "message": prefect_msg,
         }
 
-        # 如果任何组件不健康,整体状态为不健康
+        # 如果任何组件不健康, 整体状态为不健康
         if any(comp.get("status") == "unhealthy" for comp in components.values()):
             overall_status = "unhealthy"
 

@@ -106,7 +106,7 @@ async def predict_single_match(
 
     except Exception as e:
         logger.error("单场比赛预测失败", error=str(e))
-        raise HTTPException(status_code=500, detail="预测服务暂时不可用") from e
+        raise HTTPException(status_code=500, detail="预测服务暂时不可用")
 
 
 @router.post("/predict/batch", response_model=BatchPredictionResponse)
@@ -163,7 +163,7 @@ async def predict_batch_matches(
 
     except Exception as e:
         logger.error("批量预测失败", error=str(e))
-        raise HTTPException(status_code=500, detail="批量预测服务暂时不可用") from e
+        raise HTTPException(status_code=500, detail="批量预测服务暂时不可用")
 
 
 @router.get("/history")
@@ -217,4 +217,4 @@ async def get_prediction_history(
 
     except Exception as e:
         logger.error("获取预测历史失败", error=str(e))
-        raise HTTPException(status_code=500, detail="历史记录服务暂时不可用") from e
+        raise HTTPException(status_code=500, detail="历史记录服务暂时不可用")
