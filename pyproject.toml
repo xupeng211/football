@@ -24,6 +24,7 @@ dependencies = [
     "requests>=2.32.4",
     "urllib3>=2.2.2",
     "redis>=5.0.0",
+    "types-redis>=4.6.0",
 ]
 
 [project.optional-dependencies]
@@ -41,7 +42,6 @@ dev = [
     "pytest-mock>=3.10.0",
     "types-PyYAML",
     "types-requests",
-    "types-redis",
 ]
 
 [tool.hatch.build.targets.wheel]

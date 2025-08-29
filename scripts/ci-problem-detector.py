@@ -16,10 +16,10 @@ from typing import Any, Dict, List
 class CIProblemDetector:
     """CI问题检测器"""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.project_root = Path.cwd()
-        self.problems = []
-        self.critical_problems = []
+        self.problems: List[Dict[str, Any]] = []
+        self.critical_problems: List[Dict[str, Any]] = []
 
     def run_comprehensive_check(self) -> Dict[str, Any]:
         """运行全面的CI问题检测"""
@@ -143,7 +143,7 @@ class CIProblemDetector:
                             {
                                 "type": "security_issue",
                                 "path": str(file_path),
-                                "line": content[: match.start()].count("\n") + 1,
+                                "line": (content[: match.start()].count("\n") + 1),
                                 "description": desc,
                                 "severity": "critical",
                                 "solution": "使用环境变量或配置文件",
@@ -300,7 +300,8 @@ class CIProblemDetector:
                             {
                                 "type": "large_untracked_file",
                                 "path": str(file_path),
-                                "description": f"大型未跟踪文件 ({file_path.stat().st_size / 1024 / 1024:.1f}MB)",
+                                "description": f"大型未跟踪文件 "
+                                f"({file_path.stat().st_size / 1024 / 1024:.1f}MB)",
                                 "severity": "medium",
                                 "solution": "添加到.gitignore或删除",
                             }
@@ -428,7 +429,7 @@ class CIProblemDetector:
         return report
 
 
-def main():
+def main() -> int:
     """主函数"""
     print("🔍 CI问题检测和预防工具启动")
     print("=" * 60)

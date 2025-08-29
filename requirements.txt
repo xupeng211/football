@@ -47,7 +47,10 @@ colorama==0.4.6
 coolname==2.2.0
     # via prefect
 cryptography==45.0.6
-    # via prefect
+    # via
+    #   prefect
+    #   types-pyopenssl
+    #   types-redis
 dateparser==1.2.2
     # via prefect
 docker==7.1.0
@@ -264,6 +267,14 @@ toml==0.10.2
     # via prefect
 typer==0.16.1
     # via prefect
+types-cffi==1.17.0.20250822
+    # via types-pyopenssl
+types-pyopenssl==24.1.0.20240722
+    # via types-redis
+types-redis==4.6.0.20241004
+    # via football-predict-system (pyproject.toml)
+types-setuptools==80.9.0.20250822
+    # via types-cffi
 typing-extensions==4.15.0
     # via
     #   aiosqlite

@@ -49,19 +49,19 @@ regexes = [
   '''test-api-key''',
   '''dummy-password''',
   '''placeholder-secret''',
-  
+
   # 文档和注释
   '''#\s*(password|secret|key|token)''',
   '''/\*.*?(password|secret|key|token).*?\*/''',
   '''""".*?(password|secret|key|token).*?"""''',
   '''".*?示例.*?"''',
   '''".*?example.*?"''',
-  
+
   # CI/CD环境变量模板
   '''GITHUB_TOKEN\s*[:=]\s*\$\{\{\s*secrets\.''',
   '''API_KEY\s*[:=]\s*\$\{\{\s*vars\.''',
   '''\$\{\{\s*env\.''',
-  
+
   # 开发工具配置
   '''pre-commit''',
   '''pytest''',
@@ -70,7 +70,7 @@ regexes = [
   '''ruff''',
   '''black''',
   '''flake8''',
-  
+
   # 常见的非敏感字符串
   '''localhost''',
   '''127\.0\.0\.1''',
@@ -88,7 +88,7 @@ commits = []
 # 停用词列表
 stopwords = [
   "password",
-  "secret", 
+  "secret",
   "key",
   "token",
   "api",

@@ -1,9 +1,10 @@
 from pathlib import Path
 
 
-def main():
+def main() -> None:
     """
-    Reads key project documents and combines them into a single context pack file.
+    Reads key project documents and combines them into a single context pack
+    file.
     """
     project_root = Path(__file__).parent.parent
     output_dir = project_root / "context"
