@@ -147,6 +147,22 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITLEAKS_CONFIG: .gitleaks.toml
 
+
+      - name: Verify API Contract
+        run: |
+          echo "::group::API Contract Verification"
+          # Generate the schema from the current code
+          python scripts/generate_openapi.py
+          # Compare it with the committed version
+          if ! diff -q docs/api/openapi.json <(python -c 'import json, sys; print(json.dumps(json.load(sys.stdin), indent=2, ensure_ascii=False))' < docs/api/openapi.json); then
+            echo "❌ API contract is out of sync. Please run 'python scripts/generate_openapi.py' and commit the changes."
+            # Show the difference for easier debugging
+            diff -u docs/api/openapi.json <(python -c 'import json, sys; print(json.dumps(json.load(sys.stdin), indent=2, ensure_ascii=False))' < docs/api/openapi.json)
+            exit 1
+          fi
+          echo "✅ API contract is up to date."
+          echo "::endgroup::"
+
       - name: Run tests with coverage gate (single run)
         env:
           COV_MIN: ${{ vars.COV_MIN || '70' }}
