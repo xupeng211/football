@@ -4,23 +4,22 @@
 提供足球比赛结果预测的REST API接口
 """
 
-import time
-import uuid
 from contextlib import asynccontextmanager
 from typing import Any, AsyncGenerator
 
 import structlog
 import uvicorn
 from fastapi import FastAPI
+from prometheus_fastapi_instrumentator import Instrumentator
 from pydantic import BaseModel
-from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
-from starlette.requests import Request
-from starlette.responses import Response
 
-from apps.api.routers import health, metrics, predictions
-from apps.api.routers.metrics import REQUEST_COUNT, REQUEST_DURATION
+from apps.api.logging_config import configure_logging
+from apps.api.routers import health, predictions
 from apps.api.services.prediction_service import prediction_service
 from models.predictor import Predictor
+
+# Configure logging before creating any loggers
+configure_logging()
 
 
 class VersionResponse(BaseModel):
@@ -31,35 +30,7 @@ class VersionResponse(BaseModel):
     model_info: dict[str, Any]
 
 
-class LoggingMiddleware(BaseHTTPMiddleware):
-    async def dispatch(
-        self, request: Request, call_next: RequestResponseEndpoint
-    ) -> Response:
-        trace_id = str(uuid.uuid4())
-        request.state.trace_id = trace_id
-
-        start_time = time.time()
-
-        response = await call_next(request)
-
-        process_time = time.time() - start_time
-        response.headers["X-Trace-ID"] = trace_id
-
-        REQUEST_DURATION.labels(
-            method=request.method, endpoint=request.url.path
-        ).observe(process_time)
-        REQUEST_COUNT.labels(method=request.method, endpoint=request.url.path).inc()
-
-        print(
-            f"trace_id={trace_id} method={request.method} "
-            f"path='{request.url.path}' status_code={response.status_code} "
-            f"process_time={process_time:.4f}s"
-        )
-
-        return response
-
-
-logger = structlog.get_logger()
+logger = structlog.get_logger(__name__)
 predictor = Predictor()
 
 
@@ -67,7 +38,7 @@ predictor = Predictor()
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """
     Application lifespan context manager.
-    Loads all available models into memory on startup.
+    Loads models on startup and exposes Prometheus metrics.
     """
     logger.info("Application startup: Loading models...")
     try:
@@ -75,6 +46,9 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         logger.info("Models loaded successfully.")
     except Exception as e:
         logger.error("Failed to load models during startup.", error=str(e))
+
+    # Instrument the app with Prometheus metrics
+    Instrumentator().instrument(app).expose(app)
     yield
 
 
@@ -85,10 +59,9 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan,
 )
-app.add_middleware(LoggingMiddleware)
+
 app.include_router(predictions.router, prefix="/api/v1", tags=["Predictions"])
 app.include_router(health.router)
-app.include_router(metrics.router)
 
 
 @app.get("/version", response_model=VersionResponse)

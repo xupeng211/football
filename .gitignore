@@ -205,3 +205,7 @@ templates/
 .docker/
 docker-compose.override.yml
 .dockerignore.bak
+
+
+# Dependency lock file
+requirements.lock

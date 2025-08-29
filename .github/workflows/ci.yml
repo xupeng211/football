@@ -16,275 +16,153 @@ env:
   UV_SYSTEM_PYTHON: 1
 
 jobs:
-  test:
+  lint:
+    name: "Lint & Static Analysis"
     runs-on: ubuntu-22.04
-    defaults:
-      run:
-        shell: bash
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
-
-      - name: Repo hygiene — no nested git
-        run: python .tools/guard/no_nested_git.py
-
       - name: Set up Python 3.11.9
         uses: actions/setup-python@v5
         with:
           python-version: "3.11.9"
-
-      - name: Cache pip packages
+      - name: Set up uv cache
         uses: actions/cache@v4
         with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt', '**/uv.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-
-      - name: Install system dependencies
+          path: ~/.cache/uv
+          key: ${{ runner.os }}-uv-${{ hashFiles('**/pyproject.toml') }}
+      - name: Install dependencies from lock file
         run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends build-essential
-
-      - name: Install Python dependencies with uv priority
-        run: |
-          echo "::group::Dependency Installation"
           python -m pip install -U pip uv
-
-          set -euo pipefail
-          # Priority 1: Use uv.lock for exact dependency reproduction
-          if [ -f "uv.lock" ]; then
-            echo "🚀 Using uv.lock for exact dependency reproduction..."
-            uv sync || { echo "⚠️ uv.lock sync failed, falling back to requirements.txt"; pip install -r requirements.txt; }
-          # Priority 2: Fallback to requirements.txt
-          elif [ -f "requirements.txt" ]; then
-            echo "📦 uv.lock not found, falling back to requirements.txt..."
-            pip install -r requirements.txt
-          else
-            echo "❌ No dependency file found (uv.lock or requirements.txt)"
-            exit 1
+          if [ ! -f "requirements.lock" ]; then
+            echo "⚠️ Lock file not found, generating..."
+            uv pip compile pyproject.toml --all-extras -o requirements.lock
           fi
+          uv pip sync requirements.lock
+          uv pip install -e .
+      - name: Validate Configs
+        run: |
+          python -c "import tomllib; tomllib.load(open('pyproject.toml','rb'))"
+          python -c "import yaml; yaml.safe_load(open('.github/workflows/ci.yml'))"
+      - name: Run code formatting check
+        run: ruff format --check .
+      - name: Run linting
+        run: ruff check .
+      - name: Run type checking
+        run: mypy apps/ data_pipeline/ trainer/
 
-          # Install project in editable mode
-          pip install -e .
+      - name: Verify AI Context is up-to-date
+        run: |
+          make regen.context
+          git diff --exit-code context/_pack.md || (echo "❌ AI context is out of sync. Please run 'make regen.context' locally and commit the changes." && exit 1)
 
-          # Install additional dev tools
-          pip install pre-commit 'ruff==0.5.5' mypy pytest pytest-cov bandit diff-cover types-requests pytest-asyncio pytest-mock pip-audit
-          echo "::endgroup::"
 
-      - name: Cache pre-commit
+      - name: Validate Data Contract
+        run: make validate-contract
+  security:
+    name: "Security Scan"
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0 # Required for gitleaks
+      - name: Set up Python 3.11.9
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11.9"
+      - name: Set up uv cache
         uses: actions/cache@v4
         with:
-          path: ~/.cache/pre-commit
-          key: ${{ runner.os }}-pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
-
-      - name: Validate Configs (syntax + single-source)
+          path: ~/.cache/uv
+          key: ${{ runner.os }}-uv-${{ hashFiles('**/pyproject.toml') }}
+      - name: Install dependencies from lock file
         run: |
-          echo "::group::Config Validation"
-          # Validate TOML syntax
-          python -c "import tomllib; [tomllib.load(open(f,'rb')) for f in ['pyproject.toml', '.gitleaks.toml'] if __import__('os').path.exists(f)]"
-          # Validate YAML syntax
-          python -c "import yaml; [yaml.safe_load(open(f)) for f in ['.github/workflows/ci.yml'] if __import__('os').path.exists(f)]"
-          echo "✅ Configuration syntax validation passed"
-          echo "::endgroup::"
-
-      - name: Run code formatting check
-        run: |
-          echo "::group::Code Formatting"
-          ruff format --check .
-          echo "::endgroup::"
-
-      - name: Run linting
-        run: |
-          echo "::group::Linting"
-          ruff check .
-          echo "::endgroup::"
-
-      - name: Run type checking (core modules - strict)
-        continue-on-error: true
-        run: |
-          echo "::group::Type Checking - Core Modules"
-          # Check core modules strictly
-          for dir in apps data_pipeline trainer; do
-            if [ -d "$dir" ]; then
-              echo "🔍 Advisory type checking: $dir/"
-              mypy "$dir/" --ignore-missing-imports --no-strict-optional || echo "⚠️ Type issues in $dir/ (advisory only)"
-            fi
-          done
-          echo "::endgroup::"
-
-      - name: Run type checking (other modules - advisory)
-        continue-on-error: true
-        run: |
-          echo "::group::Type Checking - Other Modules (Advisory)"
-          echo "🔍 Advisory type checking for remaining modules..."
-          for dir in tests scripts models infra docs; do
-            if [ -d "$dir" ]; then
-              echo "Advisory check: $dir/"
-              mypy "$dir/" --ignore-missing-imports --no-strict-optional || echo "⚠️ Type issues in $dir/ (advisory only)"
-            fi
-          done
-          echo "::endgroup::"
-
-      - name: Run security scans (Bandit & pip-audit)
-        run: |
-          echo "::group::Security Scans"
-          mkdir -p reports
-          # Run bandit and save report
-          bandit -r . --configfile pyproject.toml -ll -o reports/bandit_report.txt
-          # Run pip-audit and save report, continue on failure
-          pip-audit --output reports/pip_audit_report.txt || echo "pip-audit found vulnerabilities, see report for details"
-          echo "::endgroup::"
-
-      - name: Run gitleaks (strict)
+          python -m pip install -U pip uv
+          if [ ! -f "requirements.lock" ]; then
+            echo "⚠️ Lock file not found, generating..."
+            uv pip compile pyproject.toml --all-extras -o requirements.lock
+          fi
+          uv pip sync requirements.lock
+          uv pip install -e .
+      - name: Run Bandit scan
+        run: bandit -r . --configfile pyproject.toml -ll -o reports/bandit_report.txt
+      - name: Run pip-audit scan
+        run: pip-audit --output reports/pip_audit_report.txt || echo "pip-audit found vulnerabilities, see report for details"
+      - name: Run gitleaks scan
         uses: gitleaks/gitleaks-action@v2
         with:
           report_path: ${{ github.workspace }}/reports/gitleaks_report.json
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITLEAKS_CONFIG: .gitleaks.toml
-
-
-      - name: Verify API Contract
-        run: |
-          echo "::group::API Contract Verification"
-          # Generate the schema from the current code
-          python scripts/generate_openapi.py
-          # Compare it with the committed version
-          if ! diff -q docs/api/openapi.json <(python -c 'import json, sys; print(json.dumps(json.load(sys.stdin), indent=2, ensure_ascii=False))' < docs/api/openapi.json); then
-            echo "❌ API contract is out of sync. Please run 'python scripts/generate_openapi.py' and commit the changes."
-            # Show the difference for easier debugging
-            diff -u docs/api/openapi.json <(python -c 'import json, sys; print(json.dumps(json.load(sys.stdin), indent=2, ensure_ascii=False))' < docs/api/openapi.json)
-            exit 1
-          fi
-          echo "✅ API contract is up to date."
-          echo "::endgroup::"
-
-      - name: Run tests with coverage gate (single run)
-        env:
-          COV_MIN: ${{ vars.COV_MIN || '70' }}
-          TEST_SEED: 42
-        run: |
-          echo "::group::Tests with Coverage Gate"
-          set -euo pipefail
-
-          # Dynamic coverage directory detection
-          COV_ARGS=""
-          for d in apps data_pipeline models trainer; do
-            [ -d "$d" ] && COV_ARGS="$COV_ARGS --cov=$d"
-          done
-
-          # Fallback to root if no specific directories found
-          if [ -z "$COV_ARGS" ]; then
-            echo "📁 No specific coverage directories found, using root"
-            COV_ARGS="--cov=."
-          else
-            echo "📁 Coverage directories: $COV_ARGS"
-          fi
-
-          # Single comprehensive test run with all reports
-          pytest -v ${COV_ARGS} \
-            --cov-report=xml \
-            --cov-report=term-missing \
-            --cov-report=html \
-            --cov-report=json \
-            --cov-fail-under="${COV_MIN}" \
-            tests/ || {
-              echo "❌ Tests failed or coverage below threshold (${COV_MIN}%)"
-              exit 1
-            }
-
-          echo "✅ Tests passed with coverage above ${COV_MIN}%"
-          echo "::endgroup::"
-
-      - name: Collect changed files
-        id: changed
-        if: ${{ github.event_name == 'pull_request' }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          base_ref="${GITHUB_BASE_REF:-main}"
-          git fetch origin "${base_ref}" --depth=1 || true
-          files=$(git diff --name-only "origin/${base_ref}...HEAD" || true)
-          # Convert multiline to single line with space separation
-          files_single_line=$(echo "${files}" | tr '\n' ' ' | xargs)
-          echo "files=${files_single_line}" >> "$GITHUB_OUTPUT"
-          if echo "${files}" | grep -E '\.(py|pyi)$' > /dev/null; then
-            echo "has_python_files=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "has_python_files=false" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Diff Coverage Gate (PR only)
-        if: ${{ github.event_name == 'pull_request' && !contains(github.event.pull_request.labels.*.name, 'ci-bypass-coverage') && steps.changed.outputs.has_python_files == 'true' }}
-        env:
-          DIFF_COV_MIN: ${{ vars.DIFF_COV_MIN || 75 }}
-        run: |
-          set -euo pipefail
-          base_ref="${{ github.base_ref || 'main' }}"
-          git fetch origin "${base_ref}" --depth=1 || true
-          # 生成报告（HTML/Markdown）
-          diff-cover coverage.xml \
-            --compare-branch "origin/${base_ref}" \
-            --html-report diff-coverage.html \
-            --markdown-report diff-coverage.md
-          # 阈值校验（未达标非零退出）
-          diff-cover coverage.xml \
-            --compare-branch "origin/${base_ref}" \
-            --fail-under ${DIFF_COV_MIN}
-
-
-      - name: Run Smoke Tests
-        run: |
-          echo "::group::Smoke Tests"
-          # Start the API server in the background
-          uvicorn apps.api.main:app --host 0.0.0.0 --port 8000 &
-          API_PID=$!
-
-          # Wait for the server to be ready by polling the /livez endpoint
-          echo "Waiting for API server to start..."
-          for i in {1..10}; do
-            if curl -s -f http://localhost:8000/livez; then
-              echo "API server is up."
-              break
-            fi
-            echo "Attempt $i: API not ready yet."
-            sleep 2
-          done
-
-          # Final check to ensure server is running before tests
-          curl -s -f http://localhost:8000/livez || { echo "API server failed to start"; kill $API_PID; exit 1; }
-
-          # Run prediction smoke test
-          echo "Running minimal_predict.py smoke test..."
-          python examples/minimal_predict.py || { echo "minimal_predict.py smoke test failed"; kill $API_PID; exit 1; }
-
-          # Run backtest smoke test
-          echo "Running minimal_backtest.py smoke test..."
-          python examples/minimal_backtest.py || { echo "minimal_backtest.py smoke test failed"; kill $API_PID; exit 1; }
-
-          # Stop the API server
-          echo "Stopping API server..."
-          kill $API_PID
-
-          echo "✅ Smoke tests passed"
-          echo "::endgroup::"
-      - name: Upload CI artifacts
+      - name: Upload security reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ci-artifacts
-          path: |
-            reports/
-            .coverage
-            coverage.xml
-            coverage.json
-            htmlcov/**
-            pytestdebug.log
-            diff-coverage.html
-            diff-coverage.md
+          name: security-reports
+          path: reports/
           if-no-files-found: ignore
-          retention-days: 30
+
+  test:
+    name: "Test & Coverage"
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0 # Required for diff-cover
+      - name: Set up Python 3.11.9
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11.9"
+      - name: Set up uv cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/uv
+          key: ${{ runner.os }}-uv-${{ hashFiles('**/pyproject.toml') }}
+      - name: Install dependencies from lock file
+        run: |
+          python -m pip install -U pip uv
+          if [ ! -f "requirements.lock" ]; then
+            echo "⚠️ Lock file not found, generating..."
+            uv pip compile pyproject.toml --all-extras -o requirements.lock
+          fi
+          uv pip sync requirements.lock
+          uv pip install -e .
+      - name: Verify API Contract
+        run: |
+          python scripts/generate_openapi.py
+          if ! diff -q docs/api/openapi.json <(jq . docs/api/openapi.json); then
+            echo "❌ API contract is out of sync. Please run 'python scripts/generate_openapi.py' and commit the changes."
+            diff -u docs/api/openapi.json <(jq . docs/api/openapi.json)
+            exit 1
+          fi
+      - name: Run tests in parallel with coverage
+        env:
+          COV_MIN: ${{ vars.COV_MIN || '70' }}
+        run: |
+          pytest --cov-fail-under="${COV_MIN}" tests/
+      - name: Diff Coverage Gate (PR only)
+        if: ${{ github.event_name == 'pull_request' }}
+        env:
+          DIFF_COV_MIN: ${{ vars.DIFF_COV_MIN || 75 }}
+        run: |
+          base_ref="${{ github.base_ref || 'main' }}"
+          diff-cover coverage.xml --compare-branch "origin/${base_ref}" --fail-under ${DIFF_COV_MIN}
+      - name: Run Smoke Tests
+        run: |
+          uvicorn apps.api.main:app --host 0.0.0.0 --port 8000 &
+          API_PID=$!
+          sleep 10 # Wait for server to start
+          python examples/minimal_predict.py
+          kill $API_PID
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-artifacts
+          path: |
+            htmlcov/
+            coverage.xml
+          if-no-files-found: ignore

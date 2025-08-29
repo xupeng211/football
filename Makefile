@@ -1,6 +1,6 @@
 # Football Prediction System - Development Makefile
 .DEFAULT_GOAL := help
-.PHONY: help clean format lint type test security ci dev docker-up docker-down install cov diffcov local-ci
+.PHONY: help clean clean-all format lint type test security security-deps ci dev docker-up docker-down install cov diffcov local-ci validate-contract
 
 # Configuration
 PYTHON := python3
@@ -34,29 +34,19 @@ help: ## Show this help message
 	@echo "  2. $(YELLOW)make ci$(NC)       # Run all checks"
 	@echo "  3. $(YELLOW)make dev$(NC)      # Start development server"
 
-install: ## Install dependencies with uv priority (CI-consistent)
-	@echo "$(BLUE)🔧 Setting up dependencies (uv priority)...$(NC)"
-	@# Ensure virtual environment exists
+install: ## Install dependencies using uv and lock file
+	@echo "$(BLUE)🔧 Setting up dependencies...$(NC)"
 	@[ -d "$(VENV)" ] || $(PYTHON) -m venv $(VENV)
 	@echo "$(GREEN)✅ Virtual environment ready: $(VENV)$(NC)"
-	@# Activate and install with uv priority strategy
 	@. $(VENV)/bin/activate; \
 	python -m pip install -U pip uv; \
-	if [ -f "uv.lock" ]; then \
-		echo "$(BLUE)🚀 Using uv.lock for exact dependency reproduction...$(NC)"; \
-		uv pip sync --frozen uv.lock || { \
-			echo "$(YELLOW)⚠️ uv.lock sync failed, falling back to requirements.txt$(NC)"; \
-			pip install -r requirements.txt; \
-		}; \
-	elif [ -f "requirements.txt" ]; then \
-		echo "$(BLUE)📦 Using requirements.txt...$(NC)"; \
-		pip install -r requirements.txt; \
-	else \
-		echo "$(RED)❌ No dependency file found$(NC)"; \
-		exit 1; \
+	if [ ! -f "requirements.lock" ]; then \
+		echo "$(YELLOW)⚠️ Lock file not found, generating...$(NC)"; \
+		uv pip compile pyproject.toml -o requirements.lock; \
 	fi; \
-	pip install -e .; \
-	pip install pre-commit ruff mypy pytest pytest-cov bandit
+	uv pip sync requirements.lock; \
+	uv pip install -e .[dev]; \
+	pre-commit install
 	@echo "$(GREEN)✅ Dependencies installed successfully$(NC)"
 	@echo "$(YELLOW)💡 Next: Run 'source $(VENV)/bin/activate' then 'make ci'$(NC)"
 
@@ -84,23 +74,17 @@ security: check-venv ## Run security scanning
 
 sec: security ## Alias for security
 
-test: check-venv ## Run tests with coverage
-	@echo "$(BLUE)🧪 Running tests with coverage...$(NC)"
-	pytest tests/ -v --cov=apps --cov=data_pipeline --cov-report=term-missing --cov-report=html
+security-deps: check-venv ## Run dependency security scan
+	@echo "$(BLUE)🔒 Running dependency security scan...$(NC)"
+	pip-audit
+	@echo "$(GREEN)✅ Dependency security scan completed$(NC)"
+
+test: check-venv ## Run tests with coverage using settings from pyproject.toml
+	@echo "$(BLUE)🧪 Running tests in parallel...$(NC)"
+	pytest tests/
 	@echo "$(GREEN)✅ Tests completed$(NC)"
 
-ci: check-venv ## Run complete CI pipeline locally
-	@echo "$(BLUE)🚀 Running complete CI pipeline...$(NC)"
-	@echo "$(YELLOW)Step 1: Code formatting$(NC)"
-	@$(MAKE) format
-	@echo "$(YELLOW)Step 2: Linting$(NC)"
-	@$(MAKE) lint
-	@echo "$(YELLOW)Step 3: Type checking$(NC)"
-	@$(MAKE) type
-	@echo "$(YELLOW)Step 4: Security scanning$(NC)"
-	@$(MAKE) security
-	@echo "$(YELLOW)Step 5: Running tests$(NC)"
-	@$(MAKE) test
+ci: format lint type security security-deps test validate policy-guard validate-contract ## Run complete CI pipeline locally
 	@echo "$(GREEN)🎊 All CI checks passed!$(NC)"
 
 dev: check-venv ## Start development server
@@ -122,7 +106,18 @@ docker-down: ## Stop all Docker services
 	docker-compose down
 	@echo "$(GREEN)✅ Docker services stopped$(NC)"
 
-clean: ## Clean up temporary files and caches
+clean: ## Clean up temporary files (excluding caches)
+	@echo "$(BLUE)🧹 Cleaning up temporary files...$(NC)"
+	find . -type f -name "*.pyc" -delete
+	find . -type d -name "__pycache__" -delete
+	find . -type d -name "*.egg-info" -exec rm -rf {} +
+	find . -name ".coverage" -delete
+	find . -name "coverage.xml" -delete
+	find . -name "coverage.json" -delete
+	rm -rf htmlcov/
+	@echo "$(GREEN)✅ Cleanup completed$(NC)"
+
+clean-all: ## Clean up all temporary files, caches, and build artifacts
 	@echo "$(BLUE)🧹 Cleaning up...$(NC)"
 	find . -type f -name "*.pyc" -delete
 	find . -type d -name "__pycache__" -delete
@@ -150,6 +145,11 @@ policy-guard: ## Check dependency sync and workflow consistency
 	fi
 	@# Check if workflows are not modified without review
 	@echo "$(GREEN)✅ Policy guard checks passed$(NC)"
+
+validate-contract: check-venv ## Validate data contract against implementation
+	@echo "$(BLUE)🔍 Validating data contract...$(NC)"
+	$(PYTHON_VENV) scripts/validate_contract.py
+	@echo "$(GREEN)✅ Data contract is in sync with implementation$(NC)"
 
 quality-check: check-venv ## Quick quality check (avoid CI failures)
 	@echo "$(YELLOW)Running quality checks...$(NC)"
@@ -205,8 +205,7 @@ diffcov: ## Run diff coverage check for changed lines (usage: make diffcov BASE=
 	diff-cover coverage.xml --compare-branch "origin/$$BASE" --markdown-report diff-coverage.md; \
 	diff-cover coverage.xml --compare-branch "origin/$$BASE" --fail-under $$THRESH
 
-local-ci: format lint type validate policy-guard sec cov ## Run complete local CI pipeline
-	@echo "$(GREEN)🎊 All local CI checks passed!$(NC)"
+local-ci: ci ## Alias for the main CI pipeline
 
 # MVP 相关命令
 mvp-up: ## 启动MVP环境 (数据库 + API)
@@ -340,6 +339,17 @@ test-clean:
 	@echo "✅ 测试文件清理完成"
 
 
+
+# ==============================================================================
+# 🔬 Advanced Testing
+# ==============================================================================
+.PHONY: mutation-test
+
+mutation-test: check-venv ## Run mutation testing with mutmut
+	@echo "$(BLUE)🔬 Running mutation testing... (this may take a while)$(NC)"
+	mutmut run
+	@echo "$(GREEN)✅ Mutation testing finished. Run 'mutmut results' to see details.$(NC)"
+	@echo "$(YELLOW)💡 You can also run 'mutmut html' to generate an HTML report.$(NC)"
 # ==============================================================================
 # 📖 Context Management (for AI Assistant)
 # ==============================================================================
