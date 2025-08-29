@@ -149,7 +149,7 @@ jobs:
 
       - name: Run tests with coverage gate (single run)
         env:
-          COV_MIN: ${{ vars.COV_MIN || '15' }}
+          COV_MIN: ${{ vars.COV_MIN || '70' }}
           TEST_SEED: 42
         run: |
           echo "::group::Tests with Coverage Gate"
