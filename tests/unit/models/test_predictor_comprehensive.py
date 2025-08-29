@@ -12,47 +12,43 @@ import pytest
 from models.predictor import Predictor, _safe_load_or_stub, _StubModel
 
 
+@patch("models.predictor._safe_load_or_stub", return_value=_StubModel())
 class TestPredictor:
     """预测器类的完整单元测试"""
 
-    def test_predictor_initialization(self):
+    def test_predictor_initialization(self, mock_safe_load):
         """测试预测器初始化"""
         predictor = Predictor()
         assert predictor is not None
-        assert hasattr(predictor, "model")
+        assert isinstance(predictor.model, _StubModel)
         assert hasattr(predictor, "model_version")
         assert hasattr(predictor, "feature_columns")
 
-    def test_predictor_with_custom_path(self):
+    def test_predictor_with_custom_path(self, mock_safe_load):
         """测试使用自定义路径初始化"""
         custom_path = "/custom/model/path"
         predictor = Predictor(model_path=custom_path)
-        # 由于路径不存在,应该使用StubModel
         assert isinstance(predictor.model, _StubModel)
+        mock_safe_load.assert_called_with(custom_path)
 
-    @patch("models.predictor._safe_load_or_stub")
     def test_load_model_success(self, mock_safe_load):
         """测试成功加载模型"""
-        # Mock设置
-        # We directly mock _safe_load_or_stub, so we don't need to mock _find_latest_model
         mock_model = Mock()
         mock_safe_load.return_value = mock_model
 
         predictor = Predictor()
-        mock_safe_load.reset_mock()  # Ignore call from __init__
         predictor.load_model("path/to/model.pkl")
 
         assert predictor.model == mock_model
-        mock_safe_load.assert_called_once_with("path/to/model.pkl")
+        mock_safe_load.assert_called_with("path/to/model.pkl")
 
-    def test_predict_single_with_stub_model(self):
+    def test_predict_single_with_stub_model(self, mock_safe_load):
         """测试使用stub模型进行单次预测"""
         predictor = Predictor()
         result = predictor.predict_single(
             home_team="Team A", away_team="Team B", odds_h=2.0, odds_d=3.0, odds_a=4.0
         )
 
-        # 验证返回结果结构
         assert isinstance(result, dict)
         required_keys = [
             "home_win",
@@ -64,17 +60,16 @@ class TestPredictor:
         for key in required_keys:
             assert key in result
 
-        # 验证概率总和为1
         total_prob = result["home_win"] + result["draw"] + result["away_win"]
         assert abs(total_prob - 1.0) < 0.01
 
-    def test_predict_batch_empty_input(self):
+    def test_predict_batch_empty_input(self, mock_safe_load):
         """测试批量预测空输入"""
         predictor = Predictor()
         result = predictor.predict_batch([])
         assert result == []
 
-    def test_predict_batch_single_match(self):
+    def test_predict_batch_single_match(self, mock_safe_load):
         """测试批量预测单场比赛"""
         predictor = Predictor()
         matches = [
@@ -86,12 +81,11 @@ class TestPredictor:
                 "odds_a": 4.0,
             }
         ]
-
         result = predictor.predict_batch(matches)
         assert len(result) == 1
         assert isinstance(result[0], dict)
 
-    def test_predict_batch_multiple_matches(self):
+    def test_predict_batch_multiple_matches(self, mock_safe_load):
         """测试批量预测多场比赛"""
         predictor = Predictor()
         matches = [
@@ -104,23 +98,15 @@ class TestPredictor:
             }
             for i in range(5)
         ]
-
         result = predictor.predict_batch(matches)
         assert len(result) == 5
         for prediction in result:
             assert isinstance(prediction, dict)
 
-    def test_predict_batch_with_exception(self):
+    def test_predict_batch_with_exception(self, mock_safe_load):
         """测试批量预测异常处理"""
         predictor = Predictor()
-
-        # 使用不存在的路径确保使用StubModel
-        predictor = Predictor(model_path="/nonexistent/path")
-
-        # 准备会导致异常的输入
         invalid_matches = [{"invalid": "data"}]
-
-        # 应该优雅处理异常
         result = predictor.predict_batch(invalid_matches)
         assert isinstance(result, list)
 
@@ -130,7 +116,10 @@ class TestSafeLoadOrStub:
 
     def test_safe_load_with_none_path(self):
         """测试空路径"""
-        result = _safe_load_or_stub(None)
+        with pytest.warns(
+            UserWarning, match="Predictor: model path is None, using stub"
+        ):
+            result = _safe_load_or_stub(None)
         assert isinstance(result, _StubModel)
 
     @patch("pickle.load")
@@ -146,14 +135,16 @@ class TestSafeLoadOrStub:
     @patch("builtins.open", side_effect=FileNotFoundError)
     def test_safe_load_file_not_found(self, mock_open):
         """测试文件不存在的情况"""
-        result = _safe_load_or_stub("/nonexistent/path.pkl")
+        with pytest.warns(UserWarning, match="missing or corrupt"):
+            result = _safe_load_or_stub("/nonexistent/path.pkl")
         assert isinstance(result, _StubModel)
 
     @patch("pickle.load", side_effect=Exception("Corrupt file"))
     @patch("builtins.open", create=True)
     def test_safe_load_corrupt_file(self, mock_open, mock_pickle_load):
         """测试损坏文件的情况"""
-        result = _safe_load_or_stub("/corrupt/file.pkl")
+        with pytest.warns(UserWarning, match="missing or corrupt"):
+            result = _safe_load_or_stub("/corrupt/file.pkl")
         assert isinstance(result, _StubModel)
 
 
