@@ -66,7 +66,7 @@ class XGBoostTrainer:
                 df = pd.read_sql_query(query, conn)
                 logger.info("Successfully loaded data from database", count=len(df))
                 return df
-        except psycopg2.Error as e:
+        except Exception as e:
             logger.error("Database error while loading data", error=str(e))
             raise
 

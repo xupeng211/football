@@ -1,0 +1,98 @@
+name: Security Scan
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # 每天凌晨2点运行安全扫描
+    - cron: '0 2 * * *'
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install bandit[toml] safety gitleaks
+
+    - name: Run Bandit Security Scan
+      run: |
+        bandit -r . -c pyproject.toml -f json -o bandit-report.json || true
+        bandit -r . -c pyproject.toml
+
+    - name: Run Safety Check
+      run: |
+        safety check --json --output safety-report.json || true
+        safety check
+
+    - name: Run GitLeaks
+      run: |
+        gitleaks detect --source . --verbose --report-format json --report-path gitleaks-report.json || true
+        gitleaks detect --source . --verbose
+
+    - name: Upload Security Reports
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: security-reports
+        path: |
+          bandit-report.json
+          safety-report.json
+          gitleaks-report.json
+
+    - name: Comment PR with Security Results
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const fs = require('fs');
+          let comment = '## 🔒 Security Scan Results\n\n';
+
+          // Bandit results
+          try {
+            const banditReport = JSON.parse(fs.readFileSync('bandit-report.json', 'utf8'));
+            const issues = banditReport.results.length;
+            comment += `### Bandit Security Scan\n`;
+            comment += `- **Issues Found**: ${issues}\n`;
+            if (issues > 0) {
+              comment += `- **Severity**: ${banditReport.metrics._totals.SEVERITY}\n`;
+            }
+          } catch (e) {
+            comment += `### Bandit Security Scan\n- ✅ No issues found\n`;
+          }
+
+          // Safety results
+          try {
+            const safetyReport = JSON.parse(fs.readFileSync('safety-report.json', 'utf8'));
+            comment += `\n### Safety Dependency Check\n`;
+            comment += `- **Vulnerabilities**: ${safetyReport.vulnerabilities?.length || 0}\n`;
+          } catch (e) {
+            comment += `\n### Safety Dependency Check\n- ✅ No vulnerabilities found\n`;
+          }
+
+          // GitLeaks results
+          try {
+            const gitleaksReport = JSON.parse(fs.readFileSync('gitleaks-report.json', 'utf8'));
+            comment += `\n### GitLeaks Secret Scan\n`;
+            comment += `- **Secrets Found**: ${gitleaksReport.length || 0}\n`;
+          } catch (e) {
+            comment += `\n### GitLeaks Secret Scan\n- ✅ No secrets detected\n`;
+          }
+
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });

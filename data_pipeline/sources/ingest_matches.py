@@ -44,7 +44,9 @@ def ingest_matches(matches: list[Match], db_conn_str: str) -> tuple[int, int]:
                         )
 
                 upsert_sql = """
-                INSERT INTO matches (id, date, home, away, home_goals, away_goals, result)
+                INSERT INTO matches (
+                    id, date, home, away, home_goals, away_goals, result
+                )
                 VALUES (%s, %s, %s, %s, %s, %s, %s)
                 ON CONFLICT (id) DO UPDATE SET
                     home_goals = EXCLUDED.home_goals,
@@ -55,7 +57,7 @@ def ingest_matches(matches: list[Match], db_conn_str: str) -> tuple[int, int]:
                 affected_rows = cur.rowcount
                 conn.commit()
                 return affected_rows, len(matches) - affected_rows
-    except psycopg2.Error as e:
+    except Exception as e:
         logger.error("Database error during match ingestion", error=str(e))
         return 0, len(matches)
 

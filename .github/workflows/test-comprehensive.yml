@@ -1,0 +1,112 @@
+name: 全面测试套件
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_PASSWORD: testpass
+          POSTGRES_USER: postgres
+          POSTGRES_DB: sports_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:6
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    strategy:
+      matrix:
+        python-version: [3.11]
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: 设置Python环境
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: 安装Poetry
+      uses: snok/install-poetry@v1
+      with:
+        version: latest
+        virtualenvs-create: true
+        virtualenvs-in-project: true
+
+    - name: 加载缓存依赖
+      uses: actions/cache@v3
+      with:
+        path: .venv
+        key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
+
+    - name: 安装依赖
+      run: poetry install --no-interaction --no-ansi
+
+    - name: 运行代码质量检查
+      run: |
+        poetry run ruff check .
+        poetry run mypy . --ignore-missing-imports
+
+    - name: 运行单元测试
+      run: |
+        poetry run pytest tests/unit/ -v --cov=. --cov-report=xml
+      env:
+        TEST_SEED: 42
+
+    - name: 运行集成测试
+      run: |
+        poetry run pytest tests/integration/ -v --cov=. --cov-append --cov-report=xml
+      env:
+        ENABLE_DB_TESTS: "1"
+        TEST_DATABASE_URL: "postgresql://postgres:testpass@localhost:5432/sports_test"
+        REDIS_URL: "redis://localhost:6379"
+        TEST_SEED: 42
+
+    - name: 运行属性测试
+      run: |
+        poetry run pytest tests/unit/test_features_property_based.py -v
+      continue-on-error: true
+
+    - name: 生成覆盖率报告
+      run: |
+        poetry run coverage report --show-missing
+        poetry run coverage html
+
+    - name: 上传覆盖率到Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+
+    - name: 上传测试报告
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: test-reports
+        path: |
+          htmlcov/
+          coverage.xml
+          .coverage

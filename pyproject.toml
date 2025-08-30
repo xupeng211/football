@@ -1,67 +1,59 @@
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
-
-[project]
+[tool.poetry]
 name = "football-predict-system"
 version = "0.1.0"
 description = "Football match outcome prediction system"
+authors = ["Your Name <you@example.com>"]
 readme = "README.md"
-requires-python = ">=3.8"
-dependencies = [
+packages = [{include = "football_predict_system", from = "src"}]
 
-    "fastapi>=0.110.3",
-    "uvicorn[standard]>=0.23.0",
-    "pydantic>=2.0.0",
-    "pandas>=2.0.0",
-    "pydantic-settings>=2.0.0",
-    "numpy>=1.24.0",
-    "scikit-learn>=1.5.0",
-    "xgboost>=1.7.0",
-    "psycopg2-binary>=2.9.0",
-    "sqlalchemy>=2.0.0",
-    "prefect>=2.20.17,<3.0.0",
-    "structlog>=23.0.0",
-    "python-dotenv>=1.0.0",
-    "requests>=2.32.4",
-    "urllib3>=2.2.2",
-    "redis>=5.0.0",
-    "types-redis>=4.6.0",
-    "prometheus-fastapi-instrumentator>=7.0.0",
-    "aiculture-kit @ git+https://github.com/xupeng211/AICultureKit.git@9c776783542e5c578f692f6a51b29d285700d094",
-]
+[tool.poetry.dependencies]
+python = ">=3.11"
+fastapi = ">=0.110.3"
+uvicorn = {version = ">=0.23.0", extras = ["standard"]}
+pydantic = ">=2.0.0"
+pandas = ">=2.0.0"
+pydantic-settings = ">=2.0.0"
+numpy = ">=1.24.0"
+scikit-learn = ">=1.5.0"
+xgboost = ">=1.7.0"
+psycopg2-binary = ">=2.9.0"
+sqlalchemy = ">=2.0.0"
+prefect = ">=2.20.17,<3.0.0"
+structlog = ">=23.0.0"
+python-dotenv = ">=1.0.0"
+requests = ">=2.32.4"
+urllib3 = ">=2.2.2"
+redis = ">=5.0.0"
+types-redis = ">=4.6.0"
+prometheus-fastapi-instrumentator = ">=7.0.0"
+aiculture-kit = {git = "https://github.com/xupeng211/AICultureKit.git", rev = "9c776783542e5c578f692f6a51b29d285700d094"}
 
+[tool.poetry.group.dev.dependencies]
+pytest = ">=7.0.0"
+pytest-cov = ">=4.0.0"
+pytest-asyncio = ">=0.21.0"
+ruff = ">=0.4.0"
+mypy = ">=1.5.0"
+bandit = ">=1.7.0"
+pre-commit = ">=3.0.0"
+types-setuptools = "*"
+setuptools = ">=65.5.1"
+diff-cover = ">=7.0.0"
+pytest-mock = ">=3.10.0"
+pytest-xdist = ">=3.5.0"
+psutil = "~=6.0.0"
+mutmut = ">=2.4.0"
+hypothesis = ">=6.100.0"
+types-PyYAML = "*"
+types-requests = "*"
 
-[tool.hatch.metadata]
-allow-direct-references = true
+defusedxml = ">=0.7.1"
+types-defusedxml = "~=0.7.0"
+types-psycopg2 = ">=2.9.21.12"
 
-[project.optional-dependencies]
-dev = [
-    "pytest>=7.0.0",
-    "pytest-cov>=4.0.0",
-    "pytest-asyncio>=0.21.0",
-    "ruff>=0.4.0",
-    "mypy>=1.5.0",
-    "bandit>=1.7.0",
-    "pre-commit>=3.0.0",
-    "types-setuptools",
-    "setuptools>=65.5.1",
-    "diff-cover>=7.0.0",
-    "pytest-mock>=3.10.0",
-    "pytest-xdist>=3.5.0",
-    "psutil~=6.0.0",
-    "mutmut>=2.4.0",
-    "hypothesis>=6.100.0",
-    "types-PyYAML",
-    "types-requests",
-    "pip-audit>=2.7.0",
-    "defusedxml>=0.7.1",
-        "types-defusedxml~=0.7.0",
-    "types-psycopg2>=2.9.21.12",
-]
-
-[tool.hatch.build.targets.wheel]
-packages = ["apps", "data_pipeline", "models", "trainer", "infra", "evaluation"]
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
 norecursedirs = ["src/aiculture-kit", "external", "vendor"]
@@ -135,9 +127,7 @@ ignore_missing_imports = true
 paths_to_mutate = "apps/,data_pipeline/,models/,trainer/"
 runner = "pytest"
 tests_dir = "tests/"
-[[tool.mypy.overrides]]
-module = ["prefect.*", "pandas.*", "sklearn.*", "xgboost.*"]
-ignore_errors = true
+
 
 [tool.bandit]
 exclude_dirs = ["tests", ".venv"]

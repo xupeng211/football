@@ -8,6 +8,8 @@ import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
+from tests.factories import sample_match, sample_prediction
+
 
 class TestHealthRouter:
     """健康检查路由测试"""
@@ -41,9 +43,10 @@ class TestHealthRouter:
             response = client.get("/health")
 
             # 验证响应
-            if response.status_code == 200:
-                data = response.json()
-                assert "status" in data
+            assert response.status_code == 200
+            data = response.json()
+            assert data["status"] == "healthy"
+            assert data["components"]["database"]["status"] == "healthy"
 
         except ImportError:
             pytest.skip("Health router not available")
@@ -88,47 +91,31 @@ class TestPredictionsRouter:
         try:
             from apps.api.routers.predictions import router
 
-            # Mock预测服务
-            mock_service.predict_single.return_value = {
-                "prediction": "H",
-                "confidence": 0.85,
-                "probabilities": {"H": 0.85, "D": 0.10, "A": 0.05},
-            }
+            # 使用测试数据工厂
+            mock_service.predict.return_value = sample_prediction(home_win=0.85)
 
             app = FastAPI()
             app.include_router(router, prefix="/api/v1")
             client = TestClient(app)
 
-            # 测试请求
-            test_data = {
-                "home_team": "Arsenal",
-                "away_team": "Chelsea",
-                "home_odds": 2.0,
-                "draw_odds": 3.0,
-                "away_odds": 4.0,
-            }
+            # 使用工厂创建测试数据
+            test_data = sample_match()
 
             response = client.post("/api/v1/predict/single", json=test_data)
 
             # 验证响应
-            if response.status_code == 200:
-                data = response.json()
-                assert "prediction" in data or "probabilities" in data
+            assert response.status_code == 200
+            data = response.json()
+            assert "prediction_id" in data
+            assert data["predicted_outcome"] == "home_win"
 
         except ImportError:
             pytest.skip("Predictions router not available")
 
     def test_batch_prediction_data_validation(self):
         """测试批量预测数据验证"""
-        # 测试数据验证逻辑
-        valid_match_data = {
-            "home_team": "Arsenal",
-            "away_team": "Chelsea",
-            "home_odds": 2.0,
-            "draw_odds": 3.0,
-            "away_odds": 4.0,
-            "match_date": "2024-01-15",
-        }
+        # 使用工厂创建有效的比赛数据
+        valid_match_data = sample_match()
 
         # 验证必要字段
         required_fields = [
@@ -153,19 +140,13 @@ class TestPredictionsRouter:
             from apps.api.routers.predictions import router
 
             # Mock预测服务抛出异常
-            mock_service.predict_single.side_effect = Exception("Load failed")
+            mock_service.predict.side_effect = Exception("Load failed")
 
             app = FastAPI()
             app.include_router(router, prefix="/api/v1")
             client = TestClient(app)
 
-            test_data = {
-                "home_team": "Arsenal",
-                "away_team": "Chelsea",
-                "home_odds": 2.0,
-                "draw_odds": 3.0,
-                "away_odds": 4.0,
-            }
+            test_data = sample_match()
 
             response = client.post("/api/v1/predict/single", json=test_data)
 

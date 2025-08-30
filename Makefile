@@ -400,3 +400,85 @@ regen.context: check-venv ## 🔄 Regenerate the global context file (_pack.md)
 	@echo "$(BLUE)🔄 Regenerating global context file...$(NC)"
 	@$(PYTHON_VENV) scripts/context_pack.py
 	@echo "$(GREEN)✅ Global context file 'context/_pack.md' regenerated successfully.$(NC)"
+
+# ==============================================================================
+# 🔧 Configuration Management
+# ==============================================================================
+.PHONY: validate-config test-db-connection test-api-keys setup-env
+
+validate-config: ## 验证所有配置文件
+	@echo "$([object Object]Validating configuration files...$(NC)"
+	@if [ ! -f ".env" ]; then \
+		echo "$(YELLOW)⚠️ .env file not found, copying from template...$(NC)"; \
+		cp .env.example .env; \
+		echo "$(YELLOW)📝 Please edit .env file with your actual values$(NC)"; \
+	fi
+	@python -c "import tomllib; tomllib.load(open('pyproject.toml','rb'))" && echo "$(GREEN)✅ pyproject.toml valid$(NC)"
+	@python -c "import yaml; yaml.safe_load(open('docker-compose.yml'))" && echo "$(GREEN)✅ docker-compose.yml valid$(NC)"
+	@echo "$(GREEN)✅ All configuration files are valid$(NC)"
+
+test-db-connection: ## 测试数据库连接
+	@echo "$(BLUE)🗄️ Testing database connection...$(NC)"
+	@if command -v psql >/dev/null 2>&1; then \
+		if [ -f ".env" ]; then \
+			set -a; source .env; set +a; \
+			psql "$$DATABASE_URL" -c "SELECT 1;" >/dev/null 2>&1 && \
+			echo "$(GREEN)✅ Database connection successful$(NC)" || \
+			echo "$(RED)❌ Database connection failed$(NC)"; \
+		else \
+			echo "$(YELLOW)⚠️ .env file not found$(NC)"; \
+		fi; \
+	else \
+		echo "$(YELLOW)⚠️ psql not installed, skipping database test$(NC)"; \
+	fi
+
+test-api-keys: ## 测试API密钥配置
+	@echo "$(BLUE)🔑 Testing API keys...$(NC)"
+	@if [ -f ".env" ]; then \
+		set -a; source .env; set +a; \
+		if [ "$$FOOTBALL_DATA_API_KEY" != "your_football_data_api_key_here" ]; then \
+			curl -s -H "X-Auth-Token: $$FOOTBALL_DATA_API_KEY" \
+				"https://api.football-data.org/v4/competitions" >/dev/null 2>&1 && \
+			echo "$(GREEN)✅ Football Data API key valid$(NC)" || \
+			echo "$(RED)❌ Football Data API key invalid$(NC)"; \
+		else \
+			echo "$(YELLOW)⚠️ Football Data API key not configured$(NC)"; \
+		fi; \
+	else \
+		echo "$(YELLOW)⚠️ .env file not found$(NC)"; \
+	fi
+
+setup-env: ## 设置开发环境
+	@echo "$(BLUE)🚀 Setting up development environment...$(NC)"
+	@if [ ! -f ".env" ]; then \
+		cp .env.example .env; \
+		echo "$(GREEN)✅ Created .env from template$(NC)"; \
+		echo "$(YELLOW)📝 Please edit .env with your actual values$(NC)"; \
+	fi
+	@mkdir -p logs models/artifacts data/samples
+	@echo "$(GREEN)✅ Development environment setup complete$(NC)"
+
+# ==============================================================================
+# 📊 Monitoring and Observability
+# ==============================================================================
+.PHONY: monitoring-up monitoring-down monitoring-logs monitoring-status
+
+monitoring-up: ## 启动监控栈 (Prometheus + Grafana + Loki)
+	@echo "$(BLUE)📊 Starting monitoring stack...$(NC)"
+	@docker network create football_net 2>/dev/null || true
+	@docker-compose -f docker-compose.monitoring.yml up -d
+	@echo "$(GREEN)✅ Monitoring stack started$(NC)"
+	@echo "$(YELLOW)📊 Grafana: http://localhost:3000 (admin/admin123)$(NC)"
+	@echo "$(YELLOW)📈 Prometheus: http://localhost:9090$(NC)"
+
+monitoring-down: ## 停止监控栈
+	@echo "$(BLUE)🛑 Stopping monitoring stack...$(NC)"
+	@docker-compose -f docker-compose.monitoring.yml down
+	@echo "$(GREEN)✅ Monitoring stack stopped$(NC)"
+
+monitoring-logs: ## 查看监控服务日志
+	@docker-compose -f docker-compose.monitoring.yml logs -f
+
+monitoring-status: ## 检查监控服务状态
+	@echo "$(BLUE)📊 Monitoring services status:$(NC)"
+	@docker-compose -f docker-compose.monitoring.yml ps

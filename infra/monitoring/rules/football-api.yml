@@ -1,0 +1,112 @@
+groups:
+  - name: football-api-alerts
+    rules:
+      # API 服务可用性告警
+      - alert: APIServiceDown
+        expr: up{job="football-api"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "足球预测 API 服务不可用"
+          description: "API 服务已经下线超过 1 分钟"
+
+      # API 响应时间告警
+      - alert: APIHighLatency
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job="football-api"}[5m])) > 1
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "API 响应时间过高"
+          description: "95% 的请求响应时间超过 1 秒，当前值: {{ $value }}s"
+
+      # API 错误率告警
+      - alert: APIHighErrorRate
+        expr: rate(http_requests_total{job="football-api",status=~"5.."}[5m]) / rate(http_requests_total{job="football-api"}[5m]) > 0.05
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "API 错误率过高"
+          description: "5xx 错误率超过 5%，当前值: {{ $value | humanizePercentage }}"
+
+      # 预测模型加载失败
+      - alert: ModelLoadFailure
+        expr: increase(model_load_failures_total[5m]) > 0
+        for: 0m
+        labels:
+          severity: critical
+        annotations:
+          summary: "预测模型加载失败"
+          description: "模型加载失败次数: {{ $value }}"
+
+      # 数据库连接告警
+      - alert: DatabaseConnectionFailure
+        expr: increase(database_connection_errors_total[5m]) > 3
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "数据库连接失败"
+          description: "数据库连接失败次数: {{ $value }}"
+
+  - name: system-alerts
+    rules:
+      # 系统资源告警
+      - alert: HighCPUUsage
+        expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "CPU 使用率过高"
+          description: "CPU 使用率超过 80%，当前值: {{ $value }}%"
+
+      - alert: HighMemoryUsage
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "内存使用率过高"
+          description: "内存使用率超过 85%，当前值: {{ $value }}%"
+
+      - alert: DiskSpaceLow
+        expr: (1 - (node_filesystem_avail_bytes / node_filesystem_size_bytes)) * 100 > 90
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "磁盘空间不足"
+          description: "磁盘使用率超过 90%，当前值: {{ $value }}%"
+
+  - name: business-alerts
+    rules:
+      # 业务指标告警
+      - alert: LowPredictionAccuracy
+        expr: prediction_accuracy_ratio < 0.5
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "预测准确率过低"
+          description: "预测准确率低于 50%，当前值: {{ $value | humanizePercentage }}"
+
+      - alert: DataCollectionFailure
+        expr: increase(data_collection_failures_total[1h]) > 5
+        for: 0m
+        labels:
+          severity: warning
+        annotations:
+          summary: "数据采集失败"
+          description: "过去 1 小时数据采集失败次数: {{ $value }}"
+
+      - alert: NoRecentPredictions
+        expr: time() - last_prediction_timestamp > 3600
+        for: 0m
+        labels:
+          severity: warning
+        annotations:
+          summary: "长时间无预测请求"
+          description: "超过 1 小时没有预测请求"

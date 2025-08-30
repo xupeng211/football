@@ -1,0 +1,139 @@
+version: 1
+disable_existing_loggers: false
+
+formatters:
+  standard:
+    format: "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+    datefmt: "%Y-%m-%d %H:%M:%S"
+
+  detailed:
+    format: "%(asctime)s [%(levelname)s] %(name)s:%(lineno)d - %(funcName)s() - %(message)s"
+    datefmt: "%Y-%m-%d %H:%M:%S"
+
+  json:
+    (): "pythonjsonlogger.jsonlogger.JsonFormatter"
+    format: "%(asctime)s %(name)s %(levelname)s %(message)s %(pathname)s %(lineno)d"
+
+  structured:
+    (): "structlog.stdlib.ProcessorFormatter"
+    processor: "structlog.dev.ConsoleRenderer"
+    foreign_pre_chain:
+      - "structlog.stdlib.add_log_level"
+      - "structlog.stdlib.add_logger_name"
+      - "structlog.stdlib.PositionalArgumentsFormatter"
+      - "structlog.processors.TimeStamper"
+      - "structlog.processors.StackInfoRenderer"
+      - "structlog.processors.format_exc_info"
+
+handlers:
+  console:
+    class: "logging.StreamHandler"
+    level: "INFO"
+    formatter: "standard"
+    stream: "ext://sys.stdout"
+
+  file:
+    class: "logging.handlers.RotatingFileHandler"
+    level: "INFO"
+    formatter: "json"
+    filename: "logs/app.log"
+    maxBytes: 10485760  # 10MB
+    backupCount: 5
+    encoding: "utf8"
+
+  error_file:
+    class: "logging.handlers.RotatingFileHandler"
+    level: "ERROR"
+    formatter: "detailed"
+    filename: "logs/error.log"
+    maxBytes: 10485760  # 10MB
+    backupCount: 3
+    encoding: "utf8"
+
+  api_file:
+    class: "logging.handlers.RotatingFileHandler"
+    level: "INFO"
+    formatter: "json"
+    filename: "logs/api.log"
+    maxBytes: 10485760  # 10MB
+    backupCount: 5
+    encoding: "utf8"
+
+  model_file:
+    class: "logging.handlers.RotatingFileHandler"
+    level: "INFO"
+    formatter: "json"
+    filename: "logs/model.log"
+    maxBytes: 10485760  # 10MB
+    backupCount: 3
+    encoding: "utf8"
+
+loggers:
+  # 应用程序日志
+  apps:
+    level: "INFO"
+    handlers: ["console", "file"]
+    propagate: false
+
+  apps.api:
+    level: "INFO"
+    handlers: ["console", "api_file"]
+    propagate: false
+
+  apps.trainer:
+    level: "INFO"
+    handlers: ["console", "model_file"]
+    propagate: false
+
+  # 数据管道日志
+  data_pipeline:
+    level: "INFO"
+    handlers: ["console", "file"]
+    propagate: false
+
+  # 模型相关日志
+  models:
+    level: "INFO"
+    handlers: ["console", "model_file"]
+    propagate: false
+
+  # 第三方库日志级别控制
+  uvicorn:
+    level: "INFO"
+    handlers: ["console"]
+    propagate: false
+
+  uvicorn.access:
+    level: "INFO"
+    handlers: ["api_file"]
+    propagate: false
+
+  fastapi:
+    level: "INFO"
+    handlers: ["console", "api_file"]
+    propagate: false
+
+  sqlalchemy:
+    level: "WARNING"
+    handlers: ["console"]
+    propagate: false
+
+  prefect:
+    level: "INFO"
+    handlers: ["console", "file"]
+    propagate: false
+
+  # HTTP 客户端日志
+  httpx:
+    level: "WARNING"
+    handlers: ["console"]
+    propagate: false
+
+  requests:
+    level: "WARNING"
+    handlers: ["console"]
+    propagate: false
+
+root:
+  level: "INFO"
+  handlers: ["console", "file", "error_file"]

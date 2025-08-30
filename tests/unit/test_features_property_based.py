@@ -1,6 +1,37 @@
 import pytest
-from hypothesis import given
-from hypothesis import strategies as st
+
+try:
+    from hypothesis import given
+    from hypothesis import strategies as st
+
+    HYPOTHESIS_AVAILABLE = True
+except ImportError:
+    HYPOTHESIS_AVAILABLE = False
+
+    # 创建占位符装饰器
+    def given(*args, **kwargs):
+        def decorator(func):
+            return pytest.mark.skip("hypothesis not available")(func)
+
+        return decorator
+
+    class st:
+        @staticmethod
+        def text(*args, **kwargs):
+            return None
+
+        @staticmethod
+        def floats(*args, **kwargs):
+            return None
+
+        @staticmethod
+        def one_of(*args, **kwargs):
+            return None
+
+        @staticmethod
+        def just(*args, **kwargs):
+            return None
+
 
 from data_pipeline.features.build import create_feature_vector
 
@@ -50,7 +81,8 @@ def test_create_feature_vector_with_valid_inputs(
         assert "prob_h_norm" in features
     except ValueError as e:
         pytest.fail(
-            f"create_feature_vector raised an unexpected ValueError with valid inputs: {e}"
+            f"create_feature_vector raised an unexpected ValueError "
+            f"with valid inputs: {e}"
         )
 
 

@@ -54,24 +54,16 @@ class TestAPIMainCoverage:
     @patch("apps.api.services.prediction_service.prediction_service.predict")
     def test_predict_endpoint_coverage(self, mock_predict, client):
         """测试预测端点覆盖率"""
-        mock_predict.return_value = {
-            "home_win": 0.1,
-            "draw": 0.2,
-            "away_win": 0.7,
-            "predicted_outcome": "away_win",
-            "confidence": 0.7,
-        }
-        response = client.post(
-            "/api/v1/predict/single",
-            json={
-                "home_team": "A",
-                "away_team": "B",
-                "match_date": "2025-01-01",
-                "home_odds": 2.0,
-                "draw_odds": 3.0,
-                "away_odds": 4.0,
-            },
+        from tests.factories import sample_match, sample_prediction
+
+        # 使用测试数据工厂
+        mock_predict.return_value = sample_prediction(
+            away_win=0.7, home_win=0.1, draw=0.2
         )
+
+        match_data = sample_match(home_team="Barcelona", away_team="Real Madrid")
+
+        response = client.post("/api/v1/predict/single", json=match_data)
         assert response.status_code == 200
         assert "prediction_id" in response.json()
 

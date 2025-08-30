@@ -10,7 +10,7 @@ from fastapi.testclient import TestClient
 
 
 @pytest.fixture
-def app():
+def app() -> FastAPI:
     """Create test FastAPI app with metrics router."""
     app = FastAPI()
     from apps.api.routers.metrics import router
@@ -20,7 +20,7 @@ def app():
 
 
 @pytest.fixture
-def client(app):
+def client(app: FastAPI) -> TestClient:
     """Create test client."""
     return TestClient(app)
 
@@ -189,14 +189,15 @@ class TestMetricsIntegration:
 
         assert prometheus_response.status_code == 200
         assert health_response.status_code == 200
-        assert "text/plain" in prometheus_response.headers.get("content-type", "")
+        content_type = prometheus_response.headers.get("content-type", "")
+        assert "text/plain" in content_type
         assert health_response.headers.get("content-type") == "application/json"
 
     def test_router_configuration(self) -> None:
         """Test router is properly configured."""
         from apps.api.routers.metrics import router
 
-        routes = [route.path for route in router.routes]
+        routes = [getattr(route, "path", "") for route in router.routes]
         assert "/metrics" in routes
         assert "/health/metrics" in routes
 
@@ -221,5 +222,5 @@ class TestMetricsErrorHandling:
         response = client.get("/health/metrics")
 
         assert response.status_code == 200
-        assert response.json() == {"error": "psutil not installed, metrics unavailable"}
-        assert response.json() == {"error": "psutil not installed, metrics unavailable"}
+        expected_error = {"error": "psutil not installed, metrics unavailable"}
+        assert response.json() == expected_error

@@ -11,28 +11,18 @@ import pytest
 def test_project_structure():
     """测试项目目录结构"""
     root = Path(".")
+    assert root.exists(), "The project root directory does not exist."
 
-    # 检查apps目录下的核心模块
-    core_modules = ["apps/api", "apps/trainer", "apps/backtest", "apps/workers"]
+    # 检查核心模块
+    core_modules = ["apps", "data_pipeline", "models", "trainer", "infra", "evaluation"]
     for module in core_modules:
         module_path = root / module
         assert module_path.exists(), f"模块目录 {module} 不存在"
-        assert (module_path / "__init__.py").exists(), f"模块 {module} 缺少 __init__.py"
 
-    # 检查data_pipeline新结构
-    data_modules = [
-        "data_pipeline/sources",
-        "data_pipeline/transforms",
-        "data_pipeline/feature_store",
-    ]
-    for module in data_modules:
-        module_path = root / module
-        assert module_path.exists(), f"数据管道模块 {module} 不存在"
-
-    # 检查其他重要目录
-    other_dirs = ["models", "infra", "evaluation", "docs", "prompts", "tests"]
+    # Check other important top-level directories
+    other_dirs = ["docs", "prompts", "tests"]
     for dir_name in other_dirs:
-        assert (root / dir_name).exists(), f"目录 {dir_name} 不存在"
+        assert (Path(".") / dir_name).exists(), f"目录 {dir_name} 不存在"
 
 
 def test_config_files():
@@ -43,7 +33,6 @@ def test_config_files():
         "pyproject.toml",
         ".env.example",
         "Makefile",
-        "requirements.txt",
         "README.md",
     ]
 

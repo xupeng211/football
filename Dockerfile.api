@@ -7,13 +7,14 @@ WORKDIR /app
 RUN pip install uv
 
 # Copy dependency configuration
-COPY pyproject.toml requirements.lock* ./
+COPY pyproject.toml requirements.lock* README.md ./
+COPY src/ ./src/
 
 # Create a virtual environment and install dependencies from the lock file
 RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 # Use the lock file for deterministic installs. Fallback to pyproject.toml if it doesn't exist.
-RUN if [ -f "requirements.lock" ]; then uv pip sync requirements.lock; else uv pip install --no-dev; fi
+RUN if [ -f "requirements.lock" ]; then uv pip sync requirements.lock; else uv pip install .; fi
 
 # ---- Final Stage: Create the production image ----
 FROM python:3.11
