@@ -1,0 +1,3 @@
+run_id,timestamp,git_sha,params,metrics,artifact_path
+run_20250830040333,2025-08-30T04:03:33.460649+00:00,32b2dea36215405b8a802251e13d249c3219c5bc,"{""learning_rate"": 0.1, ""max_depth"": 6}","{""accuracy"": 0.85, ""f1_score"": 0.82}",/tmp/test_model.pkl
+run_20250830040949,2025-08-30T04:09:49.394469+00:00,32b2dea36215405b8a802251e13d249c3219c5bc,"{""test"": true}","{""result"": ""success""}",

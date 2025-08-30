@@ -6,9 +6,10 @@ Advanced test coverage monitoring and reporting script.
 import json
 import subprocess
 import sys
-import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Dict, Tuple
+
+from defusedxml import ElementTree as ET
 
 
 class CoverageMonitor:
@@ -33,7 +34,11 @@ class CoverageMonitor:
 
         try:
             result = subprocess.run(
-                cmd, cwd=self.project_root, capture_output=True, text=True, timeout=300
+                cmd,
+                cwd=self.project_root,
+                capture_output=True,
+                text=True,
+                timeout=300,
             )
 
             success = result.returncode == 0
@@ -106,7 +111,7 @@ class CoverageMonitor:
 
         return report
 
-    def print_summary(self, report: Dict):
+    def print_summary(self, report: Dict) -> None:
         """Print coverage summary to console."""
         print("\n" + "=" * 60)
         print("📊 COVERAGE REPORT SUMMARY")
@@ -128,19 +133,23 @@ class CoverageMonitor:
         print(f"Tests Passed: {'✅' if report['test_success'] else '❌'}")
         print("=" * 60)
 
-    def save_report(self, report: Dict):
+    def save_report(self, report: Dict) -> None:
         """Save report to JSON file."""
         report_path = self.project_root / "coverage-report.json"
         with open(report_path, "w") as f:
             json.dump(report, f, indent=2)
         print(f"📄 Report saved to: {report_path}")
 
-    def run_diff_coverage(self, base_branch: str = "main"):
+    def run_diff_coverage(self, base_branch: str = "main") -> None:
         """Run diff-cover to check coverage on changed lines."""
         print(f"🔍 Running diff-cover against {base_branch}...")
 
         try:
-            cmd = ["diff-cover", "coverage.xml", f"--compare-branch={base_branch}"]
+            cmd = [
+                "diff-cover",
+                "coverage.xml",
+                f"--compare-branch={base_branch}",
+            ]
             result = subprocess.run(
                 cmd, cwd=self.project_root, capture_output=True, text=True
             )
@@ -157,7 +166,7 @@ class CoverageMonitor:
             print(f"❌ Error running diff-cover: {e}")
 
 
-def main():
+def main() -> None:
     """Main entry point."""
     target_coverage = float(sys.argv[1]) if len(sys.argv) > 1 else 85.0
 
@@ -182,4 +191,5 @@ def main():
 
 
 if __name__ == "__main__":
+    main()
     main()

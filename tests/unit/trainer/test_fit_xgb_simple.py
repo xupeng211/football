@@ -17,7 +17,12 @@ class TestXGBoostTrainerSimple(unittest.TestCase):
     def test_train_xgboost_model_default_config(self):
         """测试使用默认配置训练模型"""
         # 创建简单的测试数据
-        X = pd.DataFrame({"feature1": [1, 2, 3, 4, 5], "feature2": [2, 4, 6, 8, 10]})
+        X = pd.DataFrame(
+            {
+                "feature1": [1, 2, 3, 4, 5],
+                "feature2": [2, 4, 6, 8, 10],
+            }
+        )
         y = pd.Series([0, 1, 2, 0, 1])
 
         model = train_xgboost_model(X, y)
@@ -130,7 +135,7 @@ class TestXGBoostTrainerSimple(unittest.TestCase):
         mock_model.predict_proba.return_value = np.array(
             [[0.8, 0.1, 0.1], [0.1, 0.8, 0.1], [0.1, 0.1, 0.8]]
         )
-        # 使用numpy float32类型，测试类型转换
+        # 使用numpy float32类型,测试类型转换
         mock_model.feature_importances_ = np.array([0.7, 0.3], dtype=np.float32)
 
         X_test = pd.DataFrame(

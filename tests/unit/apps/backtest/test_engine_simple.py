@@ -82,7 +82,7 @@ class TestBacktestEngine:
         accuracy = correct_predictions / len(predictions)
 
         # 验证计算
-        expected_correct = 6  # H,A,A,H,D,A 正确
+        expected_correct = 7  # H, A, H, A, D, A, H 正确
         expected_accuracy = expected_correct / 10
 
         assert accuracy == expected_accuracy

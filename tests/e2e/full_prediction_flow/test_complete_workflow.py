@@ -44,9 +44,23 @@ class TestCompleteUserWorkflow:
             ]
         }
 
+    @patch("apps.api.routers.health.check_db_connection", return_value=(True, "OK"))
+    @patch("apps.api.routers.health.check_redis_connection", return_value=(True, "OK"))
+    @patch("apps.api.routers.health.check_model_registry", return_value=(True, "OK"))
+    @patch(
+        "apps.api.routers.health.check_prefect_connection_async",
+        return_value=(True, "OK"),
+    )
     @patch("apps.api.services.prediction_service.prediction_service.predict")
     def test_complete_prediction_workflow(
-        self, mock_predict, api_client, sample_batch_input
+        self,
+        mock_predict,
+        mock_check_prefect,
+        mock_check_model,
+        mock_check_redis,
+        mock_check_db,
+        api_client,
+        sample_batch_input,
     ):
         """Tests the E2E prediction workflow."""
         # Mock the service layer to return predictable dict probabilities

@@ -38,7 +38,7 @@ class TestOddsFetcher:
 
             fetcher = OddsFetcher()
 
-            # 测试基本方法（如果存在）
+            # 测试基本方法(如果存在)
             if hasattr(fetcher, "fetch_odds"):
                 result = fetcher.fetch_odds("test_match")
                 assert result is not None
@@ -72,7 +72,7 @@ class TestFootballAPI:
             pytest.skip("FootballAPICollector module not available")
 
     def test_football_api_async_functionality(self):
-        """测试足球API异步功能（简化版）"""
+        """测试足球API异步功能(简化版)"""
         try:
             from data_pipeline.sources.football_api import FootballAPICollector
 

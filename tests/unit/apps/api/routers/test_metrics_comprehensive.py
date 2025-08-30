@@ -213,8 +213,8 @@ class TestMetricsErrorHandling:
         mock_getpid.side_effect = OSError("OS error")
 
         # This should not crash the application
-        with pytest.raises(OSError):
-            client.get("/metrics")
+        response = client.get("/metrics")
+        assert response.status_code == 200
 
     @patch("apps.api.routers.metrics.psutil", None)
     def test_metrics_handles_import_errors(self, client: TestClient) -> None:

@@ -1,9 +1,9 @@
 """
-简化的预测器测试，专注于提升测试覆盖率
+简化的预测器测试,专注于提升测试覆盖率
 """
 
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import numpy as np
 import pandas as pd
@@ -14,7 +14,7 @@ from models.predictor import Predictor, _create_feature_vector
 class TestPredictorSimple(unittest.TestCase):
     """简化的预测器测试"""
 
-    def test_create_feature_vector(self):
+    def test_create_feature_vector(self) -> None:
         """测试特征向量创建"""
         data = {"home_odds": 2.0, "draw_odds": 3.0, "away_odds": 4.0}
 
@@ -32,7 +32,7 @@ class TestPredictorSimple(unittest.TestCase):
         self.assertEqual(result["fav_flag"].iloc[0], 1)  # home < away
         self.assertAlmostEqual(result["odds_spread_home"].iloc[0], -2.0)
 
-    def test_stub_model_predict(self):
+    def test_stub_model_predict(self) -> None:
         """测试存根模型的预测功能"""
         from models.predictor import _StubModel
 
@@ -46,7 +46,7 @@ class TestPredictorSimple(unittest.TestCase):
 
     @patch.object(Predictor, "_find_latest_model_dir")
     @patch.object(Predictor, "load_model")
-    def test_predictor_with_stub_model(self, mock_load, mock_find):
+    def test_predictor_with_stub_model(self, mock_load: Mock, mock_find: Mock) -> None:
         """测试使用存根模型的预测器"""
         # 模拟找不到模型
         mock_find.return_value = None
@@ -68,7 +68,7 @@ class TestPredictorSimple(unittest.TestCase):
 
         self.assertEqual(result["model_version"], "stub-fallback")
 
-    def test_predictor_missing_data_error(self):
+    def test_predictor_missing_data_error(self) -> None:
         """测试缺少必要数据时的错误处理"""
         predictor = Predictor()
 

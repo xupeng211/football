@@ -1,5 +1,5 @@
 import json
-import pickle
+import pickle  # nosec B403
 import warnings
 from pathlib import Path
 from typing import Any
@@ -51,7 +51,7 @@ class Predictor:
             if latest_model_dir:
                 self.load_model(latest_model_dir)
             else:
-                warnings.warn("No trained model found, using stub.", stacklevel=2)
+                warnings.warn("No model found, using stub.", stacklevel=2)
                 self._use_stub_model()
 
     def _find_latest_model_dir(self) -> Path | None:
@@ -81,7 +81,7 @@ class Predictor:
             # Load label encoder
             encoder_path = model_dir / "label_encoder.pkl"
             with open(encoder_path, "rb") as f:
-                self.label_encoder = pickle.load(f)
+                self.label_encoder = pickle.load(f)  # nosec B301
 
             # Load feature names
             features_path = model_dir / "features.json"
@@ -89,13 +89,13 @@ class Predictor:
                 self.feature_names = json.load(f)
 
             self.model_version = model_dir.name
-            logger.info("Successfully loaded model", version=self.model_version)
+            logger.info("Loaded model", version=self.model_version)
 
-        except FileNotFoundError as e:
-            warnings.warn(f"Model files not found in {model_dir}: {e}", stacklevel=2)
+        except FileNotFoundError:
+            warnings.warn(f"Model files not found: {model_dir}", stacklevel=2)
             self._use_stub_model()
-        except Exception as e:
-            warnings.warn(f"Failed to load model from {model_dir}: {e}", stacklevel=2)
+        except Exception:
+            warnings.warn(f"Failed to load model: {model_dir}", stacklevel=2)
             self._use_stub_model()
 
     def _use_stub_model(self) -> None:
@@ -141,8 +141,8 @@ class Predictor:
             confidence = proba[predicted_class_index]
         else:  # Stub model case
             probabilities = {"H": proba[0], "D": proba[1], "A": proba[2]}
-            predicted_outcome = "D"  # Stub default
-            confidence = proba[1]
+            predicted_outcome = max(probabilities, key=lambda k: probabilities[k])
+            confidence = probabilities[predicted_outcome]
 
         return {
             "probabilities": probabilities,
@@ -154,6 +154,8 @@ class Predictor:
 
 class _StubModel:
     """A fallback model that returns fixed probabilities."""
+
+    model_version = "stub"
 
     def predict_proba(self, X: pd.DataFrame) -> np.ndarray:
         return np.array([[0.34, 0.33, 0.33] for _ in range(len(X))])

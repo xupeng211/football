@@ -13,10 +13,11 @@ import json
 import subprocess
 import sys
 import time
-import xml.etree.ElementTree as ET
 from datetime import datetime
 from pathlib import Path
-from typing import Dict
+from typing import Any, Dict
+
+from defusedxml import ElementTree as ET
 
 
 class TestReportGenerator:
@@ -28,7 +29,7 @@ class TestReportGenerator:
         self.reports_dir.mkdir(exist_ok=True)
 
         self.timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        self.report_data = {
+        self.report_data: Dict[str, Any] = {
             "timestamp": datetime.now().isoformat(),
             "project": "football-predict-system",
             "test_results": {},
@@ -150,7 +151,7 @@ class TestReportGenerator:
             root = tree.getroot()
 
             # 提取测试统计
-            test_stats = {
+            test_stats: Dict[str, Any] = {
                 "total_tests": int(root.get("tests", 0)),
                 "passed_tests": 0,
                 "failed_tests": int(root.get("failures", 0)),
@@ -186,9 +187,11 @@ class TestReportGenerator:
                             "name": testcase.get("name", "unknown"),
                             "classname": testcase.get("classname", "unknown"),
                             "time": float(testcase.get("time", 0)),
-                            "error_type": failure.get("type")
-                            if failure is not None
-                            else error.get("type"),
+                            "error_type": (
+                                failure.get("type")
+                                if failure is not None
+                                else error.get("type")
+                            ),
                             "message": (
                                 failure.text if failure is not None else error.text
                             )[:200]
@@ -280,7 +283,7 @@ class TestReportGenerator:
         else:
             return "D (需改进)"
 
-    def save_reports(self):
+    def save_reports(self) -> Dict[str, Path]:
         """保存所有报告"""
         print("💾 Saving reports...")
 
@@ -456,7 +459,7 @@ class TestReportGenerator:
             return {"success": False, "error": str(e)}
 
 
-def main():
+def main() -> None:
     """主函数"""
     if len(sys.argv) > 1:
         project_root = sys.argv[1]
@@ -471,4 +474,5 @@ def main():
 
 
 if __name__ == "__main__":
+    main()
     main()

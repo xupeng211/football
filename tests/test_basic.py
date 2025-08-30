@@ -98,7 +98,18 @@ def test_trainer_import():
         from apps.trainer.xgboost_trainer import XGBoostTrainer
 
         # 验证类可以实例化
-        trainer = XGBoostTrainer()
+        # A mock config is needed for instantiation
+        class MockConfig:
+            n_estimators = 100
+            learning_rate = 0.1
+            max_depth = 3
+            objective = "binary:logistic"
+            eval_metric = "logloss"
+            seed = 42
+            num_class = 3
+            random_state = 42
+
+        trainer = XGBoostTrainer(config=MockConfig())
         assert trainer is not None
 
     except ImportError as e:

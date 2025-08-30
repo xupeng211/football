@@ -1,6 +1,6 @@
 import json
 import os
-import pickle
+import pickle  # nosec B403
 from dataclasses import dataclass
 from datetime import datetime
 

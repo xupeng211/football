@@ -153,7 +153,7 @@ class TestPredictionsRouter:
             from apps.api.routers.predictions import router
 
             # Mock预测服务抛出异常
-            mock_service.predict_single.side_effect = Exception("Model not loaded")
+            mock_service.predict_single.side_effect = Exception("Load failed")
 
             app = FastAPI()
             app.include_router(router, prefix="/api/v1")
@@ -388,9 +388,6 @@ class TestAPIDocumentation:
 
     def test_api_tags_and_metadata(self):
         """测试API标签和元数据"""
-        from fastapi import FastAPI
-
-        app = FastAPI()
 
         tags_metadata = [
             {

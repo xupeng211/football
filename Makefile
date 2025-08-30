@@ -42,7 +42,7 @@ install: ## Install dependencies using uv and lock file
 	python -m pip install -U pip uv; \
 	if [ ! -f "requirements.lock" ]; then \
 		echo "$(YELLOW)⚠️ Lock file not found, generating...$(NC)"; \
-		uv pip compile pyproject.toml -o requirements.lock; \
+		uv pip compile pyproject.toml --all-extras -o requirements.lock; \
 	fi; \
 	uv pip sync requirements.lock; \
 	uv pip install -e .[dev]; \
@@ -76,12 +76,12 @@ sec: security ## Alias for security
 
 security-deps: check-venv ## Run dependency security scan
 	@echo "$(BLUE)🔒 Running dependency security scan...$(NC)"
-	pip-audit
+	PIPAPI_PYTHON_LOCATION=$(PYTHON_VENV) pip-audit
 	@echo "$(GREEN)✅ Dependency security scan completed$(NC)"
 
 test: check-venv ## Run tests with coverage using settings from pyproject.toml
 	@echo "$(BLUE)🧪 Running tests in parallel...$(NC)"
-	pytest tests/
+	$(PYTHON_VENV) -m pytest
 	@echo "$(GREEN)✅ Tests completed$(NC)"
 
 ci: format lint type security security-deps test validate policy-guard validate-contract ## Run complete CI pipeline locally
@@ -293,7 +293,7 @@ seed.sample: seed.sample.matches seed.sample.odds seed.sample.features ## Seed d
 .PHONY: test-quick test-full test-ci test-smoke test-coverage
 
 # 基本测试命令
-test: test-quick
+test-default: test-quick
 	@echo "✅ 快速测试完成"
 
 test-unit:

@@ -45,14 +45,14 @@ def init_db(database_url: str | None = None) -> None:
         url = database_url
     else:
         if os.getenv("TEST_DATABASE_URL"):
-            url = os.getenv("TEST_DATABASE_URL")
+            url = os.getenv("TEST_DATABASE_URL", "")
         elif _is_testing():
             url = "sqlite:///:memory:"
         else:
             from dotenv import load_dotenv
 
             load_dotenv()
-            url = os.getenv("DATABASE_URL")
+            url = os.getenv("DATABASE_URL", "")
 
     if not url:
         raise ValueError("Database URL is not configured.")

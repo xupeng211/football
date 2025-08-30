@@ -167,7 +167,7 @@ class TestAPIConfiguration:
         )
 
         # 验证中间件被添加
-        assert len(app.middleware_stack) > 0
+        assert len(app.user_middleware) > 0
 
     def test_router_inclusion(self):
         """测试路由包含逻辑"""

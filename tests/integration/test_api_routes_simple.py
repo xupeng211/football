@@ -8,7 +8,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 
-# 由于main模块有依赖问题，我们需要mock一些模块
+# 由于main模块有依赖问题,我们需要mock一些模块
 @pytest.fixture
 def mock_dependencies():
     """Mock外部依赖"""
@@ -28,7 +28,7 @@ def client(mock_dependencies):
 
         return TestClient(app)
     except ImportError:
-        # 如果导入失败，创建一个简单的FastAPI应用进行测试
+        # 如果导入失败,创建一个简单的FastAPI应用进行测试
         from fastapi import FastAPI
 
         from apps.api.routers.health import router as health_router
@@ -42,7 +42,11 @@ def client(mock_dependencies):
 
         @test_app.get("/version")
         async def test_version():
-            return {"api_version": "1.0.0", "model_version": "test", "model_info": {}}
+            return {
+                "api_version": "1.0.0",
+                "model_version": "test",
+                "model_info": {},
+            }
 
         @test_app.get("/livez")
         async def test_livez():
@@ -102,7 +106,7 @@ class TestAPIRoutes:
         """测试健康检查端点"""
         response = client.get("/health")
 
-        # 健康检查可能失败，但至少应该返回响应
+        # 健康检查可能失败,但至少应该返回响应
         assert response.status_code in [200, 500, 503]
 
         if response.status_code == 200:
@@ -122,12 +126,12 @@ class TestAPIRoutes:
         # 检查基本响应
         assert response.status_code == 200
 
-        # CORS头部可能存在，但不是必需的（取决于配置）
+        # CORS头部可能存在,但不是必需的(取决于配置)
         # 这里主要测试响应能正常返回
 
     @patch("apps.api.routers.predictions.prediction_service")
     def test_predictions_route_structure(self, mock_service, client):
-        """测试预测路由结构（如果可用）"""
+        """测试预测路由结构(如果可用)"""
         # Mock预测服务
         mock_service.predict_single.return_value = {
             "prediction": "H",
@@ -135,7 +139,7 @@ class TestAPIRoutes:
             "probabilities": {"H": 0.75, "D": 0.15, "A": 0.10},
         }
 
-        # 测试预测端点（如果路由存在）
+        # 测试预测端点(如果路由存在)
         test_data = {
             "home_team": "Arsenal",
             "away_team": "Chelsea",
@@ -146,11 +150,11 @@ class TestAPIRoutes:
 
         try:
             response = client.post("/api/v1/predict/single", json=test_data)
-            # 如果端点存在，检查响应结构
+            # 如果端点存在,检查响应结构
             if response.status_code != 404:
                 assert response.status_code in [200, 422, 500]
         except Exception:
-            # 如果路由不存在或有其他问题，跳过测试
+            # 如果路由不存在或有其他问题,跳过测试
             pytest.skip("Prediction routes not available in test environment")
 
 
@@ -166,7 +170,7 @@ class TestAPIErrorHandling:
             headers={"Content-Type": "application/json"},
         )
 
-        # 期望返回400或404（取决于路由是否存在）
+        # 期望返回400或404(取决于路由是否存在)
         assert response.status_code in [400, 404, 422]
 
     def test_unsupported_method(self, client):
@@ -186,7 +190,7 @@ class TestAPIErrorHandling:
             # 应该返回错误响应而不是崩溃
             assert response.status_code in [400, 404, 413, 422, 500]
         except Exception:
-            # 如果路由不存在，跳过
+            # 如果路由不存在,跳过
             pytest.skip("Endpoint not available for testing")
 
 

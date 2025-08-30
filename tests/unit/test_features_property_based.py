@@ -5,7 +5,7 @@ from hypothesis import strategies as st
 from data_pipeline.features.build import create_feature_vector
 
 # Strategy for generating valid team names (non-empty strings)
-valid_team_names = st.text(min_size=1, max_size=50)
+valid_team_names = st.text(min_size=1, max_size=50).filter(lambda s: s.strip() != "")
 
 # Strategy for generating valid odds (floats between 1.01 and 100.0)
 valid_odds = st.floats(

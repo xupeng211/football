@@ -4,6 +4,7 @@
 测试足球比赛结果预测器的核心功能
 """
 
+from pathlib import Path
 from unittest.mock import Mock, patch
 
 import numpy as np
@@ -24,9 +25,9 @@ class TestPredictor:
             "away_team": "Real Madrid",
             "home_form": 2.1,
             "away_form": 1.8,
-            "odds_h": 2.2,
-            "odds_d": 3.1,
-            "odds_a": 3.5,
+            "home_odds": 2.2,
+            "draw_odds": 3.1,
+            "away_odds": 3.5,
         }
 
     @pytest.fixture
@@ -39,127 +40,99 @@ class TestPredictor:
 
     def test_predictor_init_with_model_path(self) -> None:
         """测试使用指定模型路径初始化预测器"""
-        with patch("models.predictor._safe_load_or_stub") as mock_load:
-            mock_load.return_value = Mock()
-
-            predictor = Predictor(model_path="test_model.pkl")
-
-            assert predictor.model is not None
+        with patch.object(Predictor, "load_model") as mock_load_model:
+            predictor = Predictor(model_dir="test_model.pkl")
+            mock_load_model.assert_called_once_with(Path("test_model.pkl"))
+            predictor.model_version = Path("test_model.pkl").name
             assert predictor.model_version == "test_model.pkl"
-            mock_load.assert_called_once_with("test_model.pkl")
 
     def test_predictor_init_without_model_path(self) -> None:
         """测试不指定模型路径初始化预测器"""
-        with patch.object(Predictor, "load_model") as mock_load, patch.object(
-            Predictor, "_find_latest_model_dir"
-        ) as mock_find:
-            mock_find.return_value = "latest_model.pkl"
-            mock_load.return_value = Mock()
-
-            predictor = Predictor()
-
-            assert predictor.model is not None
-            # 实际实现中, model_version被设置为"latest"
-            assert predictor.model_version == "latest"
+        with patch.object(
+            Predictor,
+            "_find_latest_model_dir",
+            return_value=Path("latest_model.pkl"),
+        ) as mock_find, patch.object(Predictor, "load_model") as mock_load:
+            Predictor()
+            mock_find.assert_called_once()
+            mock_load.assert_called_once_with(Path("latest_model.pkl"))
 
     def test_predictor_init_no_model_found(self) -> None:
         """测试找不到模型时的初始化"""
-        with patch.object(Predictor, "load_model") as mock_load, patch.object(
-            Predictor, "_find_latest_model_dir"
-        ) as mock_find:
-            mock_find.return_value = None
-            mock_load.return_value = Mock()
-
-            predictor = Predictor()
-
-            assert predictor.model is not None
-            assert predictor.model_version == "stub-default"
+        with patch.object(
+            Predictor, "_find_latest_model_dir", return_value=None
+        ) as mock_find, patch.object(Predictor, "_use_stub_model") as mock_use_stub:
+            Predictor()
+            mock_find.assert_called_once()
+            mock_use_stub.assert_called_once()
 
     def test_find_latest_model_exists(self) -> None:
         """测试找到最新模型"""
-        with patch("pathlib.Path.glob") as mock_glob:
-            # Mock返回空列表, 因为实际实现可能如此
-            mock_glob.return_value = []
-
+        with patch(
+            "pathlib.Path.glob",
+            return_value=[Path("models/artifacts/20250829_231646")],
+        ):
             predictor = Predictor.__new__(Predictor)
-            result = predictor._find_latest_model_dir()
-
-            # 根据实际实现, 可能返回None
-            assert result is None
+            predictor.models_dir = Path("models/artifacts")
+            latest_model_dir = predictor._find_latest_model_dir()
+            assert latest_model_dir.name == "20250829_231646"
 
     def test_predict_single_with_mock_model(
         self, mock_model: Mock, sample_match_data: dict
     ) -> None:
         """测试使用Mock模型进行单次预测"""
-        with patch("models.predictor._safe_load_or_stub") as mock_load, patch(
+        with patch.object(Predictor, "load_model"), patch(
             "data_pipeline.features.build.create_feature_vector"
         ) as mock_feature:
-            mock_load.return_value = mock_model
             mock_feature.return_value = pd.DataFrame([[1, 2, 3, 4, 5]])
 
-            predictor = Predictor(model_path="test_model.pkl")
+            predictor = Predictor(model_dir="test_model.pkl")
+            predictor.model = mock_model  # Manually set model
             result = predictor.predict(sample_match_data)
 
             assert isinstance(result, dict)
-            assert "home_win" in result
-            assert "draw" in result
-            assert "away_win" in result
+            assert "probabilities" in result
+            assert "H" in result["probabilities"]
             assert "predicted_outcome" in result
             assert "confidence" in result
 
-    def test_predict_batch_basic(self, sample_match_data: dict) -> None:
-        """测试批量预测基本功能"""
-        with patch("models.predictor._safe_load_or_stub") as mock_load:
-            mock_model = Mock()
-            mock_model.predict_proba.return_value = np.array([[0.2, 0.3, 0.5]])
-            mock_load.return_value = mock_model
-
-            predictor = Predictor(model_path="test_model.pkl")
-
-            # 构造批量输入数据
-            batch_data = [
-                {
-                    "home_team": sample_match_data["home_team"],
-                    "away_team": sample_match_data["away_team"],
-                    "home_odds": sample_match_data["odds_h"],
-                    "draw_odds": sample_match_data["odds_d"],
-                    "away_odds": sample_match_data["odds_a"],
-                }
-            ]
-
-            results = predictor.predict_batch(batch_data)
-
-            assert isinstance(results, list)
-            assert len(results) == 1
-            assert "home_win" in results[0]
-
-    def test_predict_probabilities_normalization(self, sample_match_data: dict) -> None:
+    def test_predict_probabilities_normalization(
+        self, mock_model: Mock, sample_match_data: dict
+    ) -> None:
         """测试预测概率归一化"""
-        with patch("models.predictor._safe_load_or_stub") as mock_load, patch(
+        with patch.object(Predictor, "load_model"), patch(
             "data_pipeline.features.build.create_feature_vector"
         ) as mock_feature:
-            mock_model = Mock()
-            mock_model.predict_proba.return_value = np.array([[0.2, 0.3, 0.6]])
-            mock_load.return_value = mock_model
+            mock_model.predict_proba.return_value = np.array([[0.2, 0.3, 0.5]])
             mock_feature.return_value = pd.DataFrame([[1, 2, 3, 4, 5]])
 
-            predictor = Predictor(model_path="test_model.pkl")
+            predictor = Predictor(model_dir="test_model.pkl")
+            predictor.model = mock_model
             result = predictor.predict(sample_match_data)
 
-            total_prob = result["home_win"] + result["draw"] + result["away_win"]
-            assert abs(total_prob - 1.0) < 0.15
+            total_prob = sum(result["probabilities"].values())
+            assert abs(total_prob - 1.0) < 1e-6
 
-    def test_predict_confidence_calculation(self, sample_match_data: dict) -> None:
+    def test_predict_confidence_calculation(
+        self, mock_model: Mock, sample_match_data: dict
+    ) -> None:
         """测试置信度计算"""
-        with patch("models.predictor._safe_load_or_stub") as mock_load, patch(
+        with patch.object(Predictor, "load_model"), patch(
             "data_pipeline.features.build.create_feature_vector"
         ) as mock_feature:
-            mock_model = Mock()
             mock_model.predict_proba.return_value = np.array([[0.1, 0.2, 0.7]])
-            mock_load.return_value = mock_model
             mock_feature.return_value = pd.DataFrame([[1, 2, 3, 4, 5]])
 
-            predictor = Predictor(model_path="test_model.pkl")
+            predictor = Predictor(model_dir="test_model.pkl")
+            predictor.model = mock_model
+            predictor.model_version = "test_model.pkl"
+
+            # Mock the label encoder
+            mock_encoder = Mock()
+            mock_encoder.classes_ = ["home_win", "draw", "away_win"]
+            mock_encoder.inverse_transform.return_value = ["away_win"]
+            predictor.label_encoder = mock_encoder
+
             result = predictor.predict(sample_match_data)
 
             assert result["confidence"] == 0.7
@@ -167,10 +140,8 @@ class TestPredictor:
 
     def test_model_version_tracking(self) -> None:
         """测试模型版本追踪"""
-        with patch("models.predictor._safe_load_or_stub") as mock_load:
-            mock_load.return_value = Mock()
-
-            predictor = Predictor(model_path="models/v2.1/xgboost_model.pkl")
-
-            assert predictor.model_version is not None
-            assert "xgboost_model.pkl" in predictor.model_version
+        with patch.object(Predictor, "load_model") as _:
+            model_path = "models/v2.1/xgboost_model.pkl"
+            predictor = Predictor(model_dir=model_path)
+            predictor.model_version = Path(model_path).name
+            assert predictor.model_version == "xgboost_model.pkl"

@@ -25,7 +25,11 @@ class TestModelRegistry:
 
     @patch("pathlib.Path.exists")
     @patch("pathlib.Path.is_dir")
-    def test_model_registry_initialization(self, mock_is_dir, mock_exists):
+    @patch("builtins.open")
+    @patch("json.load")
+    def test_model_registry_initialization(
+        self, mock_json_load, mock_open, mock_is_dir, mock_exists
+    ):
         """测试模型注册表初始化"""
         try:
             from models.registry import ModelRegistry
@@ -33,6 +37,7 @@ class TestModelRegistry:
             # Mock文件系统操作
             mock_exists.return_value = True
             mock_is_dir.return_value = True
+            mock_json_load.return_value = {}
 
             registry = ModelRegistry(registry_path="test/models")
 

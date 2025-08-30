@@ -35,6 +35,9 @@ class BacktestResult:
 class BacktestEngine:
     """Backtest engine for evaluating models on historical data."""
 
+    def __init__(self) -> None:
+        self.results_cache: dict[str, BacktestResult] = {}
+
     def run_backtest(
         self,
         predictor: Predictor,
@@ -122,7 +125,8 @@ class BacktestEngine:
         net_profit = 0.0
 
         for _, row in predictions.iterrows():
-            actual_result_int = {"H": 0, "D": 1, "A": 2}.get(row["actual_result"], -1)
+            actual_result_map = {"H": 0, "D": 1, "A": 2}
+            actual_result_int = actual_result_map.get(row["actual_result"], -1)
             if int(row["predicted_class"]) == actual_result_int:
                 odds_map = {0: "home_odds", 1: "draw_odds", 2: "away_odds"}
                 odds_col = odds_map[actual_result_int]
@@ -139,7 +143,7 @@ class BacktestEngine:
             return 0.0
 
         actuals = predictions["actual_result"].map({"H": 0, "D": 1, "A": 2})
-        return accuracy_score(actuals, predictions["predicted_class"])
+        return float(accuracy_score(actuals, predictions["predicted_class"]))
 
     def _get_actual_result(self, match_row: pd.Series) -> str:
         """Get actual result from match data."""
@@ -153,7 +157,9 @@ class BacktestEngine:
         else:
             return "D"
 
-    def _calculate_risk_metrics(self, pnl_results: dict[str, float]) -> dict[str, float]:
+    def _calculate_risk_metrics(
+        self, pnl_results: dict[str, float]
+    ) -> dict[str, float]:
         """Calculate risk metrics from PnL results."""
         # Simple risk metrics calculation
         net_profit = pnl_results.get("net_profit", 0.0)
@@ -168,6 +174,31 @@ class BacktestEngine:
             "sharpe_ratio": sharpe_ratio,
             "volatility": abs(roi) * 0.1,  # Simplified volatility
         }
+
+    def compare_strategies(self, strategy_names: list[str]) -> pd.DataFrame:
+        """Compares the results of multiple backtest strategies."""
+        results_to_compare = {
+            name: self.results_cache[name]
+            for name in strategy_names
+            if name in self.results_cache
+        }
+
+        if not results_to_compare:
+            return pd.DataFrame()
+
+        # Convert results to a list of dictionaries for DataFrame creation
+        results_list = [
+            {
+                "strategy": res.strategy_name,
+                "accuracy": res.accuracy,
+                "roi": res.roi,
+                "net_profit": res.net_profit,
+                "total_predictions": res.total_predictions,
+            }
+            for res in results_to_compare.values()
+        ]
+
+        return pd.DataFrame(results_list)
 
 
 def load_historical_data(db_conn_str: str) -> pd.DataFrame:

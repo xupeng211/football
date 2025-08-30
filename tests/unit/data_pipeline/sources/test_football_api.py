@@ -56,12 +56,13 @@ class TestFootballAPICollector:
         with pytest.raises(RuntimeError, match="需要在async with语句中使用"):
             await collector.collect_team_info(["1", "2"])
 
-    @patch(
-        "data_pipeline.sources.football_api.FootballAPICollector._generate_mock_matches"
-    )
-    async def test_collect_matches_exception_handling(self, mock_generate):
+    @patch("httpx.AsyncClient")
+    async def test_collect_matches_exception_handling(self, mock_async_client_class):
         """Test that exceptions during match collection are caught and raised."""
-        mock_generate.side_effect = Exception("API fetch failed")
+        mock_session = AsyncMock()
+        mock_session.get.side_effect = Exception("API fetch failed")
+        mock_async_client_class.return_value = mock_session
+
         collector = FootballAPICollector()
         async with collector:
             with pytest.raises(Exception, match="API fetch failed"):
@@ -70,3 +71,4 @@ class TestFootballAPICollector:
                     end_date=date(2024, 1, 2),
                     leagues=["PL"],
                 )
+        mock_session.get.assert_awaited_once()

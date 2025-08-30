@@ -14,12 +14,13 @@ dependencies = [
     "uvicorn[standard]>=0.23.0",
     "pydantic>=2.0.0",
     "pandas>=2.0.0",
+    "pydantic-settings>=2.0.0",
     "numpy>=1.24.0",
     "scikit-learn>=1.5.0",
     "xgboost>=1.7.0",
     "psycopg2-binary>=2.9.0",
     "sqlalchemy>=2.0.0",
-    "prefect==2.19.2",
+    "prefect>=2.20.17,<3.0.0",
     "structlog>=23.0.0",
     "python-dotenv>=1.0.0",
     "requests>=2.32.4",
@@ -47,11 +48,15 @@ dev = [
     "diff-cover>=7.0.0",
     "pytest-mock>=3.10.0",
     "pytest-xdist>=3.5.0",
+    "psutil~=6.0.0",
     "mutmut>=2.4.0",
     "hypothesis>=6.100.0",
     "types-PyYAML",
     "types-requests",
     "pip-audit>=2.7.0",
+    "defusedxml>=0.7.1",
+        "types-defusedxml~=0.7.0",
+    "types-psycopg2>=2.9.21.12",
 ]
 
 [tool.hatch.build.targets.wheel]
@@ -64,7 +69,18 @@ python_files = "test_*.py"
 python_classes = "Test*"
 python_functions = "test_*"
 asyncio_mode = "auto"
-addopts = "-n auto -v --tb=short --strict-markers --disable-warnings --cov=. --cov-report=term-missing --cov-report=html:htmlcov --cov-report=xml:coverage.xml -m 'not slow'"
+addopts = [
+    "-n", "auto",
+    "-v",
+    "--tb=short",
+    "--strict-markers",
+    "--disable-warnings",
+    "--cov=.",
+    "--cov-report=term-missing",
+    "--cov-report=html:htmlcov",
+    "--cov-report=xml:coverage.xml",
+    "-m", "not slow"
+]
 markers = [
     "unit: 单元测试",
     "integration: 集成测试",
@@ -127,4 +143,7 @@ exclude_dirs = ["tests", ".venv"]
 skips = ["B101", "B601", "B404", "B603", "B607"]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**.py" = ["F821"]
+    "tests/**.py" = ["F821"]
+    "tests/unit/test_runs_logger_complete.py" = ["E501"]
+"scripts/automated_test_report.py" = ["E501"]
+"scripts/coverage-monitor.py" = ["E501"]
