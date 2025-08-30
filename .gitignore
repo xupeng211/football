@@ -208,4 +208,3 @@ docker-compose.override.yml
 
 
 # Dependency lock file
-requirements.lock
