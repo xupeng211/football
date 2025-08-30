@@ -11,7 +11,7 @@
 git clone https://github.com/YOUR_USERNAME/football.git
 cd football
 
-# 2. 激活企业级开发环境  
+# 2. 激活企业级开发环境
 source scripts/activate-venv.sh
 
 # 3. 安装依赖
@@ -31,7 +31,7 @@ python scripts/automated_test_report.py
 ```bash
 # 代码质量检查
 make format     # 代码格式化
-make lint       # 代码风格检查  
+make lint       # 代码风格检查
 make type       # 类型检查
 make security   # 安全扫描
 
@@ -87,7 +87,7 @@ make lint && make type && make security
 - **测试用例增加**: 提升覆盖率和质量保障
 - **性能优化**: 系统响应时间和吞吐量改进
 
-### 🌟 中优先级贡献  
+### 🌟 中优先级贡献
 
 - **文档完善**: 用户指南和API文档改进
 - **CI/CD增强**: 工作流程和自动化优化
@@ -272,17 +272,17 @@ def predict_match_outcome(
 ) -> Optional[Dict[str, float]]:
     """
     预测足球比赛结果
-    
+
     Args:
         home_team: 主队名称
         away_team: 客队名称
         features: 比赛特征数据
         confidence_threshold: 置信度阈值
-        
+
     Returns:
         预测结果字典，包含各结果的概率
         如果置信度不足则返回None
-        
+
     Raises:
         ValueError: 当输入数据无效时
     """
@@ -418,7 +418,7 @@ pytest tests/performance/ --benchmark-only  # 性能基准测试
 - 第一次PR合并
 - 文档改进和小型修复
 
-**🚀 活跃贡献者**  
+**🚀 活跃贡献者**
 
 - 多个PR合并
 - 参与代码审查

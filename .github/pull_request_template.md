@@ -77,7 +77,7 @@ Brief description of changes made in this PR.
 **Performance Impact:**
 
 - [ ] 🟢 Improved - Performance enhanced
-- [ ] 🟡 No impact - Performance unchanged  
+- [ ] 🟡 No impact - Performance unchanged
 - [ ] 🔴 Needs review - Potential performance concerns
 
 **Breaking Changes:**
@@ -213,7 +213,7 @@ curl -X POST "/api/v1/new-endpoint" \
 
 3. **Manual Testing:**
    - Step 1: Do this
-   - Step 2: Verify that  
+   - Step 2: Verify that
    - Step 3: Check that result matches expected
 
 4. **Verification:**
@@ -228,7 +228,7 @@ curl -X POST "/api/v1/new-endpoint" \
 1. **Decision**: Chose approach A over B
    **Reason**: Better performance and maintainability
 
-2. **Decision**: Used library X instead of Y  
+2. **Decision**: Used library X instead of Y
    **Reason**: Better documentation and community support
 
 **Open Questions:**

@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 logger = structlog.get_logger()
 
 
-def seed_matches():
+def seed_matches() -> None:
     """Seeds the matches table with sample data."""
     load_dotenv()
     db_conn_str = os.environ.get("DATABASE_URL")

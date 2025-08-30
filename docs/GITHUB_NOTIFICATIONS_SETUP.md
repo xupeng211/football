@@ -24,7 +24,7 @@
 
 ```
 ✅ Issues and pull requests
-✅ Pull request reviews  
+✅ Pull request reviews
 ✅ Pull request pushes
 ❌ Comments on Issues and Pull Requests (避免过多邮件)
 ✅ New releases
@@ -56,7 +56,7 @@
 
 ```
 ✅ Releases              # 新版本发布
-✅ Discussions          # 社区讨论  
+✅ Discussions          # 社区讨论
 ✅ Security alerts      # 安全警告
 ✅ Issues               # 问题和Bug报告
 ✅ Pull requests        # 代码提交和审查
@@ -121,7 +121,7 @@
 ```yaml
 自动化标签系统:
   ci-failure: CI构建失败
-  coverage-alert: 覆盖率警告  
+  coverage-alert: 覆盖率警告
   automated: 自动化系统创建
   quality: 代码质量相关
   high-priority: 高优先级
@@ -152,7 +152,7 @@
    ✅ Push notifications
    ✅ Issues assigned to you
    ✅ Pull request reviews
-   ✅ Direct mentions  
+   ✅ Direct mentions
    ❌ Watching repository updates (避免过多通知)
    ```
 
@@ -170,7 +170,7 @@
 
 ```
 🌅 晨间 (9:00): 检查重要Issue和Security alerts
-🌞 午间 (13:00): 查看PR reviews和新的discussions  
+🌞 午间 (13:00): 查看PR reviews和新的discussions
 🌆 晚间 (18:00): 处理当日累积的通知
 ```
 
@@ -188,7 +188,7 @@
 - CI failure issues（构建失败）
 - Direct mentions（直接@提及）
 
-#### 🟡 24小时内处理  
+#### 🟡 24小时内处理
 
 - New issues（新问题）
 - Pull request reviews（代码审查）
@@ -213,7 +213,7 @@
 
 ### 📱 响应时间
 - Security alerts: < 2小时
-- CI failures: < 4小时  
+- CI failures: < 4小时
 - PR reviews: < 24小时
 - Issues: < 48小时
 
@@ -253,7 +253,7 @@
 ```bash
 解决步骤:
 1. 检查GitHub邮箱设置: https://github.com/settings/emails
-2. 确认邮箱已验证 
+2. 确认邮箱已验证
 3. 检查垃圾邮件文件夹
 4. 添加notifications@github.com到白名单
 ```

@@ -89,10 +89,10 @@ def test_specific_functionality():
     """Test description"""
     # Arrange
     setup_data = create_test_data()
-    
-    # Act  
+
+    # Act
     result = function_under_test(setup_data)
-    
+
     # Assert
     assert result.meets_expectation()
     assert coverage_improved()
@@ -123,7 +123,7 @@ def test_specific_functionality():
 **Target Metrics:**
 
 - Zero failing tests
-- <2% flaky test rate  
+- <2% flaky test rate
 - <5 minute full test suite
 - 80%+ coverage maintained
 
@@ -230,7 +230,7 @@ pytest tests/ --cov=. --cov-report=term-missing
 
 # Test categories:
 Unit Tests: XXX passing, XX failing
-Integration Tests: XX passing, X failing  
+Integration Tests: XX passing, X failing
 Performance Tests: X passing, X failing
 ```
 

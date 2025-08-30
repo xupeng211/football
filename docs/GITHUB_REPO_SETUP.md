@@ -11,7 +11,7 @@
 **描述要点:**
 
 - ✅ 突出"Enterprise-grade"专业级别
-- ✅ 强调"80%+ coverage"质量保障  
+- ✅ 强调"80%+ coverage"质量保障
 - ✅ 包含核心技术栈关键词
 - ✅ 保持在160字符以内(GitHub推荐长度)
 
@@ -45,7 +45,7 @@ api-development
 
 - `python` - 主要编程语言
 - `xgboost` - 机器学习框架
-- `fastapi` - API框架  
+- `fastapi` - API框架
 - `docker` - 容器化技术
 
 **业务领域:**
@@ -116,7 +116,7 @@ GitHub: xupeng211/football
    - Topics: 添加所有推荐标签
 
 3. **启用功能**
-   - ✅ Issues  
+   - ✅ Issues
    - ✅ Discussions
    - ✅ Wiki
    - ✅ Projects
@@ -164,7 +164,7 @@ GitHub: xupeng211/football
    - [ ] 项目在相关Topics页面中显示
    - [ ] 描述在搜索结果中突出显示
 
-3. **社交分享测试**  
+3. **社交分享测试**
    - [ ] 分享链接时显示正确的预览图
    - [ ] 描述和标题信息完整
    - [ ] 视觉效果专业美观

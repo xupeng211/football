@@ -9,26 +9,26 @@ on:
 jobs:
   coverage-check:
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0  # 获取完整历史以比较覆盖率
-      
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-      
+
       - name: Install uv
         uses: astral-sh/setup-uv@v4
         with:
           enable-cache: true
-      
+
       - name: Install dependencies
         run: |
           uv pip install --system -r requirements.txt
-          
+
       - name: Run tests with coverage
         run: |
           pytest tests/unit/ tests/integration/ tests/performance/ \
@@ -36,14 +36,14 @@ jobs:
             --cov-report=json:coverage-current.json \
             --cov-report=term \
             || echo "Some tests failed, but continuing coverage check"
-      
+
       - name: Check coverage and create alert
         uses: actions/github-script@v7
         with:
           script: |
             const fs = require('fs');
             const path = require('path');
-            
+
             // 读取当前覆盖率
             let currentCoverage = 0;
             try {
@@ -53,19 +53,19 @@ jobs:
               console.log('无法读取覆盖率数据:', error.message);
               return;
             }
-            
+
             // 设置覆盖率阈值
             const TARGET_COVERAGE = 80;
             const WARNING_THRESHOLD = 75;
-            
+
             console.log(`当前覆盖率: ${currentCoverage.toFixed(2)}%`);
             console.log(`目标覆盖率: ${TARGET_COVERAGE}%`);
-            
+
             // 生成覆盖率状态消息
             let coverageStatus = '';
             let alertLevel = '';
             let emoji = '';
-            
+
             if (currentCoverage >= TARGET_COVERAGE) {
               coverageStatus = '优秀';
               alertLevel = 'success';
@@ -79,27 +79,27 @@ jobs:
               alertLevel = 'error';
               emoji = '🚨';
             }
-            
+
             // 如果是PR，添加评论
             if (context.eventName === 'pull_request') {
               const comment = `
               ## ${emoji} 测试覆盖率报告
-              
+
               **当前覆盖率**: ${currentCoverage.toFixed(2)}%
               **目标覆盖率**: ${TARGET_COVERAGE}%
               **状态**: ${coverageStatus}
-              
+
               ### 📊 覆盖率评估
-              
-              ${currentCoverage >= TARGET_COVERAGE ? 
-                '✅ **优秀!** 覆盖率达到企业级标准' : 
+
+              ${currentCoverage >= TARGET_COVERAGE ?
+                '✅ **优秀!** 覆盖率达到企业级标准' :
                 currentCoverage >= WARNING_THRESHOLD ?
                 '⚠️ **注意** 覆盖率接近警戒线，建议增加测试' :
                 '🚨 **警告** 覆盖率低于标准，请添加更多测试用例'
               }
-              
+
               ### 🎯 推荐行动
-              
+
               ${currentCoverage < TARGET_COVERAGE ? `
               - 运行 \`python scripts/automated_test_report.py\` 查看详细报告
               - 添加测试用例覆盖未测试的代码
@@ -108,16 +108,16 @@ jobs:
               - 保持当前的高质量测试标准
               - 继续为新功能添加相应测试
               `}
-              
+
               ### 🔗 相关链接
-              
+
               - [查看完整测试报告](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})
               - [测试指南](https://github.com/${context.repo.owner}/${context.repo.repo}#quality-assurance)
-              
+
               ---
               *覆盖率监控由自动化系统生成 • ${new Date().toLocaleString()}*
               `;
-              
+
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
@@ -125,54 +125,54 @@ jobs:
                 body: comment
               });
             }
-            
+
             // 如果覆盖率严重下降，创建Issue
             if (currentCoverage < WARNING_THRESHOLD && context.eventName === 'push') {
               const issueTitle = `🚨 测试覆盖率警告: ${currentCoverage.toFixed(2)}%`;
               const issueBody = `
               ## 🚨 测试覆盖率低于警戒线
-              
+
               **当前覆盖率**: ${currentCoverage.toFixed(2)}%
               **警戒线**: ${WARNING_THRESHOLD}%
               **目标**: ${TARGET_COVERAGE}%
               **分支**: ${context.ref.replace('refs/heads/', '')}
               **提交**: ${context.sha.substring(0, 7)}
-              
+
               ### 📉 覆盖率下降原因
-              
+
               可能的原因包括：
               1. 新增代码未包含相应测试
               2. 现有测试被意外删除或禁用
               3. 代码重构导致测试失效
               4. 测试配置问题
-              
+
               ### 🛠️ 立即行动计划
-              
+
               \`\`\`bash
               # 1. 激活开发环境
               source scripts/activate-venv.sh
-              
+
               # 2. 运行覆盖率分析
               python scripts/automated_test_report.py
-              
+
               # 3. 查看详细覆盖率报告
               open htmlcov/index.html
-              
+
               # 4. 添加缺失的测试用例
               pytest tests/ --cov=. --cov-report=html
               \`\`\`
-              
+
               ### 🎯 覆盖率提升建议
-              
+
               - **单元测试**: 为新增函数/方法添加测试
               - **集成测试**: 验证组件间的交互
               - **边界测试**: 测试异常情况和边界条件
               - **回归测试**: 确保修复不会破坏现有功能
-              
+
               ---
               **优先级**: 高 • **截止日期**: 7天内解决
               `;
-              
+
               // 检查是否已存在类似的Issue
               const existingIssues = await github.rest.issues.listForRepo({
                 owner: context.repo.owner,
@@ -180,11 +180,11 @@ jobs:
                 state: 'open',
                 labels: 'coverage-alert,automated'
               });
-              
-              const coverageIssue = existingIssues.data.find(issue => 
+
+              const coverageIssue = existingIssues.data.find(issue =>
                 issue.title.includes('测试覆盖率警告')
               );
-              
+
               if (!coverageIssue) {
                 await github.rest.issues.create({
                   owner: context.repo.owner,
@@ -195,11 +195,11 @@ jobs:
                 });
               }
             }
-            
+
             // 设置输出供其他步骤使用
             core.setOutput('coverage', currentCoverage);
             core.setOutput('status', alertLevel);
-            
+
       - name: Upload coverage reports
         uses: actions/upload-artifact@v4
         if: always()
@@ -208,4 +208,4 @@ jobs:
           path: |
             coverage-current.json
             htmlcov/
-          retention-days: 30 
+          retention-days: 30

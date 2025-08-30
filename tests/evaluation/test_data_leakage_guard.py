@@ -69,9 +69,9 @@ def test_time_window_dislocation(create_test_data):
     # The model with dislocated data should perform significantly worse
     assert auc_aligned > 0.58, "Model with aligned data should have good performance"
     assert auc_dislocated < 0.6, "Model with dislocated data should perform poorly"
-    assert auc_aligned > auc_dislocated, (
-        "Performance on aligned data should be better than on dislocated data"
-    )
+    assert (
+        auc_aligned > auc_dislocated
+    ), "Performance on aligned data should be better than on dislocated data"
 
 
 def test_label_randomization(create_test_data):
@@ -103,9 +103,9 @@ def test_label_randomization(create_test_data):
     )
 
     # The randomized model's performance should be close to random (AUC ~ 0.5)
-    assert auc_original > 0.58, (
-        "Model with original labels should have good performance"
-    )
-    assert abs(auc_randomized - 0.5) < 0.15, (
-        "Randomized label model AUC should be close to 0.5"
-    )
+    assert (
+        auc_original > 0.58
+    ), "Model with original labels should have good performance"
+    assert (
+        abs(auc_randomized - 0.5) < 0.15
+    ), "Randomized label model AUC should be close to 0.5"

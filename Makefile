@@ -87,6 +87,16 @@ test: check-venv ## Run tests with coverage using settings from pyproject.toml
 ci: format lint type security security-deps test validate policy-guard validate-contract ## Run complete CI pipeline locally
 	@echo "$(GREEN)🎊 All CI checks passed!$(NC)"
 
+
+ci.test: test ## Run tests with coverage for CI
+	@echo "$(GREEN)✅ CI tests completed$(NC)"
+
+ci.lint: format lint ## Run linting and formatting for CI
+	@echo "$(GREEN)✅ CI linting and formatting completed$(NC)"
+
+ci.full: ci ## Run the full CI pipeline locally
+	@echo "$(GREEN)✅ Full CI simulation completed$(NC)"
+
 dev: ## Start development server
 	@echo "$(BLUE)🚀 Starting development server...$(NC)"
 	@if [ -f "apps/api/main.py" ]; then \

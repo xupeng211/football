@@ -15,6 +15,7 @@ from pydantic import BaseModel
 
 from apps.api.db import init_db
 from apps.api.logging_config import configure_logging
+from apps.api.middleware import LoggingMiddleware
 from apps.api.routers import health, predictions
 from apps.api.services.prediction_service import prediction_service
 from models.predictor import Predictor
@@ -68,6 +69,9 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan,
 )
+# Add logging middleware
+app.add_middleware(LoggingMiddleware)
+
 
 # Instrument the app with Prometheus metrics
 Instrumentator().instrument(app).expose(app)
