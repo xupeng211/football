@@ -204,13 +204,12 @@ class TestMetricsIntegration:
 class TestMetricsErrorHandling:
     """Test error handling in metrics module."""
 
-    @patch("apps.api.routers.metrics.os.getpid")
     @patch("apps.api.routers.metrics.psutil.Process")
     def test_metrics_handles_os_errors(
-        self, mock_process: Mock, mock_getpid: Mock, client: TestClient
+        self, mock_process: Mock, client: TestClient
     ) -> None:
         """Test metrics handling of OS-level errors."""
-        mock_getpid.side_effect = OSError("OS error")
+        mock_process.side_effect = OSError("OS error")
 
         # This should not crash the application
         response = client.get("/metrics")

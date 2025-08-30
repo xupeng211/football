@@ -226,10 +226,9 @@ class TestModelPerformanceRegression:
 
         # 验证置信度分布合理性
         mean_confidence = np.mean(confidences)
-        assert 0.2 <= mean_confidence <= 0.8, (
-            f"Mean confidence {mean_confidence:.3f} outside "
-            f"reasonable range [0.2, 0.8]"
-        )
+        assert (
+            0.2 <= mean_confidence <= 0.8
+        ), f"Mean confidence {mean_confidence:.3f} outside reasonable range [0.2, 0.8]"
 
     @patch.object(Predictor, "load_model")
     def test_probability_distribution_regression(
