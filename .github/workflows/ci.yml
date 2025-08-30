@@ -63,7 +63,7 @@ jobs:
             echo "⚠️ Lock file not found, generating..."
             uv pip compile pyproject.toml --all-extras -o requirements.lock
           fi
-                              uv pip sync requirements.lock --python-version 3.11
+          uv pip sync requirements.lock --python-version 3.11
           uv pip install -e .
 
       - name: Install psql client
