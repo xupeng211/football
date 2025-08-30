@@ -43,7 +43,8 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install -U pip uv
-          uv pip sync --all-extras requirements.lock
+          uv pip sync requirements.lock
+          uv pip install bandit ruff mypy pytest pytest-cov pytest-asyncio pre-commit types-setuptools setuptools diff-cover pytest-mock pytest-xdist psutil mutmut hypothesis types-PyYAML types-requests defusedxml types-defusedxml types-psycopg2
 
       - name: Run linting and validation
         run: |
@@ -92,7 +93,8 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install -U pip uv
-          uv pip sync --all-extras requirements.lock
+          uv pip sync requirements.lock
+          uv pip install bandit ruff mypy pytest pytest-cov pytest-asyncio pre-commit types-setuptools setuptools diff-cover pytest-mock pytest-xdist psutil mutmut hypothesis types-PyYAML types-requests defusedxml types-defusedxml types-psycopg2
           uv pip install -e .
 
       - name: Install psql client
