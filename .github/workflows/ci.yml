@@ -107,6 +107,20 @@ jobs:
   test:
     name: "Test & Coverage"
     runs-on: ubuntu-22.04
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: football_predict_test
+          POSTGRES_USER: runner
+          POSTGRES_PASSWORD: password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
@@ -151,6 +165,8 @@ jobs:
           base_ref="${{ github.base_ref || 'main' }}"
           diff-cover coverage.xml --compare-branch "origin/${base_ref}" --fail-under ${DIFF_COV_MIN}
       - name: Run Smoke Tests
+        env:
+          DATABASE_URL: postgresql://runner:password@localhost:5432/football_predict_test
         run: |
           uvicorn apps.api.main:app --host 0.0.0.0 --port 8000 &
           API_PID=$!
