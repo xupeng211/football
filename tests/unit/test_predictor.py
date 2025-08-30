@@ -61,21 +61,31 @@ class TestPredictor:
         """测试找不到模型时的初始化"""
         with patch.object(
             Predictor, "_find_latest_model_dir", return_value=None
-        ) as mock_find, patch.object(Predictor, "_use_stub_model") as mock_use_stub:
-            Predictor()
-            mock_find.assert_called_once()
-            mock_use_stub.assert_called_once()
+        ) as mock_find:
+            with patch.object(Predictor, "_use_stub_model") as mock_use_stub:
+                Predictor()
+                mock_find.assert_called_once()
+                mock_use_stub.assert_called_once()
 
-    def test_find_latest_model_exists(self) -> None:
+    def test_find_latest_model_exists(self, tmp_path: Path) -> None:
         """测试找到最新模型"""
-        with patch(
-            "pathlib.Path.glob",
-            return_value=[Path("models/artifacts/20250829_231646")],
-        ):
-            predictor = Predictor.__new__(Predictor)
-            predictor.models_dir = Path("models/artifacts")
-            latest_model_dir = predictor._find_latest_model_dir()
-            assert latest_model_dir.name == "20250829_231646"
+        # Create dummy model directories and files
+        models_dir = tmp_path / "models" / "artifacts"
+        model_dir_1 = models_dir / "20230101_120000"
+        model_dir_1.mkdir(parents=True)
+        (model_dir_1 / "xgboost_model.pkl").touch()
+
+        model_dir_2 = models_dir / "20230102_120000"  # newer
+        model_dir_2.mkdir()
+        (model_dir_2 / "xgboost_model.pkl").touch()
+
+        predictor = Predictor.__new__(Predictor)
+        predictor.models_dir = models_dir
+
+        latest_model_dir = predictor._find_latest_model_dir()
+
+        assert latest_model_dir is not None
+        assert latest_model_dir.name == "20230102_120000"
 
     def test_predict_single_with_mock_model(
         self, mock_model: Mock, sample_match_data: dict
