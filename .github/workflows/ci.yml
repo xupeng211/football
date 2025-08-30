@@ -164,6 +164,10 @@ jobs:
         run: |
           base_ref="${{ github.base_ref || 'main' }}"
           diff-cover coverage.xml --compare-branch "origin/${base_ref}" --fail-under ${DIFF_COV_MIN}
+      - name: Initialize DB Schema
+        run: |
+          sudo apt-get update && sudo apt-get install -y postgresql-client
+          PGPASSWORD=password psql -h localhost -U runner -d football_predict_test -f sql/schema.sql
       - name: Run Smoke Tests
         env:
           DATABASE_URL: postgresql://runner:password@localhost:5432/football_predict_test
