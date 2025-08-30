@@ -109,7 +109,7 @@ ci.full: ci ## Run the full CI pipeline locally
 dev: ## Start development server
 	@echo "$(BLUE)🚀 Starting development server...$(NC)"
 	@if [ -f "apps/api/main.py" ]; then \
-		ENV=development $(PYTHON_VENV) -m uvicorn apps.api.main:app --reload --host 0.0.0.0 --port 8000; \
+		ENV=development $(PYTHON_VENV) -m uvicorn apps.api.main:app --host 0.0.0.0 --port 8000; \
 	else \
 		echo "$(RED)❌ API main file not found$(NC)"; \
 		exit 1; \
@@ -229,7 +229,7 @@ local-ci: ci ## Alias for the main CI pipeline
 # MVP 相关命令
 mvp-up: ## 启动MVP环境 (数据库 + API)
 	@echo "$(BLUE)🚀 启动MVP环境...$(NC)"
-	docker-compose -f docker-compose.mvp.yml up -d
+	docker-compose -f docker-compose.mvp.yml up -d --build
 	@echo "$(GREEN)✅ MVP环境已启动$(NC)"
 	@echo "API地址: http://localhost:8000"
 	@echo "API文档: http://localhost:8000/docs"
@@ -267,7 +267,7 @@ serve: ## 启动API服务 (本地开发)
 
 test-api: ## 测试API接口
 	@echo "$(BLUE)🧪 测试API接口...$(NC)"
-	curl -X POST "http://localhost:8000/predict" \
+	curl -X POST "http://localhost:8000/api/v1/predict" \
 		-H "Content-Type: application/json" \
 		-d '[{"home":"Arsenal","away":"Chelsea","odds_h":2.1,"odds_d":3.3,"odds_a":3.2}]' | jq
 
