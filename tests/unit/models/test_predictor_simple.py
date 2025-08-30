@@ -44,9 +44,9 @@ class TestPredictorSimple(unittest.TestCase):
         self.assertEqual(result.shape, (1, 3))
         self.assertAlmostEqual(np.sum(result[0]), 1.0, places=2)
 
-    @patch.object(Predictor, "_find_latest_model_dir")
+    @patch("models.predictor.find_latest_model_dir")
     @patch.object(Predictor, "load_model")
-    def test_predictor_with_stub_model(self, mock_load: Mock, mock_find: Mock) -> None:
+    def test_predictor_with_stub_model(self, _: Mock, mock_find: Mock) -> None:
         """测试使用存根模型的预测器"""
         # 模拟找不到模型
         mock_find.return_value = None
@@ -68,8 +68,10 @@ class TestPredictorSimple(unittest.TestCase):
 
         self.assertEqual(result["model_version"], "stub-fallback")
 
-    def test_predictor_missing_data_error(self) -> None:
+    @patch("models.predictor.find_latest_model_dir", return_value=None)
+    def test_predictor_missing_data_error(self, _: Mock) -> None:
         """测试缺少必要数据时的错误处理"""
+        # Since no model is found, it will use the stub model.
         predictor = Predictor()
 
         # 缺少必要字段
