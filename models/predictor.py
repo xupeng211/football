@@ -35,6 +35,20 @@ def _create_feature_vector(data: dict[str, Any]) -> pd.DataFrame:
     return df
 
 
+def find_latest_model_dir(base_dir: Path) -> Path | None:
+    """Finds the directory of the latest model in a given base directory."""
+    if not base_dir.exists():
+        return None
+    model_dirs = [
+        d
+        for d in base_dir.iterdir()
+        if d.is_dir() and not d.name.startswith((".", "__"))
+    ]
+    if not model_dirs:
+        return None
+    return max(model_dirs, key=lambda d: d.stat().st_mtime)
+
+
 class Predictor:
     """Loads a trained model and makes predictions."""
 
@@ -47,29 +61,14 @@ class Predictor:
         if model_dir:
             self.load_model(Path(model_dir))
         else:
-            latest_model_dir = self._find_latest_model_dir()
+            # Default to the models/artifacts directory
+            artifacts_path = Path(__file__).resolve().parent / "artifacts"
+            latest_model_dir = find_latest_model_dir(artifacts_path)
             if latest_model_dir:
                 self.load_model(latest_model_dir)
             else:
                 warnings.warn("No model found, using stub.", stacklevel=2)
                 self._use_stub_model()
-
-    def _find_latest_model_dir(self) -> Path | None:
-        """Finds the directory of the latest model in models/artifacts."""
-        artifacts_dir = Path("models/artifacts")
-        if not artifacts_dir.exists():
-            return None
-
-        model_dirs = [
-            d
-            for d in artifacts_dir.iterdir()
-            if d.is_dir() and not d.name.startswith((".", "__"))
-        ]
-        if not model_dirs:
-            return None
-
-        latest_dir = max(model_dirs, key=lambda d: d.stat().st_mtime)
-        return latest_dir
 
     def load_model(self, model_dir: Path) -> None:
         """Loads model, encoder, and feature names from a directory."""
@@ -114,14 +113,15 @@ class Predictor:
         try:
             feature_df = _create_feature_vector(data)
         except KeyError as e:
-            raise ValueError(f"Missing required field in input data: {e}") from e
+            raise ValueError(f"Missing required field: {e}") from e
 
         # 2. Align feature columns
         if self.feature_names:
             feature_df = feature_df.reindex(columns=self.feature_names, fill_value=0)
         else:
             warnings.warn(
-                "Feature names not loaded, prediction may be inaccurate.", stacklevel=2
+                "Feature names not loaded, prediction may be inaccurate.",
+                stacklevel=2,
             )
 
         # 3. Predict probabilities

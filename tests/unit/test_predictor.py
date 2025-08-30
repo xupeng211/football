@@ -11,7 +11,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from models.predictor import Predictor
+from models.predictor import Predictor, find_latest_model_dir
 
 
 class TestPredictor:
@@ -48,9 +48,8 @@ class TestPredictor:
 
     def test_predictor_init_without_model_path(self) -> None:
         """测试不指定模型路径初始化预测器"""
-        with patch.object(
-            Predictor,
-            "_find_latest_model_dir",
+        with patch(
+            "models.predictor.find_latest_model_dir",
             return_value=Path("latest_model.pkl"),
         ) as mock_find, patch.object(Predictor, "load_model") as mock_load:
             Predictor()
@@ -59,40 +58,20 @@ class TestPredictor:
 
     def test_predictor_init_no_model_found(self) -> None:
         """测试找不到模型时的初始化"""
-        with patch.object(
-            Predictor, "_find_latest_model_dir", return_value=None
+        with patch(
+            "models.predictor.find_latest_model_dir", return_value=None
         ) as mock_find:
             with patch.object(Predictor, "_use_stub_model") as mock_use_stub:
                 Predictor()
                 mock_find.assert_called_once()
                 mock_use_stub.assert_called_once()
 
-    def test_find_latest_model_exists(self, tmp_path: Path) -> None:
-        """测试找到最新模型"""
-        # Create dummy model directories and files
-        models_dir = tmp_path / "models" / "artifacts"
-        model_dir_1 = models_dir / "20230101_120000"
-        model_dir_1.mkdir(parents=True)
-        (model_dir_1 / "xgboost_model.pkl").touch()
-
-        model_dir_2 = models_dir / "20230102_120000"  # newer
-        model_dir_2.mkdir()
-        (model_dir_2 / "xgboost_model.pkl").touch()
-
-        predictor = Predictor.__new__(Predictor)
-        predictor.models_dir = models_dir
-
-        latest_model_dir = predictor._find_latest_model_dir()
-
-        assert latest_model_dir is not None
-        assert latest_model_dir.name == "20230102_120000"
-
     def test_predict_single_with_mock_model(
         self, mock_model: Mock, sample_match_data: dict
     ) -> None:
         """测试使用Mock模型进行单次预测"""
         with patch.object(Predictor, "load_model"), patch(
-            "data_pipeline.features.build.create_feature_vector"
+            "models.predictor._create_feature_vector"
         ) as mock_feature:
             mock_feature.return_value = pd.DataFrame([[1, 2, 3, 4, 5]])
 
@@ -111,7 +90,7 @@ class TestPredictor:
     ) -> None:
         """测试预测概率归一化"""
         with patch.object(Predictor, "load_model"), patch(
-            "data_pipeline.features.build.create_feature_vector"
+            "models.predictor._create_feature_vector"
         ) as mock_feature:
             mock_model.predict_proba.return_value = np.array([[0.2, 0.3, 0.5]])
             mock_feature.return_value = pd.DataFrame([[1, 2, 3, 4, 5]])
@@ -128,7 +107,7 @@ class TestPredictor:
     ) -> None:
         """测试置信度计算"""
         with patch.object(Predictor, "load_model"), patch(
-            "data_pipeline.features.build.create_feature_vector"
+            "models.predictor._create_feature_vector"
         ) as mock_feature:
             mock_model.predict_proba.return_value = np.array([[0.1, 0.2, 0.7]])
             mock_feature.return_value = pd.DataFrame([[1, 2, 3, 4, 5]])
@@ -155,3 +134,22 @@ class TestPredictor:
             predictor = Predictor(model_dir=model_path)
             predictor.model_version = Path(model_path).name
             assert predictor.model_version == "xgboost_model.pkl"
+
+
+def test_find_latest_model_dir_exists(tmp_path: Path) -> None:
+    """Test finding the latest model directory when it exists."""
+    # Create dummy model directories
+    model_dir_1 = tmp_path / "20230101_120000"
+    model_dir_1.mkdir()
+
+    import time
+
+    time.sleep(0.1)  # Ensure modification times are distinct
+
+    model_dir_2 = tmp_path / "20230102_120000"  # This one is newer
+    model_dir_2.mkdir()
+
+    latest_model_dir = find_latest_model_dir(tmp_path)
+
+    assert latest_model_dir is not None
+    assert latest_model_dir.name == "20230102_120000"
