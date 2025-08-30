@@ -6,7 +6,12 @@
 PYTHON := python3
 VENV := .venv
 PIP := $(VENV)/bin/pip
-PYTHON_VENV := $(VENV)/bin/python
+# In CI, we don't use a venv, the python from setup-python is used directly
+ifeq ($(CI),true)
+	PYTHON_VENV := python
+else
+	PYTHON_VENV := $(VENV)/bin/python
+endif
 
 # Colors for output
 RED := \033[0;31m
