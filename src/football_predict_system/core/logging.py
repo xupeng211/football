@@ -143,14 +143,14 @@ def setup_logging() -> None:
 
     if settings.logging.format == "json":
         processors.append(CustomJSONRenderer())
-        renderer = CustomJSONRenderer()
+        CustomJSONRenderer()
     else:
         processors.extend(
             [
                 structlog.dev.ConsoleRenderer(colors=True),
             ]
         )
-        renderer = structlog.dev.ConsoleRenderer(colors=True)
+        structlog.dev.ConsoleRenderer(colors=True)
 
     structlog.configure(
         processors=processors,
@@ -201,12 +201,12 @@ def setup_logging() -> None:
     logging.getLogger("sqlalchemy.engine").setLevel(logging.WARNING)
 
 
-def get_logger(name: str = None) -> FilteringBoundLogger:
+def get_logger(name: Optional[str] = None) -> FilteringBoundLogger:
     """Get a structured logger instance."""
     return structlog.get_logger(name)
 
 
-def set_correlation_id(correlation_id: str = None) -> str:
+def set_correlation_id(correlation_id: Optional[str] = None) -> str:
     """Set correlation ID for request tracking."""
     if correlation_id is None:
         correlation_id = str(uuid4())
@@ -220,7 +220,7 @@ def set_user_id(user_id: str) -> None:
     user_id_var.set(user_id)
 
 
-def set_request_id(request_id: str = None) -> str:
+def set_request_id(request_id: Optional[str] = None) -> str:
     """Set request ID for request tracking."""
     if request_id is None:
         request_id = str(uuid4())

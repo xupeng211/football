@@ -346,7 +346,7 @@ class AnalyticsService:
 
     @log_performance("get_prediction_accuracy")
     async def get_prediction_accuracy(
-        self, model_version: str = None, days_back: int = 30
+        self, model_version: Optional[str] = None, days_back: int = 30
     ) -> Dict:
         """Calculate prediction accuracy over time period."""
         # This would analyze historical predictions vs actual results

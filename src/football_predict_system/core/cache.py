@@ -13,7 +13,7 @@ import pickle
 import time
 from datetime import datetime, timedelta
 from functools import wraps
-from typing import Any, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional
 
 import redis.asyncio as redis
 from pydantic import BaseModel
@@ -126,7 +126,11 @@ class CacheManager:
             return None
 
     async def set(
-        self, key: str, value: Any, ttl: int = None, namespace: str = "default"
+        self,
+        key: str,
+        value: Any,
+        ttl: Optional[int] = None,
+        namespace: str = "default",
     ) -> bool:
         """Set value in cache."""
         cache_key = self._generate_key(namespace, key)
@@ -303,7 +307,9 @@ async def get_cache_manager() -> CacheManager:
     return _cache_manager
 
 
-def cached(ttl: int = 3600, namespace: str = "default", key_func: callable = None):
+def cached(
+    ttl: int = 3600, namespace: str = "default", key_func: Optional[Callable] = None
+):
     """Decorator for caching function results."""
 
     def decorator(func):
@@ -359,6 +365,7 @@ class CacheInvalidator:
     def __init__(self, cache_manager: CacheManager):
         self.cache_manager = cache_manager
         self.logger = get_logger(__name__)
+        self._background_tasks = set()
 
     async def invalidate_by_pattern(
         self, pattern: str, namespace: str = "default"
@@ -409,7 +416,9 @@ class CacheInvalidator:
                 "Scheduled cache invalidation executed", key=key, delay=delay
             )
 
-        asyncio.create_task(_delayed_invalidation())
+        task = asyncio.create_task(_delayed_invalidation())
+        self._background_tasks.add(task)
+        task.add_done_callback(self._background_tasks.discard)
 
 
 # Cache warming utilities

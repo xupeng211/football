@@ -185,7 +185,7 @@ class TestAdvancedTestPatterns:
     def test_with_setup_and_teardown(self, tmp_path):
         """带有设置和清理的测试示例"""
         # 设置测试环境
-        test_file = tmp_path / "test_data.json"
+        tmp_path / "test_data.json"
 
         # 执行测试逻辑
         match_data = sample_match()

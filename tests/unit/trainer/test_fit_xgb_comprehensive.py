@@ -8,7 +8,7 @@ def test_fit_xgb_main_function():
     Test the main function of fit_xgb module with proper mocking.
     """
     # Mock all external dependencies
-    with patch("trainer.fit_xgb.setup_logging") as mock_setup_logging, patch(
+    with patch("trainer.fit_xgb.setup_logging"), patch(
         "trainer.fit_xgb.load_data_from_db"
     ) as mock_load_data, patch(
         "trainer.fit_xgb.train_xgboost_model"

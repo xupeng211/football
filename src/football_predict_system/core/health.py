@@ -180,7 +180,7 @@ class HealthChecker:
                     "packets_sent": network.packets_sent,
                     "packets_recv": network.packets_recv,
                 }
-            except:
+            except Exception:
                 network_stats = {}
 
             response_time = time.time() - start_time
@@ -369,7 +369,7 @@ class HealthChecker:
             now = datetime.utcnow()
             cached_results = []
 
-            for component_name, health in self._health_cache.items():
+            for _component_name, health in self._health_cache.items():
                 if (now - health.last_check).total_seconds() < self._cache_ttl:
                     cached_results.append(health)
 

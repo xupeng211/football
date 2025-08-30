@@ -6,7 +6,7 @@
 import random
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import pandas as pd
 
@@ -44,7 +44,7 @@ class TestDataFactory:
 
     @classmethod
     def create_match_data(
-        self, home_team: str = None, away_team: str = None, **kwargs
+        self, home_team: Optional[str] = None, away_team: Optional[str] = None, **kwargs
     ) -> Dict[str, Any]:
         """创建单场比赛数据"""
         if not home_team:
@@ -88,7 +88,10 @@ class TestDataFactory:
 
     @classmethod
     def create_prediction_response(
-        self, home_win: float = None, draw: float = None, away_win: float = None
+        self,
+        home_win: Optional[float] = None,
+        draw: Optional[float] = None,
+        away_win: Optional[float] = None,
     ) -> Dict[str, Any]:
         """创建预测响应数据"""
         if not all([home_win, draw, away_win]):
@@ -144,7 +147,7 @@ class TestDataFactory:
             # 添加一些额外的特征列
             match.update(
                 {
-                    "match_id": f"match_{i+1:04d}",
+                    "match_id": f"match_{i + 1:04d}",
                     "league": random.choice(
                         ["Premier League", "La Liga", "Bundesliga"]
                     ),

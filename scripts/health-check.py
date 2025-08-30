@@ -47,7 +47,7 @@ class HealthChecker:
             conn = psycopg2.connect(self.database_url)
             cursor = conn.cursor()
             cursor.execute("SELECT 1")
-            result = cursor.fetchone()
+            cursor.fetchone()
             cursor.close()
             conn.close()
 

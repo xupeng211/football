@@ -81,7 +81,10 @@ class ValidationError(BaseApplicationError):
     """Raised when input validation fails."""
 
     def __init__(
-        self, message: str, field: str = None, details: Optional[Dict[str, Any]] = None
+        self,
+        message: str,
+        field: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
     ):
         super().__init__(
             message=message,
@@ -103,9 +106,12 @@ class NotFoundError(BaseApplicationError):
     ):
         message = f"{resource} with identifier '{identifier}' not found"
         super().__init__(
-            message=message, error_code=ErrorCode.NOT_FOUND, details=details or {}
+            message=message,
+            error_code=ErrorCode.NOT_FOUND,
+            details=details or {},
         )
-        self.details.update({"resource": resource, "identifier": str(identifier)})
+        self.details["resource"] = resource
+        self.details["identifier"] = str(identifier)
 
 
 class UnauthorizedError(BaseApplicationError):
@@ -137,7 +143,11 @@ class ForbiddenError(BaseApplicationError):
 class RateLimitError(BaseApplicationError):
     """Raised when rate limit is exceeded."""
 
-    def __init__(self, message: str = "Rate limit exceeded", retry_after: int = None):
+    def __init__(
+        self,
+        message: str = "Rate limit exceeded",
+        retry_after: Optional[int] = None,
+    ):
         details = {}
         if retry_after:
             details["retry_after"] = retry_after
@@ -154,7 +164,7 @@ class DatabaseError(BaseApplicationError):
         self,
         message: str,
         error_code: ErrorCode,
-        query: str = None,
+        query: Optional[str] = None,
         details: Optional[Dict[str, Any]] = None,
     ):
         super().__init__(message, error_code, details)
@@ -181,7 +191,10 @@ class DatabaseQueryError(DatabaseError):
     """Raised when database query execution fails."""
 
     def __init__(
-        self, message: str, query: str = None, details: Optional[Dict[str, Any]] = None
+        self,
+        message: str,
+        query: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
     ):
         super().__init__(
             message=message,
@@ -198,7 +211,7 @@ class ModelError(BaseApplicationError):
         self,
         message: str,
         error_code: ErrorCode,
-        model_name: str = None,
+        model_name: Optional[str] = None,
         details: Optional[Dict[str, Any]] = None,
     ):
         super().__init__(message, error_code, details)
@@ -209,7 +222,7 @@ class ModelError(BaseApplicationError):
 class ModelNotFoundError(ModelError):
     """Raised when a requested model is not found."""
 
-    def __init__(self, model_name: str, version: str = None):
+    def __init__(self, model_name: str, version: Optional[str] = None):
         message = f"Model '{model_name}'"
         if version:
             message += f" version '{version}'"
@@ -220,7 +233,9 @@ class ModelNotFoundError(ModelError):
             details["version"] = version
 
         super().__init__(
-            message=message, error_code=ErrorCode.MODEL_NOT_FOUND, details=details
+            message=message,
+            error_code=ErrorCode.MODEL_NOT_FOUND,
+            details=details,
         )
 
 
@@ -230,7 +245,7 @@ class PredictionError(ModelError):
     def __init__(
         self,
         message: str = "Prediction failed",
-        model_name: str = None,
+        model_name: Optional[str] = None,
         details: Optional[Dict[str, Any]] = None,
     ):
         super().__init__(
@@ -248,7 +263,7 @@ class DataPipelineError(BaseApplicationError):
         self,
         message: str,
         error_code: ErrorCode,
-        pipeline_stage: str = None,
+        pipeline_stage: Optional[str] = None,
         details: Optional[Dict[str, Any]] = None,
     ):
         super().__init__(message, error_code, details)
@@ -260,10 +275,15 @@ class DataIngestionError(DataPipelineError):
     """Raised when data ingestion fails."""
 
     def __init__(
-        self, message: str, source: str = None, details: Optional[Dict[str, Any]] = None
+        self,
+        message: str,
+        source: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
     ):
         super().__init__(
-            message=message, error_code=ErrorCode.DATA_INGESTION_ERROR, details=details
+            message=message,
+            error_code=ErrorCode.DATA_INGESTION_ERROR,
+            details=details,
         )
         if source:
             self.details["source"] = source
@@ -275,8 +295,8 @@ class ExternalAPIError(DataPipelineError):
     def __init__(
         self,
         message: str,
-        api_name: str = None,
-        status_code: int = None,
+        api_name: Optional[str] = None,
+        status_code: Optional[int] = None,
         details: Optional[Dict[str, Any]] = None,
     ):
         super().__init__(
@@ -297,7 +317,7 @@ class BusinessLogicError(BaseApplicationError):
         self,
         message: str,
         error_code: ErrorCode,
-        context: str = None,
+        context: Optional[str] = None,
         details: Optional[Dict[str, Any]] = None,
     ):
         super().__init__(message, error_code, details)
@@ -311,8 +331,8 @@ class InsufficientDataError(BusinessLogicError):
     def __init__(
         self,
         message: str = "Insufficient data for processing",
-        required_count: int = None,
-        actual_count: int = None,
+        required_count: Optional[int] = None,
+        actual_count: Optional[int] = None,
     ):
         details = {}
         if required_count is not None:
@@ -358,7 +378,7 @@ def handle_database_exception(exc: Exception) -> DatabaseError:
 
 
 def handle_external_api_exception(
-    exc: Exception, api_name: str = None
+    exc: Exception, api_name: Optional[str] = None
 ) -> ExternalAPIError:
     """Convert external API exceptions to application exceptions."""
     import requests.exceptions as req_exc
