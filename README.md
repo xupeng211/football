@@ -8,6 +8,16 @@
 
 **⚠️ 重要：所有 AI 编程工具必须在虚拟环境中开发！**
 
+## 🚀 Quality Assurance
+
+This project uses a comprehensive set of automated tools to ensure high code quality and a stable CI pipeline. Key features include:
+
+- **Pre-commit Hooks**: Automated checks for formatting, linting, and security before every commit.
+- **Pre-push Quality Gate**: A full suite of tests and validation runs before pushing to the remote repository.
+- **Smart CI/CD**: The GitHub Actions pipeline is optimized to run static checks in parallel and intelligently select tests based on changed files for faster feedback.
+
+See the `DEVELOPER_GUIDE.md` for full details on the development workflow.
+
 ```bash
 # 🚀 快速开始（AI工具必读）
 source scripts/activate-venv.sh  # 自动激活虚拟环境

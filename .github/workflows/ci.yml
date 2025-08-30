@@ -1,6 +1,5 @@
----
-# Force CI rebuild
 name: CI
+
 on:
   push:
     branches:
@@ -20,10 +19,43 @@ env:
   PIP_DISABLE_PIP_VERSION_CHECK: 1
   PIP_DEFAULT_TIMEOUT: 60
   UV_SYSTEM_PYTHON: 1
+  PYTHON_VERSION: "3.11.9"
 
 jobs:
-  ci:
-    name: "CI"
+  lint-and-validate:
+    name: "Lint & Validate"
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Set up uv cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/uv
+          key: ${{ runner.os }}-uv-${{ hashFiles('**/pyproject.toml') }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install -U pip uv
+          uv pip sync --all-extras requirements.lock
+
+      - name: Run linting and validation
+        run: |
+          make format
+          make lint
+          make type
+          make security
+          make validate
+
+  test:
+    name: "Tests"
+    needs: lint-and-validate
     runs-on: ubuntu-22.04
     services:
       postgres:
@@ -39,16 +71,17 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
         with:
-          fetch-depth: 0 # Required for diff-cover
+          fetch-depth: 0 # Required for smart-test and diff-cover
 
-      - name: Set up Python 3.11.9
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11.9"
+          python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Set up uv cache
         uses: actions/cache@v4
@@ -56,17 +89,10 @@ jobs:
           path: ~/.cache/uv
           key: ${{ runner.os }}-uv-${{ hashFiles('**/pyproject.toml') }}
 
-      - name: Configure Git for private repositories
-        run: git config --global url."https://${{ secrets.GH_PAT }}@github.com/".insteadOf "https://github.com/"
-
-      - name: Install dependencies from lock file
+      - name: Install dependencies
         run: |
           python -m pip install -U pip uv
-          if [ ! -f "requirements.lock" ]; then
-            echo "⚠️ Lock file not found, generating..."
-            uv pip compile pyproject.toml --all-extras -o requirements.lock
-          fi
-          uv pip sync requirements.lock --python-version 3.11
+          uv pip sync --all-extras requirements.lock
           uv pip install -e .
 
       - name: Install psql client
@@ -77,13 +103,17 @@ jobs:
           PGPASSWORD: football
         run: psql -h localhost -U football -d football_test -f sql/schema.sql
 
-      - name: Run CI checks
+      - name: Run Tests (Pull Request - Smart Test)
+        if: github.event_name == 'pull_request'
         env:
           DATABASE_URL: postgresql://football:football@localhost:5432/football_test
-          COV_MIN: ${{ vars.COV_MIN || '70' }}
-          DIFF_COV_MIN: ${{ vars.DIFF_COV_MIN || '75' }}
-          BASE_REF: ${{ github.base_ref || 'main' }}
-        run: CI=true make ci
+        run: CI=true make smart-test
+
+      - name: Run Tests (Push - Full Suite)
+        if: github.event_name == 'push'
+        env:
+          DATABASE_URL: postgresql://football:football@localhost:5432/football_test
+        run: CI=true make test
 
       - name: Upload artifacts
         if: always()

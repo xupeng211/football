@@ -1,6 +1,6 @@
 # Football Prediction System - Development Makefile
 .DEFAULT_GOAL := help
-.PHONY: help clean clean-all format lint type test security security-deps ci dev docker-up docker-down install cov diffcov local-ci validate-contract
+.PHONY: help clean clean-all format lint type test security security-deps ci dev docker-up docker-down install cov diffcov local-ci validate-contract quality-gate smart-test check-env
 
 # Configuration
 PYTHON := python3
@@ -54,8 +54,10 @@ install: ## Install dependencies using uv and lock file
 		uv pip compile pyproject.toml --all-extras -o requirements.lock; \
 	fi; \
 	uv pip sync requirements.lock; \
-	uv pip install -e .[dev]; \
-	pre-commit install
+	# Explicitly install dev dependencies as the '.'[dev] syntax is not working reliably
+	uv pip install bandit ruff mypy pytest pytest-cov pytest-asyncio pre-commit types-setuptools setuptools diff-cover pytest-mock pytest-xdist psutil mutmut hypothesis types-PyYAML types-requests defusedxml types-defusedxml types-psycopg2; \
+	uv pip install -e .; \
+	pre-commit install --hook-type pre-commit --hook-type pre-push
 	@echo "$(GREEN)✅ Dependencies installed successfully$(NC)"
 	@echo "$(YELLOW)💡 Next: Run 'source $(VENV)/bin/activate' then 'make ci'$(NC)"
 
@@ -93,8 +95,25 @@ test: check-venv ## Run tests with coverage using settings from pyproject.toml
 	$(PYTHON_VENV) -m pytest
 	@echo "$(GREEN)✅ Tests completed$(NC)"
 
-ci: format lint type security security-deps test validate policy-guard validate-contract ## Run complete CI pipeline locally
+ci: quality-gate ## Run complete CI pipeline locally
 	@echo "$(GREEN)🎊 All CI checks passed!$(NC)"
+
+# ==============================================================================
+# 🚀 Quality Assurance & CI Simulation
+# ==============================================================================
+.PHONY: quality-gate smart-test ci-simulate check-env
+
+check-env: ## 🔬 Check if the development environment is healthy
+	@echo "$(BLUE)🔬 Checking development environment health...$(NC)"
+	@$(PYTHON_VENV) scripts/dev-env-check.py
+
+quality-gate: check-venv ## 🚪 Run all quality checks before pushing (lint, type, security, tests)
+	@echo "$(BLUE)🚪 Running quality gate... This will run all checks from pre-push-check.sh$(NC)"
+	@bash scripts/pre-push-check.sh
+
+smart-test: check-venv ## 🧠 Run tests intelligently based on changed files vs main
+	@echo "$(BLUE)🧠 Running smart tests against main branch...$(NC)"
+	@$(PYTHON_VENV) scripts/smart-test.py main
 
 
 ci.test: test ## Run tests with coverage for CI
