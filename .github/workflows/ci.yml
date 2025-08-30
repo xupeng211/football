@@ -3,9 +3,15 @@
 name: CI
 on:
   push:
-    branches: [main, dev, feat/ci-foundation, feat/ci-tighten, feat/p1-hardening]
+    branches:
+      - main
+      - dev
+      - 'feat/**'
+      - 'fix/**'
   pull_request:
-    branches: [main, dev]
+    branches:
+      - main
+      - dev
 
 permissions:
   contents: read
