@@ -17,12 +17,16 @@ NC := \033[0m # No Color
 
 # Check if virtual environment is active
 check-venv:
-	@if [ -z "$(VIRTUAL_ENV)" ]; then \
-		echo "$(RED)❌ Virtual environment is not active!$(NC)"; \
-		echo "$(YELLOW)Please run: source $(VENV)/bin/activate$(NC)"; \
-		exit 1; \
+	@if [ "$(CI)" = "true" ]; then \
+		echo "$(GREEN)✅ CI environment detected, skipping virtual environment check.$(NC)"; \
+	else \
+		if [ -z "$(VIRTUAL_ENV)" ]; then \
+			echo "$(RED)❌ Virtual environment is not active!$(NC)"; \
+			echo "$(YELLOW)Please run: source $(VENV)/bin/activate$(NC)"; \
+			exit 1; \
+		fi; \
+		echo "$(GREEN)✅ Virtual environment active: $(VIRTUAL_ENV)$(NC)"; \
 	fi
-	@echo "$(GREEN)✅ Virtual environment active: $(VIRTUAL_ENV)$(NC)"
 
 help: ## Show this help message
 	@echo "$(BLUE)🚀 Football Prediction System - Development Commands$(NC)"
