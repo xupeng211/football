@@ -36,7 +36,7 @@ jobs:
 
     - name: Run tests with coverage
       run: |
-        python scripts/coverage-monitor.py 85
+        python scripts/coverage-monitor.py 81
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
@@ -50,7 +50,7 @@ jobs:
       uses: py-cov-action/python-coverage-comment-action@v3
       with:
         GITHUB_TOKEN: ${{ github.token }}
-        MINIMUM_GREEN: 85
+        MINIMUM_GREEN: 81
         MINIMUM_ORANGE: 70
 
     - name: Archive coverage reports

@@ -63,13 +63,9 @@ class CoverageMonitor:
             tree = ET.parse(xml_path)
             root = tree.getroot()
 
-            # Get overall coverage
-            coverage_elem = root.find(".//coverage")
-            if coverage_elem is not None:
-                line_rate = float(coverage_elem.get("line-rate", 0)) * 100
-                branch_rate = float(coverage_elem.get("branch-rate", 0)) * 100
-            else:
-                line_rate = branch_rate = 0
+            # Get overall coverage from root element
+            line_rate = float(root.get("line-rate", 0)) * 100
+            branch_rate = float(root.get("branch-rate", 0)) * 100
 
             # Get per-package coverage
             packages = {}
@@ -191,5 +187,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
     main()
