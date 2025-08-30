@@ -80,6 +80,7 @@ jobs:
           COV_MIN: ${{ vars.COV_MIN || '70' }}
           DIFF_COV_MIN: ${{ vars.DIFF_COV_MIN || '75' }}
           BASE_REF: ${{ github.base_ref || 'main' }}
+          CI: true
         run: make ci
 
       - name: Upload artifacts
