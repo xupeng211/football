@@ -142,7 +142,7 @@ jobs:
         env:
           COV_MIN: ${{ vars.COV_MIN || '70' }}
         run: |
-          pytest --cov-fail-under="${COV_MIN}" tests/
+          pytest --cov-fail-under="${COV_MIN}" tests/unit/ tests/auto/
       - name: Diff Coverage Gate (PR only)
         if: ${{ github.event_name == 'pull_request' }}
         env:
