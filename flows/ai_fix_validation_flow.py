@@ -23,9 +23,9 @@ def propose_fixes(bug_description: str) -> List[Dict[str, Any]]:
     for i in range(random.randint(2, 3)):  # nosec
         fixes.append(
             {
-                "id": f"fix_{i+1}",
-                "description": f"方案{i+1}: 这是一个模拟的修复代码片段。",
-                "code_patch": f"# 伪代码修复 {i+1}\nprint('修复了bug')",
+                "id": f"fix_{i + 1}",
+                "description": f"方案{i + 1}: 这是一个模拟的修复代码片段。",
+                "code_patch": f"# 伪代码修复 {i + 1}\nprint('修复了bug')",
                 "confidence": round(random.uniform(0.7, 0.95), 2),  # nosec
             }
         )
