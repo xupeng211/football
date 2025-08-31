@@ -52,7 +52,8 @@ class TestRunner:
         if verbose:
             cmd.append("-v")
 
-        if coverage and test_type in ["all", "unit"]:
+        test_types_for_coverage = ["all", "unit", "integration", "regression"]
+        if coverage and test_type in test_types_for_coverage:
             cmd.extend(
                 [
                     "--cov=.",

@@ -10,6 +10,12 @@ from typing import Any, AsyncGenerator
 import structlog
 import uvicorn
 from fastapi import FastAPI
+
+# AI-Fix-Enhancement: Import OpenTelemetry modules
+from opentelemetry.distro import configure_opentelemetry
+from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+from opentelemetry.instrumentation.psycopg2 import Psycopg2Instrumentor
+from opentelemetry.instrumentation.redis import RedisInstrumentor
 from prometheus_fastapi_instrumentator import Instrumentator
 from pydantic import BaseModel
 
@@ -20,8 +26,12 @@ from apps.api.routers import health, predictions
 from apps.api.services.prediction_service import prediction_service
 from models.predictor import Predictor
 
-# Configure logging before creating any loggers
+# AI-Fix-Enhancement: Configure logging and OpenTelemetry
+# This should be called once at the beginning of the application startup.
 configure_logging()
+configure_opentelemetry()
+Psycopg2Instrumentor().instrument()
+RedisInstrumentor().instrument()
 
 
 class VersionResponse(BaseModel):
@@ -69,6 +79,11 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan,
 )
+# Add logging middleware
+# AI-Fix-Enhancement: Instrument FastAPI app with OpenTelemetry
+# This should be one of the first middlewares to capture the full request lifecycle.
+FastAPIInstrumentor.instrument_app(app)
+
 # Add logging middleware
 app.add_middleware(LoggingMiddleware)
 

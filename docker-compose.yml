@@ -55,10 +55,14 @@ services:
       - DATABASE_URL=postgresql+asyncpg://postgres:password@postgres:5432/football_predict
       - REDIS_URL=redis://redis:6379/0
       - PREFECT_API_URL=http://prefect:4200/api
+      # OpenTelemetry Configuration for Jaeger
+      - OTEL_SERVICE_NAME=football-predict-api
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
     depends_on:
       - postgres
       - redis
       - prefect
+      - jaeger
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/livez"]
       interval: 30s
@@ -112,6 +116,19 @@ services:
     networks:
       - football_net
     profiles: ["workers"]
+
+  # Jaeger分布式追踪系统
+  jaeger:
+    image: jaegertracing/all-in-one:1.59
+    container_name: football_jaeger
+    ports:
+      - "16686:16686"  # Jaeger UI
+      - "4317:4317"    # OTLP gRPC receiver
+      - "4318:4318"    # OTLP HTTP receiver
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    networks:
+      - football_net
 
 volumes:
   postgres_data:
