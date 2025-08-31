@@ -106,7 +106,7 @@ class TestFootballAPICollectorEnhanced:
 
     @pytest.mark.asyncio
     async def test_collect_team_info_partial_failure(self, collector, mock_session):
-        """测试部分成功，部分失败的情况"""
+        """测试部分成功, 部分失败的情况"""
         collector.session = mock_session
 
         call_count = 0
@@ -177,7 +177,7 @@ class TestFootballAPICollectorEnhanced:
 
         mock_session.get.side_effect = mock_get
 
-        # 执行测试（10个并发请求）
+        # 执行测试(10个并发请求)
         team_ids = [str(i) for i in range(10)]
         teams = await collector.collect_team_info(team_ids)
 

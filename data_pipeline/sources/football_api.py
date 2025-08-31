@@ -162,6 +162,9 @@ class FootballAPICollector:
             async def fetch_team_info(team_id: str) -> Team:
                 """获取单个球队信息"""
                 try:
+                    if not self.session:
+                        raise RuntimeError("Session not initialized")
+                    assert self.session is not None
                     response = await self.session.get(
                         f"{self.base_url}/teams/{team_id}"
                     )
@@ -186,7 +189,7 @@ class FootballAPICollector:
                         season="2023-24",
                     )
 
-            # 并发执行所有API调用，限制并发数量以避免API限流
+            # 并发执行所有API调用, 限制并发数量以避免API限流
             semaphore = asyncio.Semaphore(5)  # 最多5个并发请求
 
             async def bounded_fetch(team_id: str) -> Team:

@@ -6,7 +6,7 @@ JWT认证模块
 
 import os
 from datetime import datetime, timedelta
-from typing import Any, Optional
+from typing import Any, Callable, Optional
 
 import jwt
 import structlog
@@ -65,7 +65,7 @@ def create_access_token(
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
     logger.info("Created access token", username=data.get("sub"), expires=expire)
-    return encoded_jwt
+    return str(encoded_jwt)
 
 
 def verify_token(token: str) -> TokenData:
@@ -125,6 +125,24 @@ async def get_current_user(
 
     # 这里可以从数据库或其他数据源获取用户信息
     # 目前使用简单的硬编码用户
+    if token_data.username is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token data",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    if token_data.username is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token data",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    if not token_data.username:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token data",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
     user = get_user_by_username(token_data.username)
 
     if user is None:
@@ -146,9 +164,9 @@ def get_user_by_username(username: str) -> Optional[User]:
         username: 用户名
 
     Returns:
-        User: 用户信息，如果不存在则返回None
+        User: 用户信息, 如果不存在则返回None
     """
-    # 简单的用户数据库（实际应用中应该从数据库获取）
+    # 简单的用户数据库(实际应用中应该从数据库获取)
     fake_users_db = {
         "admin": User(
             username="admin",
@@ -170,7 +188,7 @@ def get_user_by_username(username: str) -> Optional[User]:
     return fake_users_db.get(username)
 
 
-def require_scopes(required_scopes: list[str]):
+def require_scopes(required_scopes: list[str]) -> Callable[[User], User]:
     """
     创建需要特定权限的依赖项
 
