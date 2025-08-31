@@ -110,7 +110,9 @@ jobs:
       - name: Initialize DB Schema
         env:
           PGPASSWORD: football
-        run: psql -h localhost -U football -d football_test -f sql/schema.sql
+        run: |
+          chmod +x sql/schema.sql
+          psql -h localhost -U football -d football_test -f sql/schema.sql
 
       - name: Run Tests (Pull Request - Smart Test)
         if: github.event_name == 'pull_request'

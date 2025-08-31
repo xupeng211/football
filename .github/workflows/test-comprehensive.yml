@@ -14,9 +14,9 @@ jobs:
       postgres:
         image: postgres:13
         env:
-          POSTGRES_PASSWORD: testpass
-          POSTGRES_USER: postgres
-          POSTGRES_DB: sports_test
+          POSTGRES_DB: football_test
+          POSTGRES_USER: football
+          POSTGRES_PASSWORD: football
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -79,7 +79,7 @@ jobs:
         poetry run pytest tests/integration/ -v --cov=. --cov-append --cov-report=xml
       env:
         ENABLE_DB_TESTS: "1"
-        TEST_DATABASE_URL: "postgresql://postgres:testpass@localhost:5432/sports_test"
+        TEST_DATABASE_URL: "postgresql://football:football@localhost:5432/football_test"
         REDIS_URL: "redis://localhost:6379"
         TEST_SEED: 42
 
