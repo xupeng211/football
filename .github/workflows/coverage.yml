@@ -54,7 +54,17 @@ jobs:
       run: |
         poetry install --with dev
 
+    - name: Install psql client
+      run: sudo apt-get update && sudo apt-get install -y postgresql-client
+
+    - name: Initialize DB Schema
+      env:
+        PGPASSWORD: football
+      run: psql -h localhost -U football -d football_test -f sql/schema.sql
+
     - name: Run tests with coverage
+      env:
+        DATABASE_URL: postgresql://football:football@localhost:5432/football_test
       run: |
         poetry run pytest tests/unit/ tests/integration/ --cov=. --cov-report=xml --cov-report=html --cov-report=json --cov-fail-under=81
 

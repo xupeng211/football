@@ -46,7 +46,17 @@ jobs:
           uv pip sync requirements.lock
           uv pip install -e .
 
+      - name: Install psql client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+
+      - name: Initialize DB Schema
+        env:
+          PGPASSWORD: football
+        run: psql -h localhost -U football -d football_test -f sql/schema.sql
+
       - name: Run tests with coverage
+        env:
+          DATABASE_URL: postgresql://football:football@localhost:5432/football_test
         run: |
           pytest tests/unit/ tests/integration/ tests/performance/ \
             --cov=. \

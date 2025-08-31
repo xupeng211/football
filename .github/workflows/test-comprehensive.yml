@@ -63,6 +63,14 @@ jobs:
     - name: 安装依赖
       run: poetry install --no-interaction --no-ansi
 
+    - name: 安装psql客户端
+      run: sudo apt-get update && sudo apt-get install -y postgresql-client
+
+    - name: 初始化数据库架构
+      env:
+        PGPASSWORD: football
+      run: psql -h localhost -U football -d football_test -f sql/schema.sql
+
     - name: 运行代码质量检查
       run: |
         poetry run ruff check .
