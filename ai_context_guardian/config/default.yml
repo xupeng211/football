@@ -1,0 +1,25 @@
+# AI Context Guardian - Default Configuration
+
+context_guardian:
+  # Basic settings
+  max_inject_files: 5
+  max_tokens_per_inject: 2000
+  log_level: "INFO"
+  detection_sensitivity: "medium" # low, medium, high
+
+  # Detection rules
+  detect_cross_file_deps: true
+  detect_config_changes: true
+  detect_ci_changes: true
+  detect_test_changes: true
+
+  # Token management
+  token_budget:
+    conservative_mode: true
+    trim_strategy: "smart" # smart, truncate, summarize
+
+  # Performance settings
+  performance:
+    cache_enabled: true
+    max_analysis_depth: 3
+    timeout_seconds: 10
