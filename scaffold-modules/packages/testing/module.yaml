@@ -1,0 +1,129 @@
+# 🧪 测试框架模块配置
+# Testing Module - 完整的测试框架和覆盖率监控
+
+name: "testing"
+display_name: "🧪 测试框架模块"
+version: "2.0.0"
+description: "完整的测试框架，包含单元测试、集成测试、覆盖率监控等"
+
+# 模块类型
+type: "feature"
+required: false
+
+# 依赖关系
+dependencies:
+  - "core"
+
+# 冲突模块
+conflicts: []
+
+# 模块文件列表
+files:
+  # 测试运行脚本
+  - src: "scripts/run_tests.py"
+    dest: "scripts/run_tests.py"
+    type: "script"
+    description: "智能测试运行器"
+
+  - src: "scripts/smart-test.py"
+    dest: "scripts/smart-test.py"
+    type: "script"
+    description: "智能测试策略"
+
+  - src: "scripts/coverage-monitor.py"
+    dest: "scripts/coverage-monitor.py"
+    type: "script"
+    description: "覆盖率监控工具"
+
+  # 测试配置文件
+  - src: ".coveragerc"
+    dest: ".coveragerc"
+    type: "config"
+    description: "测试覆盖率配置"
+
+  - src: "pytest.ini"
+    dest: "pytest.ini"
+    type: "config"
+    description: "pytest测试配置"
+
+  # GitHub Actions工作流
+  - src: ".github/workflows/test-comprehensive.yml"
+    dest: ".github/workflows/test-comprehensive.yml"
+    type: "workflow"
+    description: "全面测试工作流"
+
+  - src: ".github/workflows/coverage-alert.yml"
+    dest: ".github/workflows/coverage-alert.yml"
+    type: "workflow"
+    description: "覆盖率警报工作流"
+
+  # 测试模板
+  - src: "test-templates/unit_test.template.py"
+    dest: "test-templates/unit_test.template.py"
+    type: "template"
+    description: "单元测试模板"
+
+  - src: "test-templates/integration_test.template.py"
+    dest: "test-templates/integration_test.template.py"
+    type: "template"
+    description: "集成测试模板"
+
+  - src: "test-templates/e2e_test.template.py"
+    dest: "test-templates/e2e_test.template.py"
+    type: "template"
+    description: "端到端测试模板"
+
+# 安装后执行的命令
+post_install:
+  commands:
+    - "chmod +x scripts/run_tests.py scripts/smart-test.py scripts/coverage-monitor.py"
+    - "mkdir -p test-templates tests reports"
+    - "pip install pytest pytest-cov pytest-mock --quiet"
+
+  messages:
+    - "🎉 测试框架模块安装完成！"
+    - "🧪 测试运行器和覆盖率监控已就绪"
+    - "🚀 运行 python scripts/run_tests.py 开始测试"
+    - "📊 使用 python scripts/coverage-monitor.py 监控覆盖率"
+    - "📝 查看 test-templates/ 目录获取测试模板"
+
+# 系统要求
+requirements:
+  python: ">=3.11"
+  pip_packages:
+    - "pytest>=7.0.0"
+    - "pytest-cov>=4.0.0"
+    - "pytest-mock>=3.10.0"
+    - "coverage>=7.0.0"
+
+# 功能特性
+features:
+  - "unit_testing"
+  - "integration_testing"
+  - "coverage_monitoring"
+  - "test_automation"
+  - "test_templates"
+  - "smart_testing"
+
+# 估算指标
+metrics:
+  files_count: 10
+  install_time_seconds: 45
+  setup_complexity: "medium"
+  maintenance_effort: "low"
+
+# 使用建议
+usage_tips:
+  - "定期运行完整测试套件确保代码质量"
+  - "维持至少80%的测试覆盖率"
+  - "使用测试模板快速创建新测试"
+  - "关注覆盖率警报及时修复问题"
+
+# 版本历史
+changelog:
+  "2.0.0":
+    - "智能测试策略"
+    - "增强覆盖率监控"
+    - "测试模板系统"
+  "1.0.0":
+    - "基础测试框架"

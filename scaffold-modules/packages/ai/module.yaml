@@ -1,0 +1,137 @@
+# 🤖 AI工具模块配置
+# AI Tools Module - 智能开发辅助工具集
+
+name: "ai"
+display_name: "🤖 AI辅助工具模块"
+version: "2.0.0"
+description: "AI驱动的开发辅助工具，包含智能诊断、自动化报告、问题检测等"
+
+# 模块类型
+type: "enhancement"
+required: false
+
+# 依赖关系
+dependencies:
+  - "core"
+  - "cicd" # AI工具依赖CI/CD模块进行诊断
+
+# 冲突模块
+conflicts: []
+
+# 模块文件列表
+files:
+  # AI核心脚本
+  - src: "scripts/ai-auto-init.py"
+    dest: "scripts/ai-auto-init.py"
+    type: "script"
+    description: "AI自动项目初始化"
+    features: ["auto_initialization", "smart_setup"]
+
+  - src: "scripts/ci-diagnostics.py"
+    dest: "scripts/ci-diagnostics.py"
+    type: "script"
+    description: "CI问题智能诊断"
+    features: ["intelligent_diagnosis", "automated_analysis"]
+
+  - src: "scripts/ci-problem-detector.py"
+    dest: "scripts/ci-problem-detector.py"
+    type: "script"
+    description: "CI问题预测检测器"
+    features: ["predictive_analysis", "problem_detection"]
+
+  - src: "scripts/validate-context.py"
+    dest: "scripts/validate-context.py"
+    type: "script"
+    description: "项目上下文智能验证"
+    features: ["context_validation", "consistency_check"]
+
+  - src: "scripts/dependency-conflict-detector.py"
+    dest: "scripts/dependency-conflict-detector.py"
+    type: "script"
+    description: "依赖冲突智能检测"
+    features: ["dependency_analysis", "conflict_resolution"]
+
+  - src: "scripts/automated_test_report.py"
+    dest: "scripts/automated_test_report.py"
+    type: "script"
+    description: "自动化测试报告生成"
+    features: ["automated_reporting", "test_analysis"]
+
+  # AI工作流
+  - src: ".github/workflows/ai-maintenance.yml"
+    dest: ".github/workflows/ai-maintenance.yml"
+    type: "workflow"
+    description: "AI自动维护工作流"
+
+  - src: ".github/workflows/guardrail-daily.yml"
+    dest: ".github/workflows/guardrail-daily.yml"
+    type: "workflow"
+    description: "每日AI防护检查"
+
+  # AI配置文件
+  - src: "ai-configs/model-configs.yaml"
+    dest: "ai-configs/model-configs.yaml"
+    type: "config"
+    description: "AI模型配置"
+
+  - src: "ai-configs/prompts.yaml"
+    dest: "ai-configs/prompts.yaml"
+    type: "config"
+    description: "AI提示词模板"
+
+# 安装后执行的命令
+post_install:
+  commands:
+    - "chmod +x scripts/ai-*.py scripts/*-detector.py scripts/validate-context.py"
+    - "mkdir -p ai-configs reports logs"
+    - "python scripts/ai-auto-init.py --setup"
+
+  messages:
+    - "🎉 AI工具模块安装完成！"
+    - "🤖 AI辅助工具已就绪"
+    - "🔍 运行 python scripts/ci-diagnostics.py 进行智能诊断"
+    - "🛡️ 每日AI防护检查已配置"
+    - "📊 自动化报告生成器已安装"
+
+# 系统要求
+requirements:
+  python: ">=3.11"
+  pip_packages:
+    - "openai>=1.0.0"
+    - "requests>=2.28.0"
+    - "pyyaml>=6.0"
+    - "jinja2>=3.0.0"
+
+# 功能特性
+features:
+  - "intelligent_diagnosis"
+  - "automated_analysis"
+  - "predictive_maintenance"
+  - "smart_reporting"
+  - "context_validation"
+  - "dependency_analysis"
+
+# 估算指标
+metrics:
+  files_count: 10
+  install_time_seconds: 90
+  setup_complexity: "high"
+  maintenance_effort: "minimal"
+  ai_intelligence_level: "advanced"
+
+# 使用建议
+usage_tips:
+  - "定期运行 ci-diagnostics.py 进行系统健康检查"
+  - "使用 validate-context.py 确保项目一致性"
+  - "leverage dependency-conflict-detector.py 预防依赖问题"
+  - "查看自动生成的AI报告获取改进建议"
+
+# 版本历史
+changelog:
+  "2.0.0":
+    - "模块化重构"
+    - "增强AI诊断能力"
+    - "新增预测性维护"
+    - "优化报告生成"
+  "1.0.0":
+    - "初始AI工具集成"

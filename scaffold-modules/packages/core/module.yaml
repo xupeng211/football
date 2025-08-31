@@ -1,0 +1,102 @@
+# 🏗️ 核心模块配置
+# Core Module - 所有其他模块的基础依赖
+
+name: "core"
+display_name: "🏗️ 核心基础模块"
+version: "2.0.0"
+description: "脚手架的核心基础模块，提供基本项目结构和开发环境"
+
+# 模块类型
+type: "core"
+required: true
+
+# 依赖关系
+dependencies: [] # 核心模块不依赖其他模块
+
+# 冲突模块
+conflicts: []
+
+# 模块文件列表
+files:
+  # 项目配置文件
+  - src: "pyproject.toml"
+    dest: "pyproject.toml"
+    type: "config"
+    description: "Poetry项目配置主文件"
+
+  - src: ".editorconfig"
+    dest: ".editorconfig"
+    type: "config"
+    description: "编辑器统一配置"
+
+  - src: ".gitignore"
+    dest: ".gitignore"
+    type: "config"
+    description: "Git忽略规则"
+
+  - src: "Makefile"
+    dest: "Makefile"
+    type: "script"
+    description: "统一命令接口"
+
+  # 文档模板
+  - src: "templates/README.template.md"
+    dest: "README.md"
+    type: "template"
+    description: "项目主文档模板"
+
+  # 基础脚本
+  - src: "scripts/activate-venv.sh"
+    dest: "scripts/activate-venv.sh"
+    type: "script"
+    description: "虚拟环境激活脚本"
+
+  - src: "scripts/setup-dev-env.sh"
+    dest: "scripts/setup-dev-env.sh"
+    type: "script"
+    description: "开发环境设置脚本"
+
+  - src: "scripts/check-venv.sh"
+    dest: "scripts/check-venv.sh"
+    type: "script"
+    description: "环境检查脚本"
+
+# 安装后执行的命令
+post_install:
+  commands:
+    - "chmod +x scripts/*.sh"
+    - "poetry install"
+
+  messages:
+    - "🎉 核心模块安装完成！"
+    - "📚 查看 README.md 了解项目结构"
+    - "🔧 运行 scripts/setup-dev-env.sh 初始化开发环境"
+
+# 系统要求
+requirements:
+  python: ">=3.11"
+  poetry: ">=1.5.0"
+  git: ">=2.30"
+
+# 功能特性
+features:
+  - "project_structure"
+  - "environment_management"
+  - "basic_scripts"
+  - "development_tools"
+
+# 估算指标
+metrics:
+  files_count: 8
+  install_time_seconds: 30
+  setup_complexity: "low"
+  maintenance_effort: "minimal"
+
+# 版本历史
+changelog:
+  "2.0.0":
+    - "模块化重构"
+    - "统一配置管理"
+    - "改进脚本结构"
+  "1.0.0":
+    - "初始版本"
