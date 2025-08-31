@@ -59,7 +59,7 @@ repos:
     hooks:
       - id: pytest-check
         name: Run quick tests
-        entry: pytest
+        entry: poetry run pytest
         language: system
         files: \.py$
         pass_filenames: false
