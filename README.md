@@ -1,5 +1,9 @@
 # 🤖 AI 开发工具使用规则
 
+> **🚀 AI工具进入提示**: 请立即执行 `make ai-start` 获取完整项目上下文和环境诊断！
+>
+> 这将自动为您准备最佳工作环境，包括项目架构、CI状态、依赖检查等关键信息。
+
 [![CI](https://github.com/your-org/football-predict-system/workflows/CI/badge.svg)](https://github.com/your-org/football-predict-system/actions/workflows/ci.yml)
 [![Tests](https://img.shields.io/badge/tests-passing-green.svg)](https://github.com/your-org/football-predict-system/actions/workflows/ci.yml)
 [![Coverage](https://img.shields.io/badge/coverage-80%25+-brightgreen.svg)](https://github.com/your-org/football-predict-system/actions/workflows/coverage.yml)
