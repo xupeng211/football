@@ -56,8 +56,8 @@ jobs:
 
     - name: Run Safety Check
       run: |
-        poetry run pip-audit --format=json --output=safety-report.json || true
-        poetry run pip-audit
+        poetry run safety check --json --output=safety-report.json || true
+        poetry run safety check
 
     - name: Upload Security Reports
       uses: actions/upload-artifact@v4
