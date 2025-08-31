@@ -1,19 +1,20 @@
 #!/usr/bin/env python3
 """
 🎯 脚手架模块管理器
-功能：智能模块安装、卸载、升级和依赖解析
-版本：v2.0.0
+功能: 智能模块安装、卸载、升级和依赖解析
+版本: v2.0.0
 """
 
 import json
 import os
+import shlex
 import shutil
 import subprocess
 import sys
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, cast
 
 import yaml
 
@@ -53,11 +54,11 @@ class ModuleManager:
         # 加载已安装模块信息
         self.installed_modules = self._load_installed_modules()
 
-    def _load_installed_modules(self) -> Dict:
+    def _load_installed_modules(self) -> Dict[str, Any]:
         """加载已安装模块信息"""
         if self.installed_modules_file.exists():
             with open(self.installed_modules_file, encoding="utf-8") as f:
-                return json.load(f)
+                return cast(Dict[str, Any], json.load(f))
         return {"modules": {}, "install_history": [], "last_update": None}
 
     def _save_installed_modules(self) -> None:
@@ -108,13 +109,13 @@ class ModuleManager:
     def resolve_dependencies(self, modules: List[str]) -> Tuple[List[str], List[str]]:
         """
         解析模块依赖关系
-        返回：(安装顺序的模块列表, 冲突列表)
+        返回: (安装顺序的模块列表, 冲突列表)
         """
-        # 收集所有需要的模块（包括依赖）
+        # 收集所有需要的模块(包括依赖)
         all_modules = set()
         conflicts = []
 
-        def add_module_and_deps(module_name: str):
+        def add_module_and_deps(module_name: str) -> None:
             if module_name in all_modules:
                 return
 
@@ -229,7 +230,7 @@ class ModuleManager:
             print(f"❌ 安装模块 {module_name} 失败: {e!s}")
             return False
 
-    def _copy_module_files(self, module_info: ModuleInfo):
+    def _copy_module_files(self, module_info: ModuleInfo) -> None:
         """复制模块文件"""
         module_source_dir = self.packages_dir / module_info.name
 
@@ -247,7 +248,7 @@ class ModuleManager:
                     shutil.copytree(src_path, dest_path, dirs_exist_ok=True)
                 print(f"  📄 {file_info['dest']}")
             else:
-                # 如果源文件不存在，尝试从项目根目录复制现有文件
+                # 如果源文件不存在, 尝试从项目根目录复制现有文件
                 existing_file = self.project_root / file_info["src"]
                 if existing_file.exists():
                     if existing_file.is_file():
@@ -258,15 +259,16 @@ class ModuleManager:
                 else:
                     print(f"  ⚠️  源文件不存在: {file_info['src']}")
 
-    def _execute_post_install(self, module_info: ModuleInfo):
+    def _execute_post_install(self, module_info: ModuleInfo) -> None:
         """执行安装后命令"""
         commands = module_info.post_install.get("commands", [])
         for cmd in commands:
             try:
                 print(f"  🔧 执行: {cmd}")
+                # 安全地拆分命令, 避免shell注入
+                cmd_args = shlex.split(cmd)
                 result = subprocess.run(
-                    cmd,
-                    shell=True,
+                    cmd_args,
                     cwd=self.project_root,
                     capture_output=True,
                     text=True,
@@ -278,7 +280,7 @@ class ModuleManager:
                 print(f"  ⚠️  命令执行失败: {cmd} - {e!s}")
 
     def install_modules(self, modules: List[str], force: bool = False) -> bool:
-        """安装多个模块（处理依赖关系）"""
+        """安装多个模块(处理依赖关系)"""
         print(f"🎯 开始安装模块: {', '.join(modules)}")
 
         # 解析依赖关系
@@ -300,16 +302,16 @@ class ModuleManager:
         # 按顺序安装模块
         for module_name in ordered_modules:
             if not self.install_module(module_name, force):
-                print("❌ 安装失败，回滚操作...")
+                print("❌ 安装失败, 回滚操作...")
                 self._rollback_installation(
                     ordered_modules[: ordered_modules.index(module_name)]
                 )
                 return False
 
-        print("🎉 所有模块安装完成！")
+        print("🎉 所有模块安装完成!")
         return True
 
-    def _rollback_installation(self, installed_modules: List[str]):
+    def _rollback_installation(self, installed_modules: List[str]) -> None:
         """回滚安装"""
         print("🔄 正在回滚安装...")
         for module_name in reversed(installed_modules):
@@ -375,7 +377,7 @@ class ModuleManager:
                     updatable.append(module_name)
         return updatable
 
-    def get_module_status(self) -> Dict:
+    def get_module_status(self) -> Dict[str, Any]:
         """获取模块状态统计"""
         available = self.list_available_modules()
         installed = self.list_installed_modules()
@@ -391,7 +393,7 @@ class ModuleManager:
         }
 
 
-def main():
+def main() -> None:
     """命令行接口"""
     if len(sys.argv) < 2:
         print("Usage: python module-manager.py <command> [args...]")
@@ -402,9 +404,9 @@ def main():
     command = sys.argv[1]
 
     if command == "list":
-        modules = manager.list_available_modules()
+        available_modules = manager.list_available_modules()
         print("📦 可用模块:")
-        for module in modules:
+        for module in available_modules:
             status = (
                 "✅ 已安装" if module.name in manager.list_installed_modules() else ""
             )
@@ -415,22 +417,22 @@ def main():
         if len(sys.argv) < 3:
             print("Usage: python module-manager.py install <module1> [module2] ...")
             return
-        modules = sys.argv[2:]
-        manager.install_modules(modules)
+        module_names = sys.argv[2:]
+        manager.install_modules(module_names)
 
     elif command == "uninstall":
         if len(sys.argv) < 3:
             print("Usage: python module-manager.py uninstall <module>")
             return
-        module = sys.argv[2]
-        manager.uninstall_module(module)
+        module_name = sys.argv[2]
+        manager.uninstall_module(module_name)
 
     elif command == "status":
-        status = manager.get_module_status()
+        module_status = manager.get_module_status()
         print("📊 模块状态:")
-        print(f"  可用模块: {status['available_count']}")
-        print(f"  已安装模块: {status['installed_count']}")
-        print(f"  可更新模块: {status['updatable_count']}")
+        print(f"  可用模块: {module_status['available_count']}")
+        print(f"  已安装模块: {module_status['installed_count']}")
+        print(f"  可更新模块: {module_status['updatable_count']}")
 
     else:
         print(f"未知命令: {command}")
