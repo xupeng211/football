@@ -6,11 +6,13 @@
 PYTHON := python3
 VENV := .venv
 PIP := $(VENV)/bin/pip
-# In CI, we don't use a venv, the python from setup-python is used directly
+# In CI, we use poetry run to execute commands within the poetry venv
 ifeq ($(CI),true)
-	PYTHON_VENV := python
+	PYTHON_VENV := poetry run python
+	CMD_PREFIX := poetry run
 else
 	PYTHON_VENV := $(VENV)/bin/python
+	CMD_PREFIX :=
 endif
 
 # Colors for output
@@ -63,24 +65,24 @@ install: ## Install dependencies using uv and lock file
 
 format: check-venv ## Format code with ruff
 	@echo "$(BLUE)🎨 Formatting code...$(NC)"
-	ruff format .
+	$(CMD_PREFIX) ruff format .
 	@echo "$(GREEN)✅ Code formatting completed$(NC)"
 
 fmt: format ## Alias for format
 
 lint: check-venv ## Run linting checks
 	@echo "$(BLUE)🔍 Running linting checks...$(NC)"
-	ruff check .
+	$(CMD_PREFIX) ruff check .
 	@echo "$(GREEN)✅ Linting completed$(NC)"
 
 type: check-venv ## Run type checking
 	@echo "$(BLUE)🔍 Running type checks...$(NC)"
-	mypy apps/ data_pipeline/ --ignore-missing-imports
+	$(CMD_PREFIX) mypy apps/ data_pipeline/ --ignore-missing-imports
 	@echo "$(GREEN)✅ Type checking completed$(NC)"
 
 security: check-venv ## Run security scanning
 	@echo "$(BLUE)🔒 Running security scan...$(NC)"
-	bandit -r . -c pyproject.toml -q
+	$(CMD_PREFIX) bandit -r . -c pyproject.toml -q
 	@echo "$(GREEN)✅ Security scan completed$(NC)"
 
 sec: security ## Alias for security
@@ -171,8 +173,8 @@ clean-all: ## Clean up all temporary files, caches, and build artifacts
 
 validate: ## Validate configuration files syntax
 	@echo "$(BLUE)🔍 Validating configuration files...$(NC)"
-	@python -c "import tomllib; [tomllib.load(open(f,'rb')) for f in ['pyproject.toml', '.gitleaks.toml'] if __import__('os').path.exists(f)]"
-	@python -c "import yaml; [yaml.safe_load(open(f)) for f in ['.github/workflows/ci.yml'] if __import__('os').path.exists(f)]"
+	@$(CMD_PREFIX) python -c "import tomllib; [tomllib.load(open(f,'rb')) for f in ['pyproject.toml', '.gitleaks.toml'] if __import__('os').path.exists(f)]"
+	@$(CMD_PREFIX) python -c "import yaml; [yaml.safe_load(open(f)) for f in ['.github/workflows/ci.yml'] if __import__('os').path.exists(f)]"
 	@echo "$(GREEN)✅ Configuration files are valid$(NC)"
 
 policy-guard: ## Check dependency sync and workflow consistency
