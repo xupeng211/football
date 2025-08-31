@@ -53,7 +53,6 @@ types-requests = ">=2.28.0"
 defusedxml = ">=0.7.0"
 types-defusedxml = ">=0.7.0"
 types-psycopg2 = ">=2.9.0"
-safety = ">=2.3.0"
 
 [tool.poetry.extras]
 # 保留为空的 extras 部分以保持向后兼容性

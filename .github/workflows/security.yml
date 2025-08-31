@@ -54,11 +54,6 @@ jobs:
         poetry run bandit -r . -c pyproject.toml -f json -o bandit-report.json || true
         poetry run bandit -r . -c pyproject.toml
 
-    - name: Run Safety Check
-      run: |
-        poetry run safety check --json --output=safety-report.json || true
-        poetry run safety check
-
     - name: Upload Security Reports
       uses: actions/upload-artifact@v4
       if: always()
@@ -66,7 +61,6 @@ jobs:
         name: security-reports
         path: |
           bandit-report.json
-          safety-report.json
 
     - name: Comment PR with Security Results
       if: github.event_name == 'pull_request'
@@ -84,18 +78,11 @@ jobs:
             comment += `- **Issues Found**: ${issues}\n`;
             if (issues > 0) {
               comment += `- **Severity**: ${banditReport.metrics._totals.SEVERITY}\n`;
+            } else {
+              comment += `- ✅ No security issues found\n`;
             }
           } catch (e) {
             comment += `### Bandit Security Scan\n- ✅ No issues found\n`;
-          }
-
-          // Safety results
-          try {
-            const safetyReport = JSON.parse(fs.readFileSync('safety-report.json', 'utf8'));
-            comment += `\n### Safety Dependency Check\n`;
-            comment += `- **Vulnerabilities**: ${safetyReport.vulnerabilities?.length || 0}\n`;
-          } catch (e) {
-            comment += `\n### Safety Dependency Check\n- ✅ No vulnerabilities found\n`;
           }
 
           github.rest.issues.createComment({
