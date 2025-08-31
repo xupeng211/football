@@ -12,10 +12,12 @@ import uvicorn
 from fastapi import FastAPI
 
 # AI-Fix-Enhancement: Import OpenTelemetry modules
-from opentelemetry.distro import configure_opentelemetry
+from opentelemetry import trace
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from opentelemetry.instrumentation.psycopg2 import Psycopg2Instrumentor
 from opentelemetry.instrumentation.redis import RedisInstrumentor
+from opentelemetry.sdk.resources import Resource
+from opentelemetry.sdk.trace import TracerProvider
 from prometheus_fastapi_instrumentator import Instrumentator
 from pydantic import BaseModel
 
@@ -29,7 +31,12 @@ from models.predictor import Predictor
 # AI-Fix-Enhancement: Configure logging and OpenTelemetry
 # This should be called once at the beginning of the application startup.
 configure_logging()
-configure_opentelemetry()
+
+# Initialize OpenTelemetry
+resource = Resource.create({"service.name": "football-predict-api"})
+trace_provider = TracerProvider(resource=resource)
+trace.set_tracer_provider(trace_provider)
+
 Psycopg2Instrumentor().instrument()
 RedisInstrumentor().instrument()
 
