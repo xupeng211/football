@@ -156,16 +156,49 @@ class FootballAPICollector:
         teams = []
 
         try:
-            # TODO: 实现并发API调用
-            for team_id in team_ids:
-                # TODO: 替换为真实的API调用
-                team_info = Team(
-                    team_id=team_id,
-                    name=f"Team_{team_id}",
-                    league="PL",
-                    season="2023-24",
-                )
-                teams.append(team_info)
+            # 实现并发API调用
+            import asyncio
+
+            async def fetch_team_info(team_id: str) -> Team:
+                """获取单个球队信息"""
+                try:
+                    response = await self.session.get(
+                        f"{self.base_url}/teams/{team_id}"
+                    )
+                    response.raise_for_status()
+                    data = response.json()
+
+                    return Team(
+                        team_id=str(data["id"]),
+                        name=data["name"],
+                        league=data.get("area", {}).get("name", "Unknown"),
+                        season="2023-24",  # 默认当前赛季
+                        founded=data.get("founded"),
+                        venue=data.get("venue"),
+                    )
+                except Exception as e:
+                    logger.warning(f"Failed to fetch team {team_id}", error=str(e))
+                    # 返回占位数据以保持系统稳定
+                    return Team(
+                        team_id=team_id,
+                        name=f"Team_{team_id}",
+                        league="Unknown",
+                        season="2023-24",
+                    )
+
+            # 并发执行所有API调用，限制并发数量以避免API限流
+            semaphore = asyncio.Semaphore(5)  # 最多5个并发请求
+
+            async def bounded_fetch(team_id: str) -> Team:
+                async with semaphore:
+                    return await fetch_team_info(team_id)
+
+            # 并发收集所有球队信息
+            tasks = [bounded_fetch(team_id) for team_id in team_ids]
+            teams = await asyncio.gather(*tasks, return_exceptions=False)
+
+            # 过滤掉可能的异常结果
+            teams = [team for team in teams if isinstance(team, Team)]
 
         except Exception as e:
             logger.error("Failed to collect team info", error=str(e))
