@@ -6,10 +6,10 @@ This module defines the fundamental business entities and their relationships.
 
 from datetime import datetime
 from enum import Enum
-from typing import Dict, List, Optional, Union
+from typing import ClassVar, Dict, List, Optional, Union
 from uuid import UUID, uuid4
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, ValidationInfo, field_validator
 
 
 class MatchResult(str, Enum):
@@ -51,9 +51,9 @@ class Team(BaseModel):
     venue: Optional[str] = None
 
     # Performance metrics
-    current_form: List[MatchResult] = Field(default_factory=list, max_items=10)
-    home_form: List[MatchResult] = Field(default_factory=list, max_items=5)
-    away_form: List[MatchResult] = Field(default_factory=list, max_items=5)
+    current_form: List[MatchResult] = Field(default_factory=list, max_length=10)
+    home_form: List[MatchResult] = Field(default_factory=list, max_length=5)
+    away_form: List[MatchResult] = Field(default_factory=list, max_length=5)
 
     # Statistics
     goals_scored: int = Field(default=0, ge=0)
@@ -125,15 +125,18 @@ class Match(BaseModel):
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
-    @validator("away_possession")
-    def validate_possession_sum(cls, v, values):
+    @field_validator("away_possession")
+    @classmethod
+    def validate_possession_sum(
+        cls, v: Optional[float], info: ValidationInfo
+    ) -> Optional[float]:
         """Ensure possession percentages sum to 100."""
         if (
             v is not None
-            and "home_possession" in values
-            and values["home_possession"] is not None
+            and "home_possession" in info.data
+            and info.data["home_possession"] is not None
         ):
-            total = v + values["home_possession"]
+            total = v + info.data["home_possession"]
             if abs(total - 100) > 1:  # Allow 1% tolerance for rounding
                 raise ValueError(
                     "Possession percentages must sum to approximately 100%"
@@ -152,7 +155,7 @@ class Feature(BaseModel):
     match_id: UUID
     feature_name: str = Field(..., min_length=1, max_length=100)
     feature_value: Union[float, int, str, bool]
-    feature_type: str = Field(..., regex=r"^(numerical|categorical|boolean)$")
+    feature_type: str = Field(..., pattern=r"^(numerical|categorical|boolean)$")
 
     # Metadata
     extraction_method: str = Field(..., min_length=1, max_length=50)
@@ -193,11 +196,16 @@ class Prediction(BaseModel):
     created_at: datetime = Field(default_factory=datetime.utcnow)
     prediction_date: datetime = Field(default_factory=datetime.utcnow)
 
-    @validator("draw_probability")
-    def validate_probability_sum(cls, v, values):
+    @field_validator("draw_probability")
+    @classmethod
+    def validate_probability_sum(cls, v: float, info: ValidationInfo) -> float:
         """Ensure probabilities sum to 1."""
-        if "home_win_probability" in values and "away_win_probability" in values:
-            total = v + values["home_win_probability"] + values["away_win_probability"]
+        if "home_win_probability" in info.data and "away_win_probability" in info.data:
+            total = (
+                v
+                + info.data["home_win_probability"]
+                + info.data["away_win_probability"]
+            )
             if abs(total - 1.0) > 0.01:  # Allow 1% tolerance
                 raise ValueError("Probabilities must sum to 1.0")
         return v
@@ -210,7 +218,7 @@ class Prediction(BaseModel):
             MatchResult.DRAW: self.draw_probability,
             MatchResult.AWAY_WIN: self.away_win_probability,
         }
-        return max(probs, key=probs.get)
+        return max(probs, key=lambda k: probs[k])
 
 
 class Model(BaseModel):
@@ -282,13 +290,16 @@ class PredictionResponse(BaseModel):
     model_info: Dict[str, Union[str, float]]
 
     class Config:
-        json_encoders = {datetime: lambda v: v.isoformat(), UUID: lambda v: str(v)}
+        json_encoders: ClassVar = {
+            datetime: lambda v: v.isoformat(),
+            UUID: lambda v: str(v),
+        }
 
 
 class BatchPredictionRequest(BaseModel):
     """Request model for batch predictions."""
 
-    match_ids: List[UUID] = Field(..., min_items=1, max_items=100)
+    match_ids: List[UUID] = Field(..., min_length=1, max_length=100)
     model_version: Optional[str] = None
     include_probabilities: bool = Field(default=True)
     include_expected_scores: bool = Field(default=False)

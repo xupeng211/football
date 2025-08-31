@@ -126,4 +126,6 @@ jobs:
             htmlcov/
             coverage.xml
             reports/
+            .coverage
+            coverage.json
           if-no-files-found: ignore

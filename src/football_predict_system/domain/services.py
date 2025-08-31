@@ -7,7 +7,7 @@ domain operations and enforce business rules.
 
 import asyncio
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 from uuid import UUID
 
 from ..core.cache import get_cache_manager
@@ -35,7 +35,7 @@ logger = get_logger(__name__)
 class PredictionService:
     """Service for handling prediction operations."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.logger = get_logger(__name__)
 
     @log_performance("generate_prediction")
@@ -56,7 +56,7 @@ class PredictionService:
         # Get match data
         match = await self._get_match(request.match_id)
         if not match:
-            raise NotFoundError("match", request.match_id)
+            raise NotFoundError("match", str(request.match_id))
 
         # Get model
         model = await self._get_model(request.model_version)
@@ -76,15 +76,15 @@ class PredictionService:
             response = PredictionResponse(
                 prediction=prediction,
                 match_info={
-                    "home_team": match.home_team_id,
-                    "away_team": match.away_team_id,
+                    "home_team": str(match.home_team_id),
+                    "away_team": str(match.away_team_id),
                     "scheduled_date": match.scheduled_date,
                     "competition": match.competition,
                 },
                 model_info={
                     "name": model.name,
                     "version": model.version,
-                    "accuracy": model.accuracy,
+                    "accuracy": model.accuracy or 0.0,
                 },
             )
 
@@ -102,7 +102,9 @@ class PredictionService:
 
         except Exception as e:
             self.logger.error(
-                "Prediction generation failed", match_id=request.match_id, error=str(e)
+                "Prediction generation failed",
+                match_id=request.match_id,
+                error=str(e),
             )
             raise PredictionError(f"Failed to generate prediction: {e!s}")
 
@@ -130,9 +132,12 @@ class PredictionService:
         for i, result in enumerate(results):
             if isinstance(result, Exception):
                 errors.append(
-                    {"match_id": str(request.match_ids[i]), "error": str(result)}
+                    {
+                        "match_id": str(request.match_ids[i]),
+                        "error": str(result),
+                    }
                 )
-            else:
+            elif result is not None and isinstance(result, PredictionResponse):
                 predictions.append(result)
 
         return BatchPredictionResponse(
@@ -148,10 +153,13 @@ class PredictionService:
     ) -> Optional[PredictionResponse]:
         """Safely generate a prediction, handling exceptions."""
         try:
-            return await self.generate_prediction(request)
+            result = await self.generate_prediction(request)
+            return result if isinstance(result, PredictionResponse) else None
         except Exception as e:
             self.logger.warning(
-                "Prediction failed for match", match_id=request.match_id, error=str(e)
+                "Prediction failed for match",
+                match_id=request.match_id,
+                error=str(e),
             )
             return None
 
@@ -190,6 +198,8 @@ class PredictionService:
             away_win_probability=0.2,
             confidence_level=PredictionConfidence.MEDIUM,
             confidence_score=0.75,
+            expected_home_score=0.0,
+            expected_away_score=0.0,
             features_used=list(features.keys()),
             model_accuracy=model.accuracy,
         )
@@ -198,7 +208,7 @@ class PredictionService:
 class ModelService:
     """Service for handling ML model operations."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.logger = get_logger(__name__)
 
     @log_performance("get_available_models")
@@ -236,12 +246,14 @@ class ModelService:
 
         if production_models:
             # Return the most recent production model
-            return max(production_models, key=lambda m: m.created_at)
+            latest_model = max(production_models, key=lambda m: m.created_at)
+            return latest_model if isinstance(latest_model, Model) else None
 
         # Fallback to most recent active model
         active_models = [model for model in models if model.is_active]
         if active_models:
-            return max(active_models, key=lambda m: m.created_at)
+            latest_active = max(active_models, key=lambda m: m.created_at)
+            return latest_active if isinstance(latest_active, Model) else None
 
         return None
 
@@ -255,7 +267,7 @@ class ModelService:
 class DataService:
     """Service for handling data operations."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.logger = get_logger(__name__)
 
     @log_performance("get_match_data")
@@ -341,13 +353,13 @@ class DataService:
 class AnalyticsService:
     """Service for analytics and reporting."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.logger = get_logger(__name__)
 
     @log_performance("get_prediction_accuracy")
     async def get_prediction_accuracy(
         self, model_version: Optional[str] = None, days_back: int = 30
-    ) -> Dict:
+    ) -> Dict[str, Any]:
         """Calculate prediction accuracy over time period."""
         # This would analyze historical predictions vs actual results
         # Placeholder implementation
@@ -360,7 +372,7 @@ class AnalyticsService:
         }
 
     @log_performance("get_model_performance_comparison")
-    async def get_model_performance_comparison(self) -> Dict:
+    async def get_model_performance_comparison(self) -> Dict[str, Any]:
         """Compare performance of different models."""
         # This would compare multiple models
         # Placeholder implementation

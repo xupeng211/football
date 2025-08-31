@@ -1,12 +1,12 @@
 """
 测试数据工厂
-提供统一的测试数据生成，减少硬编码数据
+提供统一的测试数据生成,减少硬编码数据
 """
 
 import random
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from typing import Any, ClassVar, Dict, List, Optional
 
 import pandas as pd
 
@@ -29,7 +29,7 @@ class TestDataFactory:
     """测试数据工厂类"""
 
     # 常用球队名称
-    TEAMS = [
+    TEAMS: ClassVar[List[str]] = [
         "Barcelona",
         "Real Madrid",
         "Manchester United",
@@ -95,7 +95,7 @@ class TestDataFactory:
     ) -> Dict[str, Any]:
         """创建预测响应数据"""
         if not all([home_win, draw, away_win]):
-            # 生成随机概率，确保总和为1
+            # 生成随机概率,确保总和为1
             probs = [random.random() for _ in range(3)]
             total = sum(probs)
             home_win, draw, away_win = (p / total for p in probs)

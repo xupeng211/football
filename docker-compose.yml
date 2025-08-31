@@ -58,7 +58,7 @@ services:
     depends_on:
       - postgres
       - redis
-      - prefect-server
+      - prefect
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/livez"]
       interval: 30s
@@ -81,11 +81,11 @@ services:
     environment:
       - DATABASE_URL=postgresql+asyncpg://postgres:password@postgres:5432/football_predict
       - REDIS_URL=redis://redis:6379/0
-      - PREFECT_API_URL=http://prefect-server:4200/api
+      - PREFECT_API_URL=http://prefect:4200/api
     depends_on:
       - postgres
       - redis
-      - prefect-server
+      - prefect
     volumes:
       - .:/app
     networks:
@@ -105,7 +105,7 @@ services:
     depends_on:
       - postgres
       - redis
-      - prefect-server
+      - prefect
     volumes:
       - .:/app
       - ./models/artifacts:/app/models/artifacts

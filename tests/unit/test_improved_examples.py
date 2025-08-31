@@ -104,7 +104,7 @@ class TestImprovedTestExamples:
 
     @patch("models.predictor.Predictor")
     def test_integration_with_mocked_dependencies(self, mock_predictor_class):
-        """集成测试示例：使用Mock隔离外部依赖"""
+        """集成测试示例:使用Mock隔离外部依赖"""
         # 配置Mock
         mock_instance = Mock()
         mock_predictor_class.return_value = mock_instance
@@ -193,7 +193,7 @@ class TestAdvancedTestPatterns:
         # 验证结果
         assert match_data["home_team"] != match_data["away_team"]
 
-        # 清理会自动进行（tmp_path自动清理）
+        # 清理会自动进行(tmp_path自动清理)
 
     @pytest.mark.slow
     def test_performance_benchmark(self, shared_test_data):

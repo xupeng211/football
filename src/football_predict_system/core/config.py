@@ -9,9 +9,10 @@ This module provides a unified configuration system that supports:
 """
 
 from enum import Enum
-from typing import List, Optional
+from typing import Any, List, Optional
 
-from pydantic import BaseSettings, Field, validator
+from pydantic import BaseModel, Field, field_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Environment(str, Enum):
@@ -23,78 +24,76 @@ class Environment(str, Enum):
     PRODUCTION = "production"
 
 
-class DatabaseConfig(BaseSettings):
+class DatabaseConfig(BaseModel):
     """Database configuration settings."""
 
-    url: str = Field(..., env="DATABASE_URL")
-    pool_size: int = Field(default=10, env="DB_POOL_SIZE")
-    max_overflow: int = Field(default=20, env="DB_MAX_OVERFLOW")
-    pool_timeout: int = Field(default=30, env="DB_POOL_TIMEOUT")
-    pool_recycle: int = Field(default=3600, env="DB_POOL_RECYCLE")
-    echo: bool = Field(default=False, env="DB_ECHO")
+    url: str = "sqlite:///./test.db"
+    pool_size: int = 10
+    max_overflow: int = 20
+    pool_timeout: int = 30
+    pool_recycle: int = 3600
+    echo: bool = False
 
-    @validator("url")
+    @field_validator("url")
     def validate_database_url(cls, v: str) -> str:
         """Validate database URL format."""
         if not v.startswith(("postgresql://", "sqlite://", "mysql://")):
             raise ValueError(
-                "Database URL must start with postgresql://, sqlite://, or mysql://"
+                "Database URL must start with postgresql://, sqlite://, or " "mysql://"
             )
         return v
 
 
-class RedisConfig(BaseSettings):
+class RedisConfig(BaseModel):
     """Redis configuration settings."""
 
-    url: str = Field(default="redis://localhost:6379/0", env="REDIS_URL")
-    max_connections: int = Field(default=10, env="REDIS_MAX_CONNECTIONS")
-    retry_on_timeout: bool = Field(default=True, env="REDIS_RETRY_ON_TIMEOUT")
-    socket_timeout: int = Field(default=5, env="REDIS_SOCKET_TIMEOUT")
+    url: str = "redis://localhost:6379/0"
+    max_connections: int = 10
+    retry_on_timeout: bool = True
+    socket_timeout: int = 5
 
 
-class APIConfig(BaseSettings):
+class APIConfig(BaseModel):
     """API server configuration settings."""
 
-    host: str = Field(default="0.0.0.0", env="API_HOST")
-    port: int = Field(default=8000, env="API_PORT")
-    workers: int = Field(default=4, env="API_WORKERS")
-    reload: bool = Field(default=False, env="API_RELOAD")
-    log_level: str = Field(default="info", env="API_LOG_LEVEL")
+    host: str = "0.0.0.0"
+    port: int = 8000
+    workers: int = 4
+    reload: bool = False
+    log_level: str = "info"
 
     # Security
-    secret_key: str = Field(..., env="SECRET_KEY")
-    access_token_expire_minutes: int = Field(
-        default=30, env="ACCESS_TOKEN_EXPIRE_MINUTES"
-    )
+    secret_key: str = "a-secret-key"
+    access_token_expire_minutes: int = 30
 
     # CORS
-    cors_origins: List[str] = Field(default=["*"], env="CORS_ORIGINS")
-    cors_credentials: bool = Field(default=True, env="CORS_CREDENTIALS")
-    cors_methods: List[str] = Field(default=["*"], env="CORS_METHODS")
-    cors_headers: List[str] = Field(default=["*"], env="CORS_HEADERS")
+    cors_origins: List[str] = ["*"]
+    cors_credentials: bool = True
+    cors_methods: List[str] = ["*"]
+    cors_headers: List[str] = ["*"]
 
-    @validator("cors_origins", pre=True)
-    def parse_cors_origins(cls, v):
+    @field_validator("cors_origins", mode="before")
+    def parse_cors_origins(cls, v: Any) -> Any:
         """Parse CORS origins from string or list."""
         if isinstance(v, str):
             return [origin.strip() for origin in v.split(",")]
         return v
 
 
-class LoggingConfig(BaseSettings):
+class LoggingConfig(BaseModel):
     """Logging configuration settings."""
 
-    level: str = Field(default="INFO", env="LOG_LEVEL")
-    format: str = Field(default="json", env="LOG_FORMAT")  # json or text
-    file_path: Optional[str] = Field(default=None, env="LOG_FILE_PATH")
-    max_file_size: int = Field(default=10485760, env="LOG_MAX_FILE_SIZE")  # 10MB
-    backup_count: int = Field(default=5, env="LOG_BACKUP_COUNT")
+    level: str = "INFO"
+    format: str = "json"  # json or text
+    file_path: Optional[str] = None
+    max_file_size: int = 10485760  # 10MB
+    backup_count: int = 5
 
     # Structured logging
-    service_name: str = Field(default="football-predict-system", env="SERVICE_NAME")
-    service_version: str = Field(default="1.0.0", env="SERVICE_VERSION")
+    service_name: str = "football-predict-system"
+    service_version: str = "1.0.0"
 
-    @validator("level")
+    @field_validator("level")
     def validate_log_level(cls, v: str) -> str:
         """Validate log level."""
         valid_levels = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
@@ -103,46 +102,40 @@ class LoggingConfig(BaseSettings):
         return v.upper()
 
 
-class MonitoringConfig(BaseSettings):
+class MonitoringConfig(BaseModel):
     """Monitoring and observability configuration."""
 
-    enable_metrics: bool = Field(default=True, env="ENABLE_METRICS")
-    metrics_port: int = Field(default=9090, env="METRICS_PORT")
+    enable_metrics: bool = True
+    metrics_port: int = 9090
 
     # Health checks
-    health_check_interval: int = Field(default=30, env="HEALTH_CHECK_INTERVAL")
+    health_check_interval: int = 30
 
     # Tracing
-    enable_tracing: bool = Field(default=False, env="ENABLE_TRACING")
-    jaeger_endpoint: Optional[str] = Field(default=None, env="JAEGER_ENDPOINT")
+    enable_tracing: bool = False
+    jaeger_endpoint: Optional[str] = None
 
     # Alerting
-    slack_webhook_url: Optional[str] = Field(default=None, env="SLACK_WEBHOOK_URL")
-    pagerduty_integration_key: Optional[str] = Field(
-        default=None, env="PAGERDUTY_INTEGRATION_KEY"
-    )
+    slack_webhook_url: Optional[str] = None
+    pagerduty_integration_key: Optional[str] = None
 
 
-class MLConfig(BaseSettings):
+class MLConfig(BaseModel):
     """Machine learning configuration settings."""
 
-    model_registry_path: str = Field(
-        default="models/artifacts", env="MODEL_REGISTRY_PATH"
-    )
-    default_model_version: Optional[str] = Field(
-        default=None, env="DEFAULT_MODEL_VERSION"
-    )
+    model_registry_path: str = "models/artifacts"
+    default_model_version: Optional[str] = None
 
     # Training
-    train_test_split: float = Field(default=0.2, env="TRAIN_TEST_SPLIT")
-    random_state: int = Field(default=42, env="RANDOM_STATE")
+    train_test_split: float = 0.2
+    random_state: int = 42
 
     # XGBoost specific
-    xgb_n_estimators: int = Field(default=100, env="XGB_N_ESTIMATORS")
-    xgb_max_depth: int = Field(default=6, env="XGB_MAX_DEPTH")
-    xgb_learning_rate: float = Field(default=0.1, env="XGB_LEARNING_RATE")
+    xgb_n_estimators: int = 100
+    xgb_max_depth: int = 6
+    xgb_learning_rate: float = 0.1
 
-    @validator("train_test_split")
+    @field_validator("train_test_split")
     def validate_train_test_split(cls, v: float) -> float:
         """Validate train/test split ratio."""
         if not 0.1 <= v <= 0.5:
@@ -154,28 +147,30 @@ class Settings(BaseSettings):
     """Main application settings."""
 
     # Environment
-    environment: Environment = Field(default=Environment.DEVELOPMENT, env="ENVIRONMENT")
-    debug: bool = Field(default=False, env="DEBUG")
+    environment: Environment = Environment.DEVELOPMENT
+    debug: bool = False
 
     # Component configurations
-    database: DatabaseConfig = DatabaseConfig()
-    redis: RedisConfig = RedisConfig()
-    api: APIConfig = APIConfig()
-    logging: LoggingConfig = LoggingConfig()
-    monitoring: MonitoringConfig = MonitoringConfig()
-    ml: MLConfig = MLConfig()
+    database: DatabaseConfig = Field(default_factory=DatabaseConfig)
+    redis: RedisConfig = Field(default_factory=RedisConfig)
+    api: APIConfig = Field(default_factory=APIConfig)
+    logging: LoggingConfig = Field(default_factory=LoggingConfig)
+    monitoring: MonitoringConfig = Field(default_factory=MonitoringConfig)
+    ml: MLConfig = Field(default_factory=MLConfig)
 
     # Application specific
-    app_name: str = Field(default="Football Prediction System", env="APP_NAME")
-    app_version: str = Field(default="1.0.0", env="APP_VERSION")
+    app_name: str = "Football Prediction System"
+    app_version: str = "1.0.0"
 
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
-        case_sensitive = False
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        case_sensitive=False,
+        env_nested_delimiter="__",
+    )
 
-    @validator("environment", pre=True)
-    def parse_environment(cls, v):
+    @field_validator("environment", mode="before")
+    def parse_environment(cls, v: Any) -> Any:
         """Parse environment from string."""
         if isinstance(v, str):
             return Environment(v.lower())

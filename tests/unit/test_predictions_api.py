@@ -35,7 +35,7 @@ def test_predict_single_match_success(
 
 def test_predict_invalid_data(client: TestClient) -> None:
     """Test prediction with invalid data."""
-    # 使用工厂创建有效数据，然后移除一个必需字段
+    # 使用工厂创建有效数据,然后移除一个必需字段
     test_data = sample_match()
     del test_data["away_team"]
     response = client.post("/api/v1/predict/single", json=test_data)

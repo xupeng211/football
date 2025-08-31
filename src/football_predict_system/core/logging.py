@@ -17,11 +17,11 @@ import time
 import traceback
 from contextvars import ContextVar
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Callable, Dict, List, Optional, cast
 from uuid import uuid4
 
 import structlog
-from structlog.types import FilteringBoundLogger
+from structlog.types import FilteringBoundLogger, Processor
 
 from .config import get_settings
 
@@ -37,7 +37,10 @@ class CorrelationIDProcessor:
     """Add correlation ID to log records."""
 
     def __call__(
-        self, logger: FilteringBoundLogger, method_name: str, event_dict: Dict[str, Any]
+        self,
+        logger: FilteringBoundLogger,
+        method_name: str,
+        event_dict: Dict[str, Any],
     ) -> Dict[str, Any]:
         correlation_id = correlation_id_var.get()
         if correlation_id:
@@ -58,7 +61,10 @@ class PerformanceProcessor:
     """Add performance metrics to log records."""
 
     def __call__(
-        self, logger: FilteringBoundLogger, method_name: str, event_dict: Dict[str, Any]
+        self,
+        logger: FilteringBoundLogger,
+        method_name: str,
+        event_dict: Dict[str, Any],
     ) -> Dict[str, Any]:
         # Add timestamp
         event_dict["timestamp"] = time.time()
@@ -77,7 +83,10 @@ class ErrorProcessor:
     """Enhanced error processing with stack traces."""
 
     def __call__(
-        self, logger: FilteringBoundLogger, method_name: str, event_dict: Dict[str, Any]
+        self,
+        logger: FilteringBoundLogger,
+        method_name: str,
+        event_dict: Dict[str, Any],
     ) -> Dict[str, Any]:
         if method_name in ("error", "exception", "critical"):
             # Add error details
@@ -104,7 +113,10 @@ class CustomJSONRenderer:
     """Custom JSON renderer with enhanced formatting."""
 
     def __call__(
-        self, logger: FilteringBoundLogger, method_name: str, event_dict: Dict[str, Any]
+        self,
+        logger: FilteringBoundLogger,
+        method_name: str,
+        event_dict: Dict[str, Any],
     ) -> str:
         # Ensure required fields
         if "timestamp" not in event_dict:
@@ -132,7 +144,7 @@ def setup_logging() -> None:
     logging.root.handlers.clear()
 
     # Configure structlog
-    processors = [
+    processors: List[Processor] = [
         structlog.contextvars.merge_contextvars,
         CorrelationIDProcessor(),
         PerformanceProcessor(),
@@ -203,7 +215,7 @@ def setup_logging() -> None:
 
 def get_logger(name: Optional[str] = None) -> FilteringBoundLogger:
     """Get a structured logger instance."""
-    return structlog.get_logger(name)
+    return cast(FilteringBoundLogger, structlog.get_logger(name))
 
 
 def set_correlation_id(correlation_id: Optional[str] = None) -> str:
@@ -239,11 +251,13 @@ def clear_context() -> None:
 class LoggingMiddleware:
     """Middleware for automatic request logging."""
 
-    def __init__(self, app):
+    def __init__(self, app: Callable) -> None:
         self.app = app
         self.logger = get_logger(__name__)
 
-    async def __call__(self, scope, receive, send):
+    async def __call__(
+        self, scope: Dict[str, Any], receive: Callable, send: Callable
+    ) -> None:
         if scope["type"] != "http":
             await self.app(scope, receive, send)
             return
@@ -275,18 +289,21 @@ class LoggingMiddleware:
             # Log failed request
             duration = time.time() - start_time
             self.logger.error(
-                "Request failed", error=str(e), duration=duration, status="error"
+                "Request failed",
+                error=str(e),
+                duration=duration,
+                status="error",
             )
             raise
         finally:
             clear_context()
 
 
-def log_performance(operation: str):
+def log_performance(operation: str) -> Callable:
     """Decorator for logging operation performance."""
 
-    def decorator(func):
-        async def async_wrapper(*args, **kwargs):
+    def decorator(func: Callable) -> Callable:
+        async def async_wrapper(*args: Any, **kwargs: Any) -> Any:
             logger = get_logger(func.__module__)
             start_time = time.time()
 
@@ -314,7 +331,7 @@ def log_performance(operation: str):
                 )
                 raise
 
-        def sync_wrapper(*args, **kwargs):
+        def sync_wrapper(*args: Any, **kwargs: Any) -> Any:
             logger = get_logger(func.__module__)
             start_time = time.time()
 

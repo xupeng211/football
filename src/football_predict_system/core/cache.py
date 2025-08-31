@@ -13,7 +13,7 @@ import pickle
 import time
 from datetime import datetime, timedelta
 from functools import wraps
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional, Set, cast
 
 import redis.asyncio as redis
 from pydantic import BaseModel
@@ -43,7 +43,7 @@ class CacheStats(BaseModel):
 class CacheManager:
     """Manages multi-level caching with Redis backend."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.settings = get_settings()
         self.logger = get_logger(__name__)
         self._redis_client: Optional[redis.Redis] = None
@@ -72,7 +72,7 @@ class CacheManager:
         """Check if cache entry is expired."""
         if "expires_at" not in cache_entry:
             return False
-        return datetime.now() > cache_entry["expires_at"]
+        return bool(datetime.now() > cache_entry["expires_at"])
 
     async def get(self, key: str, namespace: str = "default") -> Optional[Any]:
         """Get value from cache (memory first, then Redis)."""
@@ -112,7 +112,9 @@ class CacheManager:
 
                 except (pickle.PickleError, TypeError) as e:
                     self.logger.warning(
-                        "Failed to deserialize cached data", key=cache_key, error=str(e)
+                        "Failed to deserialize cached data",
+                        key=cache_key,
+                        error=str(e),
                     )
                     await redis_client.delete(cache_key)
 
@@ -203,13 +205,17 @@ class CacheManager:
                 del self._memory_cache[key]
 
             self.logger.info(
-                "Cache namespace cleared", namespace=namespace, deleted_count=deleted
+                "Cache namespace cleared",
+                namespace=namespace,
+                deleted_count=deleted,
             )
             return deleted
 
         except Exception as e:
             self.logger.error(
-                "Cache clear namespace error", namespace=namespace, error=str(e)
+                "Cache clear namespace error",
+                namespace=namespace,
+                error=str(e),
             )
             return 0
 
@@ -247,7 +253,7 @@ class CacheManager:
 
     def get_stats(self) -> CacheStats:
         """Get cache performance statistics."""
-        return self._stats
+        return cast(CacheStats, self._stats)
 
     def clear_memory_cache(self) -> None:
         """Clear memory cache."""
@@ -308,13 +314,15 @@ async def get_cache_manager() -> CacheManager:
 
 
 def cached(
-    ttl: int = 3600, namespace: str = "default", key_func: Optional[Callable] = None
-):
+    ttl: int = 3600,
+    namespace: str = "default",
+    key_func: Optional[Callable] = None,
+) -> Callable:
     """Decorator for caching function results."""
 
-    def decorator(func):
+    def decorator(func: Callable) -> Callable:
         @wraps(func)
-        async def async_wrapper(*args, **kwargs):
+        async def async_wrapper(*args: Any, **kwargs: Any) -> Any:
             cache_manager = await get_cache_manager()
 
             # Generate cache key
@@ -339,9 +347,9 @@ def cached(
             return result
 
         @wraps(func)
-        def sync_wrapper(*args, **kwargs):
+        def sync_wrapper(*args: Any, **kwargs: Any) -> Any:
             # For synchronous functions, we need to run in event loop
-            async def _async_cached():
+            async def _async_cached() -> Any:
                 return await async_wrapper(*args, **kwargs)
 
             try:
@@ -365,7 +373,7 @@ class CacheInvalidator:
     def __init__(self, cache_manager: CacheManager):
         self.cache_manager = cache_manager
         self.logger = get_logger(__name__)
-        self._background_tasks = set()
+        self._background_tasks: Set[asyncio.Task] = set()
 
     async def invalidate_by_pattern(
         self, pattern: str, namespace: str = "default"
@@ -388,7 +396,11 @@ class CacheInvalidator:
             return 0
 
         except Exception as e:
-            self.logger.error("Cache invalidation error", pattern=pattern, error=str(e))
+            self.logger.error(
+                "Cache invalidation error",
+                pattern=pattern,
+                error=str(e),
+            )
             return 0
 
     async def invalidate_by_tags(
@@ -409,7 +421,7 @@ class CacheInvalidator:
     ) -> None:
         """Schedule cache invalidation after delay."""
 
-        async def _delayed_invalidation():
+        async def _delayed_invalidation() -> None:
             await asyncio.sleep(delay)
             await self.cache_manager.delete(key, namespace)
             self.logger.info(
@@ -455,7 +467,9 @@ class CacheWarmer:
 
             except Exception as e:
                 self.logger.error(
-                    "Cache warming failed for match", match_id=match_id, error=str(e)
+                    "Cache warming failed for match",
+                    match_id=match_id,
+                    error=str(e),
                 )
 
         self.logger.info("Prediction cache warming completed")
@@ -467,7 +481,10 @@ class CacheWarmer:
         try:
             # This would integrate with your model registry
             # Placeholder implementation
-            models_data = {"available_models": [], "default_model": None}
+            models_data: Dict[str, Any] = {
+                "available_models": [],
+                "default_model": None,
+            }
             await self.cache_manager.set("models_metadata", models_data, 3600, "models")
 
         except Exception as e:
