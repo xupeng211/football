@@ -139,7 +139,7 @@ python scripts/coverage-monitor.py       # 覆盖率监控
 │   ├── test_summary_*.md             # Markdown摘要
 │   └── coverage/                     # 覆盖率报告
 └── 📚 docs/                          # 完善文档
-    ├── GITHUB_OPTIMIZATION_GUIDE.md  # GitHub优化指南
+    ├── GITHUB_SETUP_GUIDE.md         # GitHub设置与优化指南
     └── PROJECT_SHOWCASE_GUIDE.md     # 项目展示指南
 ```
 
@@ -209,7 +209,7 @@ python scripts/automated_test_report.py
 - 🧪 **测试指南**: [质量保障部分](https://github.com/xupeng211/football#quality-assurance)
 - 🚀 **快速开始**: [项目架构](https://github.com/xupeng211/football#-项目架构)
 - 🤝 **贡献指南**: [CONTRIBUTING.md](https://github.com/xupeng211/football/blob/main/CONTRIBUTING.md)
-- 📊 **GitHub优化**: [优化指南](https://github.com/xupeng211/football/blob/main/docs/GITHUB_OPTIMIZATION_GUIDE.md)
+- 📊 **GitHub优化**: [设置指南](https://github.com/xupeng211/football/blob/main/docs/GITHUB_SETUP_GUIDE.md)
 
 ---
 

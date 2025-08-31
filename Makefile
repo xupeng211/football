@@ -27,10 +27,17 @@ check-venv:
 	@if [ "$(CI)" = "true" ]; then \
 		echo "$(GREEN)✅ CI environment detected, skipping virtual environment check.$(NC)"; \
 	else \
-		if [ -z "$(VIRTUAL_ENV)" ]; then \
-			echo "$(RED)❌ Virtual environment is not active!$(NC)"; \
-			echo "$(YELLOW)Please run: source $(VENV)/bin/activate$(NC)"; \
-			exit 1; \
+		if [ -f "scripts/env-manager.sh" ]; then \
+			scripts/env-manager.sh --check >/dev/null 2>&1 || { \
+				echo "$(YELLOW)💡 Virtual environment not ready. Run: scripts/env-manager.sh --activate$(NC)"; \
+				exit 1; \
+			}; \
+		else \
+			if [ -z "$(VIRTUAL_ENV)" ]; then \
+				echo "$(RED)❌ Virtual environment is not active!$(NC)"; \
+				echo "$(YELLOW)Please run: source $(VENV)/bin/activate$(NC)"; \
+				exit 1; \
+			fi; \
 		fi; \
 		echo "$(GREEN)✅ Virtual environment active: $(VIRTUAL_ENV)$(NC)"; \
 	fi
@@ -110,8 +117,8 @@ check-env: ## 🔬 Check if the development environment is healthy
 	@$(PYTHON_VENV) scripts/dev-env-check.py
 
 quality-gate: check-venv ## 🚪 Run all quality checks before pushing (lint, type, security, tests)
-	@echo "$(BLUE)🚪 Running quality gate... This will run all checks from pre-push-check.sh$(NC)"
-	@bash scripts/pre-push-check.sh
+	@echo "$(BLUE)🚪 Running quality gate... Using unified CI script in pre-push mode$(NC)"
+	@bash scripts/ci-unified.sh --mode=pre-push
 
 smart-test: check-venv ## 🧠 Run tests intelligently based on changed files vs main
 	@echo "$(BLUE)🧠 Running smart tests against main branch...$(NC)"
@@ -228,10 +235,10 @@ validate-configs: check-venv ## Validate configuration files syntax
 
 setup-dev: ## Automated development environment setup
 	@echo "$(BLUE)🚀 Setting up development environment...$(NC)"
-	@if [ -f "scripts/setup-dev-env.sh" ]; then \
-		bash scripts/setup-dev-env.sh; \
+	@if [ -f "scripts/env-manager.sh" ]; then \
+		bash scripts/env-manager.sh --setup; \
 	else \
-		echo "$(RED)❌ scripts/setup-dev-env.sh not found$(NC)"; \
+		echo "$(RED)❌ scripts/env-manager.sh not found$(NC)"; \
 	fi
 
 cov: test ## Alias for test (coverage included)
