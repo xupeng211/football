@@ -405,7 +405,7 @@ mutation-test: check-venv ## Run mutation testing with mutmut
 # ==============================================================================
 # 📖 Context Management (for AI Assistant)
 # ==============================================================================
-.PHONY: show.context regen.context
+.PHONY: show.context regen.context diagnose-ci validate-context
 
 show.context: ## 📜 Display the packed global context for the AI assistant
 	@if [ ! -f "context/_pack.md" ]; then \
@@ -421,6 +421,14 @@ regen.context: check-venv ## 🔄 Regenerate the global context file (_pack.md)
 	@echo "$(BLUE)🔄 Regenerating global context file...$(NC)"
 	@$(PYTHON_VENV) scripts/context_pack.py
 	@echo "$(GREEN)✅ Global context file 'context/_pack.md' regenerated successfully.$(NC)"
+
+diagnose-ci: check-venv ## 🩺 AI工具专用CI问题诊断
+	@echo "$(BLUE)🩺 运行CI诊断...$(NC)"
+	@$(PYTHON_VENV) scripts/ci-diagnostics.py
+
+validate-context: check-venv ## 🔍 验证上下文信息的时效性
+	@echo "$(BLUE)🔍 验证上下文信息...$(NC)"
+	@$(PYTHON_VENV) scripts/validate-context.py
 
 # ==============================================================================
 # 🔧 Configuration Management

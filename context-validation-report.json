@@ -1,0 +1,67 @@
+{
+  "success": true,
+  "health_score": 50,
+  "summary": {
+    "critical": 0,
+    "warnings": 1,
+    "info": 1
+  },
+  "all_issues": [
+    {
+      "severity": "warning",
+      "type": "missing_documented_module",
+      "message": "架构文档提到的模块不存在: mermaid\ngraph LR\n    %% ========= 数据与调用流（MVP） =========\n    subgraph \"A. 数据层 (Data Layer)\"\n        direction LR\n        A1[外部 API] --> A2(<b>data_pipeline/sources</b><br/>采集原始数据)\n        A2 --> A3(<b>data_pipeline/transforms</b><br/>清洗与特征工程)\n        A3 --> A4(<b>data_pipeline/feature_store</b><br/>存储特征)\n    end\n\n    subgraph \"B. 模型层 (Model Layer)\"\n        direction LR\n        A4 --> B1(<b>apps/trainer</b><br/>训练/验证)\n        B1 --> B2(<b>models/registry</b><br/>版本化与注册)\n    end\n\n    subgraph \"C. 应用层 (Application Layer)\"\n        direction TB\n        B2 --> C1(<b>apps/api</b><br/>在线推理)\n        B2 --> C2(<b>apps/backtest</b><br/>离线回测)\n    end\n\n    subgraph \"D. 评估层 (Evaluation Layer)\"\n        direction TB\n        C2 --> D1(<b>evaluation</b><br/>性能评估/报告)\n    end\n\n    subgraph \"E. 基础设施 (Infrastructure)\"\n        direction LR\n        E1[(PostgreSQL)]\n        E2[(Docker / Compose)]\n        A2 -- 写入原始表 --> E1\n        A4 -- 写入特征表 --> E1\n    end\n\n    %% ========= 样式 =========\n    classDef data fill:#F8E8FF,stroke:#333,stroke-width:1px\n    classDef model fill:#E6F0FF,stroke:#333,stroke-width:1px\n    classDef app fill:#E9FFE6,stroke:#333,stroke-width:1px\n    classDef eval fill:#FFE6FA,stroke:#333,stroke-width:1px\n    classDef infra fill:#EEEEEE,stroke:#333,stroke-width:1px\n\n    class A2,A3,A4 data\n    class B1,B2 model\n    class C1,C2 app\n    class D1 eval\n    class E1,E2 infra\n\n    %% Legend\n    %% data=数据层, model=模型层, app=应用层, eval=评估层, infra=基础设施\n",
+      "fix": "创建 mermaid\ngraph LR\n    %% ========= 数据与调用流（MVP） =========\n    subgraph \"A. 数据层 (Data Layer)\"\n        direction LR\n        A1[外部 API] --> A2(<b>data_pipeline/sources</b><br/>采集原始数据)\n        A2 --> A3(<b>data_pipeline/transforms</b><br/>清洗与特征工程)\n        A3 --> A4(<b>data_pipeline/feature_store</b><br/>存储特征)\n    end\n\n    subgraph \"B. 模型层 (Model Layer)\"\n        direction LR\n        A4 --> B1(<b>apps/trainer</b><br/>训练/验证)\n        B1 --> B2(<b>models/registry</b><br/>版本化与注册)\n    end\n\n    subgraph \"C. 应用层 (Application Layer)\"\n        direction TB\n        B2 --> C1(<b>apps/api</b><br/>在线推理)\n        B2 --> C2(<b>apps/backtest</b><br/>离线回测)\n    end\n\n    subgraph \"D. 评估层 (Evaluation Layer)\"\n        direction TB\n        C2 --> D1(<b>evaluation</b><br/>性能评估/报告)\n    end\n\n    subgraph \"E. 基础设施 (Infrastructure)\"\n        direction LR\n        E1[(PostgreSQL)]\n        E2[(Docker / Compose)]\n        A2 -- 写入原始表 --> E1\n        A4 -- 写入特征表 --> E1\n    end\n\n    %% ========= 样式 =========\n    classDef data fill:#F8E8FF,stroke:#333,stroke-width:1px\n    classDef model fill:#E6F0FF,stroke:#333,stroke-width:1px\n    classDef app fill:#E9FFE6,stroke:#333,stroke-width:1px\n    classDef eval fill:#FFE6FA,stroke:#333,stroke-width:1px\n    classDef infra fill:#EEEEEE,stroke:#333,stroke-width:1px\n\n    class A2,A3,A4 data\n    class B1,B2 model\n    class C1,C2 app\n    class D1 eval\n    class E1,E2 infra\n\n    %% Legend\n    %% data=数据层, model=模型层, app=应用层, eval=评估层, infra=基础设施\n 目录或更新文档"
+    },
+    {
+      "severity": "info",
+      "type": "requirements_outdated",
+      "message": "requirements.lock 可能过时",
+      "fix": "重新生成 requirements.lock 文件"
+    }
+  ],
+  "recommendations": [
+    "⚠️ **建议修复警告**:",
+    "  - 架构文档提到的模块不存在: mermaid\ngraph LR\n    %% ========= 数据与调用流（MVP） =========\n    subgraph \"A. 数据层 (Data Layer)\"\n        direction LR\n        A1[外部 API] --> A2(<b>data_pipeline/sources</b><br/>采集原始数据)\n        A2 --> A3(<b>data_pipeline/transforms</b><br/>清洗与特征工程)\n        A3 --> A4(<b>data_pipeline/feature_store</b><br/>存储特征)\n    end\n\n    subgraph \"B. 模型层 (Model Layer)\"\n        direction LR\n        A4 --> B1(<b>apps/trainer</b><br/>训练/验证)\n        B1 --> B2(<b>models/registry</b><br/>版本化与注册)\n    end\n\n    subgraph \"C. 应用层 (Application Layer)\"\n        direction TB\n        B2 --> C1(<b>apps/api</b><br/>在线推理)\n        B2 --> C2(<b>apps/backtest</b><br/>离线回测)\n    end\n\n    subgraph \"D. 评估层 (Evaluation Layer)\"\n        direction TB\n        C2 --> D1(<b>evaluation</b><br/>性能评估/报告)\n    end\n\n    subgraph \"E. 基础设施 (Infrastructure)\"\n        direction LR\n        E1[(PostgreSQL)]\n        E2[(Docker / Compose)]\n        A2 -- 写入原始表 --> E1\n        A4 -- 写入特征表 --> E1\n    end\n\n    %% ========= 样式 =========\n    classDef data fill:#F8E8FF,stroke:#333,stroke-width:1px\n    classDef model fill:#E6F0FF,stroke:#333,stroke-width:1px\n    classDef app fill:#E9FFE6,stroke:#333,stroke-width:1px\n    classDef eval fill:#FFE6FA,stroke:#333,stroke-width:1px\n    classDef infra fill:#EEEEEE,stroke:#333,stroke-width:1px\n\n    class A2,A3,A4 data\n    class B1,B2 model\n    class C1,C2 app\n    class D1 eval\n    class E1,E2 infra\n\n    %% Legend\n    %% data=数据层, model=模型层, app=应用层, eval=评估层, infra=基础设施\n: 创建 mermaid\ngraph LR\n    %% ========= 数据与调用流（MVP） =========\n    subgraph \"A. 数据层 (Data Layer)\"\n        direction LR\n        A1[外部 API] --> A2(<b>data_pipeline/sources</b><br/>采集原始数据)\n        A2 --> A3(<b>data_pipeline/transforms</b><br/>清洗与特征工程)\n        A3 --> A4(<b>data_pipeline/feature_store</b><br/>存储特征)\n    end\n\n    subgraph \"B. 模型层 (Model Layer)\"\n        direction LR\n        A4 --> B1(<b>apps/trainer</b><br/>训练/验证)\n        B1 --> B2(<b>models/registry</b><br/>版本化与注册)\n    end\n\n    subgraph \"C. 应用层 (Application Layer)\"\n        direction TB\n        B2 --> C1(<b>apps/api</b><br/>在线推理)\n        B2 --> C2(<b>apps/backtest</b><br/>离线回测)\n    end\n\n    subgraph \"D. 评估层 (Evaluation Layer)\"\n        direction TB\n        C2 --> D1(<b>evaluation</b><br/>性能评估/报告)\n    end\n\n    subgraph \"E. 基础设施 (Infrastructure)\"\n        direction LR\n        E1[(PostgreSQL)]\n        E2[(Docker / Compose)]\n        A2 -- 写入原始表 --> E1\n        A4 -- 写入特征表 --> E1\n    end\n\n    %% ========= 样式 =========\n    classDef data fill:#F8E8FF,stroke:#333,stroke-width:1px\n    classDef model fill:#E6F0FF,stroke:#333,stroke-width:1px\n    classDef app fill:#E9FFE6,stroke:#333,stroke-width:1px\n    classDef eval fill:#FFE6FA,stroke:#333,stroke-width:1px\n    classDef infra fill:#EEEEEE,stroke:#333,stroke-width:1px\n\n    class A2,A3,A4 data\n    class B1,B2 model\n    class C1,C2 app\n    class D1 eval\n    class E1,E2 infra\n\n    %% Legend\n    %% data=数据层, model=模型层, app=应用层, eval=评估层, infra=基础设施\n 目录或更新文档"
+  ],
+  "results": {
+    "文档时效性": {
+      "success": true,
+      "issues": []
+    },
+    "架构一致性": {
+      "success": true,
+      "issues": [
+        {
+          "severity": "warning",
+          "type": "missing_documented_module",
+          "message": "架构文档提到的模块不存在: mermaid\ngraph LR\n    %% ========= 数据与调用流（MVP） =========\n    subgraph \"A. 数据层 (Data Layer)\"\n        direction LR\n        A1[外部 API] --> A2(<b>data_pipeline/sources</b><br/>采集原始数据)\n        A2 --> A3(<b>data_pipeline/transforms</b><br/>清洗与特征工程)\n        A3 --> A4(<b>data_pipeline/feature_store</b><br/>存储特征)\n    end\n\n    subgraph \"B. 模型层 (Model Layer)\"\n        direction LR\n        A4 --> B1(<b>apps/trainer</b><br/>训练/验证)\n        B1 --> B2(<b>models/registry</b><br/>版本化与注册)\n    end\n\n    subgraph \"C. 应用层 (Application Layer)\"\n        direction TB\n        B2 --> C1(<b>apps/api</b><br/>在线推理)\n        B2 --> C2(<b>apps/backtest</b><br/>离线回测)\n    end\n\n    subgraph \"D. 评估层 (Evaluation Layer)\"\n        direction TB\n        C2 --> D1(<b>evaluation</b><br/>性能评估/报告)\n    end\n\n    subgraph \"E. 基础设施 (Infrastructure)\"\n        direction LR\n        E1[(PostgreSQL)]\n        E2[(Docker / Compose)]\n        A2 -- 写入原始表 --> E1\n        A4 -- 写入特征表 --> E1\n    end\n\n    %% ========= 样式 =========\n    classDef data fill:#F8E8FF,stroke:#333,stroke-width:1px\n    classDef model fill:#E6F0FF,stroke:#333,stroke-width:1px\n    classDef app fill:#E9FFE6,stroke:#333,stroke-width:1px\n    classDef eval fill:#FFE6FA,stroke:#333,stroke-width:1px\n    classDef infra fill:#EEEEEE,stroke:#333,stroke-width:1px\n\n    class A2,A3,A4 data\n    class B1,B2 model\n    class C1,C2 app\n    class D1 eval\n    class E1,E2 infra\n\n    %% Legend\n    %% data=数据层, model=模型层, app=应用层, eval=评估层, infra=基础设施\n",
+          "fix": "创建 mermaid\ngraph LR\n    %% ========= 数据与调用流（MVP） =========\n    subgraph \"A. 数据层 (Data Layer)\"\n        direction LR\n        A1[外部 API] --> A2(<b>data_pipeline/sources</b><br/>采集原始数据)\n        A2 --> A3(<b>data_pipeline/transforms</b><br/>清洗与特征工程)\n        A3 --> A4(<b>data_pipeline/feature_store</b><br/>存储特征)\n    end\n\n    subgraph \"B. 模型层 (Model Layer)\"\n        direction LR\n        A4 --> B1(<b>apps/trainer</b><br/>训练/验证)\n        B1 --> B2(<b>models/registry</b><br/>版本化与注册)\n    end\n\n    subgraph \"C. 应用层 (Application Layer)\"\n        direction TB\n        B2 --> C1(<b>apps/api</b><br/>在线推理)\n        B2 --> C2(<b>apps/backtest</b><br/>离线回测)\n    end\n\n    subgraph \"D. 评估层 (Evaluation Layer)\"\n        direction TB\n        C2 --> D1(<b>evaluation</b><br/>性能评估/报告)\n    end\n\n    subgraph \"E. 基础设施 (Infrastructure)\"\n        direction LR\n        E1[(PostgreSQL)]\n        E2[(Docker / Compose)]\n        A2 -- 写入原始表 --> E1\n        A4 -- 写入特征表 --> E1\n    end\n\n    %% ========= 样式 =========\n    classDef data fill:#F8E8FF,stroke:#333,stroke-width:1px\n    classDef model fill:#E6F0FF,stroke:#333,stroke-width:1px\n    classDef app fill:#E9FFE6,stroke:#333,stroke-width:1px\n    classDef eval fill:#FFE6FA,stroke:#333,stroke-width:1px\n    classDef infra fill:#EEEEEE,stroke:#333,stroke-width:1px\n\n    class A2,A3,A4 data\n    class B1,B2 model\n    class C1,C2 app\n    class D1 eval\n    class E1,E2 infra\n\n    %% Legend\n    %% data=数据层, model=模型层, app=应用层, eval=评估层, infra=基础设施\n 目录或更新文档"
+        }
+      ]
+    },
+    "依赖同步性": {
+      "success": true,
+      "issues": [
+        {
+          "severity": "info",
+          "type": "requirements_outdated",
+          "message": "requirements.lock 可能过时",
+          "fix": "重新生成 requirements.lock 文件"
+        }
+      ]
+    },
+    "任务状态": {
+      "success": true,
+      "issues": []
+    },
+    "Git状态": {
+      "success": true,
+      "issues": []
+    },
+    "上下文完整性": {
+      "success": true,
+      "issues": []
+    }
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "success": false,
+  "summary": {
+    "critical": 1,
+    "warnings": 0,
+    "info": 0
+  },
+  "issues": [
+    {
+      "severity": "critical",
+      "message": "requirements.lock缺少关键依赖: ['pytest', 'mypy', 'ruff', 'bandit']",
+      "solution": "poetry export 或切换到poetry install --with dev"
+    }
+  ],
+  "recommendations": [
+    "🚨 **立即修复关键问题**: 这些问题会阻止CI通过",
+    "  - requirements.lock缺少关键依赖: ['pytest', 'mypy', 'ruff', 'bandit']: poetry export 或切换到poetry install --with dev"
+  ],
+  "quick_fixes": [
+    "poetry install --with dev",
+    "poetry run ruff check --fix .",
+    "poetry run mypy apps/ data_pipeline/"
+  ],
+  "results": {
+    "环境检查": {
+      "success": true,
+      "issues": []
+    },
+    "依赖检查": {
+      "success": false,
+      "issues": [
+        {
+          "severity": "critical",
+          "message": "requirements.lock缺少关键依赖: ['pytest', 'mypy', 'ruff', 'bandit']",
+          "solution": "poetry export 或切换到poetry install --with dev"
+        }
+      ]
+    },
+    "配置文件检查": {
+      "success": true,
+      "issues": []
+    },
+    "代码质量检查": {
+      "success": true,
+      "issues": [
+        {
+          "severity": "warning",
+          "message": "Ruff检查失败",
+          "solution": "poetry run ruff check --fix .",
+          "details": "RUF002 Docstring contains ambiguous `，` (FULLWIDTH COMMA). Did you mean `,` (COMMA)?\n --> scripts/ci-diagnostics.py:5:27\n  |\n3 | 🩺 CI诊断助手 - 专为AI编程工具设计的CI问题诊断工具\n4 |\n5 | 这个脚本帮助AI工具快速识别和诊断CI失败的根本原因，\n  |                                                 ^^\n6 | 提供具体的修复建议和解决方案。\n7 | \"\"\"\n  |\n\nRUF003 Comment contains ambiguous `（` (FULLWIDTH LEFT PARENTHESIS). Did you mean `(` (LEFT PARENTHESIS)?\n   --> scripts/ci-diagnostics.py:337:27\n    |\n335 |             })\n336 |\n337 |         # 尝试获取最近的Actions状态（如果有gh CLI）\n    |                                    ^^\n338 |         try:\n339 |             cmd = [\n    |\n\nRUF003 Comment contains ambiguous `）` (FULLWIDTH RIGHT PARENTHESIS). Did you mean `)` (RIGHT PARENTHESIS)?\n   --> scripts/ci-diagnostics.py:337:37\n    |\n335 |             })\n336 |\n337 |         # 尝试获取最近的Actions状态（如果有gh CLI）\n    |                                                  ^^\n338 |         try:\n339 |             cmd = [\n    |\n\nRUF003 Comment contains ambiguous `，` (FULLWIDTH COMMA). Did you mean `,` (COMMA)?\n   --> scripts/ci-diagnostics.py:359:28\n    |\n357 |         except (subprocess.SubprocessError, FileNotFoundError,\n358 |                 json.JSONDecodeError):\n359 |             # gh CLI不可用或无权限，跳过\n    |                                   ^^\n360 |             pass\n    |\n\nRUF001 String contains ambiguous `ℹ` (INFORMATION SOURCE). Did you mean `i` (LATIN SMALL LETTER I)?\n   --> scripts/ci-diagnostics.py:431:15\n    |\n429 |     print(f\"  🚨 关键问题: {summary['critical']}\")\n430 |     print(f\"  ⚠️ 警告: {summary['warnings']}\")\n431 |     print(f\"  ℹ️ 信息: {summary['info']}\")\n    |               ^\n432 |\n433 |     # 显示建议\n    |\n\nRUF003 Comment contains ambiguous `，` (FULLWIDTH COMMA). Did you mean `,` (COMMA)?\n   --> scripts/ci-diagnostics.py:451:14\n    |\n449 |     print(f\"\\n📄 详细报告已保存到: {report_file}\")\n450 |\n451 |     # 如果有关键问题，返回非零退出码\n    |                     ^^\n452 |     if summary['critical'] > 0:\n453 |         print(f\"\\n❌ 发现 {summary['critical']} 个关键问题，需要立即修复！\")\n    |\n\nRUF001 String contains ambiguous `，` (FULLWIDTH COMMA). Did you mean `,` (COMMA)?\n   --> scripts/ci-diagnostics.py:453:51\n    |\n451 |     # 如果有关键问题，返回非零退出码\n452 |     if summary['critical'] > 0:\n453 |         print(f\"\\n❌ 发现 {summary['critical']} 个关键问题，需要立即修复！\")\n    |                                                           ^^\n454 |         sys.exit(1)\n455 |     elif summary['warnings'] > 0:\n    |\n\nRUF001 String contains ambiguous `！` (FULLWIDTH EXCLAMATION MARK). Did you mean `!` (EXCLAMATION MARK)?\n   --> scripts/ci-diagnostics.py:453:58\n    |\n451 |     # 如果有关键问题，返回非零退出码\n452 |     if summary['critical'] > 0:\n453 |         print(f\"\\n❌ 发现 {summary['critical']} 个关键问题，需要立即修复！\")\n    |                                                                         ^^\n454 |         sys.exit(1)\n455 |     elif summary['warnings'] > 0:\n    |\n\nRUF001 String contains ambiguous `，` (FULLWIDTH COMMA). Did you mean `,` (COMMA)?\n   --> scripts/ci-diagnostics.py:456:50\n    |\n454 |         sys.exit(1)\n455 |     elif summary['warnings'] > 0:\n456 |         print(f\"\\n⚠️ 发现 {summary['warnings']} 个警告，建议修复。\")\n    |                                                      ^^\n457 |         sys.exit(0)\n458 |     else:\n    |\n\nRUF001 String contains ambiguous `，` (FULLWIDTH COMMA). Did you mean `,` (COMMA)?\n   --> scripts/ci-diagnostics.py:459:26\n    |\n457 |         sys.exit(0)\n458 |     else:\n459 |         print(\"\\n✅ CI环境健康，未发现问题！\")\n    |                               ^^\n460 |         sys.exit(0)\n    |\n\nRUF001 String contains ambiguous `！` (FULLWIDTH EXCLAMATION MARK). Did you mean `!` (EXCLAMATION MARK)?\n   --> scripts/ci-diagnostics.py:459:32\n    |\n457 |         sys.exit(0)\n458 |     else:\n459 |         print(\"\\n✅ CI环境健康，未发现问题！\")\n    |                                           ^^\n460 |         sys.exit(0)\n    |\n\nRUF002 Docstring contains ambiguous `，` (FULLWIDTH COMMA). Did you mean `,` (COMMA)?\n --> scripts/validate-context.py:5:26\n  |\n3 | 🔍 上下文验证工具 - 确保AI工具获得准确和及时的项目信息\n4 |\n5 | 这个脚本验证项目文档、架构信息和上下文数据的时效性，\n  |                                                   ^^\n6 | 确保AI工具始终获得最新和准确的项目状态。\n7 | \"\"\"\n  |\n\nRUF003 Comment contains ambiguous `，` (FULLWIDTH COMMA). Did you mean `,` (COMMA)?\n   --> scripts/validate-context.py:123:22\n    |\n121 |             # 提取文档中提到的目录结构\n122 |             documented_modules = []\n123 |             # 简单的正则匹配，查找类似 \"apps/api\", \"data_pipeline/\" 的模式\n    |                             ^^\n124 |             module_patterns = re.findall(r'`([^`]+/[^`]*)`', content)\n125 |             documented_modules.extend(module_patterns)\n    |\n\nRUF001 String contains ambiguous `，` (FULLWIDTH COMMA). Did you mean `,` (COMMA)?\n   --> scripts/validate-context.py:207:40\n    |\n205 |                     'severity': 'info',\n206 |                     'type': 'all_tasks_complete',\n207 |                     'message': '所有任务已完成，考虑添加新任务',\n    |                                               ^^\n208 |                     'fix': '更新任务列表或归档已完成任务'\n209 |                 })\n    |\n\nRUF003 Comment contains ambiguous `，` (FULLWIDTH COMMA). Did you mean `,` (COMMA)?\n   --> scripts/validate-context.py:314:21\n    |\n312 |                 })\n313 |\n314 |             # 检查内容长度，过短可能不完整\n    |                           ^^\n315 |             if len(content) < 1000:\n316 |                 issues.append({\n    |\n\nRUF001 String contains ambiguous `ℹ` (INFORMATION SOURCE). Did you mean `i` (LATIN SMALL LETTER I)?\n   --> scripts/validate-context.py:408:15\n    |\n406 |     print(f\"  🚨 关键问题: {summary['critical']}\")\n407 |     print(f\"  ⚠️ 警告: {summary['warnings']}\")\n408 |     print(f\"  ℹ️ 信息: {summary['info']}\")\n    |               ^\n409 |\n410 |     # 显示建议\n    |\n\nRUF001 String contains ambiguous `，` (FULLWIDTH COMMA). Did you mean `,` (COMMA)?\n   --> scripts/validate-context.py:424:51\n    |\n422 |     # 根据结果设置退出码\n423 |     if summary['critical'] > 0:\n424 |         msg = f\"\\n❌ 发现 {summary['critical']} 个关键问题，AI工具可能获得过时信息！\"\n    |                                                           ^^\n425 |         print(msg)\n426 |         sys.exit(1)\n    |\n\nRUF001 String contains ambiguous `！` (FULLWIDTH EXCLAMATION MARK). Did you mean `!` (EXCLAMATION MARK)?\n   --> scripts/validate-context.py:424:64\n    |\n422 |     # 根据结果设置退出码\n423 |     if summary['critical'] > 0:\n424 |         msg = f\"\\n❌ 发现 {summary['critical']} 个关键问题，AI工具可能获得过时信息！\"\n    |                                                                                   ^^\n425 |         print(msg)\n426 |         sys.exit(1)\n    |\n\nRUF001 String contains ambiguous `，` (FULLWIDTH COMMA). Did you mean `,` (COMMA)?\n   --> scripts/validate-context.py:428:51\n    |\n426 |         sys.exit(1)\n427 |     elif summary['warnings'] > 3:\n428 |         msg = f\"\\n⚠️ 警告较多 ({summary['warnings']}个)，建议优化上下文质量。\"\n    |                                                       ^^\n429 |         print(msg)\n430 |         sys.exit(0)\n    |\n\nRUF001 String contains ambiguous `，` (FULLWIDTH COMMA). Did you mean `,` (COMMA)?\n   --> scripts/validate-context.py:432:27\n    |\n430 |         sys.exit(0)\n431 |     else:\n432 |         print(\"\\n✅ 上下文信息健康，AI工具可获得准确信息！\")\n    |                                   ^^\n433 |         sys.exit(0)\n    |\n\nRUF001 String contains ambiguous `！` (FULLWIDTH EXCLAMATION MARK). Did you mean `!` (EXCLAMATION MARK)?\n   --> scripts/validate-context.py:432:39\n    |\n430 |         sys.exit(0)\n431 |     else:\n432 |         print(\"\\n✅ 上下文信息健康，AI工具可获得准确信息！\")\n    |                                                         ^^\n433 |         sys.exit(0)\n    |\n\nFound 21 errors.\n"
+        },
+        {
+          "severity": "warning",
+          "message": "MyPy类型检查失败",
+          "solution": "修复类型注解错误",
+          "details": "models/predictor.py:7: error: Skipping analyzing \"joblib\": module is installed, but missing library stubs or py.typed marker  [import-untyped]\napps/trainer/xgboost_trainer.py:7: error: Skipping analyzing \"joblib\": module is installed, but missing library stubs or py.typed marker  [import-untyped]\napps/trainer/xgboost_trainer.py:7: note: See https://mypy.readthedocs.io/en/stable/running_mypy.html#missing-imports\nFound 2 errors in 2 files (checked 47 source files)\n"
+        }
+      ]
+    },
+    "测试状态检查": {
+      "success": true,
+      "issues": []
+    },
+    "Git状态检查": {
+      "success": true,
+      "issues": [
+        {
+          "severity": "info",
+          "message": "有未提交的更改",
+          "solution": "git add . && git commit -m \"...\" 或 git stash"
+        }
+      ]
+    },
+    "GitHub Actions检查": {
+      "success": true,
+      "issues": [
+        {
+          "severity": "warning",
+          "message": "检测到 4 个失败的工作流运行",
+          "solution": "gh run view <run-id> --log 查看详细错误日志"
+        }
+      ]
+    }
+  }
+}

@@ -17,6 +17,9 @@ def main() -> None:
         "docs/ARCHITECTURE.md",
         "docs/TASKS.md",
         "docs/dev_log.md",
+        "docs/CI_KNOWLEDGE_BASE.md",
+        "AI_DEVELOPMENT_GUIDELINES.md",
+        "DEVELOPER_GUIDE.md",
         "PROMPTS.md",
     ]
 
