@@ -20,11 +20,7 @@ from ...core.exceptions import (
 )
 from ...core.logging import get_logger
 from ...core.security import Permission, User, require_permission
-from ...domain.models import (
-    BatchPredictionRequest,
-    MatchResult,
-    PredictionRequest,
-)
+from ...domain.models import BatchPredictionRequest, MatchResult, PredictionRequest
 from ...domain.services import prediction_service
 
 logger = get_logger(__name__)
@@ -47,7 +43,7 @@ class LegacyBatchMatchRequest(BaseModel):
     """Legacy batch match prediction request."""
 
     matches: List[LegacySingleMatchRequest] = Field(
-        ..., description="List of matches", min_items=1, max_items=50
+        ..., description="List of matches", min_length=1, max_length=50
     )
 
 

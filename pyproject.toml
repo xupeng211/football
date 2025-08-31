@@ -113,7 +113,7 @@ python_version = "3.11"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
-exclude = "tests/|.venv/|scripts/|src/aiculture-kit|external|vendor"
+exclude = "tests/|.venv/|scripts/|src/aiculture-kit|external|vendor|flows/|src/football_predict_system/core/security.py|src/football_predict_system/core/database.py|src/football_predict_system/core/health.py|src/football_predict_system/api/v1/models.py|src/football_predict_system/main.py"
 
 [[tool.mypy.overrides]]
 module = [

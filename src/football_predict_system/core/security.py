@@ -13,7 +13,7 @@ import hashlib
 import secrets
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Dict, List, Optional, Set
+from typing import Any, Dict, List, Optional, Set
 
 import bcrypt
 import jwt
@@ -113,7 +113,7 @@ class User(BaseModel):
     last_login: Optional[datetime] = None
     permissions: Set[Permission] = set()
 
-    def __init__(self, **data):
+    def __init__(self, **data: Any) -> None:
         super().__init__(**data)
         # Set permissions based on role
         self.permissions = ROLE_PERMISSIONS.get(self.role, set())
@@ -142,7 +142,7 @@ class TokenPayload(BaseModel):
     jti: str  # JWT ID
 
     @validator("exp", "iat", pre=True)
-    def parse_datetime(cls, v):
+    def parse_datetime(cls, v: Any) -> Any:
         if isinstance(v, (int, float)):
             return datetime.fromtimestamp(v)
         return v
@@ -151,7 +151,7 @@ class TokenPayload(BaseModel):
 class AuthenticationService:
     """Handles authentication operations."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.settings = get_settings()
         self.logger = get_logger(__name__)
         self.algorithm = "HS256"
@@ -160,11 +160,13 @@ class AuthenticationService:
         """Hash password using bcrypt."""
         salt = bcrypt.gensalt()
         hashed = bcrypt.hashpw(password.encode("utf-8"), salt)
-        return hashed.decode("utf-8")
+        return str(hashed.decode("utf-8"))  # Explicitly cast to str
 
     def verify_password(self, password: str, hashed_password: str) -> bool:
         """Verify password against hash."""
-        return bcrypt.checkpw(password.encode("utf-8"), hashed_password.encode("utf-8"))
+        return bool(
+            bcrypt.checkpw(password.encode("utf-8"), hashed_password.encode("utf-8"))
+        )
 
     def create_access_token(self, user: User) -> str:
         """Create JWT access token."""
@@ -191,7 +193,7 @@ class AuthenticationService:
             expires_at=expire.isoformat(),
         )
 
-        return token
+        return str(token)  # Explicitly cast to str
 
     def verify_token(self, token: str) -> TokenPayload:
         """Verify and decode JWT token."""
@@ -231,7 +233,7 @@ class AuthenticationService:
 class AuthorizationService:
     """Handles authorization operations."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.logger = get_logger(__name__)
 
     def check_permission(self, user: User, required_permission: Permission) -> None:
@@ -286,7 +288,7 @@ class AuthorizationService:
 class RateLimiter:
     """Rate limiting implementation."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.requests: Dict[str, List[datetime]] = {}
         self.limits = {
             "default": (100, 3600),  # 100 requests per hour
@@ -422,11 +424,11 @@ rate_limiter = RateLimiter()
 input_validator = InputValidator()
 
 
-def require_permission(permission: Permission):
+def require_permission(permission: Permission) -> Any:
     """Decorator to require specific permission."""
 
-    def decorator(func):
-        def wrapper(*args, **kwargs):
+    def decorator(func: Any) -> Any:
+        def wrapper(*args: Any, **kwargs: Any) -> Any:
             # This would be implemented with dependency injection in FastAPI
             # For now, it's a placeholder for the concept
             user = kwargs.get("current_user")
@@ -439,11 +441,11 @@ def require_permission(permission: Permission):
     return decorator
 
 
-def require_any_permission(permissions: List[Permission]):
+def require_any_permission(permissions: List[Permission]) -> Any:
     """Decorator to require any of the specified permissions."""
 
-    def decorator(func):
-        def wrapper(*args, **kwargs):
+    def decorator(func: Any) -> Any:
+        def wrapper(*args: Any, **kwargs: Any) -> Any:
             user = kwargs.get("current_user")
             if user:
                 authz_service.check_any_permission(user, permissions)

@@ -21,7 +21,7 @@ from typing import Any, Callable, Dict, List, Optional, cast
 from uuid import uuid4
 
 import structlog
-from structlog.types import FilteringBoundLogger, Processor
+from structlog.types import FilteringBoundLogger
 
 from .config import get_settings
 
@@ -144,7 +144,7 @@ def setup_logging() -> None:
     logging.root.handlers.clear()
 
     # Configure structlog
-    processors: List[Processor] = [
+    processors: List = [
         structlog.contextvars.merge_contextvars,
         CorrelationIDProcessor(),
         PerformanceProcessor(),
