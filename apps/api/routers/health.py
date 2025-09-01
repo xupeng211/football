@@ -9,10 +9,10 @@ import structlog
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
-from apps.api.db import check_db_connection
-from apps.api.model_registry import check_model_registry
+from apps.api.db import check_db_connection_async
+from apps.api.model_registry import check_model_registry_async
 from apps.api.prefect import check_prefect_connection_async
-from apps.api.redis import check_redis_connection
+from apps.api.redis import check_redis_connection_async
 
 logger = structlog.get_logger()
 router = APIRouter()
@@ -43,21 +43,21 @@ async def health_check() -> HealthResponse:
         overall_status = "healthy"
 
         # 检查数据库连接
-        db_ok, db_msg = check_db_connection()
+        db_ok, db_msg = await check_db_connection_async()
         components["database"] = {
             "status": "healthy" if db_ok else "unhealthy",
             "message": db_msg,
         }
 
         # 检查Redis连接
-        redis_ok, redis_msg = check_redis_connection()
+        redis_ok, redis_msg = await check_redis_connection_async()
         components["redis"] = {
             "status": "healthy" if redis_ok else "unhealthy",
             "message": redis_msg,
         }
 
         # 检查模型注册表
-        model_ok, model_msg = check_model_registry()
+        model_ok, model_msg = await check_model_registry_async()
         components["model_registry"] = {
             "status": "healthy" if model_ok else "unhealthy",
             "message": model_msg,

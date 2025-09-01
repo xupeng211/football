@@ -13,15 +13,15 @@ from fastapi import FastAPI
 
 # AI-Fix-Enhancement: Import OpenTelemetry modules
 from opentelemetry import trace
+from opentelemetry.instrumentation.asyncpg import AsyncPGInstrumentor
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
-from opentelemetry.instrumentation.psycopg2 import Psycopg2Instrumentor
 from opentelemetry.instrumentation.redis import RedisInstrumentor
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
 from prometheus_fastapi_instrumentator import Instrumentator
 from pydantic import BaseModel
 
-from apps.api.db import init_db
+from apps.api.db import check_db_connection_async
 from apps.api.logging_config import configure_logging
 from apps.api.middleware import LoggingMiddleware
 from apps.api.routers import health, predictions
@@ -37,7 +37,7 @@ resource = Resource.create({"service.name": "football-predict-api"})
 trace_provider = TracerProvider(resource=resource)
 trace.set_tracer_provider(trace_provider)
 
-Psycopg2Instrumentor().instrument()
+AsyncPGInstrumentor().instrument()
 RedisInstrumentor().instrument()
 
 
@@ -58,9 +58,14 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     Application lifespan context manager.
     Loads models on startup and exposes Prometheus metrics.
     """
-    logger.info("Application startup: Initializing database...")
-    init_db()
-    logger.info("Database initialized.")
+    logger.info("Application startup: Checking database connection...")
+    db_ok, db_msg = await check_db_connection_async()
+    if not db_ok:
+        logger.error("Database connection failed during startup.", message=db_msg)
+        # Depending on the desired behavior, you might want to exit the application
+        # raise RuntimeError("Failed to connect to the database on startup.")
+    else:
+        logger.info("Database connection successful.")
 
     logger.info("Application startup: Loading models...")
     predictor = None
