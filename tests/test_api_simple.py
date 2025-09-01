@@ -64,7 +64,7 @@ def mock_settings() -> MagicMock:
 
 @pytest.fixture
 def client() -> TestClient:
-    """创建测试客户端，模拟所有外部依赖"""
+    """创建测试客户端,模拟所有外部依赖"""
     # 创建模拟设置
     mock_settings = MagicMock()
     mock_settings.app_name = "Football Prediction System"

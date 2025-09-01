@@ -124,7 +124,7 @@ class TestPredictionWorkflowE2E:
             "/api/v1/predictions", json=match_data
         )
 
-        # 如果端点不存在，跳过这部分测试
+        # 如果端点不存在,跳过这部分测试
         if prediction_response.status_code == 404:
             pytest.skip("Prediction endpoint not implemented yet")
 
@@ -209,7 +209,7 @@ class TestSystemIntegrationE2E:
     @pytest.fixture
     async def integration_client(self):
         """集成测试客户端"""
-        # 重用e2e_client的配置，但专注于集成测试
+        # 重用e2e_client的配置,但专注于集成测试
         with patch(
             "src.football_predict_system.core.config.get_settings"
         ) as mock_get_settings:

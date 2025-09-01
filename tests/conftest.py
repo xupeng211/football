@@ -100,10 +100,10 @@ def pytest_runtest_setup(item: Item) -> None:
 def benchmark_config():
     """基准测试配置"""
     return {
-        "max_response_time": 1.0,  # 最大响应时间（秒）
+        "max_response_time": 1.0,  # 最大响应时间(秒)
         "min_requests_per_second": 100,  # 最小每秒请求数
         "concurrent_users": 10,  # 并发用户数
-        "test_duration": 30,  # 测试持续时间（秒）
+        "test_duration": 30,  # 测试持续时间(秒)
     }
 
 

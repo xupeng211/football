@@ -40,7 +40,7 @@ def main():
         },
         {"cmd": ["pytest", "-m", "performance", "-v"], "desc": "性能测试"},
         {"cmd": ["pytest", "-m", "e2e", "-v"], "desc": "端到端测试"},
-        {"cmd": ["pytest", "--co", "-q"], "desc": "收集所有测试（不运行）"},
+        {"cmd": ["pytest", "--co", "-q"], "desc": "收集所有测试(不运行)"},
         {
             "cmd": ["pytest", "--cov=src", "--cov-report=term-missing"],
             "desc": "覆盖率测试",

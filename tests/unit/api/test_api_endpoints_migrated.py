@@ -99,7 +99,7 @@ class TestMigratedAPIEndpoints:
                     yield client
 
     async def test_health_endpoint_migrated(self, async_client: AsyncClient):
-        """测试健康检查端点（已迁移到异步）"""
+        """测试健康检查端点(已迁移到异步)"""
         response = await async_client.get("/health")
         assert response.status_code == 200
 
@@ -108,7 +108,7 @@ class TestMigratedAPIEndpoints:
         assert data["status"] == "healthy"
 
     async def test_root_endpoint_migrated(self, async_client: AsyncClient):
-        """测试根端点（已迁移到异步）"""
+        """测试根端点(已迁移到异步)"""
         response = await async_client.get("/")
         assert response.status_code == 200
 
@@ -118,7 +118,7 @@ class TestMigratedAPIEndpoints:
         assert "environment" in data
 
     async def test_api_status_endpoint_migrated(self, async_client: AsyncClient):
-        """测试API状态端点（已迁移到异步）"""
+        """测试API状态端点(已迁移到异步)"""
         response = await async_client.get("/api/v1/status")
         assert response.status_code == 200
 
@@ -129,7 +129,7 @@ class TestMigratedAPIEndpoints:
     # 异步特有的测试 - 并发测试
     @pytest.mark.concurrent
     async def test_concurrent_api_calls(self, async_client: AsyncClient):
-        """测试并发API调用（异步测试特有）"""
+        """测试并发API调用(异步测试特有)"""
         import asyncio
 
         # 同时发起多个请求
@@ -148,7 +148,7 @@ class TestMigratedAPIEndpoints:
     # 性能测试
     @pytest.mark.performance
     async def test_response_time_migrated(self, async_client: AsyncClient):
-        """测试响应时间（异步性能测试）"""
+        """测试响应时间(异步性能测试)"""
         import time
 
         start_time = time.time()
@@ -161,10 +161,10 @@ class TestMigratedAPIEndpoints:
         assert response_time < 1.0  # 应在1秒内响应
 
 
-# 导入测试（保持同步，因为不涉及HTTP请求）
+# 导入测试(保持同步,因为不涉及HTTP请求)
 @pytest.mark.unit
 def test_app_import_migrated():
-    """测试API应用导入（保持同步）"""
+    """测试API应用导入(保持同步)"""
     with (
         patch("src.football_predict_system.core.config.Settings") as MockSettings,
         patch("src.football_predict_system.core.logging.setup_logging"),
@@ -182,7 +182,7 @@ def test_app_import_migrated():
 
 @pytest.mark.unit
 def test_api_router_import_migrated():
-    """测试API路由导入（保持同步）"""
+    """测试API路由导入(保持同步)"""
     with patch("src.football_predict_system.core.logging.get_logger"):
         from src.football_predict_system.api.v1.endpoints import router
 
