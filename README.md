@@ -60,6 +60,8 @@ football-predict-system-v3/
 |------|------|------|
 | `make ai-setup` | 🤖 AI优化设置 | 一键配置AI友好环境 |
 | `make ai-check` | 🤖 AI环境检查 | 快速诊断项目状态 |
+| `make ai-file-check` | 🤖 文件操作检查 | 检查最近文件操作规范 |
+| `make ai-file-guard` | 🤖 文件守护检查 | 检查指定文件规范 |
 | `make install` | 📦 安装依赖 | 使用 uv 快速安装 |
 | `make dev` | 🔧 启动开发服务器 | 热重载开发模式 |
 | `make ci` | 🚀 运行所有检查 | 格式化+检查+测试 |
@@ -73,9 +75,11 @@ football-predict-system-v3/
 
 - **智能环境检测** - `make ai-check` 快速了解项目状态
 - **一键优化设置** - `make ai-setup` 配置AI友好环境  
+- **文件操作守护** - `make ai-file-check` 防止AI创建重复文件
+- **实时文件监控** - 自动检查文件操作规范
 - **VS Code增强** - 智能补全、自动导入、类型检查
 - **状态文件输出** - AI可读的JSON格式项目状态
-- **专用使用指南** - 查看 [AI工具指南](docs/AI_TOOLS_GUIDE.md)
+- **专用使用指南** - 查看 [AI工具指南](docs/AI_TOOLS_GUIDE.md) 和 [文件守护指南](docs/AI_FILE_GUARD_GUIDE.md)
 
 ## 📊 性能提升
 

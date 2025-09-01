@@ -124,6 +124,19 @@ ai-check: ## 🤖 AI工具专用环境检查
 	@echo "$(CYAN)🤖 AI工具环境检查...$(NC)"
 	python3 scripts/ai_health_check.py
 
+ai-file-check: ## 🤖 检查最近文件操作规范
+	@echo "$(CYAN)🔍 检查最近文件操作...$(NC)"
+	@python3 scripts/ai_file_monitor.py scan 10
+	@python3 scripts/ai_file_monitor.py status
+
+ai-file-guard: ## 🤖 检查指定文件规范 (用法: make ai-file-guard FILE=file.py)
+	@echo "$(CYAN)🛡️ 文件操作守护检查...$(NC)"
+	@if [ -z "$(FILE)" ]; then \
+		echo "$(RED)❌ 请指定文件: make ai-file-guard FILE=path/to/file.py$(NC)"; \
+		exit 1; \
+	fi
+	@python3 scripts/ai_file_guard.py "$(FILE)"
+
 fix-permissions: ## 🤖 修复虚拟环境权限问题
 	@echo "$(BLUE)🔧 修复权限问题...$(NC)"
 	@find .venv -name "*.pyi" -exec chmod 644 {} \; 2>/dev/null || true

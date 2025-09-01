@@ -1,0 +1,17 @@
+{
+  "last_scan": 1756741199.9625006,
+  "checks": [
+    {
+      "file": "test_demo_file.py",
+      "exit_code": 0,
+      "output": "🤖 AI文件操作检查\n========================================\n📁 相似文件:\n  • ./tests/test_models.py (0.71)\n  • ./tests/unit/apps/backtest/test_engine.py (0.71)\n  • ./tests/unit/apps/api/test_main.py (0.69)\n📍 推荐路径:\n  1. tests/unit/test_main.py\n  2. tests/integration/test_main.py\n========================================\n",
+      "error": "",
+      "timestamp": 1756741199.9624665
+    }
+  ],
+  "summary": {
+    "total_files": 1,
+    "warnings": 0,
+    "errors": 0
+  }
+}

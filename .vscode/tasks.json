@@ -52,6 +52,39 @@
       "problemMatcher": []
     },
     {
+      "label": "🤖 AI: 检查文件操作",
+      "type": "shell",
+      "command": "make",
+      "args": [
+        "ai-file-check"
+      ],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🤖 AI: 检查当前文件",
+      "type": "shell",
+      "command": "make",
+      "args": [
+        "ai-file-guard",
+        "FILE=${file}"
+      ],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
       "label": "🤖 AI: 完整CI检查",
       "type": "shell",
       "command": "make",
