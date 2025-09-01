@@ -1,43 +1,50 @@
-FROM ubuntu:22.04
+# Football Prediction System v3.0 - Optimized Dockerfile
+FROM python:3.11-slim
 
-# Set non-interactive frontend to avoid prompts
-ENV DEBIAN_FRONTEND=noninteractive
+# 设置环境变量
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
+# 安装系统依赖
+RUN apt-get update && apt-get install -y \
+    curl \
     build-essential \
-    python3.11 \
-    python3.11-venv \
-    python3-pip \
-    git \
-    postgresql-client \
-    wget \
     && rm -rf /var/lib/apt/lists/*
 
-# Set up Python alternatives
-RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1 && \
-    update-alternatives --install /usr/bin/python python /usr/bin/python3.11 1
+# 安装uv
+RUN pip install uv
 
-# Install uv and poetry
-RUN python3 -m pip install -U pip uv
-RUN curl -sSL https://install.python-poetry.org | python3 -
-
-# Add poetry to PATH
-ENV PATH="/root/.local/bin:${PATH}"
-
-# Set up working directory
+# 设置工作目录
 WORKDIR /app
 
-# Copy dependency files and install dependencies
-COPY pyproject.toml poetry.lock requirements.lock ./
-RUN uv pip sync --system requirements.lock
-RUN uv pip install --system bandit ruff mypy pytest pytest-cov pytest-asyncio pre-commit types-setuptools setuptools diff-cover pytest-mock pytest-xdist psutil mutmut hypothesis types-PyYAML types-requests defusedxml types-defusedxml types-psycopg2
+# 复制依赖文件
+COPY pyproject.toml ./
 
-# Copy the rest of the application code
-COPY . .
+# 创建虚拟环境并安装依赖
+RUN uv venv .venv && \
+    . .venv/bin/activate && \
+    uv sync --no-dev
 
-# Install the project in editable mode
-RUN uv pip install --system -e .
+# 复制源代码
+COPY src/ ./src/
+COPY tests/ ./tests/
 
-# Set the entrypoint
-ENTRYPOINT ["/bin/bash"]
+# 安装项目本身
+RUN . .venv/bin/activate && uv pip install -e .
+
+# 创建非root用户
+RUN adduser --disabled-password --gecos '' appuser && \
+    chown -R appuser:appuser /app
+USER appuser
+
+# 暴露端口
+EXPOSE 8000
+
+# 健康检查
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
+
+# 启动命令
+CMD [".venv/bin/uvicorn", "src.football_predict_system.main:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -1,138 +1,114 @@
 version: '3.8'
 
 services:
-  # PostgreSQL数据库
-  postgres:
-    image: postgres:15
-    container_name: project-db
+  # 主应用
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-football_predict}
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      - ENV=development
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/football_db
+      - REDIS_URL=redis://redis:6379/0
+      - LOG_LEVEL=info
+    volumes:
+      - .:/app
+      - /app/.venv
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    command: uvicorn src.football_predict_system.main:app --host 0.0.0.0 --port 8000 --reload
+    networks:
+      - football_net
+
+  # PostgreSQL 数据库
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: football_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./sql:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
     networks:
       - football_net
 
-  # Redis缓存
+  # Redis 缓存
   redis:
     image: redis:7-alpine
-    container_name: football_redis
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/data
-    networks:
-      - football_net
-
-  # Prefect服务器
-  prefect:
-    image: prefecthq/prefect:2.19.2-python3.11
-    container_name: football_prefect
-    ports:
-      - "4200:4200"
-    environment:
-      - PREFECT_SERVER_API_HOST=0.0.0.0
-      - PREFECT_API_DATABASE_CONNECTION_URL=postgresql+asyncpg://postgres:password@postgres:5432/prefect_db
-    depends_on:
-      - postgres
-    networks:
-      - football_net
-    command: prefect server start
-
-  # API服务
-  api:
-    build:
-      context: .
-      dockerfile: infra/docker/Dockerfile.api
-    container_name: football_api
-    ports:
-      - "8000:8000"
-    environment:
-      - DATABASE_URL=postgresql+asyncpg://postgres:password@postgres:5432/football_predict
-      - REDIS_URL=redis://redis:6379/0
-      - PREFECT_API_URL=http://prefect:4200/api
-      # OpenTelemetry Configuration for Jaeger
-      - OTEL_SERVICE_NAME=football-predict-api
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
-    depends_on:
-      - postgres
-      - redis
-      - prefect
-      - jaeger
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/livez"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 5s
-    volumes:
-      - .:/app
-      - ./models/artifacts:/app/models/artifacts
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
     networks:
       - football_net
-    profiles: ["app"]
 
-  # 数据采集工作器
-  data-worker:
-    build:
-      context: .
-      dockerfile: infra/docker/Dockerfile.worker
-    container_name: football_data_worker
-    environment:
-      - DATABASE_URL=postgresql+asyncpg://postgres:password@postgres:5432/football_predict
-      - REDIS_URL=redis://redis:6379/0
-      - PREFECT_API_URL=http://prefect:4200/api
-    depends_on:
-      - postgres
-      - redis
-      - prefect
-    volumes:
-      - .:/app
-    networks:
-      - football_net
-    profiles: ["workers"]
-
-  # 训练工作器
-  training-worker:
-    build:
-      context: .
-      dockerfile: infra/docker/Dockerfile.worker
-    container_name: football_training_worker
-    environment:
-      - DATABASE_URL=postgresql+asyncpg://postgres:password@postgres:5432/football_predict
-      - REDIS_URL=redis://redis:6379/0
-      - PREFECT_API_URL=http://prefect:4200/api
-    depends_on:
-      - postgres
-      - redis
-      - prefect
-    volumes:
-      - .:/app
-      - ./models/artifacts:/app/models/artifacts
-    networks:
-      - football_net
-    profiles: ["workers"]
-
-  # Jaeger分布式追踪系统
-  jaeger:
-    image: jaegertracing/all-in-one:1.59
-    container_name: football_jaeger
+  # Prometheus 监控 (可选)
+  prometheus:
+    image: prom/prometheus:latest
     ports:
-      - "16686:16686"  # Jaeger UI
-      - "4317:4317"    # OTLP gRPC receiver
-      - "4318:4318"    # OTLP HTTP receiver
-    environment:
-      - COLLECTOR_OTLP_ENABLED=true
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    restart: unless-stopped
     networks:
       - football_net
+    profiles:
+      - monitoring
+
+  # Grafana 仪表板 (可选)
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin123
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources
+    restart: unless-stopped
+    networks:
+      - football_net
+    profiles:
+      - monitoring
 
 volumes:
   postgres_data:
+    driver: local
   redis_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
 
 networks:
   football_net:
