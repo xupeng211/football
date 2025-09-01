@@ -10,20 +10,20 @@ from .database_fixtures import *
 from .factories import *
 
 __all__ = [
-    # API fixtures
-    "async_client",
-    "authenticated_client",
-    "mock_app",
-    # Database fixtures
-    "async_db_session",
-    "clean_database",
-    "sample_data",
-    # Cache fixtures
-    "redis_client",
-    "clean_cache",
     # Factories
     "MatchFactory",
-    "TeamFactory",
     "PredictionFactory",
+    "TeamFactory",
     "UserFactory",
+    # API fixtures
+    "async_client",
+    # Database fixtures
+    "async_db_session",
+    "authenticated_client",
+    "clean_cache",
+    "clean_database",
+    "mock_app",
+    # Cache fixtures
+    "redis_client",
+    "sample_data",
 ]

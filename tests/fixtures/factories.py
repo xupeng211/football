@@ -14,10 +14,10 @@ class MatchFactory:
 
     @staticmethod
     def create(
-        match_id: str = None,
-        home_team_id: str = None,
-        away_team_id: str = None,
-        date: datetime = None,
+        match_id: str | None = None,
+        home_team_id: str | None = None,
+        away_team_id: str | None = None,
+        date: datetime | None = None,
         status: str = "scheduled",
         **kwargs,
     ) -> dict[str, Any]:
@@ -45,8 +45,8 @@ class TeamFactory:
 
     @staticmethod
     def create(
-        team_id: str = None,
-        name: str = None,
+        team_id: str | None = None,
+        name: str | None = None,
         league: str = "Premier League",
         country: str = "England",
         **kwargs,
@@ -84,8 +84,8 @@ class PredictionFactory:
 
     @staticmethod
     def create(
-        prediction_id: str = None,
-        match_id: str = None,
+        prediction_id: str | None = None,
+        match_id: str | None = None,
         home_win_prob: float = 0.45,
         draw_prob: float = 0.30,
         away_win_prob: float = 0.25,
@@ -117,9 +117,9 @@ class UserFactory:
 
     @staticmethod
     def create(
-        user_id: str = None,
-        username: str = None,
-        email: str = None,
+        user_id: str | None = None,
+        username: str | None = None,
+        email: str | None = None,
         is_active: bool = True,
         **kwargs,
     ) -> dict[str, Any]:
@@ -140,7 +140,7 @@ class ModelFactory:
 
     @staticmethod
     def create(
-        model_id: str = None,
+        model_id: str | None = None,
         name: str = "xgboost_v1",
         version: str = "1.0.0",
         accuracy: float = 0.85,
@@ -178,7 +178,7 @@ class APIResponseFactory:
     def error_response(
         error_code: str = "VALIDATION_ERROR",
         message: str = "Validation failed",
-        details: dict[str, Any] = None,
+        details: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         """创建错误响应"""
         return {
