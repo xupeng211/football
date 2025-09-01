@@ -1,0 +1,37 @@
+# 🐳 本地CI验证环境 - 模拟GitHub Actions
+FROM ubuntu:22.04
+
+# 设置非交互式安装
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+ENV PYTHON_VERSION=3.11
+
+# 安装系统依赖（模拟GitHub Actions runners）
+RUN apt-get update && apt-get install -y \
+    python3.11 \
+    python3.11-dev \
+    python3.11-venv \
+    python3-pip \
+    curl \
+    git \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# 设置Python 3.11为默认
+RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.11 1
+
+# 安装uv（和GitHub Actions setup-uv@v3相同方式）
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+ENV PATH="/root/.local/bin:/root/.cargo/bin:$PATH"
+RUN echo 'export PATH="/root/.local/bin:/root/.cargo/bin:$PATH"' >> /root/.bashrc
+
+# 创建工作目录
+WORKDIR /workspace
+
+# 模拟GitHub Actions的环境变量
+ENV PYTHONPATH=/workspace/src
+ENV UV_CACHE_DIR=/tmp/.uv-cache
+
+# 默认执行CI验证脚本
+CMD ["./ci-verify.sh"] 

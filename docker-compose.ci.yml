@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  ci-test:
+    build:
+      context: .
+      dockerfile: Dockerfile.ci-test
+    container_name: football-ci-test
+    volumes:
+      - .:/workspace
+      - /workspace/.venv  # 排除本地venv
+    environment:
+      - PYTHONPATH=/workspace/src
+      - UV_CACHE_DIR=/tmp/.uv-cache
+      - PYTHON_VERSION=3.11
+    working_dir: /workspace
+    command: /workspace/ci-verify.sh
+    
+  # 交互式CI调试环境  
+  ci-debug:
+    build:
+      context: .
+      dockerfile: Dockerfile.ci-test
+    container_name: football-ci-debug
+    volumes:
+      - .:/workspace
+      - /workspace/.venv  # 排除本地venv
+    environment:
+      - PYTHONPATH=/workspace/src
+      - UV_CACHE_DIR=/tmp/.uv-cache
+      - PYTHON_VERSION=3.11
+    working_dir: /workspace
+    command: bash
+    stdin_open: true
+    tty: true 
