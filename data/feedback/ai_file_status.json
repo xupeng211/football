@@ -1,16 +1,37 @@
 {
-  "last_scan": 1756741199.9625006,
+  "last_scan": 1756741724.5065565,
   "checks": [
     {
-      "file": "test_demo_file.py",
+      "file": "data/feedback/ai_environment_status.json",
       "exit_code": 0,
-      "output": "🤖 AI文件操作检查\n========================================\n📁 相似文件:\n  • ./tests/test_models.py (0.71)\n  • ./tests/unit/apps/backtest/test_engine.py (0.71)\n  • ./tests/unit/apps/api/test_main.py (0.69)\n📍 推荐路径:\n  1. tests/unit/test_main.py\n  2. tests/integration/test_main.py\n========================================\n",
+      "output": "🤖 AI文件操作检查\n========================================\n📍 推荐路径:\n  1. src/ai_environment_status.json\n========================================\n",
       "error": "",
-      "timestamp": 1756741199.9624665
+      "timestamp": 1756741724.4466572
+    },
+    {
+      "file": "scripts/ai_file_guard.py",
+      "exit_code": 0,
+      "output": "🤖 AI文件操作检查\n========================================\n📁 相似文件:\n  • ./scripts/ai_file_monitor.py (0.71)\n  • ./tests/evaluation/test_data_leakage_guard.py (0.62)\n📍 推荐路径:\n  1. src/ai_file_guard.py\n========================================\n",
+      "error": "",
+      "timestamp": 1756741724.4673948
+    },
+    {
+      "file": "data/feedback/ai_file_status.json",
+      "exit_code": 0,
+      "output": "🤖 AI文件操作检查\n========================================\n📍 推荐路径:\n  1. src/ai_file_status.json\n========================================\n",
+      "error": "",
+      "timestamp": 1756741724.4871745
+    },
+    {
+      "file": "scripts/ai_file_monitor.py",
+      "exit_code": 0,
+      "output": "🤖 AI文件操作检查\n========================================\n📁 相似文件:\n  • ./scripts/ai_file_guard.py (0.71)\n📍 推荐路径:\n  1. src/ai_file_monitor.py\n========================================\n",
+      "error": "",
+      "timestamp": 1756741724.5065088
     }
   ],
   "summary": {
-    "total_files": 1,
+    "total_files": 4,
     "warnings": 0,
     "errors": 0
   }
