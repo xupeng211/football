@@ -39,7 +39,8 @@ class DatabaseConfig(BaseModel):
         """Validate database URL format."""
         if not v.startswith(("postgresql://", "sqlite://", "mysql://")):
             raise ValueError(
-                "Database URL must start with postgresql://, sqlite://, or mysql://"
+                "Database URL must start with postgresql://, sqlite://, "
+                "or mysql://"
             )
         return v
 
@@ -167,6 +168,7 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         case_sensitive=False,
         env_nested_delimiter="__",
+        extra="ignore",  # 忽略额外的环境变量字段
     )
 
     @field_validator("environment", mode="before")

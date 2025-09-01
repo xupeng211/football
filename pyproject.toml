@@ -200,28 +200,32 @@ python_classes = ["Test*"]
 python_functions = ["test_*"]
 asyncio_mode = "auto"
 addopts = [
-    "-n", "auto",
     "-v",
     "--tb=short",
     "--strict-markers",
-    "--disable-warnings",
-    "--cov=.",
-    "--cov-report=term-missing",
-    "--cov-report=html:htmlcov",
-    "--cov-report=xml:coverage.xml",
-    "-m", "not slow"
 ]
 markers = [
-    "unit: 单元测试",
-    "integration: 集成测试", 
-    "regression: 回归测试",
+    "unit: 快速单元测试",
+    "integration: 需要外部依赖的集成测试", 
     "e2e: 端到端测试",
-    "slow: 慢速测试",
-    "fast: 快速测试",
-    "api: API测试",
-    "model: 模型测试",
+    "slow: 慢速测试 (>10秒)",
+    "fast: 快速测试 (<1秒)",
+    "api: API相关测试",
+    "database: 数据库相关测试",
+    "cache: 缓存相关测试",
+    "async: 异步测试",
+    "concurrent: 并发测试",
+    "performance: 性能测试",
+    "regression: 回归测试",
 ]
-norecursedirs = ["external", "vendor"]
+norecursedirs = ["external", "vendor", "node_modules"]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+]
+
+# 异步测试配置
+asyncio_default_fixture_loop_scope = "function"
 
 [tool.coverage.run]
 source = ["."]

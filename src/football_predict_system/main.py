@@ -85,7 +85,9 @@ async def security_headers_middleware(request: Request, call_next):
 
 # Configure exception handlers
 @app.exception_handler(BaseApplicationError)
-async def application_exception_handler(request: Request, exc: BaseApplicationError):
+async def application_exception_handler(
+    request: Request, exc: BaseApplicationError
+):
     """Handle custom application exceptions."""
     logger.error(
         "Application error occurred",
@@ -102,7 +104,9 @@ async def application_exception_handler(request: Request, exc: BaseApplicationEr
 @app.exception_handler(Exception)
 async def generic_exception_handler(request: Request, exc: Exception):
     """Handle unexpected exceptions."""
-    logger.critical("An unexpected error occurred", error=str(exc), exc_info=True)
+    logger.critical(
+        "An unexpected error occurred", error=str(exc), exc_info=True
+    )
     return JSONResponse(
         status_code=500,
         content={
@@ -127,7 +131,9 @@ async def health_check():
 
     status_code = 200 if health_report.status == "healthy" else 503
 
-    return JSONResponse(content=health_report.dict(), status_code=status_code)
+    return JSONResponse(
+        content=health_report.model_dump(mode="json"), status_code=status_code
+    )
 
 
 # Add root endpoint
