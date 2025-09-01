@@ -1,4 +1,5 @@
 import pytest
+
 pytestmark = pytest.mark.skip(reason="data_pipeline module not implemented")
 
 from datetime import datetime

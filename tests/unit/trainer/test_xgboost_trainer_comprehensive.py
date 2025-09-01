@@ -1,4 +1,5 @@
 """Comprehensive tests for XGBoost trainer module."""
+
 import pytest
 
 # Skip entire module since XGBoostTrainer is not implemented

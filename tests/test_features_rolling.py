@@ -7,7 +7,9 @@ import pytest
 from data_pipeline.features.rolling import add_form
 
 # Skip test since data_pipeline module is not implemented
-pytestmark = pytest.mark.skip(reason="data_pipeline.features.rolling module not implemented")
+pytestmark = pytest.mark.skip(
+    reason="data_pipeline.features.rolling module not implemented"
+)
 
 
 def test_add_form_ok():

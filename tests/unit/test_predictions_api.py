@@ -1,4 +1,5 @@
 """Test the predictions API endpoints."""
+
 import pytest
 
 # Skip since prediction_service is not implemented

@@ -1,4 +1,5 @@
 """Core unit tests for cache module to boost coverage."""
+
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -73,7 +74,7 @@ class TestCacheManager:
     @pytest.mark.asyncio
     async def test_get_redis_client(self, manager):
         """Test Redis client creation."""
-        with patch('redis.asyncio.from_url') as mock_redis:
+        with patch("redis.asyncio.from_url") as mock_redis:
             mock_client = AsyncMock()
             mock_redis.return_value = mock_client
 
@@ -83,7 +84,7 @@ class TestCacheManager:
     @pytest.mark.asyncio
     async def test_set_operation(self, manager):
         """Test cache set operation."""
-        with patch.object(manager, 'get_redis_client') as mock_get:
+        with patch.object(manager, "get_redis_client") as mock_get:
             mock_client = AsyncMock()
             mock_get.return_value = mock_client
             mock_client.setex.return_value = True
@@ -95,7 +96,7 @@ class TestCacheManager:
     @pytest.mark.asyncio
     async def test_get_operation(self, manager):
         """Test cache get operation."""
-        with patch.object(manager, 'get_redis_client') as mock_get:
+        with patch.object(manager, "get_redis_client") as mock_get:
             mock_client = AsyncMock()
             mock_get.return_value = mock_client
             mock_client.get.return_value = b'{"data": "test"}'
@@ -107,7 +108,7 @@ class TestCacheManager:
     @pytest.mark.asyncio
     async def test_delete_operation(self, manager):
         """Test cache delete operation."""
-        with patch.object(manager, 'get_redis_client') as mock_get:
+        with patch.object(manager, "get_redis_client") as mock_get:
             mock_client = AsyncMock()
             mock_get.return_value = mock_client
             mock_client.delete.return_value = 1
@@ -119,7 +120,7 @@ class TestCacheManager:
     @pytest.mark.asyncio
     async def test_exists_operation(self, manager):
         """Test key existence check."""
-        with patch.object(manager, 'get_redis_client') as mock_get:
+        with patch.object(manager, "get_redis_client") as mock_get:
             mock_client = AsyncMock()
             mock_get.return_value = mock_client
             mock_client.exists.return_value = 1
@@ -130,7 +131,7 @@ class TestCacheManager:
     @pytest.mark.asyncio
     async def test_get_ttl(self, manager):
         """Test TTL retrieval."""
-        with patch.object(manager, 'get_redis_client') as mock_get:
+        with patch.object(manager, "get_redis_client") as mock_get:
             mock_client = AsyncMock()
             mock_get.return_value = mock_client
             mock_client.ttl.return_value = 300
@@ -154,7 +155,7 @@ class TestCacheManager:
     @pytest.mark.asyncio
     async def test_health_check(self, manager):
         """Test cache health check."""
-        with patch.object(manager, 'get_redis_client') as mock_get:
+        with patch.object(manager, "get_redis_client") as mock_get:
             mock_client = AsyncMock()
             mock_get.return_value = mock_client
             mock_client.ping.return_value = True
@@ -166,10 +167,10 @@ class TestCacheManager:
     @pytest.mark.asyncio
     async def test_clear_namespace(self, manager):
         """Test namespace clearing."""
-        with patch.object(manager, 'get_redis_client') as mock_get:
+        with patch.object(manager, "get_redis_client") as mock_get:
             mock_client = AsyncMock()
             mock_get.return_value = mock_client
-            mock_client.scan_iter.return_value = ['key1', 'key2']
+            mock_client.scan_iter.return_value = ["key1", "key2"]
             mock_client.delete.return_value = 2
 
             count = await manager.clear_namespace("test")
@@ -178,7 +179,7 @@ class TestCacheManager:
     @pytest.mark.asyncio
     async def test_close(self, manager):
         """Test cache manager close."""
-        with patch.object(manager, 'get_redis_client') as mock_get:
+        with patch.object(manager, "get_redis_client") as mock_get:
             mock_client = AsyncMock()
             mock_get.return_value = mock_client
 
@@ -208,7 +209,7 @@ async def test_cached_decorator():
         call_count += 1
         return x * 2
 
-    with patch('football_predict_system.core.cache.get_cache_manager') as mock_get:
+    with patch("football_predict_system.core.cache.get_cache_manager") as mock_get:
         mock_manager = AsyncMock()
         mock_get.return_value = mock_manager
 

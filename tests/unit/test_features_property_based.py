@@ -1,7 +1,9 @@
 import pytest
 
 # Skip test since data_pipeline module is not implemented
-pytestmark = pytest.mark.skip(reason="data_pipeline.features.build module not implemented")
+pytestmark = pytest.mark.skip(
+    reason="data_pipeline.features.build module not implemented"
+)
 
 try:
     from hypothesis import given

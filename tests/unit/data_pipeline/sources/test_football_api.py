@@ -1,4 +1,5 @@
 import pytest
+
 pytestmark = pytest.mark.skip(reason="data_pipeline module not implemented")
 
 # tests/unit/data_pipeline/sources/test_football_api.py

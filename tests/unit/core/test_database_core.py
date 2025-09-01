@@ -1,4 +1,5 @@
 """Core unit tests for database module to boost coverage."""
+
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -26,7 +27,7 @@ class TestDatabaseManager:
     @pytest.mark.asyncio
     async def test_create_engine(self, db_manager):
         """Test engine creation."""
-        with patch('sqlalchemy.ext.asyncio.create_async_engine') as mock_create:
+        with patch("sqlalchemy.ext.asyncio.create_async_engine") as mock_create:
             mock_engine = AsyncMock()
             mock_create.return_value = mock_engine
 
@@ -37,7 +38,7 @@ class TestDatabaseManager:
     @pytest.mark.asyncio
     async def test_get_engine(self, db_manager):
         """Test getting engine."""
-        with patch.object(db_manager, 'create_engine') as mock_create:
+        with patch.object(db_manager, "create_engine") as mock_create:
             mock_engine = AsyncMock()
             mock_create.return_value = mock_engine
 
@@ -47,11 +48,13 @@ class TestDatabaseManager:
     @pytest.mark.asyncio
     async def test_create_session_factory(self, db_manager):
         """Test session factory creation."""
-        with patch.object(db_manager, 'get_engine') as mock_get_engine:
+        with patch.object(db_manager, "get_engine") as mock_get_engine:
             mock_engine = AsyncMock()
             mock_get_engine.return_value = mock_engine
 
-            with patch('sqlalchemy.ext.asyncio.async_sessionmaker') as mock_sessionmaker:
+            with patch(
+                "sqlalchemy.ext.asyncio.async_sessionmaker"
+            ) as mock_sessionmaker:
                 mock_factory = MagicMock()
                 mock_sessionmaker.return_value = mock_factory
 
@@ -62,7 +65,7 @@ class TestDatabaseManager:
     @pytest.mark.asyncio
     async def test_get_session(self, db_manager):
         """Test getting database session."""
-        with patch.object(db_manager, 'get_session_factory') as mock_get_factory:
+        with patch.object(db_manager, "get_session_factory") as mock_get_factory:
             mock_factory = MagicMock()
             mock_session = AsyncMock(spec=AsyncSession)
             mock_factory.return_value = mock_session
@@ -74,7 +77,7 @@ class TestDatabaseManager:
     @pytest.mark.asyncio
     async def test_execute_query(self, db_manager):
         """Test query execution."""
-        with patch.object(db_manager, 'get_session') as mock_get_session:
+        with patch.object(db_manager, "get_session") as mock_get_session:
             mock_session = AsyncMock()
             mock_result = MagicMock()
             mock_session.execute.return_value = mock_result
@@ -91,7 +94,7 @@ class TestDatabaseManager:
             ("UPDATE table2 SET x=?", (2,)),
         ]
 
-        with patch.object(db_manager, 'get_session') as mock_get_session:
+        with patch.object(db_manager, "get_session") as mock_get_session:
             mock_session = AsyncMock()
             mock_get_session.return_value.__aenter__.return_value = mock_session
 
@@ -104,7 +107,7 @@ class TestDatabaseManager:
     @pytest.mark.asyncio
     async def test_health_check_success(self, db_manager):
         """Test successful database health check."""
-        with patch.object(db_manager, 'execute_query') as mock_execute:
+        with patch.object(db_manager, "execute_query") as mock_execute:
             mock_result = MagicMock()
             mock_result.scalar.return_value = 1
             mock_execute.return_value = mock_result
@@ -118,7 +121,7 @@ class TestDatabaseManager:
     @pytest.mark.asyncio
     async def test_health_check_failure(self, db_manager):
         """Test failed database health check."""
-        with patch.object(db_manager, 'execute_query') as mock_execute:
+        with patch.object(db_manager, "execute_query") as mock_execute:
             mock_execute.side_effect = Exception("Database error")
 
             health = await db_manager.health_check()
@@ -140,11 +143,11 @@ class TestDatabaseManager:
     @pytest.mark.asyncio
     async def test_init_database(self, db_manager):
         """Test database initialization."""
-        with patch.object(db_manager, 'get_engine') as mock_get_engine:
+        with patch.object(db_manager, "get_engine") as mock_get_engine:
             mock_engine = AsyncMock()
             mock_get_engine.return_value = mock_engine
 
-            with patch('football_predict_system.core.database.Base') as mock_base:
+            with patch("football_predict_system.core.database.Base") as mock_base:
                 await db_manager.init_database()
 
                 # Should create all tables
@@ -185,7 +188,7 @@ class TestDatabaseManager:
     @pytest.mark.asyncio
     async def test_create_connection_pool(self, db_manager):
         """Test connection pool creation."""
-        with patch.object(db_manager, 'get_engine') as mock_get_engine:
+        with patch.object(db_manager, "get_engine") as mock_get_engine:
             mock_engine = AsyncMock()
             mock_get_engine.return_value = mock_engine
 
@@ -211,7 +214,9 @@ class TestDatabaseContext:
         mock_session = AsyncMock()
         mock_manager.get_session.return_value.__aenter__.return_value = mock_session
 
-        with patch('football_predict_system.core.database.get_database_manager') as mock_get:
+        with patch(
+            "football_predict_system.core.database.get_database_manager"
+        ) as mock_get:
             mock_get.return_value = mock_manager
 
             # Import and test session context
@@ -228,7 +233,9 @@ class TestDatabaseContext:
         mock_session.execute.side_effect = Exception("Query failed")
         mock_manager.get_session.return_value.__aenter__.return_value = mock_session
 
-        with patch('football_predict_system.core.database.get_database_manager') as mock_get:
+        with patch(
+            "football_predict_system.core.database.get_database_manager"
+        ) as mock_get:
             mock_get.return_value = mock_manager
 
             # Should handle rollback on error
