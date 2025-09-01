@@ -22,22 +22,25 @@ class TestPredictionWorkflowE2E:
     @pytest.fixture
     async def e2e_client(self):
         """端到端测试客户端"""
-        with patch(
-            "src.football_predict_system.core.config.Settings"
-        ) as MockSettings, patch(
-            "src.football_predict_system.core.config.get_settings"
-        ) as mock_get_settings, patch(
-            "src.football_predict_system.core.database.get_database_manager"
-        ) as mock_db, patch(
-            "src.football_predict_system.core.cache.get_cache_manager"
-        ) as mock_cache, patch(
-            "src.football_predict_system.core.health.get_health_checker"
-        ) as mock_health, patch(
-            "src.football_predict_system.domain.services.PredictionService"
-        ) as mock_prediction_service, patch(
-            "src.football_predict_system.core.logging.setup_logging"
-        ), patch(
-            "src.football_predict_system.core.logging.get_logger"
+        with (
+            patch("src.football_predict_system.core.config.Settings") as MockSettings,
+            patch(
+                "src.football_predict_system.core.config.get_settings"
+            ) as mock_get_settings,
+            patch(
+                "src.football_predict_system.core.database.get_database_manager"
+            ) as mock_db,
+            patch(
+                "src.football_predict_system.core.cache.get_cache_manager"
+            ) as mock_cache,
+            patch(
+                "src.football_predict_system.core.health.get_health_checker"
+            ) as mock_health,
+            patch(
+                "src.football_predict_system.domain.services.PredictionService"
+            ) as mock_prediction_service,
+            patch("src.football_predict_system.core.logging.setup_logging"),
+            patch("src.football_predict_system.core.logging.get_logger"),
         ):
             # 配置模拟设置
             mock_settings = MagicMock()

@@ -21,20 +21,22 @@ class TestMigratedAPIEndpoints:
     async def async_client(self):
         """异步HTTP客户端"""
         # 模拟所有外部依赖
-        with patch(
-            "src.football_predict_system.core.config.Settings"
-        ) as MockSettings, patch(
-            "src.football_predict_system.core.config.get_settings"
-        ) as mock_get_settings, patch(
-            "src.football_predict_system.core.database.get_database_manager"
-        ) as mock_db, patch(
-            "src.football_predict_system.core.cache.get_cache_manager"
-        ) as mock_cache, patch(
-            "src.football_predict_system.core.health.get_health_checker"
-        ) as mock_health, patch(
-            "src.football_predict_system.core.logging.setup_logging"
-        ), patch(
-            "src.football_predict_system.core.logging.get_logger"
+        with (
+            patch("src.football_predict_system.core.config.Settings") as MockSettings,
+            patch(
+                "src.football_predict_system.core.config.get_settings"
+            ) as mock_get_settings,
+            patch(
+                "src.football_predict_system.core.database.get_database_manager"
+            ) as mock_db,
+            patch(
+                "src.football_predict_system.core.cache.get_cache_manager"
+            ) as mock_cache,
+            patch(
+                "src.football_predict_system.core.health.get_health_checker"
+            ) as mock_health,
+            patch("src.football_predict_system.core.logging.setup_logging"),
+            patch("src.football_predict_system.core.logging.get_logger"),
         ):
             # 配置模拟设置
             mock_settings = MagicMock()
@@ -163,12 +165,10 @@ class TestMigratedAPIEndpoints:
 @pytest.mark.unit
 def test_app_import_migrated():
     """测试API应用导入（保持同步）"""
-    with patch(
-        "src.football_predict_system.core.config.Settings"
-    ) as MockSettings, patch(
-        "src.football_predict_system.core.logging.setup_logging"
-    ), patch(
-        "src.football_predict_system.core.logging.get_logger"
+    with (
+        patch("src.football_predict_system.core.config.Settings") as MockSettings,
+        patch("src.football_predict_system.core.logging.setup_logging"),
+        patch("src.football_predict_system.core.logging.get_logger"),
     ):
         mock_settings = MagicMock()
         mock_settings.app_name = "Football Prediction System"

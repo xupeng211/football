@@ -35,15 +35,16 @@ async def authenticated_client() -> AsyncGenerator[AsyncClient, None]:
 @pytest.fixture
 def mock_app() -> FastAPI:
     """模拟的FastAPI应用实例"""
-    with patch(
-        "src.football_predict_system.core.config.get_settings"
-    ) as mock_settings, patch(
-        "src.football_predict_system.core.database.get_database_manager"
-    ) as mock_db, patch(
-        "src.football_predict_system.core.cache.get_cache_manager"
-    ) as mock_cache, patch(
-        "src.football_predict_system.core.health.get_health_checker"
-    ) as mock_health:
+    with (
+        patch("src.football_predict_system.core.config.get_settings") as mock_settings,
+        patch(
+            "src.football_predict_system.core.database.get_database_manager"
+        ) as mock_db,
+        patch("src.football_predict_system.core.cache.get_cache_manager") as mock_cache,
+        patch(
+            "src.football_predict_system.core.health.get_health_checker"
+        ) as mock_health,
+    ):
         # 配置模拟设置
         settings = MagicMock()
         settings.app_name = "Test Football Prediction System"

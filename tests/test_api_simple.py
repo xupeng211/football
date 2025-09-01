@@ -80,23 +80,25 @@ def client() -> TestClient:
     api_config.cors_headers = ["*"]
     mock_settings.api = api_config
 
-    with patch(
-        "src.football_predict_system.core.config.Settings"
-    ) as MockSettings, patch(
-        "src.football_predict_system.core.config.get_settings",
-        return_value=mock_settings,
-    ), patch(
-        "src.football_predict_system.core.config.settings", mock_settings
-    ), patch(
-        "src.football_predict_system.core.database.get_database_manager"
-    ) as mock_db, patch(
-        "src.football_predict_system.core.cache.get_cache_manager"
-    ) as mock_cache, patch(
-        "src.football_predict_system.core.health.get_health_checker"
-    ) as mock_health, patch(
-        "src.football_predict_system.core.logging.setup_logging"
-    ), patch(
-        "src.football_predict_system.core.logging.get_logger", return_value=MagicMock()
+    with (
+        patch("src.football_predict_system.core.config.Settings") as MockSettings,
+        patch(
+            "src.football_predict_system.core.config.get_settings",
+            return_value=mock_settings,
+        ),
+        patch("src.football_predict_system.core.config.settings", mock_settings),
+        patch(
+            "src.football_predict_system.core.database.get_database_manager"
+        ) as mock_db,
+        patch("src.football_predict_system.core.cache.get_cache_manager") as mock_cache,
+        patch(
+            "src.football_predict_system.core.health.get_health_checker"
+        ) as mock_health,
+        patch("src.football_predict_system.core.logging.setup_logging"),
+        patch(
+            "src.football_predict_system.core.logging.get_logger",
+            return_value=MagicMock(),
+        ),
     ):
         # 模拟Settings类的实例化
         MockSettings.return_value = mock_settings
@@ -144,12 +146,10 @@ def client() -> TestClient:
 
 def test_app_import() -> None:
     """测试API应用导入"""
-    with patch(
-        "src.football_predict_system.core.config.Settings"
-    ) as MockSettings, patch(
-        "src.football_predict_system.core.logging.setup_logging"
-    ), patch(
-        "src.football_predict_system.core.logging.get_logger"
+    with (
+        patch("src.football_predict_system.core.config.Settings") as MockSettings,
+        patch("src.football_predict_system.core.logging.setup_logging"),
+        patch("src.football_predict_system.core.logging.get_logger"),
     ):
         mock_settings = MagicMock()
         mock_settings.app_name = "Football Prediction System"
@@ -171,9 +171,10 @@ def test_api_router_import() -> None:
 
 def test_predictions_router_import() -> None:
     """测试预测路由导入"""
-    with patch(
-        "src.football_predict_system.core.config.Settings"
-    ) as MockSettings, patch("src.football_predict_system.core.logging.get_logger"):
+    with (
+        patch("src.football_predict_system.core.config.Settings") as MockSettings,
+        patch("src.football_predict_system.core.logging.get_logger"),
+    ):
         MockSettings.return_value = MagicMock()
 
         from src.football_predict_system.api.v1.predictions import router
@@ -183,9 +184,10 @@ def test_predictions_router_import() -> None:
 
 def test_models_router_import() -> None:
     """测试模型路由导入"""
-    with patch(
-        "src.football_predict_system.core.config.Settings"
-    ) as MockSettings, patch("src.football_predict_system.core.logging.get_logger"):
+    with (
+        patch("src.football_predict_system.core.config.Settings") as MockSettings,
+        patch("src.football_predict_system.core.logging.get_logger"),
+    ):
         MockSettings.return_value = MagicMock()
 
         from src.football_predict_system.api.v1.models import router
@@ -210,12 +212,10 @@ def test_app_routes_registered(client: TestClient) -> None:
 
 def test_cors_middleware() -> None:
     """测试CORS中间件配置"""
-    with patch(
-        "src.football_predict_system.core.config.Settings"
-    ) as MockSettings, patch(
-        "src.football_predict_system.core.logging.setup_logging"
-    ), patch(
-        "src.football_predict_system.core.logging.get_logger"
+    with (
+        patch("src.football_predict_system.core.config.Settings") as MockSettings,
+        patch("src.football_predict_system.core.logging.setup_logging"),
+        patch("src.football_predict_system.core.logging.get_logger"),
     ):
         # 模拟设置
         mock_settings = MagicMock()
@@ -236,12 +236,10 @@ def test_cors_middleware() -> None:
 
 def test_exception_handler() -> None:
     """测试全局异常处理器"""
-    with patch(
-        "src.football_predict_system.core.config.Settings"
-    ) as MockSettings, patch(
-        "src.football_predict_system.core.logging.setup_logging"
-    ), patch(
-        "src.football_predict_system.core.logging.get_logger"
+    with (
+        patch("src.football_predict_system.core.config.Settings") as MockSettings,
+        patch("src.football_predict_system.core.logging.setup_logging"),
+        patch("src.football_predict_system.core.logging.get_logger"),
     ):
         mock_settings = MagicMock()
         mock_settings.app_name = "Football Prediction System"
