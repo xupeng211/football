@@ -13,7 +13,7 @@ import hashlib
 import secrets
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Any, Dict, List, Optional, Set
+from typing import Any
 
 import bcrypt
 import jwt
@@ -63,7 +63,7 @@ class Permission(str, Enum):
 
 
 # Role-based permissions mapping
-ROLE_PERMISSIONS: Dict[UserRole, Set[Permission]] = {
+ROLE_PERMISSIONS: dict[UserRole, set[Permission]] = {
     UserRole.ADMIN: {
         Permission.PREDICT_READ,
         Permission.PREDICT_WRITE,
@@ -110,8 +110,8 @@ class User(BaseModel):
     role: UserRole
     is_active: bool = True
     created_at: datetime
-    last_login: Optional[datetime] = None
-    permissions: Set[Permission] = set()
+    last_login: datetime | None = None
+    permissions: set[Permission] = set()
 
     def __init__(self, **data: Any) -> None:
         super().__init__(**data)
@@ -122,11 +122,11 @@ class User(BaseModel):
         """Check if user has specific permission."""
         return permission in self.permissions
 
-    def has_any_permission(self, permissions: List[Permission]) -> bool:
+    def has_any_permission(self, permissions: list[Permission]) -> bool:
         """Check if user has any of the specified permissions."""
         return any(perm in self.permissions for perm in permissions)
 
-    def has_all_permissions(self, permissions: List[Permission]) -> bool:
+    def has_all_permissions(self, permissions: list[Permission]) -> bool:
         """Check if user has all of the specified permissions."""
         return all(perm in self.permissions for perm in permissions)
 
@@ -143,7 +143,7 @@ class TokenPayload(BaseModel):
 
     @validator("exp", "iat", pre=True)
     def parse_datetime(cls, v: Any) -> Any:
-        if isinstance(v, (int, float)):
+        if isinstance(v, int | float):
             return datetime.fromtimestamp(v)
         return v
 
@@ -252,7 +252,7 @@ class AuthorizationService:
             raise ForbiddenError(f"Permission '{required_permission.value}' required")
 
     def check_any_permission(
-        self, user: User, required_permissions: List[Permission]
+        self, user: User, required_permissions: list[Permission]
     ) -> None:
         """Check if user has any of the required permissions."""
         if not user.is_active:
@@ -289,7 +289,7 @@ class RateLimiter:
     """Rate limiting implementation."""
 
     def __init__(self) -> None:
-        self.requests: Dict[str, List[datetime]] = {}
+        self.requests: dict[str, list[datetime]] = {}
         self.limits = {
             "default": (100, 3600),  # 100 requests per hour
             "auth": (10, 300),  # 10 auth attempts per 5 minutes
@@ -321,7 +321,7 @@ class RateLimiter:
 
     def get_reset_time(
         self, identifier: str, limit_type: str = "default"
-    ) -> Optional[datetime]:
+    ) -> datetime | None:
         """Get when rate limit resets for identifier."""
         if identifier not in self.requests or not self.requests[identifier]:
             return None
@@ -335,7 +335,7 @@ class SecurityHeaders:
     """Security headers for HTTP responses."""
 
     @staticmethod
-    def get_security_headers() -> Dict[str, str]:
+    def get_security_headers() -> dict[str, str]:
         """Get recommended security headers."""
         return {
             "X-Content-Type-Options": "nosniff",
@@ -441,7 +441,7 @@ def require_permission(permission: Permission) -> Any:
     return decorator
 
 
-def require_any_permission(permissions: List[Permission]) -> Any:
+def require_any_permission(permissions: list[Permission]) -> Any:
     """Decorator to require any of the specified permissions."""
 
     def decorator(func: Any) -> Any:

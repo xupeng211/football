@@ -4,7 +4,6 @@ from unittest.mock import MagicMock, patch
 
 import psycopg2
 import pytest
-
 from data_pipeline.sources.ingest_odds import ingest_data, main
 
 

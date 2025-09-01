@@ -7,7 +7,6 @@ from pathlib import Path
 
 import pytest
 import requests
-
 from data_pipeline.sources import odds_fetcher
 
 

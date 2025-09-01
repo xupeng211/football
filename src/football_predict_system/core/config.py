@@ -9,7 +9,7 @@ This module provides a unified configuration system that supports:
 """
 
 from enum import Enum
-from typing import Any, List, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -67,10 +67,10 @@ class APIConfig(BaseModel):
     access_token_expire_minutes: int = 30
 
     # CORS
-    cors_origins: List[str] = ["*"]
+    cors_origins: list[str] = ["*"]
     cors_credentials: bool = True
-    cors_methods: List[str] = ["*"]
-    cors_headers: List[str] = ["*"]
+    cors_methods: list[str] = ["*"]
+    cors_headers: list[str] = ["*"]
 
     @field_validator("cors_origins", mode="before")
     def parse_cors_origins(cls, v: Any) -> Any:
@@ -85,7 +85,7 @@ class LoggingConfig(BaseModel):
 
     level: str = "INFO"
     format: str = "json"  # json or text
-    file_path: Optional[str] = None
+    file_path: str | None = None
     max_file_size: int = 10485760  # 10MB
     backup_count: int = 5
 
@@ -113,18 +113,18 @@ class MonitoringConfig(BaseModel):
 
     # Tracing
     enable_tracing: bool = False
-    jaeger_endpoint: Optional[str] = None
+    jaeger_endpoint: str | None = None
 
     # Alerting
-    slack_webhook_url: Optional[str] = None
-    pagerduty_integration_key: Optional[str] = None
+    slack_webhook_url: str | None = None
+    pagerduty_integration_key: str | None = None
 
 
 class MLConfig(BaseModel):
     """Machine learning configuration settings."""
 
     model_registry_path: str = "models/artifacts"
-    default_model_version: Optional[str] = None
+    default_model_version: str | None = None
 
     # Training
     train_test_split: float = 0.2
@@ -167,6 +167,7 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         case_sensitive=False,
         env_nested_delimiter="__",
+        extra="ignore",  # 忽略额外的环境变量字段
     )
 
     @field_validator("environment", mode="before")

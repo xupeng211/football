@@ -4,7 +4,6 @@ Unit tests for rolling feature calculations.
 
 import pandas as pd
 import pytest
-
 from data_pipeline.features import rolling
 
 

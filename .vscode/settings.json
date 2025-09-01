@@ -21,13 +21,29 @@
     "source.organizeImports": "explicit",
     "source.fixAll.ruff": "explicit"
   },
-  "ruff.args": ["--config=pyproject.toml"],
-  "mypy-type-checker.args": ["--config-file=pyproject.toml"],
+  "ruff.args": [
+    "--config=pyproject.toml"
+  ],
+  "mypy-type-checker.args": [
+    "--config-file=pyproject.toml"
+  ],
   "terminal.integrated.defaultProfile.linux": "bash",
   "terminal.integrated.profiles.linux": {
     "AI Development (venv)": {
       "path": "bash",
-      "args": ["-c", "source .venv/bin/activate && exec bash"]
+      "args": [
+        "-c",
+        "source .venv/bin/activate && exec bash"
+      ]
     }
+  },
+  "terminal.integrated.shellIntegration.suggestEnabled": true,
+  "python.analysis.autoImportCompletions": true,
+  "python.analysis.completeFunctionParens": true,
+  "editor.suggest.showStatusBar": true,
+  "editor.quickSuggestions": {
+    "other": "on",
+    "comments": "on",
+    "strings": "on"
   }
 }

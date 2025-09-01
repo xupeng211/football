@@ -2,9 +2,8 @@
 Tests for the metrics API router.
 """
 
-from fastapi.testclient import TestClient
-
 from apps.api.main import app
+from fastapi.testclient import TestClient
 
 client = TestClient(app)
 

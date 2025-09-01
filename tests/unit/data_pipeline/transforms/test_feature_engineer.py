@@ -4,13 +4,12 @@ Unit tests for the feature engineering module.
 
 import pandas as pd
 import pytest
-from pandas.testing import assert_frame_equal
-
 from data_pipeline.transforms.feature_engineer import (
     aggregate_odds,
     calculate_implied_probabilities,
     generate_features,
 )
+from pandas.testing import assert_frame_equal
 
 
 @pytest.fixture

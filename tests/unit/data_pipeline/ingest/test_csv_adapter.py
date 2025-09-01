@@ -7,9 +7,8 @@ from unittest.mock import patch
 
 import pandas as pd
 import pytest
-from sqlalchemy import create_engine, text
-
 from data_pipeline.ingest.csv_adapter import ingest_csv_data
+from sqlalchemy import create_engine, text
 
 
 @pytest.fixture
@@ -45,9 +44,10 @@ def mock_db_and_fs(tmp_path):
     db_url = f"sqlite:///{tmp_path / 'test.db'}"
 
     # Patch env var and Path to redirect file access to tmp_path
-    with patch.dict(os.environ, {"DATABASE_URL": db_url}), patch(
-        "data_pipeline.ingest.csv_adapter.Path"
-    ) as mock_path:
+    with (
+        patch.dict(os.environ, {"DATABASE_URL": db_url}),
+        patch("data_pipeline.ingest.csv_adapter.Path") as mock_path,
+    ):
         # Configure the mock to return paths within the tmp_path fixture
         mock_path.return_value.parent.parent.parent = tmp_path
         # Since the original code does `project_root / "sql" / "sample" / ...`

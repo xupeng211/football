@@ -6,9 +6,8 @@ import asyncio
 from unittest.mock import AsyncMock, Mock
 
 import pytest
-from httpx import Response
-
 from data_pipeline.sources.football_api import FootballAPICollector, Team
+from httpx import Response
 
 
 class TestFootballAPICollectorEnhanced:

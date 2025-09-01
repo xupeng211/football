@@ -2,7 +2,6 @@ import os
 
 import psycopg2
 import pytest
-
 from data_pipeline.transforms.ingest_features import (
     fetch_source_data,
     ingest_features_data,

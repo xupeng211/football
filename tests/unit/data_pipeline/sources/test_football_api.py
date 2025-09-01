@@ -4,7 +4,6 @@ from datetime import date
 from unittest.mock import AsyncMock, patch
 
 import pytest
-
 from data_pipeline.sources.football_api import FootballAPICollector
 
 

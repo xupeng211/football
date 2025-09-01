@@ -145,7 +145,7 @@ class TestDataFactoryValidation:
         # 验证数据类型
         assert isinstance(match["home_team"], str)
         assert isinstance(match["away_team"], str)
-        assert isinstance(match["home_odds"], (int, float))
+        assert isinstance(match["home_odds"], int | float)
         assert match["home_odds"] > 0
 
     def test_prediction_response_validation(self):

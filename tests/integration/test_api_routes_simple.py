@@ -12,11 +12,14 @@ from fastapi.testclient import TestClient
 @pytest.fixture
 def mock_dependencies():
     """Mock外部依赖"""
-    with patch("apps.api.main.check_prefect_connection_async"), patch(
-        "apps.api.main.check_redis_connection"
-    ), patch("apps.api.main.check_db_connection"), patch(
-        "apps.api.main.prediction_service"
-    ), patch("prefect.get_client"), patch("apps.api.main.logger"):
+    with (
+        patch("apps.api.main.check_prefect_connection_async"),
+        patch("apps.api.main.check_redis_connection"),
+        patch("apps.api.main.check_db_connection"),
+        patch("apps.api.main.prediction_service"),
+        patch("prefect.get_client"),
+        patch("apps.api.main.logger"),
+    ):
         yield
 
 
@@ -29,9 +32,8 @@ def client(mock_dependencies):
         return TestClient(app)
     except ImportError:
         # 如果导入失败,创建一个简单的FastAPI应用进行测试
-        from fastapi import FastAPI
-
         from apps.api.routers.health import router as health_router
+        from fastapi import FastAPI
 
         test_app = FastAPI()
         test_app.include_router(health_router)

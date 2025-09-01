@@ -7,7 +7,7 @@ domain operations and enforce business rules.
 
 import asyncio
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from typing import Any
 from uuid import UUID
 
 from ..core.cache import get_cache_manager
@@ -150,7 +150,7 @@ class PredictionService:
 
     async def _safe_generate_prediction(
         self, request: PredictionRequest
-    ) -> Optional[PredictionResponse]:
+    ) -> PredictionResponse | None:
         """Safely generate a prediction, handling exceptions."""
         try:
             result = await self.generate_prediction(request)
@@ -163,26 +163,26 @@ class PredictionService:
             )
             return None
 
-    async def _get_match(self, match_id: UUID) -> Optional[Match]:
+    async def _get_match(self, match_id: UUID) -> Match | None:
         """Get match data from database."""
         # This would integrate with your database layer
         # Placeholder implementation
         return None
 
-    async def _get_model(self, model_version: Optional[str]) -> Optional[Model]:
+    async def _get_model(self, model_version: str | None) -> Model | None:
         """Get model from registry."""
         # This would integrate with your model registry
         # Placeholder implementation
         return None
 
-    async def _extract_features(self, match: Match) -> Optional[Dict]:
+    async def _extract_features(self, match: Match) -> dict | None:
         """Extract features for prediction."""
         # This would integrate with your feature extraction pipeline
         # Placeholder implementation
         return {}
 
     async def _predict_with_model(
-        self, model: Model, features: Dict, match: Match
+        self, model: Model, features: dict, match: Match
     ) -> Prediction:
         """Make prediction using the model."""
         # This would integrate with your ML model
@@ -212,7 +212,7 @@ class ModelService:
         self.logger = get_logger(__name__)
 
     @log_performance("get_available_models")
-    async def get_available_models(self) -> List[Model]:
+    async def get_available_models(self) -> list[Model]:
         """Get list of available models."""
         cache_manager = await get_cache_manager()
 
@@ -233,13 +233,13 @@ class ModelService:
         return models
 
     @log_performance("get_model_by_version")
-    async def get_model_by_version(self, version: str) -> Optional[Model]:
+    async def get_model_by_version(self, version: str) -> Model | None:
         """Get specific model by version."""
         models = await self.get_available_models()
         return next((model for model in models if model.version == version), None)
 
     @log_performance("get_default_model")
-    async def get_default_model(self) -> Optional[Model]:
+    async def get_default_model(self) -> Model | None:
         """Get the default/production model."""
         models = await self.get_available_models()
         production_models = [model for model in models if model.is_production]
@@ -257,7 +257,7 @@ class ModelService:
 
         return None
 
-    async def _load_models_from_registry(self) -> List[Model]:
+    async def _load_models_from_registry(self) -> list[Model]:
         """Load models from the model registry."""
         # This would integrate with your model registry
         # Placeholder implementation
@@ -271,7 +271,7 @@ class DataService:
         self.logger = get_logger(__name__)
 
     @log_performance("get_match_data")
-    async def get_match_data(self, match_id: UUID) -> Optional[Match]:
+    async def get_match_data(self, match_id: UUID) -> Match | None:
         """Get match data with caching."""
         cache_manager = await get_cache_manager()
 
@@ -292,7 +292,7 @@ class DataService:
         return match
 
     @log_performance("get_team_data")
-    async def get_team_data(self, team_id: UUID) -> Optional[Team]:
+    async def get_team_data(self, team_id: UUID) -> Team | None:
         """Get team data with caching."""
         cache_manager = await get_cache_manager()
 
@@ -311,7 +311,7 @@ class DataService:
         return team
 
     @log_performance("get_upcoming_matches")
-    async def get_upcoming_matches(self, days_ahead: int = 7) -> List[Match]:
+    async def get_upcoming_matches(self, days_ahead: int = 7) -> list[Match]:
         """Get upcoming matches."""
         cache_key = f"upcoming_{days_ahead}d"
         cache_manager = await get_cache_manager()
@@ -331,19 +331,19 @@ class DataService:
 
         return matches
 
-    async def _load_match_from_db(self, match_id: UUID) -> Optional[Match]:
+    async def _load_match_from_db(self, match_id: UUID) -> Match | None:
         """Load match from database."""
         # This would integrate with your database layer
         # Placeholder implementation
         return None
 
-    async def _load_team_from_db(self, team_id: UUID) -> Optional[Team]:
+    async def _load_team_from_db(self, team_id: UUID) -> Team | None:
         """Load team from database."""
         # This would integrate with your database layer
         # Placeholder implementation
         return None
 
-    async def _load_upcoming_matches_from_db(self, end_date: datetime) -> List[Match]:
+    async def _load_upcoming_matches_from_db(self, end_date: datetime) -> list[Match]:
         """Load upcoming matches from database."""
         # This would integrate with your database layer
         # Placeholder implementation
@@ -358,8 +358,8 @@ class AnalyticsService:
 
     @log_performance("get_prediction_accuracy")
     async def get_prediction_accuracy(
-        self, model_version: Optional[str] = None, days_back: int = 30
-    ) -> Dict[str, Any]:
+        self, model_version: str | None = None, days_back: int = 30
+    ) -> dict[str, Any]:
         """Calculate prediction accuracy over time period."""
         # This would analyze historical predictions vs actual results
         # Placeholder implementation
@@ -372,7 +372,7 @@ class AnalyticsService:
         }
 
     @log_performance("get_model_performance_comparison")
-    async def get_model_performance_comparison(self) -> Dict[str, Any]:
+    async def get_model_performance_comparison(self) -> dict[str, Any]:
         """Compare performance of different models."""
         # This would compare multiple models
         # Placeholder implementation

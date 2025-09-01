@@ -1,2 +1,0 @@
-data_pipeline/sources/football_api.py:118: error: unexpected indent  [syntax]
-Found 1 error in 1 file (errors prevented further checking)

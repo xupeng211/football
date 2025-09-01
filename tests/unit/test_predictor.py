@@ -48,10 +48,13 @@ class TestPredictor:
 
     def test_predictor_init_without_model_path(self) -> None:
         """测试不指定模型路径初始化预测器"""
-        with patch(
-            "models.predictor.find_latest_model_dir",
-            return_value=Path("latest_model.pkl"),
-        ) as mock_find, patch.object(Predictor, "load_model") as mock_load:
+        with (
+            patch(
+                "models.predictor.find_latest_model_dir",
+                return_value=Path("latest_model.pkl"),
+            ) as mock_find,
+            patch.object(Predictor, "load_model") as mock_load,
+        ):
             Predictor()
             mock_find.assert_called_once()
             mock_load.assert_called_once_with(Path("latest_model.pkl"))
@@ -70,9 +73,10 @@ class TestPredictor:
         self, mock_model: Mock, sample_match_data: dict
     ) -> None:
         """测试使用Mock模型进行单次预测"""
-        with patch.object(Predictor, "load_model"), patch(
-            "models.predictor._create_feature_vector"
-        ) as mock_feature:
+        with (
+            patch.object(Predictor, "load_model"),
+            patch("models.predictor._create_feature_vector") as mock_feature,
+        ):
             mock_feature.return_value = pd.DataFrame([[1, 2, 3, 4, 5]])
 
             predictor = Predictor(model_dir="test_model.pkl")
@@ -89,9 +93,10 @@ class TestPredictor:
         self, mock_model: Mock, sample_match_data: dict
     ) -> None:
         """测试预测概率归一化"""
-        with patch.object(Predictor, "load_model"), patch(
-            "models.predictor._create_feature_vector"
-        ) as mock_feature:
+        with (
+            patch.object(Predictor, "load_model"),
+            patch("models.predictor._create_feature_vector") as mock_feature,
+        ):
             mock_model.predict_proba.return_value = np.array([[0.2, 0.3, 0.5]])
             mock_feature.return_value = pd.DataFrame([[1, 2, 3, 4, 5]])
 
@@ -106,9 +111,10 @@ class TestPredictor:
         self, mock_model: Mock, sample_match_data: dict
     ) -> None:
         """测试置信度计算"""
-        with patch.object(Predictor, "load_model"), patch(
-            "models.predictor._create_feature_vector"
-        ) as mock_feature:
+        with (
+            patch.object(Predictor, "load_model"),
+            patch("models.predictor._create_feature_vector") as mock_feature,
+        ):
             mock_model.predict_proba.return_value = np.array([[0.1, 0.2, 0.7]])
             mock_feature.return_value = pd.DataFrame([[1, 2, 3, 4, 5]])
 

@@ -127,7 +127,9 @@ async def health_check():
 
     status_code = 200 if health_report.status == "healthy" else 503
 
-    return JSONResponse(content=health_report.dict(), status_code=status_code)
+    return JSONResponse(
+        content=health_report.model_dump(mode="json"), status_code=status_code
+    )
 
 
 # Add root endpoint

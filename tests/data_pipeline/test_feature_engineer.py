@@ -1,6 +1,5 @@
 import pandas as pd
 import pytest
-
 from data_pipeline.transforms.feature_engineer import (
     aggregate_odds,
     calculate_implied_probabilities,

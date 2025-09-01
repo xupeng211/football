@@ -1,0 +1,27 @@
+{
+    "timestamp": "2024-12-19T10:30:00Z",
+    "session_id": "test_session_001",
+    "ai_tool": "Claude-3.5-Sonnet",
+    "action": "code_generation",
+    "context": {
+        "file": "test_file.py",
+        "function": "test_function",
+        "language": "python"
+    },
+    "suggestion": {
+        "original_code": "def example(): pass",
+        "ai_generated_code": "def example():\n    \"\"\"AI generated function.\"\"\"\n    return True",
+        "confidence": 0.85
+    },
+    "developer_feedback": {
+        "accepted": true,
+        "rating": 4,
+        "modifications": "Added error handling",
+        "comments": "Good suggestion, but needed additional error handling"
+    },
+    "metrics": {
+        "time_to_accept": 15,
+        "lines_of_code": 3,
+        "complexity_reduced": true
+    }
+}

@@ -7,7 +7,6 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 import structlog
-
 from apps.api.core.logging import (
     get_logger_with_trace,
     log_api_request,

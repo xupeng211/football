@@ -1,0 +1,38 @@
+{
+  "last_scan": 1756741724.5065565,
+  "checks": [
+    {
+      "file": "data/feedback/ai_environment_status.json",
+      "exit_code": 0,
+      "output": "🤖 AI文件操作检查\n========================================\n📍 推荐路径:\n  1. src/ai_environment_status.json\n========================================\n",
+      "error": "",
+      "timestamp": 1756741724.4466572
+    },
+    {
+      "file": "scripts/ai_file_guard.py",
+      "exit_code": 0,
+      "output": "🤖 AI文件操作检查\n========================================\n📁 相似文件:\n  • ./scripts/ai_file_monitor.py (0.71)\n  • ./tests/evaluation/test_data_leakage_guard.py (0.62)\n📍 推荐路径:\n  1. src/ai_file_guard.py\n========================================\n",
+      "error": "",
+      "timestamp": 1756741724.4673948
+    },
+    {
+      "file": "data/feedback/ai_file_status.json",
+      "exit_code": 0,
+      "output": "🤖 AI文件操作检查\n========================================\n📍 推荐路径:\n  1. src/ai_file_status.json\n========================================\n",
+      "error": "",
+      "timestamp": 1756741724.4871745
+    },
+    {
+      "file": "scripts/ai_file_monitor.py",
+      "exit_code": 0,
+      "output": "🤖 AI文件操作检查\n========================================\n📁 相似文件:\n  • ./scripts/ai_file_guard.py (0.71)\n📍 推荐路径:\n  1. src/ai_file_monitor.py\n========================================\n",
+      "error": "",
+      "timestamp": 1756741724.5065088
+    }
+  ],
+  "summary": {
+    "total_files": 4,
+    "warnings": 0,
+    "errors": 0
+  }
+}

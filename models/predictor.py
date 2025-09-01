@@ -133,7 +133,7 @@ class Predictor:
         # 4. Decode results
         if self.label_encoder:
             class_labels = self.label_encoder.classes_
-            probabilities = dict(zip(class_labels, proba))
+            probabilities = dict(zip(class_labels, proba, strict=False))
             predicted_class_index = proba.argmax()
             predicted_outcome = self.label_encoder.inverse_transform(
                 [predicted_class_index]

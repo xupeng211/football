@@ -8,13 +8,12 @@ from unittest.mock import MagicMock, patch
 import pandas as pd
 import psycopg2
 import pytest
-from pandas.testing import assert_frame_equal
-
 from data_pipeline.transforms.ingest_features import (
     fetch_source_data,
     ingest_features_data,
 )
 from data_pipeline.transforms.ingest_features import main as ingest_features_main
+from pandas.testing import assert_frame_equal
 
 
 @pytest.fixture

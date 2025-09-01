@@ -3,7 +3,6 @@ from unittest.mock import MagicMock, patch
 
 import pandas as pd
 import pytest
-
 from apps.trainer.xgboost_trainer import TrainingConfig, XGBoostTrainer, main
 
 DB_URL_PATCH = patch(

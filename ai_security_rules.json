@@ -1,0 +1,196 @@
+{
+    "project_info": {
+        "name": "football-predict-system",
+        "type": "python-ml-api",
+        "security_level": "production"
+    },
+    "security_rules": {
+        "forbidden_patterns": {
+            "imports": [
+                "import pickle",
+                "from pickle import",
+                "pickle.loads",
+                "pickle.load",
+                "exec(",
+                "eval(",
+                "os.system(",
+                "subprocess.call"
+            ],
+            "code_patterns": [
+                "password.*=.*[\"'][^\"']{1,8}[\"']",
+                "secret.*=.*[\"'][^\"']{1,16}[\"']",
+                "api_key.*=.*[\"'][^\"']{1,16}[\"']",
+                "token.*=.*[\"'][^\"']{1,16}[\"']",
+                "host.*=.*[\"']0\\.0\\.0\\.0[\"']",
+                "allow_origins.*=.*\\[\\s*[\"']\\*[\"']\\s*\\]",
+                "debug.*=.*True"
+            ],
+            "file_contents": [
+                "password123",
+                "admin123",
+                "secret123",
+                "your_secret_key",
+                "change_me",
+                "TODO: change this"
+            ]
+        },
+        "required_patterns": {
+            "config_files": [
+                "field_validator.*secret",
+                "pydantic_settings.*BaseSettings",
+                "@validator.*password"
+            ],
+            "security_headers": [
+                "X-Content-Type-Options",
+                "X-Frame-Options",
+                "X-XSS-Protection",
+                "Strict-Transport-Security"
+            ],
+            "environment_variables": [
+                "SECRET_KEY",
+                "DATABASE_URL",
+                "REDIS_URL"
+            ]
+        },
+        "secure_alternatives": {
+            "pickle": {
+                "alternatives": [
+                    "json",
+                    "joblib",
+                    "safetensors"
+                ],
+                "reason": "pickle is unsafe for untrusted data",
+                "example": "Use json.dumps/loads for data, joblib.dump/load for ML models"
+            },
+            "exec": {
+                "alternatives": [
+                    "ast.literal_eval",
+                    "safe_eval"
+                ],
+                "reason": "exec allows arbitrary code execution",
+                "example": "Use ast.literal_eval for safe evaluation"
+            },
+            "hardcoded_secrets": {
+                "alternatives": [
+                    "os.environ.get",
+                    "pydantic.SecretStr"
+                ],
+                "reason": "secrets should come from environment variables",
+                "example": "password = os.environ.get('DB_PASSWORD')"
+            },
+            "bind_all_interfaces": {
+                "alternatives": [
+                    "127.0.0.1",
+                    "specific_ip"
+                ],
+                "reason": "0.0.0.0 exposes service to all networks",
+                "example": "host = '127.0.0.1' for local only"
+            }
+        }
+    },
+    "dependency_security": {
+        "vulnerable_packages": [
+            "requests<2.31.0",
+            "urllib3<2.0.0",
+            "pyyaml<6.0",
+            "jinja2<3.1.0",
+            "flask<2.3.0"
+        ],
+        "banned_packages": [
+            "pickle5",
+            "dill",
+            "cloudpickle"
+        ],
+        "security_scanners": [
+            "bandit",
+            "safety",
+            "semgrep",
+            "pip-audit"
+        ]
+    },
+    "configuration_security": {
+        "environment_separation": {
+            "development": {
+                "debug": true,
+                "cors_origins": [
+                    "http://localhost:*"
+                ],
+                "log_level": "DEBUG"
+            },
+            "production": {
+                "debug": false,
+                "cors_origins": "specific_domains_only",
+                "log_level": "INFO",
+                "require_https": true
+            }
+        },
+        "secret_management": {
+            "min_secret_length": 32,
+            "require_env_vars": true,
+            "rotation_reminder": "90_days",
+            "entropy_check": true
+        }
+    },
+    "ai_guidance_templates": {
+        "pickle_warning": "⚠️ 检测到pickle使用 - 这存在安全风险！建议使用: {alternatives}",
+        "weak_secret": "🔒 检测到弱密钥 - 长度应至少32字符，建议生成随机密钥",
+        "hardcoded_secret": "❌ 检测到硬编码密钥 - 应使用环境变量: os.environ.get('{key}')",
+        "insecure_binding": "🌐 检测到不安全的网络绑定 - 考虑使用 '127.0.0.1' 或具体IP",
+        "debug_in_prod": "🐛 检测到生产环境debug=True - 这会暴露敏感信息",
+        "cors_wildcard": "🔓 检测到CORS通配符 - 生产环境应指定具体域名",
+        "missing_validation": "📝 缺少输入验证 - 建议添加 pydantic validators",
+        "dependency_vulnerability": "🔍 检测到依赖漏洞 - 请升级 {package} 到 {safe_version}"
+    },
+    "automated_fixes": {
+        "secret_generation": {
+            "command": "python -c \"import secrets; print(secrets.token_urlsafe(32))\"",
+            "description": "生成32字符的安全密钥"
+        },
+        "security_headers": {
+            "template": "src/templates/security_headers.py",
+            "description": "添加标准安全头"
+        },
+        "input_validation": {
+            "template": "src/templates/pydantic_validators.py",
+            "description": "添加输入验证"
+        }
+    },
+    "compliance_checks": {
+        "owasp_top10": [
+            "injection_prevention",
+            "broken_authentication",
+            "sensitive_data_exposure",
+            "xml_external_entities",
+            "broken_access_control",
+            "security_misconfiguration",
+            "cross_site_scripting",
+            "insecure_deserialization",
+            "known_vulnerabilities",
+            "insufficient_logging"
+        ],
+        "required_tools": [
+            "bandit",
+            "safety",
+            "pre-commit"
+        ]
+    },
+    "integration": {
+        "pre_commit_hooks": [
+            "security-lint",
+            "secret-scan",
+            "dependency-check"
+        ],
+        "ci_cd_checks": [
+            "security-audit",
+            "dependency-scan",
+            "secret-detection"
+        ],
+        "ide_integration": {
+            "vscode_tasks": [
+                "🔒 AI: 安全检查",
+                "🔍 AI: 扫描秘密",
+                "📦 AI: 依赖审计"
+            ]
+        }
+    }
+}

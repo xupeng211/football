@@ -4,7 +4,6 @@ from pathlib import Path
 
 import psycopg2
 import pytest
-
 from data_pipeline.sources.ingest_odds import ingest_data, validate_odds
 
 # 标记整个模块的测试为integration测试

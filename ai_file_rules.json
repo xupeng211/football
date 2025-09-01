@@ -1,0 +1,102 @@
+{
+    "project_info": {
+        "name": "football-predict-system",
+        "type": "python-ml-api",
+        "structure": "src-based"
+    },
+    "file_operation_rules": {
+        "forbidden_patterns": {
+            "suffixes": [
+                "_copy",
+                "_backup",
+                "_new",
+                "_old",
+                "_temp",
+                "_v1",
+                "_v2",
+                "_duplicate"
+            ],
+            "names": [
+                "temp.py",
+                "test.py",
+                "new_file.py",
+                "untitled.py"
+            ],
+            "paths": [
+                "src/temp/",
+                "src/backup/",
+                "root/*.py"
+            ]
+        },
+        "location_rules": {
+            "test_files": {
+                "pattern": "test_*.py",
+                "allowed_locations": [
+                    "tests/unit/",
+                    "tests/integration/",
+                    "tests/e2e/"
+                ],
+                "prefer_location": "tests/unit/",
+                "max_similar_files": 2
+            },
+            "api_files": {
+                "pattern": "*api*.py",
+                "allowed_locations": [
+                    "src/football_predict_system/api/",
+                    "src/api/"
+                ],
+                "prefer_location": "src/football_predict_system/api/",
+                "max_similar_files": 1
+            },
+            "models": {
+                "pattern": "*model*.py",
+                "allowed_locations": [
+                    "src/football_predict_system/domain/",
+                    "src/models/"
+                ],
+                "prefer_location": "src/football_predict_system/domain/",
+                "max_similar_files": 1
+            },
+            "services": {
+                "pattern": "*service*.py",
+                "allowed_locations": [
+                    "src/football_predict_system/domain/",
+                    "src/services/"
+                ],
+                "prefer_location": "src/football_predict_system/domain/",
+                "max_similar_files": 1
+            },
+            "config": {
+                "pattern": "*config*.py|*settings*.py",
+                "allowed_locations": [
+                    "src/football_predict_system/core/",
+                    "config/"
+                ],
+                "prefer_location": "src/football_predict_system/core/",
+                "max_similar_files": 1
+            }
+        },
+        "similarity_threshold": 0.75,
+        "action_preferences": {
+            "high_similarity": "modify_existing",
+            "medium_similarity": "confirm_create",
+            "low_similarity": "create_new"
+        }
+    },
+    "ai_guidance_templates": {
+        "duplicate_warning": "⚠️ 发现相似文件 {similar_file} (相似度: {similarity})",
+        "location_suggestion": "💡 建议位置: {suggested_path}",
+        "modify_suggestion": "🔄 建议修改现有文件: {existing_file}",
+        "forbidden_pattern": "❌ 禁止的文件名模式: {pattern}",
+        "success_message": "✅ 文件位置和命名符合项目规范"
+    },
+    "integration": {
+        "vscode_task": "🤖 AI: 检查文件操作",
+        "makefile_command": "ai-file-check",
+        "git_hook": "pre-commit",
+        "auto_run_on": [
+            "file_create",
+            "file_rename"
+        ]
+    }
+}

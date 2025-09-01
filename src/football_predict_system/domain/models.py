@@ -6,7 +6,7 @@ This module defines the fundamental business entities and their relationships.
 
 from datetime import datetime
 from enum import Enum
-from typing import ClassVar, Dict, List, Optional, Union
+from typing import ClassVar
 from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field, ValidationInfo, field_validator
@@ -47,13 +47,13 @@ class Team(BaseModel):
     short_name: str = Field(..., min_length=1, max_length=10)
     country: str = Field(..., min_length=2, max_length=50)
     league: str = Field(..., min_length=1, max_length=100)
-    founded_year: Optional[int] = None
-    venue: Optional[str] = None
+    founded_year: int | None = None
+    venue: str | None = None
 
     # Performance metrics
-    current_form: List[MatchResult] = Field(default_factory=list, max_length=10)
-    home_form: List[MatchResult] = Field(default_factory=list, max_length=5)
-    away_form: List[MatchResult] = Field(default_factory=list, max_length=5)
+    current_form: list[MatchResult] = Field(default_factory=list, max_length=10)
+    home_form: list[MatchResult] = Field(default_factory=list, max_length=5)
+    away_form: list[MatchResult] = Field(default_factory=list, max_length=5)
 
     # Statistics
     goals_scored: int = Field(default=0, ge=0)
@@ -94,33 +94,33 @@ class Match(BaseModel):
     # Match details
     competition: str = Field(..., min_length=1, max_length=100)
     season: str = Field(..., min_length=4, max_length=20)
-    matchday: Optional[int] = Field(None, ge=1)
+    matchday: int | None = Field(None, ge=1)
 
     # Scheduling
     scheduled_date: datetime
-    kickoff_time: Optional[datetime] = None
-    venue: Optional[str] = None
+    kickoff_time: datetime | None = None
+    venue: str | None = None
 
     # Status and result
     status: MatchStatus = MatchStatus.SCHEDULED
-    result: Optional[MatchResult] = None
+    result: MatchResult | None = None
 
     # Scores
-    home_score: Optional[int] = Field(None, ge=0)
-    away_score: Optional[int] = Field(None, ge=0)
+    home_score: int | None = Field(None, ge=0)
+    away_score: int | None = Field(None, ge=0)
 
     # Match statistics
-    home_possession: Optional[float] = Field(None, ge=0, le=100)
-    away_possession: Optional[float] = Field(None, ge=0, le=100)
-    home_shots: Optional[int] = Field(None, ge=0)
-    away_shots: Optional[int] = Field(None, ge=0)
-    home_shots_on_target: Optional[int] = Field(None, ge=0)
-    away_shots_on_target: Optional[int] = Field(None, ge=0)
+    home_possession: float | None = Field(None, ge=0, le=100)
+    away_possession: float | None = Field(None, ge=0, le=100)
+    home_shots: int | None = Field(None, ge=0)
+    away_shots: int | None = Field(None, ge=0)
+    home_shots_on_target: int | None = Field(None, ge=0)
+    away_shots_on_target: int | None = Field(None, ge=0)
 
     # Odds (if available)
-    home_odds: Optional[float] = Field(None, gt=0)
-    draw_odds: Optional[float] = Field(None, gt=0)
-    away_odds: Optional[float] = Field(None, gt=0)
+    home_odds: float | None = Field(None, gt=0)
+    draw_odds: float | None = Field(None, gt=0)
+    away_odds: float | None = Field(None, gt=0)
 
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
@@ -128,8 +128,8 @@ class Match(BaseModel):
     @field_validator("away_possession")
     @classmethod
     def validate_possession_sum(
-        cls, v: Optional[float], info: ValidationInfo
-    ) -> Optional[float]:
+        cls, v: float | None, info: ValidationInfo
+    ) -> float | None:
         """Ensure possession percentages sum to 100."""
         if (
             v is not None
@@ -154,7 +154,7 @@ class Feature(BaseModel):
 
     match_id: UUID
     feature_name: str = Field(..., min_length=1, max_length=100)
-    feature_value: Union[float, int, str, bool]
+    feature_value: float | int | str | bool
     feature_type: str = Field(..., pattern=r"^(numerical|categorical|boolean)$")
 
     # Metadata
@@ -162,9 +162,9 @@ class Feature(BaseModel):
     extraction_timestamp: datetime = Field(default_factory=datetime.utcnow)
 
     # Quality metrics
-    confidence_score: Optional[float] = Field(None, ge=0, le=1)
+    confidence_score: float | None = Field(None, ge=0, le=1)
     is_derived: bool = Field(default=False)
-    source_features: List[str] = Field(default_factory=list)
+    source_features: list[str] = Field(default_factory=list)
 
 
 class Prediction(BaseModel):
@@ -185,12 +185,12 @@ class Prediction(BaseModel):
     confidence_score: float = Field(..., ge=0, le=1)
 
     # Expected scores (optional)
-    expected_home_score: Optional[float] = Field(None, ge=0)
-    expected_away_score: Optional[float] = Field(None, ge=0)
+    expected_home_score: float | None = Field(None, ge=0)
+    expected_away_score: float | None = Field(None, ge=0)
 
     # Model metadata
-    features_used: List[str] = Field(default_factory=list)
-    model_accuracy: Optional[float] = Field(None, ge=0, le=1)
+    features_used: list[str] = Field(default_factory=list)
+    model_accuracy: float | None = Field(None, ge=0, le=1)
 
     # Timestamps
     created_at: datetime = Field(default_factory=datetime.utcnow)
@@ -230,38 +230,36 @@ class Model(BaseModel):
     algorithm: str = Field(..., min_length=1, max_length=50)
 
     # Model metadata
-    description: Optional[str] = Field(None, max_length=500)
-    hyperparameters: Dict[str, Union[str, int, float, bool]] = Field(
-        default_factory=dict
-    )
-    feature_names: List[str] = Field(default_factory=list)
+    description: str | None = Field(None, max_length=500)
+    hyperparameters: dict[str, str | int | float | bool] = Field(default_factory=dict)
+    feature_names: list[str] = Field(default_factory=list)
 
     # Performance metrics
-    accuracy: Optional[float] = Field(None, ge=0, le=1)
-    precision: Optional[float] = Field(None, ge=0, le=1)
-    recall: Optional[float] = Field(None, ge=0, le=1)
-    f1_score: Optional[float] = Field(None, ge=0, le=1)
-    roc_auc: Optional[float] = Field(None, ge=0, le=1)
-    log_loss: Optional[float] = Field(None, ge=0)
+    accuracy: float | None = Field(None, ge=0, le=1)
+    precision: float | None = Field(None, ge=0, le=1)
+    recall: float | None = Field(None, ge=0, le=1)
+    f1_score: float | None = Field(None, ge=0, le=1)
+    roc_auc: float | None = Field(None, ge=0, le=1)
+    log_loss: float | None = Field(None, ge=0)
 
     # Training metadata
-    training_data_size: Optional[int] = Field(None, ge=0)
-    training_date: Optional[datetime] = None
-    validation_method: Optional[str] = None
+    training_data_size: int | None = Field(None, ge=0)
+    training_date: datetime | None = None
+    validation_method: str | None = None
 
     # Status
     is_active: bool = Field(default=True)
     is_production: bool = Field(default=False)
 
     # File paths
-    model_path: Optional[str] = None
-    metrics_path: Optional[str] = None
+    model_path: str | None = None
+    metrics_path: str | None = None
 
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
     @property
-    def performance_summary(self) -> Dict[str, Optional[float]]:
+    def performance_summary(self) -> dict[str, float | None]:
         """Get summary of model performance metrics."""
         return {
             "accuracy": self.accuracy,
@@ -277,7 +275,7 @@ class PredictionRequest(BaseModel):
     """Request model for making predictions."""
 
     match_id: UUID
-    model_version: Optional[str] = None
+    model_version: str | None = None
     include_probabilities: bool = Field(default=True)
     include_expected_scores: bool = Field(default=False)
 
@@ -286,8 +284,8 @@ class PredictionResponse(BaseModel):
     """Response model for predictions."""
 
     prediction: Prediction
-    match_info: Dict[str, Union[str, datetime]]
-    model_info: Dict[str, Union[str, float]]
+    match_info: dict[str, str | datetime]
+    model_info: dict[str, str | float]
 
     class Config:
         json_encoders: ClassVar = {
@@ -299,8 +297,8 @@ class PredictionResponse(BaseModel):
 class BatchPredictionRequest(BaseModel):
     """Request model for batch predictions."""
 
-    match_ids: List[UUID] = Field(..., min_length=1, max_length=100)
-    model_version: Optional[str] = None
+    match_ids: list[UUID] = Field(..., min_length=1, max_length=100)
+    model_version: str | None = None
     include_probabilities: bool = Field(default=True)
     include_expected_scores: bool = Field(default=False)
 
@@ -308,8 +306,8 @@ class BatchPredictionRequest(BaseModel):
 class BatchPredictionResponse(BaseModel):
     """Response model for batch predictions."""
 
-    predictions: List[PredictionResponse]
+    predictions: list[PredictionResponse]
     total_count: int
     successful_predictions: int
     failed_predictions: int
-    errors: List[Dict[str, str]] = Field(default_factory=list)
+    errors: list[dict[str, str]] = Field(default_factory=list)
