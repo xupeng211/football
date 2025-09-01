@@ -27,12 +27,12 @@ def mock_dependencies():
 def client(mock_dependencies):
     """创建测试客户端"""
     try:
-        from apps.api.main import app
+        from football_predict_system.api.main import app
 
         return TestClient(app)
     except ImportError:
         # 如果导入失败,创建一个简单的FastAPI应用进行测试
-        from apps.api.routers.health import router as health_router
+        from football_predict_system.api.routers.health import router as health_router
         from fastapi import FastAPI
 
         test_app = FastAPI()

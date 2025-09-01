@@ -2,7 +2,7 @@
 
 from unittest.mock import patch
 
-from apps.api.model_registry import check_model_registry
+from football_predict_system.api.model_registry import check_model_registry
 
 
 class TestCheckModelRegistry:

@@ -7,7 +7,7 @@ import pytest
 
 def test_settings_import():
     """测试设置模块导入"""
-    from apps.api.core.settings import Settings, settings
+    from football_predict_system.api.core.settings import Settings, settings
 
     assert Settings is not None
     assert settings is not None
@@ -15,7 +15,7 @@ def test_settings_import():
 
 def test_settings_attributes():
     """测试设置属性"""
-    from apps.api.core.settings import settings
+    from football_predict_system.api.core.settings import settings
 
     # 测试基本属性存在
     assert hasattr(settings, "app_port")
@@ -31,7 +31,7 @@ def test_settings_attributes():
 
 def test_settings_defaults():
     """测试设置默认值"""
-    from apps.api.core.settings import Settings
+    from football_predict_system.api.core.settings import Settings
 
     # 创建新的设置实例测试默认值
     test_settings = Settings()
@@ -44,7 +44,7 @@ def test_settings_defaults():
 def test_logging_setup():
     """测试日志设置"""
     try:
-        from apps.api.core.logging import setup_logging
+        from football_predict_system.api.core.logging import setup_logging
 
         # 测试日志设置函数可以调用
         setup_logging()

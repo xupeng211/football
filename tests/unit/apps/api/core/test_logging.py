@@ -7,13 +7,13 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 import structlog
-from apps.api.core.logging import (
+from football_predict_system.api.core.logging import (
     get_logger_with_trace,
     log_api_request,
     log_api_response,
     setup_logging,
 )
-from apps.api.core.settings import settings
+from football_predict_system.api.core.settings import settings
 
 
 @pytest.fixture(autouse=True)

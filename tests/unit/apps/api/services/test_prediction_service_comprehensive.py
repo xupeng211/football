@@ -5,7 +5,7 @@ Tests for the refactored PredictionService.
 from unittest.mock import MagicMock
 
 import pytest
-from apps.api.services.prediction_service import PredictionService
+from football_predict_system.api.services.prediction_service import PredictionService
 
 from models.predictor import Predictor
 

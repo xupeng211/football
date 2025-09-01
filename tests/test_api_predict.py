@@ -2,8 +2,8 @@
 FastAPI预测接口测试
 """
 
-from apps.api.main import app
-from apps.api.services.prediction_service import prediction_service
+from football_predict_system.api.main import app
+from football_predict_system.api.services.prediction_service import prediction_service
 from fastapi.testclient import TestClient
 
 from models.predictor import Predictor
@@ -121,7 +121,7 @@ def test_root_endpoint():
 
 
 def test_predict_422():
-    from apps.api.main import app
+    from football_predict_system.api.main import app
     from fastapi.testclient import TestClient
 
     # Send invalid data (empty match object)

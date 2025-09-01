@@ -13,7 +13,7 @@ class TestAPIBasic:
 
     def test_api_import_and_creation(self):
         """Test that API app can be imported and created."""
-        from apps.api.main import app
+        from football_predict_system.api.main import app
 
         assert app is not None
 
@@ -24,7 +24,7 @@ class TestAPIBasic:
 
     def test_health_check_endpoint(self):
         """Test basic health check endpoint."""
-        from apps.api.main import app
+        from football_predict_system.api.main import app
 
         with TestClient(app) as client:
             # Mock any external dependencies
@@ -48,7 +48,7 @@ class TestAPIBasic:
 
     def test_docs_endpoint(self):
         """Test that API documentation endpoint works."""
-        from apps.api.main import app
+        from football_predict_system.api.main import app
 
         with TestClient(app) as client:
             response = client.get("/docs")
@@ -56,7 +56,7 @@ class TestAPIBasic:
 
     def test_openapi_schema(self):
         """Test that OpenAPI schema is accessible."""
-        from apps.api.main import app
+        from football_predict_system.api.main import app
 
         with TestClient(app) as client:
             response = client.get("/openapi.json")
@@ -74,7 +74,7 @@ class TestPredictionEndpoint:
 
     def test_prediction_endpoint_exists(self):
         """Test that prediction endpoint is accessible."""
-        from apps.api.main import app
+        from football_predict_system.api.main import app
 
         with TestClient(app) as client:
             # Try to access prediction endpoint (might fail due to missing data)
@@ -86,7 +86,7 @@ class TestPredictionEndpoint:
 
     def test_prediction_with_mock_data(self):
         """Test prediction endpoint with mocked dependencies."""
-        from apps.api.main import app
+        from football_predict_system.api.main import app
 
         with TestClient(app) as client:
             # Mock all external dependencies
@@ -127,7 +127,7 @@ class TestMetricsEndpoint:
 
     def test_metrics_endpoint_exists(self):
         """Test that metrics endpoint exists."""
-        from apps.api.main import app
+        from football_predict_system.api.main import app
 
         with TestClient(app) as client:
             response = client.get("/metrics")
@@ -146,7 +146,7 @@ class TestErrorHandling:
 
     def test_invalid_endpoint(self):
         """Test response to invalid endpoints."""
-        from apps.api.main import app
+        from football_predict_system.api.main import app
 
         with TestClient(app) as client:
             response = client.get("/invalid-endpoint")
@@ -154,7 +154,7 @@ class TestErrorHandling:
 
     def test_invalid_method(self):
         """Test invalid HTTP methods."""
-        from apps.api.main import app
+        from football_predict_system.api.main import app
 
         with TestClient(app) as client:
             # Try POST on GET endpoint
@@ -163,7 +163,7 @@ class TestErrorHandling:
 
     def test_malformed_prediction_request(self):
         """Test malformed prediction requests."""
-        from apps.api.main import app
+        from football_predict_system.api.main import app
 
         with TestClient(app) as client:
             # Send invalid JSON
@@ -182,7 +182,7 @@ class TestMiddleware:
 
     def test_cors_headers(self):
         """Test that CORS headers are present."""
-        from apps.api.main import app
+        from football_predict_system.api.main import app
 
         with TestClient(app) as client:
             response = client.options("/health")
@@ -192,7 +192,7 @@ class TestMiddleware:
 
     def test_request_logging(self):
         """Test that requests are being logged/tracked."""
-        from apps.api.main import app
+        from football_predict_system.api.main import app
 
         with TestClient(app) as client:
             # Mock logging to verify it's called
@@ -211,7 +211,7 @@ class TestAPIConfiguration:
 
     def test_api_title_and_version(self):
         """Test API metadata configuration."""
-        from apps.api.main import app
+        from football_predict_system.api.main import app
 
         # Check that app has proper configuration
         assert hasattr(app, "title")
@@ -227,7 +227,7 @@ class TestAPIConfiguration:
 
     def test_api_routes_configured(self):
         """Test that main routes are configured."""
-        from apps.api.main import app
+        from football_predict_system.api.main import app
 
         # Check that routes exist
         route_paths = [route.path for route in app.routes]

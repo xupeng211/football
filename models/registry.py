@@ -10,7 +10,10 @@ from pathlib import Path
 from typing import Any, cast
 
 import structlog
-from apps.api.core.settings import settings
+
+from football_predict_system.core.config import get_settings
+
+settings = get_settings()
 
 logger = structlog.get_logger()
 # settings imported above
@@ -71,7 +74,7 @@ class ModelRegistry:
         Args:
             registry_path: 注册表根目录
         """
-        self.registry_path = Path(registry_path or settings.model_registry_path)
+        self.registry_path = Path(registry_path or settings.ml.model_registry_path)
         self.registry_path.mkdir(parents=True, exist_ok=True)
 
         # 注册表索引文件

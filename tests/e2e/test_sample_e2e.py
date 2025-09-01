@@ -2,8 +2,9 @@
 # BUGFIX: N/A [2025-08-31/Cascade]
 
 import pytest
-from apps.api.main import app  # 假设这是您的FastAPI应用实例
 from fastapi.testclient import TestClient
+
+from football_predict_system.main import app  # FastAPI应用实例
 
 # 使用FastAPI的TestClient来模拟对应用的HTTP请求
 client = TestClient(app)

@@ -3,7 +3,7 @@
 from unittest.mock import AsyncMock, patch
 
 import pytest
-from apps.api.prefect import check_prefect_connection, check_prefect_connection_async
+from football_predict_system.api.prefect import check_prefect_connection, check_prefect_connection_async
 from prefect.exceptions import PrefectException
 
 

@@ -2,7 +2,7 @@
 Tests for the metrics API router.
 """
 
-from apps.api.main import app
+from football_predict_system.api.main import app
 from fastapi.testclient import TestClient
 
 client = TestClient(app)

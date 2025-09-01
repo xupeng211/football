@@ -17,7 +17,7 @@ class TestHealthRouter:
     def test_health_router_import(self):
         """测试健康检查路由导入"""
         try:
-            from apps.api.routers.health import router
+            from football_predict_system.api.routers.health import router
 
             assert router is not None
         except ImportError:
@@ -29,7 +29,7 @@ class TestHealthRouter:
     def test_health_endpoint_success(self, mock_prefect, mock_redis, mock_db):
         """测试健康检查端点成功情况"""
         try:
-            from apps.api.routers.health import router
+            from football_predict_system.api.routers.health import router
 
             # Mock所有依赖服务正常
             mock_db.return_value = (True, "DB OK")
@@ -55,7 +55,7 @@ class TestHealthRouter:
     def test_health_endpoint_db_failure(self, mock_db):
         """测试数据库故障时的健康检查"""
         try:
-            from apps.api.routers.health import router
+            from football_predict_system.api.routers.health import router
 
             # Mock数据库连接失败
             mock_db.return_value = (False, "DB connection failed")
@@ -79,7 +79,7 @@ class TestPredictionsRouter:
     def test_predictions_router_import(self):
         """测试预测路由导入"""
         try:
-            from apps.api.routers.predictions import router
+            from football_predict_system.api.routers.predictions import router
 
             assert router is not None
         except ImportError:
@@ -89,7 +89,7 @@ class TestPredictionsRouter:
     def test_single_prediction_endpoint(self, mock_service):
         """测试单次预测端点"""
         try:
-            from apps.api.routers.predictions import router
+            from football_predict_system.api.routers.predictions import router
 
             # 使用测试数据工厂
             mock_service.predict.return_value = sample_prediction(home_win=0.85)
@@ -139,7 +139,7 @@ class TestPredictionsRouter:
     def test_prediction_error_handling(self, mock_service):
         """测试预测错误处理"""
         try:
-            from apps.api.routers.predictions import router
+            from football_predict_system.api.routers.predictions import router
 
             # Mock预测服务抛出异常
             mock_service.predict.side_effect = Exception("Load failed")
@@ -165,7 +165,7 @@ class TestMetricsRouter:
     def test_metrics_router_import(self):
         """测试指标路由导入"""
         try:
-            from apps.api.routers.metrics import router
+            from football_predict_system.api.routers.metrics import router
 
             assert router is not None
         except ImportError:
@@ -175,7 +175,7 @@ class TestMetricsRouter:
     def test_metrics_endpoint(self, mock_process):
         """测试指标端点"""
         try:
-            from apps.api.routers.metrics import router
+            from football_predict_system.api.routers.metrics import router
 
             # Mock系统指标
             mock_proc = Mock()

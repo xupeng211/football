@@ -9,7 +9,7 @@ This module provides:
 """
 
 import asyncio
-import pickle
+import json
 import time
 from collections.abc import Callable
 from datetime import datetime, timedelta
@@ -97,7 +97,8 @@ class CacheManager:
 
             if cached_data is not None:
                 try:
-                    value = pickle.loads(cached_data)
+                    # Use JSON for safer deserialization
+                    value = json.loads(cached_data.decode('utf-8'))
 
                     # Store in memory cache for faster access
                     if len(self._memory_cache) < self._max_memory_items:
@@ -111,7 +112,7 @@ class CacheManager:
                     self.logger.debug("Cache hit (Redis)", key=cache_key)
                     return value
 
-                except (pickle.PickleError, TypeError) as e:
+                except (json.JSONDecodeError, TypeError, UnicodeDecodeError) as e:
                     self.logger.warning(
                         "Failed to deserialize cached data",
                         key=cache_key,
@@ -140,9 +141,13 @@ class CacheManager:
         ttl = ttl or self._default_ttl
 
         try:
-            # Store in Redis
+            # Store in Redis using JSON serialization
             redis_client = await self.get_redis_client()
-            serialized_value = pickle.dumps(value)
+            try:
+                serialized_value = json.dumps(value, default=str).encode('utf-8')
+            except (TypeError, ValueError) as e:
+                self.logger.warning("Failed to serialize value with JSON", error=str(e))
+                return False
             await redis_client.setex(cache_key, ttl, serialized_value)
 
             # Store in memory cache

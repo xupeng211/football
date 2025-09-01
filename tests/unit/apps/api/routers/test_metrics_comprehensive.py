@@ -13,7 +13,7 @@ from fastapi.testclient import TestClient
 def app() -> FastAPI:
     """Create test FastAPI app with metrics router."""
     app = FastAPI()
-    from apps.api.routers.metrics import router
+    from football_predict_system.api.routers.metrics import router
 
     app.include_router(router)
     return app
@@ -135,31 +135,31 @@ class TestPrometheusMetrics:
 
     def test_request_count_metric_exists(self) -> None:
         """Test REQUEST_COUNT metric exists."""
-        from apps.api.routers.metrics import REQUEST_COUNT
+        from football_predict_system.api.routers.metrics import REQUEST_COUNT
 
         assert REQUEST_COUNT._name == "http_requests"
 
     def test_request_duration_metric_exists(self) -> None:
         """Test REQUEST_DURATION metric exists."""
-        from apps.api.routers.metrics import REQUEST_DURATION
+        from football_predict_system.api.routers.metrics import REQUEST_DURATION
 
         assert REQUEST_DURATION._name == "http_request_duration_seconds"
 
     def test_system_uptime_metric_exists(self) -> None:
         """Test SYSTEM_UPTIME metric exists."""
-        from apps.api.routers.metrics import SYSTEM_UPTIME
+        from football_predict_system.api.routers.metrics import SYSTEM_UPTIME
 
         assert SYSTEM_UPTIME._name == "system_uptime_seconds"
 
     def test_memory_usage_metric_exists(self) -> None:
         """Test MEMORY_USAGE metric exists."""
-        from apps.api.routers.metrics import MEMORY_USAGE
+        from football_predict_system.api.routers.metrics import MEMORY_USAGE
 
         assert MEMORY_USAGE._name == "memory_usage_bytes"
 
     def test_custom_registry_exists(self) -> None:
         """Test custom registry is properly configured."""
-        from apps.api.routers.metrics import generate_latest, registry
+        from football_predict_system.api.routers.metrics import generate_latest, registry
 
         output = generate_latest(registry).decode("utf-8")
         assert "http_requests_total" in output
@@ -195,7 +195,7 @@ class TestMetricsIntegration:
 
     def test_router_configuration(self) -> None:
         """Test router is properly configured."""
-        from apps.api.routers.metrics import router
+        from football_predict_system.api.routers.metrics import router
 
         routes = [getattr(route, "path", "") for route in router.routes]
         assert "/metrics" in routes

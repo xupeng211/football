@@ -13,7 +13,7 @@ from unittest.mock import patch
 
 import httpx
 import pytest
-from apps.api.main import app
+from football_predict_system.api.main import app
 from fastapi.testclient import TestClient
 
 

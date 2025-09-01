@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 import pytest
 from apps.api import db
-from apps.api.db import _is_testing, check_db_connection, init_db
+from football_predict_system.api.db import _is_testing, check_db_connection, init_db
 from sqlalchemy.exc import SQLAlchemyError
 
 

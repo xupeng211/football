@@ -17,7 +17,7 @@ class TestMainModule:
         """测试主模块导入"""
         try:
             # 尝试导入主要组件
-            from apps.api.main import VersionResponse
+            from football_predict_system.api.main import VersionResponse
 
             # 验证响应模型
             assert hasattr(VersionResponse, "__fields__")
@@ -27,7 +27,7 @@ class TestMainModule:
     def test_version_response_model(self):
         """测试版本响应模型"""
         try:
-            from apps.api.main import VersionResponse
+            from football_predict_system.api.main import VersionResponse
 
             # 创建版本响应实例
             version_response = VersionResponse(
