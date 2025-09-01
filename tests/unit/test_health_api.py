@@ -4,7 +4,7 @@ Tests for the health API router.
 
 from fastapi.testclient import TestClient
 
-from football_predict_system.api.main import app
+from football_predict_system.main import app
 
 client = TestClient(app)
 
