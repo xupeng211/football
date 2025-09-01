@@ -46,7 +46,7 @@ class TestAsyncDatabaseIntegration:
         tasks = [
             async_db_session.execute("SELECT 1"),
             async_db_session.execute("SELECT 2"),
-            async_db_session.execute("SELECT 3")
+            async_db_session.execute("SELECT 3"),
         ]
 
         results = await asyncio.gather(*tasks)

@@ -65,9 +65,7 @@ class TestPredictionWorkflowE2E:
             mock_db.return_value = mock_db_manager
 
             mock_cache_manager = AsyncMock()
-            mock_cache_manager.get_redis_client = AsyncMock(
-                return_value=MagicMock()
-            )
+            mock_cache_manager.get_redis_client = AsyncMock(return_value=MagicMock())
             mock_cache_manager.close = AsyncMock()
             mock_cache.return_value = mock_cache_manager
 
@@ -79,10 +77,10 @@ class TestPredictionWorkflowE2E:
                 "timestamp": "2024-01-01T00:00:00",
                 "components": [
                     {"name": "database", "status": "healthy"},
-                    {"name": "redis", "status": "healthy"}
+                    {"name": "redis", "status": "healthy"},
                 ],
                 "uptime": 123.45,
-                "version": "1.0.0"
+                "version": "1.0.0",
             }
             mock_health_checker.get_system_health = AsyncMock(
                 return_value=health_response
@@ -101,8 +99,7 @@ class TestPredictionWorkflowE2E:
 
             async with asgi_lifespan.LifespanManager(app):
                 async with AsyncClient(
-                    transport=httpx.ASGITransport(app=app),
-                    base_url="http://test"
+                    transport=httpx.ASGITransport(app=app), base_url="http://test"
                 ) as client:
                     yield client
 
@@ -121,8 +118,7 @@ class TestPredictionWorkflowE2E:
         # 3. 发起预测请求 (如果端点存在)
         match_data = MatchFactory.create()
         prediction_response = await e2e_client.post(
-            "/api/v1/predictions",
-            json=match_data
+            "/api/v1/predictions", json=match_data
         )
 
         # 如果端点不存在，跳过这部分测试
@@ -224,8 +220,7 @@ class TestSystemIntegrationE2E:
 
             async with asgi_lifespan.LifespanManager(app):
                 async with AsyncClient(
-                    transport=httpx.ASGITransport(app=app),
-                    base_url="http://test"
+                    transport=httpx.ASGITransport(app=app), base_url="http://test"
                 ) as client:
                     yield client
 
@@ -259,7 +254,6 @@ class TestSystemIntegrationE2E:
 
         # 检查响应
         successful_responses = [
-            r for r in responses
-            if hasattr(r, 'status_code') and r.status_code == 200
+            r for r in responses if hasattr(r, "status_code") and r.status_code == 200
         ]
         assert len(successful_responses) >= 15  # 至少75%的请求成功

@@ -24,6 +24,7 @@ random.seed(SEED)
 
 try:
     import numpy as np
+
     np.random.seed(SEED)
 except ImportError:
     pass  # numpy not available, skip numpy seed setting
@@ -49,36 +50,16 @@ def db_available() -> bool:
 
 def pytest_configure(config: Config) -> None:
     """注册自定义标记"""
-    config.addinivalue_line(
-        "markers", "unit: 快速单元测试"
-    )
-    config.addinivalue_line(
-        "markers", "integration: 需要外部依赖的集成测试"
-    )
-    config.addinivalue_line(
-        "markers", "e2e: 端到端测试"
-    )
-    config.addinivalue_line(
-        "markers", "slow: 慢速测试 (>10秒)"
-    )
-    config.addinivalue_line(
-        "markers", "fast: 快速测试 (<1秒)"
-    )
-    config.addinivalue_line(
-        "markers", "api: API相关测试"
-    )
-    config.addinivalue_line(
-        "markers", "database: 数据库相关测试"
-    )
-    config.addinivalue_line(
-        "markers", "cache: 缓存相关测试"
-    )
-    config.addinivalue_line(
-        "markers", "performance: 性能测试"
-    )
-    config.addinivalue_line(
-        "markers", "concurrent: 并发测试"
-    )
+    config.addinivalue_line("markers", "unit: 快速单元测试")
+    config.addinivalue_line("markers", "integration: 需要外部依赖的集成测试")
+    config.addinivalue_line("markers", "e2e: 端到端测试")
+    config.addinivalue_line("markers", "slow: 慢速测试 (>10秒)")
+    config.addinivalue_line("markers", "fast: 快速测试 (<1秒)")
+    config.addinivalue_line("markers", "api: API相关测试")
+    config.addinivalue_line("markers", "database: 数据库相关测试")
+    config.addinivalue_line("markers", "cache: 缓存相关测试")
+    config.addinivalue_line("markers", "performance: 性能测试")
+    config.addinivalue_line("markers", "concurrent: 并发测试")
 
 
 def pytest_collection_modifyitems(config: Config, items: list[Item]) -> None:
@@ -105,6 +86,7 @@ def pytest_runtest_setup(item: Item) -> None:
     # 禁止网络访问, 除非标记 @pytest.mark.allow_network
     try:
         import pytest_socket
+
         pytest_socket.disable_socket()
 
         if any(mark.name == "allow_network" for mark in item.iter_markers()):

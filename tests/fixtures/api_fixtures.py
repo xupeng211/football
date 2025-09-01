@@ -28,11 +28,7 @@ async def async_client() -> AsyncGenerator[AsyncClient, None]:
 async def authenticated_client() -> AsyncGenerator[AsyncClient, None]:
     """带认证的异步HTTP客户端"""
     headers = {"Authorization": "Bearer test_token"}
-    async with AsyncClient(
-        app=app,
-        base_url="http://test",
-        headers=headers
-    ) as client:
+    async with AsyncClient(app=app, base_url="http://test", headers=headers) as client:
         yield client
 
 
@@ -48,7 +44,6 @@ def mock_app() -> FastAPI:
     ) as mock_cache, patch(
         "src.football_predict_system.core.health.get_health_checker"
     ) as mock_health:
-
         # 配置模拟设置
         settings = MagicMock()
         settings.app_name = "Test Football Prediction System"
@@ -87,14 +82,12 @@ def mock_app() -> FastAPI:
             "timestamp": "2024-01-01T00:00:00",
             "components": [
                 {"name": "database", "status": "healthy"},
-                {"name": "redis", "status": "healthy"}
+                {"name": "redis", "status": "healthy"},
             ],
             "uptime": 123.45,
-            "version": "0.1.0"
+            "version": "0.1.0",
         }
-        health_checker.get_system_health = AsyncMock(
-            return_value=health_response
-        )
+        health_checker.get_system_health = AsyncMock(return_value=health_response)
         mock_health.return_value = health_checker
 
         yield app
@@ -105,7 +98,7 @@ async def concurrent_clients(
     request: Any,
 ) -> AsyncGenerator[list[AsyncClient], None]:
     """创建多个并发客户端用于负载测试"""
-    client_count = getattr(request, 'param', 5)
+    client_count = getattr(request, "param", 5)
     clients = []
 
     for _ in range(client_count):
@@ -133,14 +126,14 @@ def mock_prediction_service():
                 "home_team_win_probability": 0.45,
                 "draw_probability": 0.30,
                 "away_team_win_probability": 0.25,
-                "confidence": 0.85
+                "confidence": 0.85,
             }
         )
 
         service_instance.generate_batch_predictions = AsyncMock(
             return_value=[
                 {"match_id": "1", "prediction": "home_win"},
-                {"match_id": "2", "prediction": "draw"}
+                {"match_id": "2", "prediction": "draw"},
             ]
         )
 
@@ -158,11 +151,7 @@ def mock_model_service():
         service_instance.get_available_models = AsyncMock(
             return_value=[
                 {"name": "xgboost_v1", "version": "1.0.0", "accuracy": 0.85},
-                {
-                    "name": "neural_net_v1",
-                    "version": "1.0.0",
-                    "accuracy": 0.87
-                }
+                {"name": "neural_net_v1", "version": "1.0.0", "accuracy": 0.87},
             ]
         )
 

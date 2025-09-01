@@ -31,38 +31,17 @@ def main():
     print("=" * 60)
 
     test_scenarios = [
-        {
-            "cmd": ["pytest", "-m", "unit and fast", "-v"],
-            "desc": "快速单元测试"
-        },
-        {
-            "cmd": ["pytest", "-m", "unit and api", "-v"],
-            "desc": "API单元测试"
-        },
-        {
-            "cmd": ["pytest", "-m", "async", "-v"],
-            "desc": "异步测试"
-        },
+        {"cmd": ["pytest", "-m", "unit and fast", "-v"], "desc": "快速单元测试"},
+        {"cmd": ["pytest", "-m", "unit and api", "-v"], "desc": "API单元测试"},
+        {"cmd": ["pytest", "-m", "async", "-v"], "desc": "异步测试"},
         {
             "cmd": ["pytest", "-m", "integration", "-v", "--disable-warnings"],
-            "desc": "集成测试"
+            "desc": "集成测试",
         },
-        {
-            "cmd": ["pytest", "-m", "performance", "-v"],
-            "desc": "性能测试"
-        },
-        {
-            "cmd": ["pytest", "-m", "e2e", "-v"],
-            "desc": "端到端测试"
-        },
-        {
-            "cmd": ["pytest", "--co", "-q"],
-            "desc": "收集所有测试（不运行）"
-        },
-        {
-            "cmd": ["pytest", "--cov=src", "--cov-report=term-missing"],
-            "desc": "覆盖率测试"
-        }
+        {"cmd": ["pytest", "-m", "performance", "-v"], "desc": "性能测试"},
+        {"cmd": ["pytest", "-m", "e2e", "-v"], "desc": "端到端测试"},
+        {"cmd": ["pytest", "--co", "-q"], "desc": "收集所有测试（不运行）"},
+        {"cmd": ["pytest", "--cov=src", "--cov-report=term-missing"], "desc": "覆盖率测试"},
     ]
 
     if len(sys.argv) > 1:
@@ -75,7 +54,7 @@ def main():
             "performance": test_scenarios[4],
             "e2e": test_scenarios[5],
             "collect": test_scenarios[6],
-            "coverage": test_scenarios[7]
+            "coverage": test_scenarios[7],
         }
 
         if scenario_name in scenarios_map:

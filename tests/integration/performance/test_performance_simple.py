@@ -56,9 +56,9 @@ class TestPredictionPerformance:
 
             # 计算每秒预测数
             predictions_per_second = 100 / duration
-            assert predictions_per_second > 50, (
-                f"Too slow: {predictions_per_second:.1f}"
-            )
+            assert (
+                predictions_per_second > 50
+            ), f"Too slow: {predictions_per_second:.1f}"
 
         except ImportError:
             pytest.skip("Predictor module not available")
@@ -94,9 +94,9 @@ class TestPredictionPerformance:
                 avg_time_curr = performance_results[batch_size] / batch_size
 
                 # 性能退化不应超过100%
-                assert avg_time_curr < avg_time_prev * 2.0, (
-                    f"Performance degraded: {avg_time_curr:.6f}s vs {avg_time_prev:.6f}s"
-                )
+                assert (
+                    avg_time_curr < avg_time_prev * 2.0
+                ), f"Performance degraded: {avg_time_curr:.6f}s vs {avg_time_prev:.6f}s"
 
         except ImportError:
             pytest.skip("Predictor module not available")
@@ -218,9 +218,9 @@ class TestDataProcessingPerformance:
             memory_increase = peak_memory - initial_memory
 
             # 验证内存使用合理(不应超过100MB增长)
-            assert memory_increase < 100, (
-                f"Memory usage too high: {memory_increase:.1f}MB"
-            )
+            assert (
+                memory_increase < 100
+            ), f"Memory usage too high: {memory_increase:.1f}MB"
 
         except ImportError:
             pytest.skip("psutil not available for memory testing")

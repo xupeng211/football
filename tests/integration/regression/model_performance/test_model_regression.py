@@ -150,9 +150,9 @@ class TestModelPerformanceRegression:
             assert len(results) == batch_size
 
         # 验证批量处理效率不退化(大批量时每个预测的时间应该更少)
-        assert time_per_prediction[-1] <= time_per_prediction[0] * 2, (
-            "Batch processing efficiency has degraded"
-        )
+        assert (
+            time_per_prediction[-1] <= time_per_prediction[0] * 2
+        ), "Batch processing efficiency has degraded"
 
     @patch.object(Predictor, "load_model")
     def test_prediction_consistency_regression(
@@ -216,9 +216,9 @@ class TestModelPerformanceRegression:
         confidences = [pred["confidence"] for pred in predictions]
 
         # 验证置信度基本统计特性
-        assert all(0 <= conf <= 1 for conf in confidences), (
-            "Confidence scores outside [0,1] range"
-        )
+        assert all(
+            0 <= conf <= 1 for conf in confidences
+        ), "Confidence scores outside [0,1] range"
         assert np.std(confidences) >= performance_baselines["min_confidence_range"], (
             f"Confidence variance {np.std(confidences):.3f} too low, "
             f"may indicate model issues"
@@ -226,9 +226,9 @@ class TestModelPerformanceRegression:
 
         # 验证置信度分布合理性
         mean_confidence = np.mean(confidences)
-        assert 0.2 <= mean_confidence <= 0.8, (
-            f"Mean confidence {mean_confidence:.3f} outside reasonable range [0.2, 0.8]"
-        )
+        assert (
+            0.2 <= mean_confidence <= 0.8
+        ), f"Mean confidence {mean_confidence:.3f} outside reasonable range [0.2, 0.8]"
 
     @patch.object(Predictor, "load_model")
     def test_probability_distribution_regression(
@@ -252,9 +252,9 @@ class TestModelPerformanceRegression:
         for pred in predictions:
             # 验证概率总和为1
             total_prob = sum(pred["probabilities"].values())
-            assert abs(total_prob - 1.0) < 0.01, (
-                f"Probabilities don't sum to 1: {total_prob}"
-            )
+            assert (
+                abs(total_prob - 1.0) < 0.01
+            ), f"Probabilities don't sum to 1: {total_prob}"
 
             # 验证所有概率为非负
             assert all(p >= 0 for p in pred["probabilities"].values())
@@ -262,9 +262,9 @@ class TestModelPerformanceRegression:
             # 验证最高概率对应预测结果
             expected_outcome = max(pred["probabilities"], key=pred["probabilities"].get)
 
-            assert pred["predicted_outcome"] == expected_outcome, (
-                "Predicted outcome doesn't match highest probability"
-            )
+            assert (
+                pred["predicted_outcome"] == expected_outcome
+            ), "Predicted outcome doesn't match highest probability"
 
 
 class TestModelStabilityRegression:
@@ -322,9 +322,9 @@ class TestModelStabilityRegression:
 
                 # 验证概率仍然有效
                 total_prob = sum(result["probabilities"].values())
-                assert abs(total_prob - 1.0) < 0.1, (
-                    "Probabilities invalid for extreme case"
-                )
+                assert (
+                    abs(total_prob - 1.0) < 0.1
+                ), "Probabilities invalid for extreme case"
 
             except Exception as e:
                 pytest.fail(f"Model failed on extreme case {case}: {e}")
@@ -408,9 +408,9 @@ class TestModelVersionCompatibility:
         data = response.json()
         required_fields = ["api_version"]
         for field in required_fields:
-            assert field in data, (
-                f"Required field {field} missing from version response"
-            )
+            assert (
+                field in data
+            ), f"Required field {field} missing from version response"
 
         # 测试预测接口格式稳定性
         test_request = [
@@ -436,9 +436,9 @@ class TestModelVersionCompatibility:
                     "confidence",
                 ]
                 for field in expected_fields:
-                    assert field in pred, (
-                        f"Required field {field} missing from prediction response"
-                    )
+                    assert (
+                        field in pred
+                    ), f"Required field {field} missing from prediction response"
 
 
 if __name__ == "__main__":

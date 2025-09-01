@@ -39,8 +39,7 @@ class DatabaseConfig(BaseModel):
         """Validate database URL format."""
         if not v.startswith(("postgresql://", "sqlite://", "mysql://")):
             raise ValueError(
-                "Database URL must start with postgresql://, sqlite://, "
-                "or mysql://"
+                "Database URL must start with postgresql://, sqlite://, " "or mysql://"
             )
         return v
 

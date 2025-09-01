@@ -19,7 +19,7 @@ class MatchFactory:
         away_team_id: str = None,
         date: datetime = None,
         status: str = "scheduled",
-        **kwargs
+        **kwargs,
     ) -> dict[str, Any]:
         """创建比赛数据"""
         return {
@@ -31,7 +31,7 @@ class MatchFactory:
             "league": kwargs.get("league", "Premier League"),
             "season": kwargs.get("season", "2024-25"),
             "round": kwargs.get("round", 1),
-            **kwargs
+            **kwargs,
         }
 
     @staticmethod
@@ -49,12 +49,18 @@ class TeamFactory:
         name: str = None,
         league: str = "Premier League",
         country: str = "England",
-        **kwargs
+        **kwargs,
     ) -> dict[str, Any]:
         """创建球队数据"""
         team_names = [
-            "Manchester United", "Liverpool", "Arsenal", "Chelsea",
-            "Manchester City", "Tottenham", "Newcastle", "Brighton"
+            "Manchester United",
+            "Liverpool",
+            "Arsenal",
+            "Chelsea",
+            "Manchester City",
+            "Tottenham",
+            "Newcastle",
+            "Brighton",
         ]
 
         return {
@@ -64,7 +70,7 @@ class TeamFactory:
             "country": country,
             "founded": kwargs.get("founded", 1878),
             "stadium": kwargs.get("stadium", f"{name or 'Test'} Stadium"),
-            **kwargs
+            **kwargs,
         }
 
     @staticmethod
@@ -84,7 +90,7 @@ class PredictionFactory:
         draw_prob: float = 0.30,
         away_win_prob: float = 0.25,
         confidence: float = 0.85,
-        **kwargs
+        **kwargs,
     ) -> dict[str, Any]:
         """创建预测数据"""
         return {
@@ -97,7 +103,7 @@ class PredictionFactory:
             "model_name": kwargs.get("model_name", "xgboost_v1"),
             "model_version": kwargs.get("model_version", "1.0.0"),
             "created_at": kwargs.get("created_at", datetime.utcnow()),
-            **kwargs
+            **kwargs,
         }
 
     @staticmethod
@@ -115,7 +121,7 @@ class UserFactory:
         username: str = None,
         email: str = None,
         is_active: bool = True,
-        **kwargs
+        **kwargs,
     ) -> dict[str, Any]:
         """创建用户数据"""
         return {
@@ -125,7 +131,7 @@ class UserFactory:
             "is_active": is_active,
             "role": kwargs.get("role", "user"),
             "created_at": kwargs.get("created_at", datetime.utcnow()),
-            **kwargs
+            **kwargs,
         }
 
 
@@ -138,7 +144,7 @@ class ModelFactory:
         name: str = "xgboost_v1",
         version: str = "1.0.0",
         accuracy: float = 0.85,
-        **kwargs
+        **kwargs,
     ) -> dict[str, Any]:
         """创建模型数据"""
         return {
@@ -151,7 +157,7 @@ class ModelFactory:
             "f1_score": kwargs.get("f1_score", 0.85),
             "training_date": kwargs.get("training_date", datetime.utcnow()),
             "is_active": kwargs.get("is_active", True),
-            **kwargs
+            **kwargs,
         }
 
 
@@ -165,14 +171,14 @@ class APIResponseFactory:
             "status": "success",
             "message": message,
             "data": data,
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.utcnow().isoformat(),
         }
 
     @staticmethod
     def error_response(
         error_code: str = "VALIDATION_ERROR",
         message: str = "Validation failed",
-        details: dict[str, Any] = None
+        details: dict[str, Any] = None,
     ) -> dict[str, Any]:
         """创建错误响应"""
         return {
@@ -180,7 +186,7 @@ class APIResponseFactory:
             "error_code": error_code,
             "message": message,
             "details": details or {},
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.utcnow().isoformat(),
         }
 
 
@@ -192,17 +198,13 @@ class TestDataSets:
     def premier_league_match() -> dict[str, Any]:
         """英超比赛数据"""
         home_team = TeamFactory.create(
-            name="Manchester United",
-            league="Premier League"
+            name="Manchester United", league="Premier League"
         )
-        away_team = TeamFactory.create(
-            name="Liverpool",
-            league="Premier League"
-        )
+        away_team = TeamFactory.create(name="Liverpool", league="Premier League")
         match = MatchFactory.create(
             home_team_id=home_team["id"],
             away_team_id=away_team["id"],
-            league="Premier League"
+            league="Premier League",
         )
         prediction = PredictionFactory.create(match_id=match["id"])
 
@@ -210,7 +212,7 @@ class TestDataSets:
             "home_team": home_team,
             "away_team": away_team,
             "match": match,
-            "prediction": prediction
+            "prediction": prediction,
         }
 
     @staticmethod
@@ -219,6 +221,6 @@ class TestDataSets:
         matches = []
         for i in range(count):
             match_data = TestDataSets.premier_league_match()
-            match_data["match"]["date"] = datetime.utcnow() + timedelta(days=i+1)
+            match_data["match"]["date"] = datetime.utcnow() + timedelta(days=i + 1)
             matches.append(match_data)
         return matches

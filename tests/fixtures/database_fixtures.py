@@ -50,14 +50,14 @@ def sample_data():
                 "id": "team_1",
                 "name": "Manchester United",
                 "league": "Premier League",
-                "country": "England"
+                "country": "England",
             },
             {
                 "id": "team_2",
                 "name": "Liverpool",
                 "league": "Premier League",
-                "country": "England"
-            }
+                "country": "England",
+            },
         ],
         "matches": [
             {
@@ -65,7 +65,7 @@ def sample_data():
                 "home_team_id": "team_1",
                 "away_team_id": "team_2",
                 "date": "2024-01-15T15:00:00",
-                "status": "scheduled"
+                "status": "scheduled",
             }
         ],
         "predictions": [
@@ -75,9 +75,9 @@ def sample_data():
                 "home_win_prob": 0.45,
                 "draw_prob": 0.30,
                 "away_win_prob": 0.25,
-                "confidence": 0.85
+                "confidence": 0.85,
             }
-        ]
+        ],
     }
 
 
@@ -91,9 +91,7 @@ async def mock_database_manager():
 
         # 模拟异步会话
         mock_session = AsyncMock(spec=AsyncSession)
-        manager_instance.get_async_session = AsyncMock(
-            return_value=mock_session
-        )
+        manager_instance.get_async_session = AsyncMock(return_value=mock_session)
 
         # 模拟健康检查
         manager_instance.health_check = AsyncMock(

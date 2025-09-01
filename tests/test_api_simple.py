@@ -15,10 +15,18 @@ from fastapi.testclient import TestClient
 def clean_environment() -> Generator[None, None, None]:
     """清理可能导致配置问题的环境变量"""
     env_vars_to_remove = [
-        'app_port', 'feature_set', 'model_version', 'log_level',
-        'prefect_api_url', 'metrics_port', 'football_api_key',
-        'data_update_interval_minutes', 'model_registry_path',
-        'model_cache_size', 'backtest_start_date', 'backtest_end_date'
+        "app_port",
+        "feature_set",
+        "model_version",
+        "log_level",
+        "prefect_api_url",
+        "metrics_port",
+        "football_api_key",
+        "data_update_interval_minutes",
+        "model_registry_path",
+        "model_cache_size",
+        "backtest_start_date",
+        "backtest_end_date",
     ]
 
     original_values = {}
@@ -76,10 +84,9 @@ def client() -> TestClient:
         "src.football_predict_system.core.config.Settings"
     ) as MockSettings, patch(
         "src.football_predict_system.core.config.get_settings",
-        return_value=mock_settings
+        return_value=mock_settings,
     ), patch(
-        "src.football_predict_system.core.config.settings",
-        mock_settings
+        "src.football_predict_system.core.config.settings", mock_settings
     ), patch(
         "src.football_predict_system.core.database.get_database_manager"
     ) as mock_db, patch(
@@ -89,8 +96,7 @@ def client() -> TestClient:
     ) as mock_health, patch(
         "src.football_predict_system.core.logging.setup_logging"
     ), patch(
-        "src.football_predict_system.core.logging.get_logger",
-        return_value=MagicMock()
+        "src.football_predict_system.core.logging.get_logger", return_value=MagicMock()
     ):
         # 模拟Settings类的实例化
         MockSettings.return_value = mock_settings
@@ -104,9 +110,7 @@ def client() -> TestClient:
 
         # 模拟缓存管理器
         mock_cache_manager = AsyncMock()
-        mock_cache_manager.get_redis_client = AsyncMock(
-            return_value=MagicMock()
-        )
+        mock_cache_manager.get_redis_client = AsyncMock(return_value=MagicMock())
         mock_cache_manager.close = AsyncMock()
         mock_cache.return_value = mock_cache_manager
 
@@ -122,10 +126,10 @@ def client() -> TestClient:
             "timestamp": "2024-01-01T00:00:00",
             "components": [
                 {"name": "database", "status": "healthy"},
-                {"name": "redis", "status": "healthy"}
+                {"name": "redis", "status": "healthy"},
             ],
             "uptime": 123.45,
-            "version": "1.0.0"
+            "version": "1.0.0",
         }
         mock_health_checker.get_system_health = AsyncMock(
             return_value=mock_health_response
@@ -134,6 +138,7 @@ def client() -> TestClient:
 
         # 导入并创建测试客户端
         from src.football_predict_system.main import app
+
         return TestClient(app)
 
 
@@ -158,9 +163,7 @@ def test_app_import() -> None:
 
 def test_api_router_import() -> None:
     """测试API路由导入"""
-    with patch(
-        "src.football_predict_system.core.logging.get_logger"
-    ):
+    with patch("src.football_predict_system.core.logging.get_logger"):
         from src.football_predict_system.api.v1.endpoints import router
 
         assert router is not None
@@ -170,9 +173,7 @@ def test_predictions_router_import() -> None:
     """测试预测路由导入"""
     with patch(
         "src.football_predict_system.core.config.Settings"
-    ) as MockSettings, patch(
-        "src.football_predict_system.core.logging.get_logger"
-    ):
+    ) as MockSettings, patch("src.football_predict_system.core.logging.get_logger"):
         MockSettings.return_value = MagicMock()
 
         from src.football_predict_system.api.v1.predictions import router
@@ -184,9 +185,7 @@ def test_models_router_import() -> None:
     """测试模型路由导入"""
     with patch(
         "src.football_predict_system.core.config.Settings"
-    ) as MockSettings, patch(
-        "src.football_predict_system.core.logging.get_logger"
-    ):
+    ) as MockSettings, patch("src.football_predict_system.core.logging.get_logger"):
         MockSettings.return_value = MagicMock()
 
         from src.football_predict_system.api.v1.models import router

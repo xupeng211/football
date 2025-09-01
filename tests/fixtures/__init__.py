@@ -14,16 +14,13 @@ __all__ = [
     "async_client",
     "authenticated_client",
     "mock_app",
-
     # Database fixtures
     "async_db_session",
     "clean_database",
     "sample_data",
-
     # Cache fixtures
     "redis_client",
     "clean_cache",
-
     # Factories
     "MatchFactory",
     "TeamFactory",

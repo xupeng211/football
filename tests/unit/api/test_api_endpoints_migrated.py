@@ -63,9 +63,7 @@ class TestMigratedAPIEndpoints:
 
             # 模拟缓存管理器
             mock_cache_manager = AsyncMock()
-            mock_cache_manager.get_redis_client = AsyncMock(
-                return_value=MagicMock()
-            )
+            mock_cache_manager.get_redis_client = AsyncMock(return_value=MagicMock())
             mock_cache_manager.close = AsyncMock()
             mock_cache.return_value = mock_cache_manager
 
@@ -78,10 +76,10 @@ class TestMigratedAPIEndpoints:
                 "timestamp": "2024-01-01T00:00:00",
                 "components": [
                     {"name": "database", "status": "healthy"},
-                    {"name": "redis", "status": "healthy"}
+                    {"name": "redis", "status": "healthy"},
                 ],
                 "uptime": 123.45,
-                "version": "1.0.0"
+                "version": "1.0.0",
             }
             mock_health_checker.get_system_health = AsyncMock(
                 return_value=health_response
@@ -94,8 +92,7 @@ class TestMigratedAPIEndpoints:
             # 使用asgi-lifespan管理应用生命周期
             async with asgi_lifespan.LifespanManager(app):
                 async with AsyncClient(
-                    transport=httpx.ASGITransport(app=app),
-                    base_url="http://test"
+                    transport=httpx.ASGITransport(app=app), base_url="http://test"
                 ) as client:
                     yield client
 
@@ -137,7 +134,7 @@ class TestMigratedAPIEndpoints:
         tasks = [
             async_client.get("/health"),
             async_client.get("/"),
-            async_client.get("/api/v1/status")
+            async_client.get("/api/v1/status"),
         ]
 
         responses = await asyncio.gather(*tasks)
@@ -186,9 +183,7 @@ def test_app_import_migrated():
 @pytest.mark.unit
 def test_api_router_import_migrated():
     """测试API路由导入（保持同步）"""
-    with patch(
-        "src.football_predict_system.core.logging.get_logger"
-    ):
+    with patch("src.football_predict_system.core.logging.get_logger"):
         from src.football_predict_system.api.v1.endpoints import router
 
         assert router is not None

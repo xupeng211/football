@@ -58,9 +58,7 @@ async def mock_cache_manager():
         # 模拟Redis客户端
         mock_redis = AsyncMock()
         mock_redis.ping = AsyncMock(return_value=True)
-        manager_instance.get_redis_client = AsyncMock(
-            return_value=mock_redis
-        )
+        manager_instance.get_redis_client = AsyncMock(return_value=mock_redis)
 
         # 模拟缓存操作
         manager_instance.get = AsyncMock(return_value=None)
@@ -93,12 +91,12 @@ def cache_test_data():
             "home_win_prob": 0.6,
             "draw_prob": 0.25,
             "away_win_prob": 0.15,
-            "timestamp": "2024-01-01T12:00:00"
+            "timestamp": "2024-01-01T12:00:00",
         },
         "test_model_info": {
             "name": "xgboost_v1",
             "version": "1.0.0",
             "accuracy": 0.85,
-            "last_trained": "2024-01-01T00:00:00"
-        }
+            "last_trained": "2024-01-01T00:00:00",
+        },
     }
