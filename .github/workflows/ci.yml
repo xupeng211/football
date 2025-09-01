@@ -76,6 +76,7 @@ jobs:
         run: |
           uv sync --frozen --extra dev
           uv pip install -e .
+          uv pip install bcrypt PyJWT
       
       - name: Run ${{ matrix.check }}
         run: uv run make ${{ matrix.check }}
@@ -144,10 +145,10 @@ jobs:
           uv sync --frozen --extra dev
           uv pip install -e .
       
-      - name: Install additional async test dependencies
+      - name: Install additional test dependencies
         if: matrix.test-type == 'e2e' || matrix.test-type == 'integration'
         run: |
-          uv pip install httpx[http2] asgi-lifespan pytest-asyncio
+          uv pip install httpx[http2] asgi-lifespan pytest-asyncio bcrypt PyJWT
       
       - name: Run ${{ matrix.test-type }} tests
         env:
@@ -222,6 +223,7 @@ jobs:
         run: |
           uv sync --frozen --extra dev
           uv pip install -e .
+          uv pip install bcrypt PyJWT
       
       - name: Validate async test architecture
         run: |
