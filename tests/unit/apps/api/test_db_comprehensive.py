@@ -5,8 +5,9 @@ from unittest.mock import patch
 
 import pytest
 from apps.api import db
-from football_predict_system.api.db import _is_testing, check_db_connection, init_db
 from sqlalchemy.exc import SQLAlchemyError
+
+from football_predict_system.api.db import _is_testing, check_db_connection, init_db
 
 
 @patch("apps.api.db.load_dotenv", lambda: None)

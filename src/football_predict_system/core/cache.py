@@ -98,7 +98,7 @@ class CacheManager:
             if cached_data is not None:
                 try:
                     # Use JSON for safer deserialization
-                    value = json.loads(cached_data.decode('utf-8'))
+                    value = json.loads(cached_data.decode("utf-8"))
 
                     # Store in memory cache for faster access
                     if len(self._memory_cache) < self._max_memory_items:
@@ -144,7 +144,7 @@ class CacheManager:
             # Store in Redis using JSON serialization
             redis_client = await self.get_redis_client()
             try:
-                serialized_value = json.dumps(value, default=str).encode('utf-8')
+                serialized_value = json.dumps(value, default=str).encode("utf-8")
             except (TypeError, ValueError) as e:
                 self.logger.warning("Failed to serialize value with JSON", error=str(e))
                 return False

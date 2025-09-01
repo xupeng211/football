@@ -5,10 +5,10 @@ Tests for the predictions API router.
 from unittest.mock import MagicMock, patch
 
 import pytest
-from football_predict_system.api.main import app
-from football_predict_system.api.services.prediction_service import prediction_service
 from fastapi.testclient import TestClient
 
+from football_predict_system.api.main import app
+from football_predict_system.api.services.prediction_service import prediction_service
 from tests.factories import sample_match, sample_matches, sample_prediction
 
 

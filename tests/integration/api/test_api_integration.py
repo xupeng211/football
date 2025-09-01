@@ -6,8 +6,9 @@ API集成测试
 from unittest.mock import patch
 
 import pytest
-from football_predict_system.api.main import app
 from fastapi.testclient import TestClient
+
+from football_predict_system.api.main import app
 
 
 class TestAPIIntegration:

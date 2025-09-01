@@ -56,6 +56,7 @@ def test_api_module_import():
     try:
         # 测试核心模块导入
         from football_predict_system.core.config import get_settings
+
         settings = get_settings()
 
         # 验证配置可以获取

@@ -198,7 +198,9 @@ class AISecurityGuard:
 
         return issues
 
-    def _check_dangerous_calls(self, tree: ast.AST, file_path: str) -> list[SecurityIssue]:
+    def _check_dangerous_calls(
+        self, tree: ast.AST, file_path: str
+    ) -> list[SecurityIssue]:
         """检查危险函数调用"""
         issues = []
         for node in ast.walk(tree):
@@ -217,7 +219,9 @@ class AISecurityGuard:
                     issues.append(issue)
         return issues
 
-    def _check_hardcoded_secrets(self, tree: ast.AST, file_path: str) -> list[SecurityIssue]:
+    def _check_hardcoded_secrets(
+        self, tree: ast.AST, file_path: str
+    ) -> list[SecurityIssue]:
         """检查硬编码密钥"""
         issues = []
         for node in ast.walk(tree):
@@ -231,13 +235,17 @@ class AISecurityGuard:
 
     def _is_secret_assignment(self, target: ast.expr, node: ast.Assign) -> bool:
         """检查是否为密钥赋值"""
-        return (isinstance(target, ast.Name)
-                and "secret" in target.id.lower()
-                and isinstance(node.value, ast.Constant)
-                and isinstance(node.value.value, str)
-                and len(node.value.value) < 32)
+        return (
+            isinstance(target, ast.Name)
+            and "secret" in target.id.lower()
+            and isinstance(node.value, ast.Constant)
+            and isinstance(node.value.value, str)
+            and len(node.value.value) < 32
+        )
 
-    def _create_weak_key_issue(self, target: ast.Name, node: ast.Assign, file_path: str) -> SecurityIssue | None:
+    def _create_weak_key_issue(
+        self, target: ast.Name, node: ast.Assign, file_path: str
+    ) -> SecurityIssue | None:
         """创建弱密钥问题"""
         if not isinstance(node.value, ast.Constant):
             return None

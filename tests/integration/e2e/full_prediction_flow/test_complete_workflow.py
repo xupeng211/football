@@ -5,8 +5,9 @@ End-to-end test for the complete user workflow.
 from unittest.mock import patch
 
 import pytest
-from football_predict_system.api.main import app
 from fastapi.testclient import TestClient
+
+from football_predict_system.api.main import app
 
 
 class TestCompleteUserWorkflow:

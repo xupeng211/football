@@ -13,8 +13,9 @@ from unittest.mock import patch
 
 import httpx
 import pytest
-from football_predict_system.api.main import app
 from fastapi.testclient import TestClient
+
+from football_predict_system.api.main import app
 
 
 class APIPerformanceBenchmarks:

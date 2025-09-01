@@ -5,9 +5,10 @@ Unit tests for the prediction API endpoints.
 from unittest.mock import patch
 
 import pytest
+from fastapi.testclient import TestClient
+
 from football_predict_system.api.main import app
 from football_predict_system.api.services.prediction_service import prediction_service
-from fastapi.testclient import TestClient
 
 
 @pytest.fixture

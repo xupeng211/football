@@ -58,7 +58,7 @@ class APIConfig(BaseModel):
 
     host: str = Field(
         default="127.0.0.1",
-        description="Host to bind to. Use 0.0.0.0 only in production"
+        description="Host to bind to. Use 0.0.0.0 only in production",
     )
     port: int = 8000
     workers: int = 4

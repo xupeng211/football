@@ -3,8 +3,12 @@
 from unittest.mock import AsyncMock, patch
 
 import pytest
-from football_predict_system.api.prefect import check_prefect_connection, check_prefect_connection_async
 from prefect.exceptions import PrefectException
+
+from football_predict_system.api.prefect import (
+    check_prefect_connection,
+    check_prefect_connection_async,
+)
 
 
 @pytest.mark.asyncio

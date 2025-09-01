@@ -159,7 +159,10 @@ class TestPrometheusMetrics:
 
     def test_custom_registry_exists(self) -> None:
         """Test custom registry is properly configured."""
-        from football_predict_system.api.routers.metrics import generate_latest, registry
+        from football_predict_system.api.routers.metrics import (
+            generate_latest,
+            registry,
+        )
 
         output = generate_latest(registry).decode("utf-8")
         assert "http_requests_total" in output
