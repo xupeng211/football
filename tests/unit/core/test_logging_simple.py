@@ -1,4 +1,5 @@
 """Simple comprehensive unit tests for logging module to boost coverage."""
+
 from unittest.mock import MagicMock, patch
 
 from football_predict_system.core.logging import (
@@ -36,7 +37,7 @@ class TestCorrelationIDProcessor:
         assert "event" in result
         assert result["event"] == "Test event"
 
-    @patch('football_predict_system.core.logging.correlation_id_var')
+    @patch("football_predict_system.core.logging.correlation_id_var")
     def test_call_with_correlation_id(self, mock_correlation_var):
         """Test __call__ with correlation ID set."""
         processor = CorrelationIDProcessor()
@@ -53,7 +54,7 @@ class TestCorrelationIDProcessor:
         assert "correlation_id" in result
         assert result["correlation_id"] == "test-correlation-123"
 
-    @patch('football_predict_system.core.logging.user_id_var')
+    @patch("football_predict_system.core.logging.user_id_var")
     def test_call_with_user_id(self, mock_user_var):
         """Test __call__ with user ID set."""
         processor = CorrelationIDProcessor()
@@ -126,12 +127,10 @@ class TestErrorProcessor:
             raise ValueError("Test error")
         except ValueError:
             import sys
+
             exc_info = sys.exc_info()
 
-        event_dict = {
-            "event": "Error occurred",
-            "exc_info": exc_info
-        }
+        event_dict = {"event": "Error occurred", "exc_info": exc_info}
 
         result = processor(logger, "error", event_dict)
 
@@ -153,11 +152,7 @@ class TestCustomJSONRenderer:
         renderer = CustomJSONRenderer()
         logger = MagicMock()
 
-        event_dict = {
-            "event": "Test event",
-            "level": "info",
-            "data": {"key": "value"}
-        }
+        event_dict = {"event": "Test event", "level": "info", "data": {"key": "value"}}
 
         result = renderer(logger, "info", event_dict)
 
@@ -166,6 +161,7 @@ class TestCustomJSONRenderer:
 
         # Should be valid JSON
         import json
+
         parsed = json.loads(result)
         assert "event" in parsed
         assert parsed["event"] == "Test event"
@@ -179,7 +175,7 @@ class TestCustomJSONRenderer:
             "event": "Complex event",
             "nested": {"a": 1, "b": [1, 2, 3]},
             "number": 42,
-            "boolean": True
+            "boolean": True,
         }
 
         result = renderer(logger, "info", event_dict)
@@ -188,6 +184,7 @@ class TestCustomJSONRenderer:
         assert isinstance(result, str)
 
         import json
+
         parsed = json.loads(result)
         assert parsed["nested"]["a"] == 1
         assert parsed["nested"]["b"] == [1, 2, 3]
@@ -198,7 +195,7 @@ class TestCustomJSONRenderer:
 class TestLoggingFunctions:
     """Test logging utility functions."""
 
-    @patch('football_predict_system.core.logging.get_settings')
+    @patch("football_predict_system.core.logging.get_settings")
     def test_setup_logging(self, mock_get_settings):
         """Test logging setup."""
         # Mock settings
@@ -210,7 +207,7 @@ class TestLoggingFunctions:
         mock_get_settings.return_value = mock_settings
 
         # Should not raise exception
-        with patch('structlog.configure'):
+        with patch("structlog.configure"):
             setup_logging()
 
     def test_get_logger_basic(self):
@@ -218,10 +215,10 @@ class TestLoggingFunctions:
         logger = get_logger("test.module")
 
         assert logger is not None
-        assert hasattr(logger, 'info')
-        assert hasattr(logger, 'error')
-        assert hasattr(logger, 'warning')
-        assert hasattr(logger, 'debug')
+        assert hasattr(logger, "info")
+        assert hasattr(logger, "error")
+        assert hasattr(logger, "warning")
+        assert hasattr(logger, "debug")
 
     def test_get_logger_with_name(self):
         """Test getting logger with specific name."""
@@ -230,14 +227,14 @@ class TestLoggingFunctions:
         # Should return structlog logger
         assert logger is not None
         # Structlog loggers have bind method
-        assert hasattr(logger, 'bind')
+        assert hasattr(logger, "bind")
 
     def test_get_logger_default_name(self):
         """Test getting logger with default name."""
         logger = get_logger()
 
         assert logger is not None
-        assert hasattr(logger, 'info')
+        assert hasattr(logger, "info")
 
     def test_set_correlation_id(self):
         """Test setting correlation ID."""
@@ -274,7 +271,7 @@ class TestLoggingFunctions:
 class TestLoggingIntegration:
     """Integration tests for logging functionality."""
 
-    @patch('football_predict_system.core.logging.get_settings')
+    @patch("football_predict_system.core.logging.get_settings")
     def test_full_logging_workflow(self, mock_get_settings):
         """Test complete logging workflow."""
         # Setup mock settings
@@ -286,7 +283,7 @@ class TestLoggingIntegration:
         mock_get_settings.return_value = mock_settings
 
         # Test full workflow
-        with patch('structlog.configure'):
+        with patch("structlog.configure"):
             # Setup logging
             setup_logging()
 
@@ -315,7 +312,7 @@ class TestLoggingIntegration:
         bound_logger = logger.bind(user_id=123, action="test")
 
         assert bound_logger is not None
-        assert hasattr(bound_logger, 'info')
+        assert hasattr(bound_logger, "info")
 
         # Test logging with bound context
         bound_logger.info("Bound log message", result="success")
@@ -339,6 +336,7 @@ class TestLoggingIntegration:
 
         # Should produce valid JSON
         import json
+
         parsed = json.loads(final_result)
         assert "event" in parsed
         assert parsed["event"] == "Chain test"

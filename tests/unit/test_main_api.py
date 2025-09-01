@@ -1,4 +1,5 @@
 """Comprehensive tests for main.py FastAPI application to boost coverage."""
+
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -69,7 +70,7 @@ class TestMainApp:
         # Should have CORS headers for preflight
         assert response.status_code in [200, 405]
 
-    @patch('football_predict_system.main.get_database_manager')
+    @patch("football_predict_system.main.get_database_manager")
     def test_database_startup(self, mock_get_db, client):
         """Test database initialization on startup."""
         mock_db = AsyncMock()
@@ -79,7 +80,7 @@ class TestMainApp:
         response = client.get("/health")
         assert response.status_code == 200
 
-    @patch('football_predict_system.main.get_cache_manager')
+    @patch("football_predict_system.main.get_cache_manager")
     def test_cache_startup(self, mock_get_cache, client):
         """Test cache initialization on startup."""
         mock_cache = AsyncMock()
@@ -114,10 +115,7 @@ class TestAPIV1Endpoints:
             "home_team": "Arsenal",
             "away_team": "Chelsea",
             "match_date": "2024-01-01",
-            "features": {
-                "home_goals_avg": 1.5,
-                "away_goals_avg": 1.2
-            }
+            "features": {"home_goals_avg": 1.5, "away_goals_avg": 1.2},
         }
 
         response = client.post("/api/v1/predict", json=test_data)
@@ -171,7 +169,7 @@ class TestMiddleware:
             "x-content-type-options",
             "x-frame-options",
             "x-xss-protection",
-            "strict-transport-security"
+            "strict-transport-security",
         ]
 
         # At least verify response has headers
@@ -183,7 +181,7 @@ class TestMiddleware:
         headers = {
             "Origin": "http://localhost:3000",
             "Access-Control-Request-Method": "GET",
-            "Access-Control-Request-Headers": "Content-Type"
+            "Access-Control-Request-Headers": "Content-Type",
         }
 
         response = client.options("/health", headers=headers)
@@ -225,8 +223,8 @@ class TestErrorHandling:
 class TestApplicationLifecycle:
     """Test application startup and shutdown events."""
 
-    @patch('football_predict_system.main.get_database_manager')
-    @patch('football_predict_system.main.get_cache_manager')
+    @patch("football_predict_system.main.get_database_manager")
+    @patch("football_predict_system.main.get_cache_manager")
     def test_startup_events(self, mock_cache, mock_db):
         """Test startup event handling."""
         mock_db.return_value = AsyncMock()
@@ -243,7 +241,7 @@ class TestApplicationLifecycle:
         """Test app configuration and settings."""
         # Verify app is configured correctly
         assert app.title == "Football Prediction System"
-        assert hasattr(app, 'routes')
+        assert hasattr(app, "routes")
         assert len(app.routes) > 0
 
     def test_dependency_injection(self, client=None):
@@ -295,14 +293,11 @@ class TestFullAPIIntegration:
         # All requests should succeed
         assert all(status == 200 for status in results)
 
-    @patch('football_predict_system.main.get_database_manager')
+    @patch("football_predict_system.main.get_database_manager")
     def test_database_connection_handling(self, mock_get_db, client):
         """Test database connection in real scenario."""
         mock_db = AsyncMock()
-        mock_db.health_check.return_value = {
-            "status": "healthy",
-            "connection": True
-        }
+        mock_db.health_check.return_value = {"status": "healthy", "connection": True}
         mock_get_db.return_value = mock_db
 
         response = client.get("/health")
