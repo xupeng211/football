@@ -26,6 +26,9 @@ help: ## 📚 显示帮助信息
 	@echo "$(YELLOW)🔧 开发工具:$(NC)"
 	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z_-]+:.*?## 🔧/ { printf "  $(GREEN)%-15s$(NC) %s\n", $$1, substr($$2, 5) }' $(MAKEFILE_LIST)
 	@echo ""
+	@echo "$(YELLOW)🤖 AI工具:$(NC)"
+	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z_-]+:.*?## 🤖/ { printf "  $(GREEN)%-15s$(NC) %s\n", $$1, substr($$2, 5) }' $(MAKEFILE_LIST)
+	@echo ""
 	@echo "$(YELLOW)🧪 测试相关:$(NC)"
 	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z_-]+:.*?## 🧪/ { printf "  $(GREEN)%-15s$(NC) %s\n", $$1, substr($$2, 5) }' $(MAKEFILE_LIST)
 	@echo ""
@@ -33,10 +36,10 @@ help: ## 📚 显示帮助信息
 	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z_-]+:.*?## 🐳/ { printf "  $(GREEN)%-15s$(NC) %s\n", $$1, substr($$2, 5) }' $(MAKEFILE_LIST)
 	@echo ""
 	@echo "$(BLUE)💡 推荐工作流:$(NC)"
-	@echo "  1. $(GREEN)make install$(NC)    # 安装依赖"
-	@echo "  2. $(GREEN)make dev$(NC)        # 启动开发服务器"
-	@echo "  3. $(GREEN)make ci$(NC)         # 运行所有检查"
-	@echo "  4. $(GREEN)make test$(NC)       # 运行测试"
+	@echo "  1. $(GREEN)make ai-setup$(NC)   # AI友好环境设置"
+	@echo "  2. $(GREEN)make install$(NC)    # 安装依赖"
+	@echo "  3. $(GREEN)make dev$(NC)        # 启动开发服务器"
+	@echo "  4. $(GREEN)make ci$(NC)         # 运行所有检查"
 
 # === 环境管理 ===
 install: ## 📦 安装所有依赖
@@ -116,6 +119,30 @@ doctor: ## 🔧 环境健康检查
 	@echo "依赖状态:"
 	@uv pip list 2>/dev/null | head -10 || echo "需要先运行 make install"
 	@echo "$(GREEN)✅ 环境检查完成$(NC)"
+
+ai-check: ## 🤖 AI工具专用环境检查
+	@echo "$(CYAN)🤖 AI工具环境检查...$(NC)"
+	python3 scripts/ai_health_check.py
+
+fix-permissions: ## 🤖 修复虚拟环境权限问题
+	@echo "$(BLUE)🔧 修复权限问题...$(NC)"
+	@find .venv -name "*.pyi" -exec chmod 644 {} \; 2>/dev/null || true
+	@find .venv -type d -exec chmod 755 {} \; 2>/dev/null || true
+	@echo "$(GREEN)✅ 权限修复完成$(NC)"
+
+ai-setup: ai-check fix-permissions setup-hooks ## 🤖 为AI工具优化项目设置
+	@echo "$(CYAN)🤖 优化项目为AI友好模式...$(NC)"
+	@echo "📊 项目状态检查完成"
+	@echo "🔧 权限问题已修复"
+	@echo "🪝 Git hooks已配置"
+	@git status --porcelain >/dev/null 2>&1 && echo "📁 Git仓库状态: 正常" || echo "📁 非Git项目或有未提交更改"
+	@echo "$(GREEN)🎉 项目已优化为AI友好模式!$(NC)"
+	@echo "💡 建议: 运行 'make help' 查看可用命令"
+
+setup-hooks: ## 🤖 设置Git hooks自动检查
+	@echo "$(BLUE)🪝 设置Git hooks...$(NC)"
+	@git config core.hooksPath .githooks 2>/dev/null && echo "✅ Git hooks已启用" || echo "⚠️ 非Git项目，跳过hooks设置"
+	@echo "$(GREEN)✅ Git hooks配置完成$(NC)"
 
 # === 容器相关 ===
 build: ## 🐳 构建Docker镜像

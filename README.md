@@ -58,12 +58,24 @@ football-predict-system-v3/
 
 | 命令 | 功能 | 说明 |
 |------|------|------|
+| `make ai-setup` | 🤖 AI优化设置 | 一键配置AI友好环境 |
+| `make ai-check` | 🤖 AI环境检查 | 快速诊断项目状态 |
 | `make install` | 📦 安装依赖 | 使用 uv 快速安装 |
 | `make dev` | 🔧 启动开发服务器 | 热重载开发模式 |
 | `make ci` | 🚀 运行所有检查 | 格式化+检查+测试 |
 | `make test` | 🧪 运行测试 | 单元+集成测试 |
 | `make build` | 🐳 构建镜像 | Docker 镜像构建 |
 | `make clean` | 🧹 清理缓存 | 清理临时文件 |
+
+### 🤖 AI编程支持
+
+本项目专门为AI编程工具优化，提供：
+
+- **智能环境检测** - `make ai-check` 快速了解项目状态
+- **一键优化设置** - `make ai-setup` 配置AI友好环境  
+- **VS Code增强** - 智能补全、自动导入、类型检查
+- **状态文件输出** - AI可读的JSON格式项目状态
+- **专用使用指南** - 查看 [AI工具指南](docs/AI_TOOLS_GUIDE.md)
 
 ## 📊 性能提升
 

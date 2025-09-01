@@ -5,7 +5,9 @@
       "label": "🤖 AI: 激活虚拟环境",
       "type": "shell",
       "command": "source",
-      "args": ["scripts/activate-venv.sh"],
+      "args": [
+        "scripts/activate-venv.sh"
+      ],
       "group": "build",
       "presentation": {
         "echo": true,
@@ -21,8 +23,26 @@
       "label": "🤖 AI: 检查环境",
       "type": "shell",
       "command": "make",
-      "args": ["check-venv"],
+      "args": [
+        "ai-check"
+      ],
       "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🤖 AI: 优化项目设置",
+      "type": "shell",
+      "command": "make",
+      "args": [
+        "ai-setup"
+      ],
+      "group": "build",
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -35,7 +55,9 @@
       "label": "🤖 AI: 完整CI检查",
       "type": "shell",
       "command": "make",
-      "args": ["ci"],
+      "args": [
+        "ci"
+      ],
       "group": "test",
       "presentation": {
         "echo": true,
@@ -43,7 +65,10 @@
         "focus": false,
         "panel": "shared"
       },
-      "problemMatcher": ["$ruff", "$mypy"]
+      "problemMatcher": [
+        "$ruff",
+        "$mypy"
+      ]
     }
   ]
 }

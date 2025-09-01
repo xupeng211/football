@@ -1,0 +1,56 @@
+{
+    "folders": [
+        {
+            "path": ".."
+        }
+    ],
+    "settings": {
+        "python.defaultInterpreterPath": "./.venv/bin/python",
+        "python.terminal.activateEnvironment": true,
+        "terminal.integrated.env.linux": {
+            "VIRTUAL_ENV_PROMPT": "🤖 AI-DEV"
+        },
+        "python.analysis.autoImportCompletions": true,
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "explicit",
+            "source.fixAll.ruff": "explicit"
+        }
+    },
+    "extensions": {
+        "recommendations": [
+            "ms-python.python",
+            "ms-python.vscode-pylance",
+            "charliermarsh.ruff",
+            "ms-python.mypy-type-checker",
+            "ms-vscode.vscode-json",
+            "github.copilot",
+            "github.copilot-chat",
+            "ms-vscode.makefile-tools"
+        ]
+    },
+    "tasks": {
+        "version": "2.0.0",
+        "tasks": [
+            {
+                "label": "🚀 AI: 初始化项目",
+                "type": "shell",
+                "command": "make",
+                "args": [
+                    "ai-setup"
+                ],
+                "group": "build",
+                "presentation": {
+                    "echo": true,
+                    "reveal": "always",
+                    "focus": false,
+                    "panel": "new",
+                    "showReuseMessage": false
+                },
+                "runOptions": {
+                    "runOn": "folderOpen"
+                }
+            }
+        ]
+    }
+}
