@@ -77,7 +77,7 @@ class TestBacktestEngine:
 
         # 计算准确率
         correct_predictions = sum(
-            1 for p, a in zip(predictions, actual_results) if p == a
+            1 for p, a in zip(predictions, actual_results, strict=False) if p == a
         )
         accuracy = correct_predictions / len(predictions)
 
@@ -134,9 +134,9 @@ class TestBacktestEngine:
         max_drawdown = np.min(drawdown)
 
         # 验证计算结果
-        assert isinstance(mean_return, (int, float))
+        assert isinstance(mean_return, int | float)
         assert volatility >= 0
-        assert isinstance(sharpe_ratio, (int, float))
+        assert isinstance(sharpe_ratio, int | float)
         assert max_drawdown <= 0
 
 

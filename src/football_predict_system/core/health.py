@@ -12,7 +12,7 @@ import asyncio
 import time
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import psutil
 from pydantic import BaseModel
@@ -39,16 +39,16 @@ class ComponentHealth(BaseModel):
     name: str
     status: HealthStatus
     response_time: float
-    details: Dict[str, Any] = {}
+    details: dict[str, Any] = {}
     last_check: datetime
-    error: Optional[str] = None
+    error: str | None = None
 
 
 class SystemHealth(BaseModel):
     """Overall system health status."""
 
     status: HealthStatus
-    components: List[ComponentHealth]
+    components: list[ComponentHealth]
     timestamp: datetime
     uptime: float
     version: str
@@ -61,7 +61,7 @@ class HealthChecker:
         self.settings = get_settings()
         self.logger = get_logger(__name__)
         self.start_time = time.time()
-        self._health_cache: Dict[str, ComponentHealth] = {}
+        self._health_cache: dict[str, ComponentHealth] = {}
         self._cache_ttl = 30  # Cache health results for 30 seconds
 
     async def check_database_health(self) -> ComponentHealth:
@@ -406,7 +406,7 @@ class HealthChecker:
             version=self.settings.app_version,
         )
 
-    async def _check_all_components(self) -> List[ComponentHealth]:
+    async def _check_all_components(self) -> list[ComponentHealth]:
         """Check all system components."""
         tasks = [
             self.check_database_health(),
@@ -433,7 +433,7 @@ class HealthChecker:
 
 
 # Global health checker instance
-_health_checker: Optional[HealthChecker] = None
+_health_checker: HealthChecker | None = None
 
 
 def get_health_checker() -> HealthChecker:

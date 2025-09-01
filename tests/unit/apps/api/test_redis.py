@@ -1,10 +1,9 @@
 from unittest.mock import AsyncMock, patch
 
-import pytest
-from redis.asyncio.exceptions import ConnectionError as AsyncConnectionError
-
 # The module to be tested
 import apps.api.redis
+import pytest
+from redis.asyncio.exceptions import ConnectionError as AsyncConnectionError
 
 # Mark all tests in this module as asyncio
 pytestmark = pytest.mark.asyncio

@@ -2,7 +2,6 @@ from datetime import datetime
 from unittest.mock import MagicMock, patch
 
 import psycopg2
-
 from data_pipeline.sources.football_api import Match
 from data_pipeline.sources.ingest_matches import (
     _get_result,

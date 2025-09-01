@@ -11,9 +11,10 @@ This module provides:
 import asyncio
 import pickle
 import time
+from collections.abc import Callable
 from datetime import datetime, timedelta
 from functools import wraps
-from typing import Any, Callable, Dict, List, Optional, Set, cast
+from typing import Any, cast
 
 import redis.asyncio as redis
 from pydantic import BaseModel
@@ -46,8 +47,8 @@ class CacheManager:
     def __init__(self) -> None:
         self.settings = get_settings()
         self.logger = get_logger(__name__)
-        self._redis_client: Optional[redis.Redis] = None
-        self._memory_cache: Dict[str, Dict[str, Any]] = {}
+        self._redis_client: redis.Redis | None = None
+        self._memory_cache: dict[str, dict[str, Any]] = {}
         self._stats = CacheStats()
         self._max_memory_items = 1000
         self._default_ttl = 3600  # 1 hour
@@ -68,13 +69,13 @@ class CacheManager:
         """Generate cache key with namespace."""
         return f"{self.settings.app_name}:{namespace}:{key}"
 
-    def _is_expired(self, cache_entry: Dict[str, Any]) -> bool:
+    def _is_expired(self, cache_entry: dict[str, Any]) -> bool:
         """Check if cache entry is expired."""
         if "expires_at" not in cache_entry:
             return False
         return bool(datetime.now() > cache_entry["expires_at"])
 
-    async def get(self, key: str, namespace: str = "default") -> Optional[Any]:
+    async def get(self, key: str, namespace: str = "default") -> Any | None:
         """Get value from cache (memory first, then Redis)."""
         cache_key = self._generate_key(namespace, key)
 
@@ -131,7 +132,7 @@ class CacheManager:
         self,
         key: str,
         value: Any,
-        ttl: Optional[int] = None,
+        ttl: int | None = None,
         namespace: str = "default",
     ) -> bool:
         """Set value in cache."""
@@ -260,7 +261,7 @@ class CacheManager:
         self._memory_cache.clear()
         self.logger.info("Memory cache cleared")
 
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """Perform cache health check."""
         try:
             redis_client = await self.get_redis_client()
@@ -302,7 +303,7 @@ class CacheManager:
 
 
 # Global cache manager instance
-_cache_manager: Optional[CacheManager] = None
+_cache_manager: CacheManager | None = None
 
 
 async def get_cache_manager() -> CacheManager:
@@ -316,7 +317,7 @@ async def get_cache_manager() -> CacheManager:
 def cached(
     ttl: int = 3600,
     namespace: str = "default",
-    key_func: Optional[Callable] = None,
+    key_func: Callable | None = None,
 ) -> Callable:
     """Decorator for caching function results."""
 
@@ -373,7 +374,7 @@ class CacheInvalidator:
     def __init__(self, cache_manager: CacheManager):
         self.cache_manager = cache_manager
         self.logger = get_logger(__name__)
-        self._background_tasks: Set[asyncio.Task] = set()
+        self._background_tasks: set[asyncio.Task] = set()
 
     async def invalidate_by_pattern(
         self, pattern: str, namespace: str = "default"
@@ -404,7 +405,7 @@ class CacheInvalidator:
             return 0
 
     async def invalidate_by_tags(
-        self, tags: List[str], namespace: str = "default"
+        self, tags: list[str], namespace: str = "default"
     ) -> int:
         """Invalidate cache entries by tags."""
         total_deleted = 0
@@ -441,7 +442,7 @@ class CacheWarmer:
         self.cache_manager = cache_manager
         self.logger = get_logger(__name__)
 
-    async def warm_predictions(self, match_ids: List[str]) -> None:
+    async def warm_predictions(self, match_ids: list[str]) -> None:
         """Pre-warm prediction cache for upcoming matches."""
         self.logger.info(
             "Starting prediction cache warming", match_count=len(match_ids)
@@ -481,7 +482,7 @@ class CacheWarmer:
         try:
             # This would integrate with your model registry
             # Placeholder implementation
-            models_data: Dict[str, Any] = {
+            models_data: dict[str, Any] = {
                 "available_models": [],
                 "default_model": None,
             }

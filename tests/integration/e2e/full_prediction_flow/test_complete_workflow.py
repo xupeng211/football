@@ -5,9 +5,8 @@ End-to-end test for the complete user workflow.
 from unittest.mock import patch
 
 import pytest
-from fastapi.testclient import TestClient
-
 from apps.api.main import app
+from fastapi.testclient import TestClient
 
 
 class TestCompleteUserWorkflow:

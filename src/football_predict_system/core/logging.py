@@ -15,9 +15,10 @@ import logging.handlers
 import sys
 import time
 import traceback
+from collections.abc import Callable
 from contextvars import ContextVar
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, cast
+from typing import Any, cast
 from uuid import uuid4
 
 import structlog
@@ -26,11 +27,9 @@ from structlog.types import FilteringBoundLogger
 from .config import get_settings
 
 # Context variables for request tracking
-correlation_id_var: ContextVar[Optional[str]] = ContextVar(
-    "correlation_id", default=None
-)
-user_id_var: ContextVar[Optional[str]] = ContextVar("user_id", default=None)
-request_id_var: ContextVar[Optional[str]] = ContextVar("request_id", default=None)
+correlation_id_var: ContextVar[str | None] = ContextVar("correlation_id", default=None)
+user_id_var: ContextVar[str | None] = ContextVar("user_id", default=None)
+request_id_var: ContextVar[str | None] = ContextVar("request_id", default=None)
 
 
 class CorrelationIDProcessor:
@@ -40,8 +39,8 @@ class CorrelationIDProcessor:
         self,
         logger: FilteringBoundLogger,
         method_name: str,
-        event_dict: Dict[str, Any],
-    ) -> Dict[str, Any]:
+        event_dict: dict[str, Any],
+    ) -> dict[str, Any]:
         correlation_id = correlation_id_var.get()
         if correlation_id:
             event_dict["correlation_id"] = correlation_id
@@ -64,8 +63,8 @@ class PerformanceProcessor:
         self,
         logger: FilteringBoundLogger,
         method_name: str,
-        event_dict: Dict[str, Any],
-    ) -> Dict[str, Any]:
+        event_dict: dict[str, Any],
+    ) -> dict[str, Any]:
         # Add timestamp
         event_dict["timestamp"] = time.time()
 
@@ -86,8 +85,8 @@ class ErrorProcessor:
         self,
         logger: FilteringBoundLogger,
         method_name: str,
-        event_dict: Dict[str, Any],
-    ) -> Dict[str, Any]:
+        event_dict: dict[str, Any],
+    ) -> dict[str, Any]:
         if method_name in ("error", "exception", "critical"):
             # Add error details
             if "error" in event_dict:
@@ -116,7 +115,7 @@ class CustomJSONRenderer:
         self,
         logger: FilteringBoundLogger,
         method_name: str,
-        event_dict: Dict[str, Any],
+        event_dict: dict[str, Any],
     ) -> str:
         # Ensure required fields
         if "timestamp" not in event_dict:
@@ -144,7 +143,7 @@ def setup_logging() -> None:
     logging.root.handlers.clear()
 
     # Configure structlog
-    processors: List = [
+    processors: list = [
         structlog.contextvars.merge_contextvars,
         CorrelationIDProcessor(),
         PerformanceProcessor(),
@@ -213,12 +212,12 @@ def setup_logging() -> None:
     logging.getLogger("sqlalchemy.engine").setLevel(logging.WARNING)
 
 
-def get_logger(name: Optional[str] = None) -> FilteringBoundLogger:
+def get_logger(name: str | None = None) -> FilteringBoundLogger:
     """Get a structured logger instance."""
     return cast(FilteringBoundLogger, structlog.get_logger(name))
 
 
-def set_correlation_id(correlation_id: Optional[str] = None) -> str:
+def set_correlation_id(correlation_id: str | None = None) -> str:
     """Set correlation ID for request tracking."""
     if correlation_id is None:
         correlation_id = str(uuid4())
@@ -232,7 +231,7 @@ def set_user_id(user_id: str) -> None:
     user_id_var.set(user_id)
 
 
-def set_request_id(request_id: Optional[str] = None) -> str:
+def set_request_id(request_id: str | None = None) -> str:
     """Set request ID for request tracking."""
     if request_id is None:
         request_id = str(uuid4())
@@ -256,7 +255,7 @@ class LoggingMiddleware:
         self.logger = get_logger(__name__)
 
     async def __call__(
-        self, scope: Dict[str, Any], receive: Callable, send: Callable
+        self, scope: dict[str, Any], receive: Callable, send: Callable
     ) -> None:
         if scope["type"] != "http":
             await self.app(scope, receive, send)

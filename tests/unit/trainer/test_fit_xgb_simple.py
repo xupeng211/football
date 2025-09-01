@@ -7,7 +7,6 @@ from unittest.mock import Mock, patch
 
 import numpy as np
 import pandas as pd
-
 from trainer.fit_xgb import evaluate_model, save_model_and_metrics, train_xgboost_model
 
 

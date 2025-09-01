@@ -2,10 +2,10 @@
 FastAPI预测接口测试
 """
 
-from fastapi.testclient import TestClient
-
 from apps.api.main import app
 from apps.api.services.prediction_service import prediction_service
+from fastapi.testclient import TestClient
+
 from models.predictor import Predictor
 
 # 确保预测服务在测试中被正确初始化
@@ -121,9 +121,8 @@ def test_root_endpoint():
 
 
 def test_predict_422():
-    from fastapi.testclient import TestClient
-
     from apps.api.main import app
+    from fastapi.testclient import TestClient
 
     # Send invalid data (empty match object)
     r = TestClient(app).post("/api/v1/predict/batch", json={"matches": [{}]})

@@ -4,7 +4,6 @@
 
 import pandas as pd
 import pytest
-
 from data_pipeline.features.rolling import add_form
 
 

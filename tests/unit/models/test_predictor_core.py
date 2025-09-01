@@ -127,7 +127,7 @@ class TestErrorHandling:
                 if model is None:
                     raise ValueError("Model not loaded")
 
-                if not isinstance(features, (list, np.ndarray)):
+                if not isinstance(features, list | np.ndarray):
                     raise TypeError("Features must be list or array")
 
                 if len(features) == 0:

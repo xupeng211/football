@@ -8,7 +8,6 @@ import numpy as np
 import pandas as pd
 import pytest
 import xgboost as xgb
-
 from trainer.fit_xgb import (
     evaluate_model,
     load_data_from_db,

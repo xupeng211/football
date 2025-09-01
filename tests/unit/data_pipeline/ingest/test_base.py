@@ -1,6 +1,5 @@
 import pandas as pd
 import pytest
-
 from data_pipeline.ingest.base import (
     DataSource,
     DataSourceError,

@@ -32,9 +32,8 @@ def client(mock_dependencies):
         return TestClient(app)
     except ImportError:
         # 如果导入失败,创建一个简单的FastAPI应用进行测试
-        from fastapi import FastAPI
-
         from apps.api.routers.health import router as health_router
+        from fastapi import FastAPI
 
         test_app = FastAPI()
         test_app.include_router(health_router)

@@ -5,10 +5,10 @@ Tests for the predictions API router.
 from unittest.mock import MagicMock, patch
 
 import pytest
-from fastapi.testclient import TestClient
-
 from apps.api.main import app
 from apps.api.services.prediction_service import prediction_service
+from fastapi.testclient import TestClient
+
 from tests.factories import sample_match, sample_matches, sample_prediction
 
 

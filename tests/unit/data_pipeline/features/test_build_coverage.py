@@ -5,7 +5,6 @@
 import numpy as np
 import pandas as pd
 import pytest
-
 from data_pipeline.features.build import (
     add_basic_features,
     add_head_to_head_features,

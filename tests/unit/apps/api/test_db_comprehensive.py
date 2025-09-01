@@ -4,10 +4,9 @@ import sys
 from unittest.mock import patch
 
 import pytest
-from sqlalchemy.exc import SQLAlchemyError
-
 from apps.api import db
 from apps.api.db import _is_testing, check_db_connection, init_db
+from sqlalchemy.exc import SQLAlchemyError
 
 
 @patch("apps.api.db.load_dotenv", lambda: None)

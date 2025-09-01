@@ -10,7 +10,6 @@ from pathlib import Path
 from typing import Any, cast
 
 import structlog
-
 from apps.api.core.settings import settings
 
 logger = structlog.get_logger()

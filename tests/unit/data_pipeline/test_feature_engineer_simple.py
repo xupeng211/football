@@ -5,7 +5,6 @@
 import unittest
 
 import pandas as pd
-
 from data_pipeline.transforms.feature_engineer import (
     aggregate_odds,
     calculate_implied_probabilities,

@@ -53,7 +53,7 @@ class TestOddsFetcher:
 
         # 验证赔率值合理性
         assert all(odds > 1.0 for odds in valid_odds.values())
-        assert all(isinstance(odds, (int, float)) for odds in valid_odds.values())
+        assert all(isinstance(odds, int | float) for odds in valid_odds.values())
 
 
 class TestFootballAPI:

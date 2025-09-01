@@ -5,9 +5,8 @@ API主模块的覆盖率测试
 from unittest.mock import patch
 
 import pytest
-from fastapi.testclient import TestClient
-
 from apps.api.main import app
+from fastapi.testclient import TestClient
 
 
 class TestAPIMainCoverage:

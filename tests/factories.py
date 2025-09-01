@@ -6,7 +6,7 @@
 import random
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import Any, ClassVar, Dict, List, Optional
+from typing import Any, ClassVar
 
 import pandas as pd
 
@@ -29,7 +29,7 @@ class TestDataFactory:
     """测试数据工厂类"""
 
     # 常用球队名称
-    TEAMS: ClassVar[List[str]] = [
+    TEAMS: ClassVar[list[str]] = [
         "Barcelona",
         "Real Madrid",
         "Manchester United",
@@ -44,8 +44,8 @@ class TestDataFactory:
 
     @classmethod
     def create_match_data(
-        self, home_team: Optional[str] = None, away_team: Optional[str] = None, **kwargs
-    ) -> Dict[str, Any]:
+        self, home_team: str | None = None, away_team: str | None = None, **kwargs
+    ) -> dict[str, Any]:
         """创建单场比赛数据"""
         if not home_team:
             home_team = random.choice(self.TEAMS)
@@ -68,7 +68,7 @@ class TestDataFactory:
         return default_data
 
     @classmethod
-    def create_batch_matches(self, count: int = 5) -> List[Dict[str, Any]]:
+    def create_batch_matches(self, count: int = 5) -> list[dict[str, Any]]:
         """创建批量比赛数据"""
         matches = []
         used_pairs = set()
@@ -89,10 +89,10 @@ class TestDataFactory:
     @classmethod
     def create_prediction_response(
         self,
-        home_win: Optional[float] = None,
-        draw: Optional[float] = None,
-        away_win: Optional[float] = None,
-    ) -> Dict[str, Any]:
+        home_win: float | None = None,
+        draw: float | None = None,
+        away_win: float | None = None,
+    ) -> dict[str, Any]:
         """创建预测响应数据"""
         if not all([home_win, draw, away_win]):
             # 生成随机概率,确保总和为1
@@ -125,7 +125,7 @@ class TestDataFactory:
         db_status: bool = True,
         redis_status: bool = True,
         prefect_status: bool = True,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """创建健康检查响应数据"""
         return {
             "status": status,
@@ -162,21 +162,21 @@ class TestDataFactory:
 
 
 # 便捷函数
-def sample_match(**kwargs) -> Dict[str, Any]:
+def sample_match(**kwargs) -> dict[str, Any]:
     """快速创建单场比赛数据"""
     return TestDataFactory.create_match_data(**kwargs)
 
 
-def sample_matches(count: int = 5) -> List[Dict[str, Any]]:
+def sample_matches(count: int = 5) -> list[dict[str, Any]]:
     """快速创建批量比赛数据"""
     return TestDataFactory.create_batch_matches(count)
 
 
-def sample_prediction(**kwargs) -> Dict[str, Any]:
+def sample_prediction(**kwargs) -> dict[str, Any]:
     """快速创建预测响应数据"""
     return TestDataFactory.create_prediction_response(**kwargs)
 
 
-def sample_health(**kwargs) -> Dict[str, Any]:
+def sample_health(**kwargs) -> dict[str, Any]:
     """快速创建健康检查响应数据"""
     return TestDataFactory.create_health_response(**kwargs)

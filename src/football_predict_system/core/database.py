@@ -11,8 +11,9 @@ This module provides:
 
 import asyncio
 import time
+from collections.abc import AsyncGenerator, Generator
 from contextlib import asynccontextmanager, contextmanager
-from typing import Any, AsyncGenerator, Dict, Generator, Optional
+from typing import Any
 
 from sqlalchemy import create_engine, event, text
 from sqlalchemy.engine import Engine
@@ -34,10 +35,10 @@ class DatabaseManager:
 
     def __init__(self):
         self.settings = get_settings()
-        self._engine: Optional[Engine] = None
-        self._async_engine: Optional[AsyncEngine] = None
-        self._session_factory: Optional[sessionmaker] = None
-        self._async_session_factory: Optional[sessionmaker] = None
+        self._engine: Engine | None = None
+        self._async_engine: AsyncEngine | None = None
+        self._session_factory: sessionmaker | None = None
+        self._async_session_factory: sessionmaker | None = None
         self._health_check_query = text("SELECT 1")
 
     def get_engine(self) -> Engine:
@@ -200,7 +201,7 @@ class DatabaseManager:
         finally:
             await session.close()
 
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """Perform database health check."""
         start_time = time.time()
 
@@ -240,7 +241,7 @@ class DatabaseManager:
             logger.error("Database health check failed", **health_status)
             return health_status
 
-    def _get_pool_info(self) -> Dict[str, Any]:
+    def _get_pool_info(self) -> dict[str, Any]:
         """Get database connection pool information."""
         if self._engine is None:
             return {}
@@ -266,7 +267,7 @@ class DatabaseManager:
 
 
 # Global database manager instance
-_db_manager: Optional[DatabaseManager] = None
+_db_manager: DatabaseManager | None = None
 
 
 def get_database_manager() -> DatabaseManager:

@@ -9,7 +9,7 @@ This module provides:
 """
 
 from enum import Enum
-from typing import Any, Dict, Optional, Union
+from typing import Any
 
 
 class ErrorCode(str, Enum):
@@ -55,8 +55,8 @@ class BaseApplicationError(Exception):
         self,
         message: str,
         error_code: ErrorCode,
-        details: Optional[Dict[str, Any]] = None,
-        cause: Optional[Exception] = None,
+        details: dict[str, Any] | None = None,
+        cause: Exception | None = None,
     ):
         super().__init__(message)
         self.message = message
@@ -64,7 +64,7 @@ class BaseApplicationError(Exception):
         self.details = details or {}
         self.cause = cause
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert exception to dictionary for serialization."""
         return {
             "error_code": self.error_code.value,
@@ -83,8 +83,8 @@ class ValidationError(BaseApplicationError):
     def __init__(
         self,
         message: str,
-        field: Optional[str] = None,
-        details: Optional[Dict[str, Any]] = None,
+        field: str | None = None,
+        details: dict[str, Any] | None = None,
     ):
         super().__init__(
             message=message,
@@ -101,8 +101,8 @@ class NotFoundError(BaseApplicationError):
     def __init__(
         self,
         resource: str,
-        identifier: Union[str, int],
-        details: Optional[Dict[str, Any]] = None,
+        identifier: str | int,
+        details: dict[str, Any] | None = None,
     ):
         message = f"{resource} with identifier '{identifier}' not found"
         super().__init__(
@@ -120,7 +120,7 @@ class UnauthorizedError(BaseApplicationError):
     def __init__(
         self,
         message: str = "Authentication required",
-        details: Optional[Dict[str, Any]] = None,
+        details: dict[str, Any] | None = None,
     ):
         super().__init__(
             message=message, error_code=ErrorCode.UNAUTHORIZED, details=details
@@ -133,7 +133,7 @@ class ForbiddenError(BaseApplicationError):
     def __init__(
         self,
         message: str = "Insufficient permissions",
-        details: Optional[Dict[str, Any]] = None,
+        details: dict[str, Any] | None = None,
     ):
         super().__init__(
             message=message, error_code=ErrorCode.FORBIDDEN, details=details
@@ -146,7 +146,7 @@ class RateLimitError(BaseApplicationError):
     def __init__(
         self,
         message: str = "Rate limit exceeded",
-        retry_after: Optional[int] = None,
+        retry_after: int | None = None,
     ):
         details = {}
         if retry_after:
@@ -164,8 +164,8 @@ class DatabaseError(BaseApplicationError):
         self,
         message: str,
         error_code: ErrorCode,
-        query: Optional[str] = None,
-        details: Optional[Dict[str, Any]] = None,
+        query: str | None = None,
+        details: dict[str, Any] | None = None,
     ):
         super().__init__(message, error_code, details)
         if query:
@@ -178,7 +178,7 @@ class DatabaseConnectionError(DatabaseError):
     def __init__(
         self,
         message: str = "Database connection failed",
-        details: Optional[Dict[str, Any]] = None,
+        details: dict[str, Any] | None = None,
     ):
         super().__init__(
             message=message,
@@ -193,8 +193,8 @@ class DatabaseQueryError(DatabaseError):
     def __init__(
         self,
         message: str,
-        query: Optional[str] = None,
-        details: Optional[Dict[str, Any]] = None,
+        query: str | None = None,
+        details: dict[str, Any] | None = None,
     ):
         super().__init__(
             message=message,
@@ -211,8 +211,8 @@ class ModelError(BaseApplicationError):
         self,
         message: str,
         error_code: ErrorCode,
-        model_name: Optional[str] = None,
-        details: Optional[Dict[str, Any]] = None,
+        model_name: str | None = None,
+        details: dict[str, Any] | None = None,
     ):
         super().__init__(message, error_code, details)
         if model_name:
@@ -222,7 +222,7 @@ class ModelError(BaseApplicationError):
 class ModelNotFoundError(ModelError):
     """Raised when a requested model is not found."""
 
-    def __init__(self, model_name: str, version: Optional[str] = None):
+    def __init__(self, model_name: str, version: str | None = None):
         message = f"Model '{model_name}'"
         if version:
             message += f" version '{version}'"
@@ -245,8 +245,8 @@ class PredictionError(ModelError):
     def __init__(
         self,
         message: str = "Prediction failed",
-        model_name: Optional[str] = None,
-        details: Optional[Dict[str, Any]] = None,
+        model_name: str | None = None,
+        details: dict[str, Any] | None = None,
     ):
         super().__init__(
             message=message,
@@ -263,8 +263,8 @@ class DataPipelineError(BaseApplicationError):
         self,
         message: str,
         error_code: ErrorCode,
-        pipeline_stage: Optional[str] = None,
-        details: Optional[Dict[str, Any]] = None,
+        pipeline_stage: str | None = None,
+        details: dict[str, Any] | None = None,
     ):
         super().__init__(message, error_code, details)
         if pipeline_stage:
@@ -277,8 +277,8 @@ class DataIngestionError(DataPipelineError):
     def __init__(
         self,
         message: str,
-        source: Optional[str] = None,
-        details: Optional[Dict[str, Any]] = None,
+        source: str | None = None,
+        details: dict[str, Any] | None = None,
     ):
         super().__init__(
             message=message,
@@ -295,9 +295,9 @@ class ExternalAPIError(DataPipelineError):
     def __init__(
         self,
         message: str,
-        api_name: Optional[str] = None,
-        status_code: Optional[int] = None,
-        details: Optional[Dict[str, Any]] = None,
+        api_name: str | None = None,
+        status_code: int | None = None,
+        details: dict[str, Any] | None = None,
     ):
         super().__init__(
             message=message,
@@ -317,8 +317,8 @@ class BusinessLogicError(BaseApplicationError):
         self,
         message: str,
         error_code: ErrorCode,
-        context: Optional[str] = None,
-        details: Optional[Dict[str, Any]] = None,
+        context: str | None = None,
+        details: dict[str, Any] | None = None,
     ):
         super().__init__(message, error_code, details)
         if context:
@@ -331,8 +331,8 @@ class InsufficientDataError(BusinessLogicError):
     def __init__(
         self,
         message: str = "Insufficient data for processing",
-        required_count: Optional[int] = None,
-        actual_count: Optional[int] = None,
+        required_count: int | None = None,
+        actual_count: int | None = None,
     ):
         details = {}
         if required_count is not None:
@@ -378,7 +378,7 @@ def handle_database_exception(exc: Exception) -> DatabaseError:
 
 
 def handle_external_api_exception(
-    exc: Exception, api_name: Optional[str] = None
+    exc: Exception, api_name: str | None = None
 ) -> ExternalAPIError:
     """Convert external API exceptions to application exceptions."""
     import requests.exceptions as req_exc

@@ -64,7 +64,7 @@ class TestModelRegistry:
                 # 测试基本方法(如果存在)
                 if hasattr(registry, "list_models"):
                     models = registry.list_models()
-                    assert isinstance(models, (list, dict, type(None)))
+                    assert isinstance(models, list | dict | type(None))
 
         except ImportError:
             pytest.skip("ModelRegistry module not available")

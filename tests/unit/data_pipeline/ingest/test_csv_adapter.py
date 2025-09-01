@@ -7,9 +7,8 @@ from unittest.mock import patch
 
 import pandas as pd
 import pytest
-from sqlalchemy import create_engine, text
-
 from data_pipeline.ingest.csv_adapter import ingest_csv_data
+from sqlalchemy import create_engine, text
 
 
 @pytest.fixture

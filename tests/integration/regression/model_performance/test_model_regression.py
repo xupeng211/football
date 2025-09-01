@@ -396,9 +396,8 @@ class TestModelVersionCompatibility:
     @patch.object(Predictor, "load_model")
     def test_api_response_format_stability(self, mock_load_model):
         """测试API响应格式的稳定性"""
-        from fastapi.testclient import TestClient
-
         from apps.api.main import app
+        from fastapi.testclient import TestClient
 
         client = TestClient(app)
 

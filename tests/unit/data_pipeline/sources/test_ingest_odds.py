@@ -7,7 +7,6 @@ from typing import Any
 from unittest.mock import MagicMock, patch
 
 import pytest
-
 from data_pipeline.sources.ingest_odds import ingest_data, validate_odds
 
 
