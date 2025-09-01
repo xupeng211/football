@@ -5,7 +5,7 @@
 """
 
 from .api_fixtures import async_client, authenticated_client, mock_app
-from .cache_fixtures import clean_cache, redis_client, sample_data
+from .cache_fixtures import clean_cache, redis_client
 from .database_fixtures import async_db_session, clean_database
 from .factories import MatchFactory, PredictionFactory, TeamFactory, UserFactory
 
@@ -25,5 +25,4 @@ __all__ = [
     "mock_app",
     # Cache fixtures
     "redis_client",
-    "sample_data",
 ]
