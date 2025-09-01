@@ -39,9 +39,11 @@ class TestDatabaseUrlLogic:
             assert db.DATABASE_URL == "prod_db_url"
 
     def test_database_url_is_testing(self):
-        with patch.dict(os.environ, {}, clear=True), patch(
-            "dotenv.load_dotenv", lambda: None
-        ), patch.dict(os.environ, {"PYTEST_CURRENT_TEST": "true"}):
+        with (
+            patch.dict(os.environ, {}, clear=True),
+            patch("dotenv.load_dotenv", lambda: None),
+            patch.dict(os.environ, {"PYTEST_CURRENT_TEST": "true"}),
+        ):
             importlib.reload(db)
             assert db.DATABASE_URL == "sqlite:///:memory:"
 

@@ -12,11 +12,14 @@ from fastapi.testclient import TestClient
 @pytest.fixture
 def mock_dependencies():
     """Mock外部依赖"""
-    with patch("apps.api.main.check_prefect_connection_async"), patch(
-        "apps.api.main.check_redis_connection"
-    ), patch("apps.api.main.check_db_connection"), patch(
-        "apps.api.main.prediction_service"
-    ), patch("prefect.get_client"), patch("apps.api.main.logger"):
+    with (
+        patch("apps.api.main.check_prefect_connection_async"),
+        patch("apps.api.main.check_redis_connection"),
+        patch("apps.api.main.check_db_connection"),
+        patch("apps.api.main.prediction_service"),
+        patch("prefect.get_client"),
+        patch("apps.api.main.logger"),
+    ):
         yield
 
 

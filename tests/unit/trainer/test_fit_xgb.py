@@ -107,9 +107,10 @@ def test_save_model_and_metrics(
 
 def test_load_data_from_db_empty_data():
     """测试从数据库加载空数据的情况"""
-    with patch("trainer.fit_xgb.create_engine"), patch(
-        "trainer.fit_xgb.pd.read_sql"
-    ) as mock_read_sql:
+    with (
+        patch("trainer.fit_xgb.create_engine"),
+        patch("trainer.fit_xgb.pd.read_sql") as mock_read_sql,
+    ):
         # 模拟空数据
         mock_read_sql.side_effect = [pd.DataFrame(), pd.DataFrame()]
 

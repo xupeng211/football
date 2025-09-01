@@ -8,15 +8,13 @@ def test_fit_xgb_main_function():
     Test the main function of fit_xgb module with proper mocking.
     """
     # Mock all external dependencies
-    with patch("trainer.fit_xgb.setup_logging"), patch(
-        "trainer.fit_xgb.load_data_from_db"
-    ) as mock_load_data, patch(
-        "trainer.fit_xgb.train_xgboost_model"
-    ) as mock_train_model, patch(
-        "trainer.fit_xgb.evaluate_model"
-    ) as mock_evaluate_model, patch(
-        "trainer.fit_xgb.save_model_and_metrics"
-    ) as mock_save_model:
+    with (
+        patch("trainer.fit_xgb.setup_logging"),
+        patch("trainer.fit_xgb.load_data_from_db") as mock_load_data,
+        patch("trainer.fit_xgb.train_xgboost_model") as mock_train_model,
+        patch("trainer.fit_xgb.evaluate_model") as mock_evaluate_model,
+        patch("trainer.fit_xgb.save_model_and_metrics") as mock_save_model,
+    ):
         # Setup mock return values with enough samples for stratified split
         mock_features_df = pd.DataFrame(
             {

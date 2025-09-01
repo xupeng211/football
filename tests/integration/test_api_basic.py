@@ -28,9 +28,10 @@ class TestAPIBasic:
 
         with TestClient(app) as client:
             # Mock any external dependencies
-            with patch("apps.api.db.get_db_connection") as mock_db, patch(
-                "apps.api.redis.check_redis_connection"
-            ) as mock_redis:
+            with (
+                patch("apps.api.db.get_db_connection") as mock_db,
+                patch("apps.api.redis.check_redis_connection") as mock_redis,
+            ):
                 # Mock successful connections
                 mock_db.return_value = True
                 mock_redis.return_value = True
@@ -89,9 +90,10 @@ class TestPredictionEndpoint:
 
         with TestClient(app) as client:
             # Mock all external dependencies
-            with patch(
-                "apps.api.routers.predictions.get_current_user"
-            ) as mock_user, patch("models.predictor.Predictor") as mock_predictor:
+            with (
+                patch("apps.api.routers.predictions.get_current_user") as mock_user,
+                patch("models.predictor.Predictor") as mock_predictor,
+            ):
                 # Mock user authentication
                 mock_user.return_value = {"user_id": "test_user"}
 

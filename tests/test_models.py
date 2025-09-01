@@ -19,8 +19,9 @@ def test_model_registry_basic():
     from models.registry import ModelRegistry
 
     # 使用临时路径避免文件系统副作用
-    with patch("models.registry.Path") as mock_path, patch(
-        "builtins.open", new_callable=mock_open, read_data="{}"
+    with (
+        patch("models.registry.Path") as mock_path,
+        patch("builtins.open", new_callable=mock_open, read_data="{}"),
     ):
         mock_path.return_value.mkdir = MagicMock()
         mock_path.return_value.exists.return_value = True
