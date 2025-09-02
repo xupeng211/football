@@ -22,8 +22,30 @@ class DatabaseWriter:
         self.db_manager = get_database_manager()
         self.logger = get_logger(__name__)
 
-    async def upsert_teams(self, df: pd.DataFrame) -> dict[str, int]:
+    async def upsert_teams(self, teams_data) -> dict[str, int]:
         """Insert or update team data."""
+
+        # Handle both DataFrame and list of Team objects
+        if isinstance(teams_data, list):
+            # Convert Team objects to DataFrame
+            if not teams_data:
+                return {"inserted": 0, "updated": 0, "failed": 0}
+
+            # Convert Team objects to dict for DataFrame
+            team_dicts = []
+            for team in teams_data:
+                if hasattr(team, 'model_dump'):
+                    team_dict = team.model_dump()
+                else:
+                    # Fallback for other types
+                    team_dict = teams_data
+                team_dicts.append(team_dict)
+
+            df = pd.DataFrame(team_dicts)
+        else:
+            # Assume DataFrame
+            df = teams_data
+
         if df.empty:
             return {"inserted": 0, "updated": 0, "failed": 0}
 

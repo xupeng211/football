@@ -184,7 +184,7 @@ class FootballDataAPICollector(MatchDataSource, TeamDataSource):
 
         return pd.DataFrame(matches)
 
-    def _parse_matches_response(self, response_data: dict) -> pd.DataFrame:
+    def _parse_matches_response(self, response_data: dict[str, Any]) -> pd.DataFrame:
         """Parse matches response data into DataFrame format.
 
         Args:

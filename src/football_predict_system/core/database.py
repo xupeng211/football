@@ -55,8 +55,11 @@ class DatabaseManager:
         """Create synchronous database engine with optimized settings."""
         db_config = self.settings.database
 
+        # Get the correct database URL
+        database_url = self.settings.get_database_url()
+
         # Configure engine based on database type
-        if "sqlite" in db_config.url:
+        if "sqlite" in database_url:
             # SQLite doesn't support connection pooling
             engine = create_engine(
                 db_config.url,
@@ -94,10 +97,13 @@ class DatabaseManager:
         """Create asynchronous database engine."""
         db_config = self.settings.database
 
+        # Get the correct database URL
+        database_url = self.settings.get_database_url()
+
         # Configure async engine based on database type
-        if "sqlite" in db_config.url:
+        if "sqlite" in database_url:
             # SQLite async configuration
-            async_url = db_config.url.replace("sqlite://", "sqlite+aiosqlite://")
+            async_url = database_url.replace("sqlite://", "sqlite+aiosqlite://")
             engine = create_async_engine(
                 async_url,
                 echo=db_config.echo,
@@ -105,7 +111,7 @@ class DatabaseManager:
             )
         else:
             # PostgreSQL async configuration
-            async_url = db_config.url.replace("postgresql://", "postgresql+asyncpg://")
+            async_url = database_url.replace("postgresql://", "postgresql+asyncpg://")
             engine = create_async_engine(
                 async_url,
                 pool_size=db_config.pool_size,

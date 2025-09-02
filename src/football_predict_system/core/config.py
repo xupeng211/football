@@ -155,6 +155,9 @@ class Settings(BaseSettings):
 
     # Component configurations
     database: DatabaseConfig = Field(default_factory=DatabaseConfig)
+
+    # Direct environment variable support
+    database_url: str = Field(default="sqlite:///./test.db", env="DATABASE_URL")
     redis: RedisConfig = Field(default_factory=RedisConfig)
     api: APIConfig = Field(default_factory=APIConfig)
     logging: LoggingConfig = Field(default_factory=LoggingConfig)
@@ -190,9 +193,11 @@ class Settings(BaseSettings):
 
     def get_database_url(self) -> str:
         """Get database URL with environment-specific modifications."""
-        if self.is_development() and "@db:" in self.database.url:
-            return self.database.url.replace("@db:", "@localhost:")
-        return self.database.url
+        # Use direct environment variable if available, otherwise fallback to config
+        db_url = self.database_url if hasattr(self, 'database_url') else self.database.url
+        if self.is_development() and "@db:" in db_url:
+            return db_url.replace("@db:", "@localhost:")
+        return db_url
 
 
 # Global settings instance
