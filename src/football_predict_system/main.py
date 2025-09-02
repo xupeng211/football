@@ -6,10 +6,12 @@ and sets up core components like logging, database, and caching.
 """
 
 from contextlib import asynccontextmanager
+from datetime import datetime
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from prometheus_fastapi_instrumentator import Instrumentator
 
 from .api.v1.endpoints import router as api_v1_router
 from .core.cache import get_cache_manager
@@ -40,6 +42,11 @@ async def lifespan(app: FastAPI):
     cache_manager = await get_cache_manager()
     _ = await cache_manager.get_redis_client()
 
+    # Initialize Prometheus metrics
+    if hasattr(app.state, "instrumentator"):
+        app.state.instrumentator.expose(app)
+        logger.info("Prometheus metrics endpoint exposed at /metrics")
+
     logger.info("Application startup complete")
     yield
 
@@ -61,6 +68,26 @@ app = FastAPI(
     docs_url="/docs",
     redoc_url="/redoc",
 )
+
+# Configure Prometheus monitoring
+instrumentator = Instrumentator(
+    should_group_status_codes=False,
+    should_ignore_untemplated=True,
+    should_respect_env_var=True,
+    should_instrument_requests_inprogress=True,
+    excluded_handlers=[
+        "/health", "/health/ready", "/health/live", "/metrics"
+    ],
+    env_var_name="ENABLE_METRICS",
+    inprogress_name="http_requests_inprogress",
+    inprogress_labels=True,
+)
+
+# Instrument the FastAPI app
+instrumentator.instrument(app)
+
+# Store instrumentator in app state for lifespan access
+app.state.instrumentator = instrumentator
 
 
 # Configure middleware
@@ -102,7 +129,9 @@ async def application_exception_handler(request: Request, exc: BaseApplicationEr
 @app.exception_handler(Exception)
 async def generic_exception_handler(request: Request, exc: Exception):
     """Handle unexpected exceptions."""
-    logger.critical("An unexpected error occurred", error=str(exc), exc_info=True)
+    logger.critical(
+        "An unexpected error occurred", error=str(exc), exc_info=True
+    )
     return JSONResponse(
         status_code=500,
         content={
@@ -114,22 +143,130 @@ async def generic_exception_handler(request: Request, exc: Exception):
 
 
 # Include API routers
-
 app.include_router(api_v1_router, prefix="/api/v1")
 
 
-# Add health check endpoint
+# Health check endpoints - Production ready monitoring
 @app.get("/health", tags=["monitoring"])
 async def health_check():
-    """Perform system health check."""
-    health_checker = get_health_checker()
-    health_report = await health_checker.get_system_health()
+    """
+    Comprehensive system health check.
+    
+    Returns detailed health status of all system components including:
+    - Database connectivity
+    - Redis cache
+    - External APIs
+    - System resources
+    - Model registry
+    """
+    try:
+        health_checker = get_health_checker()
+        health_report = await health_checker.get_system_health()
 
-    status_code = 200 if health_report.status == "healthy" else 503
+        status_code = 200 if health_report.status == "healthy" else 503
 
-    return JSONResponse(
-        content=health_report.model_dump(mode="json"), status_code=status_code
-    )
+        return JSONResponse(
+            content=health_report.model_dump(mode="json"),
+            status_code=status_code
+        )
+    except Exception as e:
+        logger.error("Health check failed", error=str(e), exc_info=True)
+        return JSONResponse(
+            status_code=503,
+            content={
+                "status": "unhealthy",
+                "timestamp": datetime.utcnow().isoformat(),
+                "error": str(e),
+                "version": settings.app_version
+            }
+        )
+
+
+@app.get("/health/ready", tags=["monitoring"])
+async def readiness_check():
+    """
+    Kubernetes readiness probe endpoint.
+    
+    Checks if the service is ready to accept traffic by verifying:
+    - Database connectivity
+    - Cache availability
+    - Essential dependencies
+    
+    Returns 200 if ready, 503 if not ready.
+    """
+    try:
+        # Check critical dependencies only
+        db_manager = get_database_manager()
+        cache_manager = await get_cache_manager()
+
+        # Quick health checks for readiness
+        db_check = await db_manager.health_check()
+
+        # Try to ping Redis
+        redis_client = await cache_manager.get_redis_client()
+        cache_healthy = True
+        try:
+            await redis_client.ping()
+        except Exception:
+            cache_healthy = False
+
+        # Service is ready if both critical services are healthy
+        if db_check.get("status") == "healthy" and cache_healthy:
+            return {
+                "status": "ready",
+                "timestamp": datetime.utcnow().isoformat(),
+                "checks": {
+                    "database": "healthy",
+                    "cache": "healthy"
+                }
+            }
+        else:
+            raise HTTPException(
+                status_code=503,
+                detail={
+                    "status": "not_ready",
+                    "timestamp": datetime.utcnow().isoformat(),
+                    "checks": {
+                        "database": (
+                            "healthy"
+                            if db_check.get("status") == "healthy"
+                            else "unhealthy"
+                        ),
+                        "cache": "healthy" if cache_healthy else "unhealthy"
+                    }
+                }
+            )
+    except Exception as e:
+        logger.warning("Readiness check failed", error=str(e))
+        raise HTTPException(
+            status_code=503,
+            detail={
+                "status": "not_ready",
+                "timestamp": datetime.utcnow().isoformat(),
+                "error": str(e)
+            }
+        )
+
+
+@app.get("/health/live", tags=["monitoring"])
+async def liveness_check():
+    """
+    Kubernetes liveness probe endpoint.
+    
+    Simple endpoint to verify the application process is alive and responding.
+    This should only fail if the application is completely unresponsive.
+    
+    Always returns 200 unless the process is dead.
+    """
+    return {
+        "status": "alive",
+        "timestamp": datetime.utcnow().isoformat(),
+        "uptime_seconds": (
+            __import__("time").time()
+            - app.state.__dict__.get("start_time", __import__("time").time())
+        ),
+        "version": settings.app_version
+    }
 
 
 # Add root endpoint
@@ -140,7 +277,9 @@ async def root():
         "app_name": settings.app_name,
         "version": settings.app_version,
         "environment": settings.environment.value,
-        "timestamp": __import__("datetime").datetime.utcnow().isoformat(),
+        "timestamp": datetime.utcnow().isoformat(),
+        "docs_url": "/docs",
+        "health_url": "/health"
     }
 
 
