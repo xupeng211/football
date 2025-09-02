@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  # 主应用
+  # 主应用 (使用与CI环境一致的配置)
   app:
     build:
       context: .
@@ -9,43 +9,37 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - ENV=development
-      - DATABASE_URL=postgresql://postgres:password@postgres:5432/football_db
-      - REDIS_URL=redis://redis:6379/0
-      - LOG_LEVEL=info
+      - ENVIRONMENT=development
+      - DATABASE_URL=postgresql://test_user:test_pass@postgres:5432/test_football_db
+      - REDIS_URL=redis://redis:6379/1
+      - FOOTBALL_DATA_API_KEY=test_api_key
+      - PYTHONPATH=/workspace/src
     volumes:
-      - .:/app
-      - /app/.venv
+      - .:/workspace
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health/live"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-    restart: unless-stopped
-    command: uvicorn src.football_predict_system.main:app --host 0.0.0.0 --port 8000 --reload
+    # 覆盖CI默认命令，用于开发服务器
+    command: .venv/bin/uvicorn src.football_predict_system.main:app --host 0.0.0.0 --port 8000 --reload
     networks:
       - football_net
 
-  # PostgreSQL 数据库
+  # PostgreSQL 数据库 (与CI环境一致)
   postgres:
-    image: postgres:15-alpine
+    image: postgres:15
     environment:
-      POSTGRES_DB: football_db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      POSTGRES_DB: test_football_db
+      POSTGRES_USER: test_user
+      POSTGRES_PASSWORD: test_pass
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./sql:/docker-entrypoint-initdb.d
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U test_user -d test_football_db"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -53,9 +47,9 @@ services:
     networks:
       - football_net
 
-  # Redis 缓存
+  # Redis 缓存 (与CI环境一致)
   redis:
-    image: redis:7-alpine
+    image: redis:7
     ports:
       - "6379:6379"
     volumes:
@@ -63,57 +57,16 @@ services:
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
-      timeout: 3s
+      timeout: 5s
       retries: 5
     restart: unless-stopped
     networks:
       - football_net
 
-  # Prometheus 监控 (可选)
-  prometheus:
-    image: prom/prometheus:latest
-    ports:
-      - "9090:9090"
-    volumes:
-      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
-      - prometheus_data:/prometheus
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
-      - '--web.console.templates=/usr/share/prometheus/consoles'
-      - '--web.enable-lifecycle'
-    restart: unless-stopped
-    networks:
-      - football_net
-    profiles:
-      - monitoring
-
-  # Grafana 仪表板 (可选)
-  grafana:
-    image: grafana/grafana:latest
-    ports:
-      - "3000:3000"
-    environment:
-      - GF_SECURITY_ADMIN_PASSWORD=admin123
-    volumes:
-      - grafana_data:/var/lib/grafana
-      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
-      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources
-    restart: unless-stopped
-    networks:
-      - football_net
-    profiles:
-      - monitoring
-
 volumes:
   postgres_data:
     driver: local
   redis_data:
-    driver: local
-  prometheus_data:
-    driver: local
-  grafana_data:
     driver: local
 
 networks:

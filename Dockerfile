@@ -1,50 +1,61 @@
-# Football Prediction System v3.0 - Optimized Dockerfile
-FROM python:3.11-slim
+# 🐳 Local CI Docker Image - Matches GitHub Actions Environment
+# 与远程GitHub Actions完全一致的本地CI环境
+
+FROM ubuntu:22.04
 
 # 设置环境变量
-ENV PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1 \
-    PIP_NO_CACHE_DIR=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHON_VERSION=3.11
+ENV UV_CACHE_DIR=/tmp/.uv-cache
+ENV PYTHONPATH=/workspace/src
+ENV ENVIRONMENT=testing
 
-# 安装系统依赖
+# 使用清华镜像源提高下载速度和稳定性
+RUN sed -i 's@//.*archive.ubuntu.com@//mirrors.tuna.tsinghua.edu.cn@g' /etc/apt/sources.list && \
+    sed -i 's@//.*security.ubuntu.com@//mirrors.tuna.tsinghua.edu.cn@g' /etc/apt/sources.list
+
+# 安装系统依赖 (与GitHub Actions ubuntu-latest一致)
 RUN apt-get update && apt-get install -y \
+    python3.11 \
+    python3.11-dev \
+    python3.11-venv \
+    python3-pip \
     curl \
+    git \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# 安装uv
-RUN pip install uv
+# 设置Python 3.11为默认python
+RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.11 1
 
-# 设置工作目录
-WORKDIR /app
+# 安装uv (与GitHub Actions保持一致)
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+ENV PATH="/root/.local/bin:$PATH"
 
-# 复制依赖文件
-COPY pyproject.toml README.md ./
+# 创建工作目录
+WORKDIR /workspace
 
-# 创建虚拟环境并安装依赖
-RUN uv venv .venv && \
-    . .venv/bin/activate && \
-    uv sync --no-dev
-
-# 复制源代码
+# 复制项目文件
+COPY pyproject.toml uv.lock ./
 COPY src/ ./src/
 COPY tests/ ./tests/
+COPY Makefile ./
+COPY ai_security_rules.json ./
 
-# 安装项目本身
-RUN . .venv/bin/activate && uv pip install -e .
+# 安装依赖
+RUN uv sync --extra dev
 
-# 创建非root用户
-RUN adduser --disabled-password --gecos '' appuser && \
-    chown -R appuser:appuser /app
-USER appuser
+# 设置Git安全目录 (避免Git安全警告)
+RUN git config --global --add safe.directory /workspace
 
-# 暴露端口
-EXPOSE 8000
+# 创建CI执行脚本
+COPY scripts/ci/local_ci_runner.sh /usr/local/bin/local_ci_runner.sh
+RUN chmod +x /usr/local/bin/local_ci_runner.sh
 
-# 健康检查 - 使用liveness端点，更适合Docker容器监控
-HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-    CMD curl -f http://localhost:8000/health/live || exit 1
+# 健康检查
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD python3 --version && uv --version
 
-# 启动命令
-CMD [".venv/bin/uvicorn", "src.football_predict_system.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# 默认执行CI流程
+CMD ["/usr/local/bin/local_ci_runner.sh"] 
