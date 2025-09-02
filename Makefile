@@ -215,3 +215,42 @@ shell: ## 🐚 启动项目shell
 healthcheck: ## 🏥 健康检查
 	@echo "$(BLUE)🏥 健康检查...$(NC)"
 	curl -f http://localhost:8000/health || echo "$(RED)❌ 服务不可用$(NC)"
+
+# === 数据中台 ===
+data-setup: ## 📊 设置数据中台
+	@echo "$(BLUE)🏗️ 设置数据中台...$(NC)"
+	uv run python scripts/data_platform/setup_data_platform.py --action setup
+	@echo "$(GREEN)✅ 数据中台设置完成$(NC)"
+
+data-quick-start: ## 📊 数据中台快速启动
+	@echo "$(BLUE)🚀 数据中台快速启动...$(NC)"
+	uv run python scripts/data_platform/quick_start.py
+	@echo "$(GREEN)✅ 数据中台启动完成$(NC)"
+
+data-collect: ## 📊 运行数据采集
+	@echo "$(BLUE)📡 启动数据采集...$(NC)"
+	uv run python -c "import asyncio; from src.football_predict_system.data_platform.flows.data_collection import daily_data_collection_flow; asyncio.run(daily_data_collection_flow())"
+	@echo "$(GREEN)✅ 数据采集完成$(NC)"
+
+data-backfill: ## 📊 历史数据回填 (需要参数: COMP_ID, START, END)
+	@echo "$(BLUE)📚 历史数据回填...$(NC)"
+	@if [ -z "$(COMP_ID)" ] || [ -z "$(START)" ] || [ -z "$(END)" ]; then \
+		echo "$(RED)❌ 缺少参数: make data-backfill COMP_ID=2021 START=2023-08-01 END=2024-05-31$(NC)"; \
+		exit 1; \
+	fi
+	uv run python -c "import asyncio; from src.football_predict_system.data_platform.flows.data_collection import historical_backfill_flow; asyncio.run(historical_backfill_flow($(COMP_ID), '$(START)', '$(END)'))"
+	@echo "$(GREEN)✅ 历史数据回填完成$(NC)"
+
+data-monitor: ## 📊 数据质量监控
+	@echo "$(BLUE)🔍 数据质量检查...$(NC)"
+	uv run python -c "import asyncio; from src.football_predict_system.data_platform.flows.data_collection import data_quality_check_flow; asyncio.run(data_quality_check_flow())"
+	@echo "$(GREEN)✅ 数据质量检查完成$(NC)"
+
+data-health: ## 📊 数据平台健康检查
+	@echo "$(BLUE)🏥 数据平台健康检查...$(NC)"
+	uv run python scripts/data_platform/setup_data_platform.py --action health
+
+data-deploy-flows: ## 📊 部署Prefect流程
+	@echo "$(BLUE)🚀 部署Prefect流程...$(NC)"
+	uv run python scripts/data_platform/deploy_flows.py
+	@echo "$(GREEN)✅ Prefect流程部署完成$(NC)"
