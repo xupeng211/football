@@ -29,20 +29,18 @@ class FootballDataAPICollector(MatchDataSource, TeamDataSource):
     def __init__(self, api_key: str | None = None):
         super().__init__()
         self.settings = get_settings()
-        self.api_key = api_key or getattr(self.settings, 'football_data_api_key', None)
+        self.api_key = api_key or getattr(self.settings, "football_data_api_key", None)
         self.rate_limiter = RateLimiter(calls_per_minute=10)  # Free tier limit
         self.session: aiohttp.ClientSession | None = None
 
     async def fetch(self, **kwargs) -> pd.DataFrame:
         """Fetch data from the source - delegates to specific methods."""
-        competition_id = kwargs.get('competition_id')
-        date_from = kwargs.get('date_from')
-        date_to = kwargs.get('date_to')
+        competition_id = kwargs.get("competition_id")
+        date_from = kwargs.get("date_from")
+        date_to = kwargs.get("date_to")
 
         return await self.fetch_matches(
-            competition_id=competition_id,
-            date_from=date_from,
-            date_to=date_to
+            competition_id=competition_id, date_from=date_from, date_to=date_to
         )
 
     async def _get_session(self) -> aiohttp.ClientSession:
