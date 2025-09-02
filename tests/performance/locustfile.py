@@ -70,7 +70,10 @@ class PerformanceTestData:
         return {
             "home_team": home_team,
             "away_team": away_team,
-            "date": f"2024-{random.randint(1, 12):02d}-{random.randint(1, 28):02d}T15:00:00Z",
+            "date": (
+                f"2024-{random.randint(1, 12):02d}-"
+                f"{random.randint(1, 28):02d}T15:00:00Z"
+            ),
             "league": random.choice(self.leagues),
         }
 
@@ -126,7 +129,7 @@ class BaseFootballPredictUser(HttpUser):
                 raise StopUser()
         except Exception as e:
             print(f"Failed to connect to API: {e}")
-            raise StopUser()
+            raise StopUser() from e
 
 
 class HealthCheckUser(BaseFootballPredictUser):
@@ -267,9 +270,11 @@ class PredictionUser(BaseFootballPredictUser):
                     if "predictions" in data:
                         predictions = data["predictions"]
                         if len(predictions) != batch_size:
-                            response.failure(
-                                f"Expected {batch_size} predictions, got {len(predictions)}"
+                            error_msg = (
+                                f"Expected {batch_size} predictions, "
+                                f"got {len(predictions)}"
                             )
+                            response.failure(error_msg)
                 except json.JSONDecodeError:
                     response.failure("Invalid JSON in batch response")
 
@@ -459,9 +464,12 @@ def on_locust_init(environment, **kwargs):
 def on_test_start(environment, **kwargs):
     """Actions to perform when test starts."""
     print("📊 Performance test started")
-    print(
-        f"Users: {environment.runner.user_count if hasattr(environment.runner, 'user_count') else 'N/A'}"
+    user_count = (
+        environment.runner.user_count
+        if hasattr(environment.runner, "user_count")
+        else "N/A"
     )
+    print(f"Users: {user_count}")
 
 
 @events.test_stop.add_listener
@@ -485,12 +493,10 @@ def on_test_stop(environment, **kwargs):
 
         print("\n🎯 Performance Baseline Results:")
         print(f"Error rate: {error_rate:.2f}% (target: <1%)")
-        print(
-            f"Average response time: {stats.total.avg_response_time:.2f}ms (target: <2000ms)"
-        )
-        print(
-            f"95th percentile: {stats.total.get_response_time_percentile(0.95):.2f}ms (target: <5000ms)"
-        )
+        avg_time = stats.total.avg_response_time
+        print(f"Average response time: {avg_time:.2f}ms (target: <2000ms)")
+        p95_time = stats.total.get_response_time_percentile(0.95)
+        print(f"95th percentile: {p95_time:.2f}ms (target: <5000ms)")
 
         # Determine if performance baseline is met
         baseline_met = (
