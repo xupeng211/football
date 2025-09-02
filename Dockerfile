@@ -20,7 +20,7 @@ RUN pip install uv
 WORKDIR /app
 
 # 复制依赖文件
-COPY pyproject.toml ./
+COPY pyproject.toml README.md ./
 
 # 创建虚拟环境并安装依赖
 RUN uv venv .venv && \

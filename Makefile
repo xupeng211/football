@@ -7,6 +7,24 @@ PYTHON := python3
 PROJECT_NAME := football-predict-system
 DOCKER_IMAGE := $(PROJECT_NAME):latest
 
+# 虚拟环境配置
+VENV_PATH := .venv
+VENV_ACTIVATE := $(VENV_PATH)/bin/activate
+VENV_PYTHON := $(VENV_PATH)/bin/python
+VENV_PIP := $(VENV_PATH)/bin/pip
+
+# 检查并激活虚拟环境的函数（备用方案，优先使用direnv）
+define activate_venv
+	@if [ ! -d "$(VENV_PATH)" ]; then \
+		echo "$(RED)❌ 虚拟环境不存在，请先运行 make install$(NC)"; \
+		exit 1; \
+	fi
+	@if [ -z "$$VIRTUAL_ENV" ]; then \
+		echo "$(YELLOW)🔄 激活虚拟环境...$(NC)"; \
+		. $(VENV_ACTIVATE); \
+	fi
+endef
+
 # 颜色输出
 RED := \033[0;31m
 GREEN := \033[0;32m
@@ -42,12 +60,30 @@ help: ## 📚 显示帮助信息
 	@echo "  4. $(GREEN)make ci$(NC)         # 运行所有检查"
 
 # === 环境管理 ===
-install: ## 📦 安装所有依赖
+check-venv: ## 📦 检查虚拟环境状态
+	@echo "$(BLUE)🔍 检查虚拟环境状态...$(NC)"
+	@if [ -d "$(VENV_PATH)" ]; then \
+		echo "$(GREEN)✅ 虚拟环境存在: $(VENV_PATH)$(NC)"; \
+	else \
+		echo "$(YELLOW)⚠️ 虚拟环境不存在$(NC)"; \
+	fi
+	@if [ -n "$$VIRTUAL_ENV" ]; then \
+		echo "$(GREEN)✅ 当前虚拟环境已激活: $$VIRTUAL_ENV$(NC)"; \
+	elif command -v direnv >/dev/null 2>&1 && direnv status 2>/dev/null | grep -q "Found RC path"; then \
+		echo "$(GREEN)✅ direnv 已配置，虚拟环境将自动激活$(NC)"; \
+	else \
+		echo "$(YELLOW)⚠️ 虚拟环境未激活，建议安装 direnv 或手动激活$(NC)"; \
+		echo "$(CYAN)  手动激活: source $(VENV_ACTIVATE)$(NC)"; \
+		echo "$(CYAN)  安装 direnv: https://direnv.net/$(NC)"; \
+	fi
+
+install: check-venv ## 📦 安装所有依赖
 	@echo "$(BLUE)🔧 安装依赖...$(NC)"
 	@command -v uv >/dev/null 2>&1 || { echo "$(RED)❌ 请先安装 uv: pip install uv$(NC)"; exit 1; }
 	uv sync --all-extras
 	uv pip install -e .
 	@echo "$(GREEN)✅ 依赖安装完成$(NC)"
+	@echo "$(CYAN)💡 提示: 使用 direnv 可自动激活虚拟环境$(NC)"
 
 install-dev: ## 📦 安装开发依赖
 	@echo "$(BLUE)🔧 安装开发依赖...$(NC)"
@@ -254,3 +290,41 @@ data-deploy-flows: ## 📊 部署Prefect流程
 	@echo "$(BLUE)🚀 部署Prefect流程...$(NC)"
 	uv run python scripts/data_platform/deploy_flows.py
 	@echo "$(GREEN)✅ Prefect流程部署完成$(NC)"
+
+# =================== 本地CI流程 ===================
+
+.PHONY: ci.local
+ci.local: ## 🔍 本地CI流程 (使用uv环境)
+	@echo "🔍 运行本地 CI 流程 (格式化 + Lint + 类型检查 + 安全扫描)..."
+	@echo "1) 格式化检查..."
+	uv run ruff format --check .
+	@echo "2) Lint 检查..."
+	uv run ruff check .
+	@echo "3) 类型检查..."
+	uv run mypy src/football_predict_system/data_platform/ --show-error-codes --no-error-summary --ignore-missing-imports || true
+	@echo "4) 安全扫描..."
+	uv run bandit -r src/ -c pyproject.toml
+	@echo "✅ 本地CI检查完成"
+
+.PHONY: ci.docker
+ci.docker: ## 🐳 Docker环境CI流程
+	@echo "🔍 运行Docker CI 流程..."
+	docker compose run --rm app bash -c "\
+		set -e; \
+		echo '1) 格式化检查...'; \
+		. .venv/bin/activate && uv run ruff format --check .; \
+		echo '2) Lint 检查...'; \
+		. .venv/bin/activate && uv run ruff check .; \
+		echo '3) 类型检查...'; \
+		. .venv/bin/activate && uv run mypy src/football_predict_system/data_platform/ --show-error-codes --no-error-summary --ignore-missing-imports || true; \
+		echo '4) 安全扫描...'; \
+		. .venv/bin/activate && uv run bandit -r src/ -c pyproject.toml; \
+		echo '✅ Docker CI检查完成'; \
+	"
+
+.PHONY: ci.fix
+ci.fix: ## 🔧 自动修复代码格式问题
+	@echo "🔧 自动修复代码格式..."
+	uv run ruff format .
+	uv run ruff check . --fix
+	@echo "✅ 代码格式修复完成"

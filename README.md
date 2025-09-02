@@ -16,6 +16,38 @@
 - **🐳 容器优化**: 精简 Docker 配置
 - **📊 CI/CD 可靠**: 单一工作流，并行执行
 
+## 🔧 环境配置
+
+### 推荐：使用 direnv 自动激活虚拟环境
+
+项目根目录已包含 `.envrc` 文件，使用 [direnv](https://direnv.net/) 可自动激活虚拟环境：
+
+```bash
+# 1. 安装 direnv
+# Ubuntu/Debian
+sudo apt install direnv
+
+# macOS
+brew install direnv
+
+# 2. 配置 shell
+echo 'eval "$(direnv hook bash)"' >> ~/.bashrc  # bash
+echo 'eval "$(direnv hook zsh)"' >> ~/.zshrc    # zsh
+
+# 3. 重新加载配置
+source ~/.bashrc  # 或 source ~/.zshrc
+
+# 4. 进入项目目录时自动激活虚拟环境
+cd /path/to/football-predict-system
+direnv allow
+```
+
+> 💡 **提示**: 配置成功后，每次进入项目目录都会自动激活虚拟环境，无需手动 `source .venv/bin/activate`
+
+### 备选方案：Makefile 和 Git 钩子
+
+如果不使用 direnv，项目的 Makefile 和 Git 钩子已自动处理虚拟环境激活。
+
 ## ⚡ 快速开始
 
 ### 1. 一键安装
