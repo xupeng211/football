@@ -42,14 +42,15 @@ class DataPlatformSetup:
             # Determine database type from URL
             db_url = self.settings.database.url
             is_postgres = "postgresql" in db_url
-            is_sqlite = "sqlite" in db_url
 
             # Choose appropriate schema file
             if is_postgres:
                 schema_file = Path(__file__).parent.parent.parent / "sql" / "schema.sql"
             else:
                 # For SQLite, use a simplified schema
-                schema_file = Path(__file__).parent.parent.parent / "sql" / "schema_sqlite.sql"
+                schema_file = (
+                    Path(__file__).parent.parent.parent / "sql" / "schema_sqlite.sql"
+                )
 
                 # If SQLite schema doesn't exist, create it
                 if not schema_file.exists():
@@ -75,9 +76,14 @@ class DataPlatformSetup:
                     # SQLite: Skip PostgreSQL-specific statements
                     statements = [s.strip() for s in schema_sql.split(";") if s.strip()]
                     for statement in statements:
-                        if statement and not any(pg_keyword in statement.upper() for pg_keyword in [
-                            "CREATE EXTENSION", "UUID_GENERATE_V4", "WITH TIME ZONE"
-                        ]):
+                        if statement and not any(
+                            pg_keyword in statement.upper()
+                            for pg_keyword in [
+                                "CREATE EXTENSION",
+                                "UUID_GENERATE_V4",
+                                "WITH TIME ZONE",
+                            ]
+                        ):
                             # Convert PostgreSQL syntax to SQLite
                             statement = statement.replace("UUID", "TEXT")
                             statement = statement.replace("NOW()", "CURRENT_TIMESTAMP")
@@ -157,7 +163,9 @@ CREATE TABLE IF NOT EXISTS matches (
         logger.info("Verifying API access...")
 
         # Check if API key is configured (use environment variable or default)
-        api_key = getattr(self.settings, 'football_data_api_key', None) or os.getenv('FOOTBALL_DATA_API_KEY')
+        api_key = getattr(self.settings, "football_data_api_key", None) or os.getenv(
+            "FOOTBALL_DATA_API_KEY"
+        )
         if not api_key:
             logger.error("FOOTBALL_DATA_API_KEY not configured")
             return False
