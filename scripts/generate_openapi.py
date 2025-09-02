@@ -5,7 +5,7 @@ Generate OpenAPI schema for the FastAPI application.
 import json
 from pathlib import Path
 
-from apps.api.main import app
+from football_predict_system.main import app
 
 
 def generate_openapi_schema() -> None:

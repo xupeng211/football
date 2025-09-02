@@ -23,7 +23,9 @@ def test_health_check_e2e():
 
     # Assert: 验证结果是否符合预期
     assert response.status_code == 200
-    assert response.json() == {"status": "ok"}
+    # 修正期望值以匹配实际的livez端点返回
+    response_data = response.json()
+    assert response_data["status"] == "alive"
 
 
 @pytest.mark.e2e

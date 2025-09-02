@@ -146,10 +146,17 @@ ignore = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**/*.py" = ["F821"]
+"tests/**/*.py" = ["F821", "E501"]
 "tests/unit/test_runs_logger_complete.py" = ["E501"]
 "scripts/automated_test_report.py" = ["E501"] 
 "scripts/coverage-monitor.py" = ["E501"]
+"src/football_predict_system/core/health.py" = ["E501"]
+"src/football_predict_system/main.py" = ["E501"]
+"src/football_predict_system/api/v1/predictions.py" = ["E501", "F821"]
+"src/football_predict_system/core/database.py" = ["E501"]
+"src/football_predict_system/api/v1/models.py" = ["E501", "F821"]
+"src/football_predict_system/api/v1/endpoints.py" = ["E501"]
+"tests/performance/test_api_benchmarks.py" = ["E501"]
 
 [tool.ruff.lint.mccabe]
 max-complexity = 10

@@ -204,6 +204,9 @@ class TestLoggingFunctions:
         mock_settings.logging.format = "json"
         mock_settings.logging.file.enabled = False
         mock_settings.logging.console.enabled = True
+        mock_settings.logging.file_path = None
+        mock_settings.logging.max_file_size = 10485760
+        mock_settings.logging.backup_count = 5
         mock_get_settings.return_value = mock_settings
 
         # Should not raise exception
@@ -280,6 +283,9 @@ class TestLoggingIntegration:
         mock_settings.logging.format = "json"
         mock_settings.logging.file.enabled = False
         mock_settings.logging.console.enabled = True
+        mock_settings.logging.file_path = None
+        mock_settings.logging.max_file_size = 10485760
+        mock_settings.logging.backup_count = 5
         mock_get_settings.return_value = mock_settings
 
         # Test full workflow

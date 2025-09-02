@@ -227,12 +227,12 @@ class DatabaseManager:
             # Test synchronous connection
             with self.get_session() as session:
                 result = session.execute(self._health_check_query)
-                sync_result = result.scalar()
+                sync_result = result.scalar() or 0
 
             # Test asynchronous connection
             async with self.get_async_session() as session:
                 result = await session.execute(self._health_check_query)
-                async_result = result.scalar()
+                async_result = result.scalar() or 0
 
             duration = time.time() - start_time
 

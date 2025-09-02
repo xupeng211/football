@@ -17,7 +17,7 @@ from .predictions import router as predictions_router
 router = APIRouter()
 
 # Include endpoint routers
-router.include_router(predictions_router, prefix="/predictions", tags=["predictions"])
+router.include_router(predictions_router, prefix="/predict", tags=["predictions"])
 router.include_router(models_router, prefix="/models", tags=["models"])
 # router.include_router(data_router, prefix="/data", tags=["data"])
 # router.include_router(monitoring_router, prefix="/monitoring", tags=["monitoring"])

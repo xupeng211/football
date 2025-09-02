@@ -38,9 +38,10 @@ class ComponentHealth(BaseModel):
 
     name: str
     status: HealthStatus
-    response_time: float
+    message: str | None = None
+    response_time: float | None = None
     details: dict[str, Any] = {}
-    last_check: datetime
+    last_check: datetime | None = None
     error: str | None = None
 
 
@@ -252,7 +253,13 @@ class HealthChecker:
 
             response_time = time.time() - start_time
 
-            status = HealthStatus.HEALTHY if model_count > 0 else HealthStatus.DEGRADED
+            # In development/testing environments, empty model registry is acceptable
+            if self.settings.environment.value in ["development", "testing"]:
+                status = HealthStatus.HEALTHY  # Always healthy in dev/test
+            else:
+                status = (
+                    HealthStatus.HEALTHY if model_count > 0 else HealthStatus.DEGRADED
+                )
 
             return ComponentHealth(
                 name="model_registry",

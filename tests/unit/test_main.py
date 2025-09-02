@@ -116,17 +116,23 @@ class TestErrorHandling:
 
         from fastapi import Request
 
-        from football_predict_system.core.exceptions import BaseApplicationError
+        from football_predict_system.core.exceptions import (
+            BaseApplicationError,
+            ErrorCode,
+        )
 
         # Get the error handler
         handler = app.exception_handlers[BaseApplicationError]
 
         # Create a mock request and exception
         mock_request = Mock(spec=Request)
-        mock_exception = BaseApplicationError("Test error", status_code=400)
+        mock_exception = BaseApplicationError(
+            "Test error", error_code=ErrorCode.VALIDATION_ERROR
+        )
 
-        # Call the handler
-        response = handler(mock_request, mock_exception)
+        # Call the async handler
+        import asyncio
+        response = asyncio.run(handler(mock_request, mock_exception))
 
         # Should return a JSONResponse
         from fastapi.responses import JSONResponse

@@ -168,6 +168,38 @@ class Settings(BaseSettings):
     app_name: str = "Football Prediction System"
     app_version: str = "1.0.0"
 
+    # JWT Configuration (for backward compatibility)
+    jwt_secret_key: str = Field(default="", description="JWT secret key")
+    jwt_algorithm: str = Field(default="HS256", description="JWT algorithm")
+    jwt_expire_minutes: int = Field(
+        default=30, description="JWT expiration time in minutes"
+    )
+
+    # Redis URL (for backward compatibility)
+    redis_url: str = Field(default="", description="Redis connection URL")
+    redis_password: str = Field(default="", description="Redis password")
+
+    def model_post_init(self, __context: Any) -> None:
+        """Post initialization to sync values."""
+        # Sync JWT settings with API config if not explicitly set
+        if not self.jwt_secret_key:
+            self.jwt_secret_key = self.api.secret_key
+        else:
+            # If explicitly set, update API config
+            self.api.secret_key = self.jwt_secret_key
+
+        if self.jwt_expire_minutes != 30:  # If changed from default
+            self.api.access_token_expire_minutes = self.jwt_expire_minutes
+        else:
+            self.jwt_expire_minutes = self.api.access_token_expire_minutes
+
+        # Sync Redis URL
+        if not self.redis_url:
+            self.redis_url = self.redis.url
+        else:
+            # If explicitly set, update Redis config
+            self.redis.url = self.redis_url
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
@@ -193,7 +225,7 @@ class Settings(BaseSettings):
 
     def get_database_url(self) -> str:
         """Get database URL with environment-specific modifications."""
-        # Use direct environment variable if available, otherwise fallback to config
+        # Use direct environment variable if available, otherwise fallback
         db_url = (
             self.database_url if hasattr(self, "database_url") else self.database.url
         )
@@ -202,17 +234,25 @@ class Settings(BaseSettings):
         return db_url
 
 
-# Global settings instance
-settings = Settings()
+# Global settings instance (lazy initialization)
+_settings: Settings | None = None
 
 
 def get_settings() -> Settings:
     """Get application settings instance."""
-    return settings
+    global _settings
+    # Handle case where _settings might be deleted by tests
+    if "_settings" not in globals() or _settings is None:
+        _settings = Settings()
+    return _settings
+
+
+# Initialize settings for backward compatibility
+settings = get_settings()
 
 
 def reload_settings() -> Settings:
     """Reload settings from environment."""
-    global settings
-    settings = Settings()
-    return settings
+    global _settings
+    _settings = Settings()
+    return _settings

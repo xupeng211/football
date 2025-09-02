@@ -302,9 +302,10 @@ class CacheManager:
 
     async def close(self) -> None:
         """Close cache connections."""
-        if self._redis_client:
-            await self._redis_client.close()
-            self.logger.info("Redis client closed")
+        redis_client = await self.get_redis_client()
+        if redis_client:
+            await redis_client.close()
+        self.logger.info("Redis client closed")
 
 
 # Global cache manager instance

@@ -64,9 +64,15 @@ app = FastAPI(
     debug=settings.debug,
     lifespan=lifespan,
     # Add OpenAPI documentation configuration here
-    openapi_url="/api/v1/openapi.json",
+    openapi_url="/openapi.json",  # Standard OpenAPI URL
     docs_url="/docs",
     redoc_url="/redoc",
+    openapi_tags=[
+        {"name": "general", "description": "General endpoints"},
+        {"name": "monitoring", "description": "Health and monitoring endpoints"},
+        {"name": "predictions", "description": "Prediction endpoints"},
+        {"name": "models", "description": "Model management endpoints"},
+    ],
 )
 
 # Configure Prometheus monitoring
@@ -278,12 +284,38 @@ async def root():
     """Root endpoint with application information."""
     return {
         "app_name": settings.app_name,
+        "message": f"Welcome to {settings.app_name}",
         "version": settings.app_version,
         "environment": settings.environment.value,
         "timestamp": datetime.utcnow().isoformat(),
         "docs_url": "/docs",
         "health_url": "/health",
     }
+
+
+# Add version endpoint for compatibility
+@app.get("/version", tags=["general"])
+async def get_version():
+    """Get application version information."""
+    return {
+        "app_name": settings.app_name,
+        "version": settings.app_version,
+        "api_version": "v1",  # 添加API版本
+        "model_version": settings.ml.default_model_version or "1.0.0",
+        "model_info": {
+            "registry_path": settings.ml.model_registry_path,
+            "default_version": settings.ml.default_model_version or "1.0.0",
+        },
+        "environment": settings.environment.value,
+        "timestamp": datetime.utcnow().isoformat(),
+    }
+
+
+# Add livez endpoint for compatibility
+@app.get("/livez", tags=["monitoring"])
+async def livez():
+    """Liveness probe endpoint (alias for /health/live)."""
+    return await liveness_check()
 
 
 # Example of how to run the application with uvicorn

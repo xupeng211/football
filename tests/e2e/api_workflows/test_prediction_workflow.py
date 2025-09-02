@@ -120,6 +120,18 @@ class TestPredictionWorkflowE2E:
 
         # 3. 发起预测请求 (如果端点存在)
         match_data = MatchFactory.create()
+        # 转换datetime字段为ISO字符串格式以支持JSON序列化
+        if "date" in match_data and hasattr(match_data["date"], "isoformat"):
+            match_data["date"] = match_data["date"].isoformat()
+        if "created_at" in match_data and hasattr(
+            match_data["created_at"], "isoformat"
+        ):
+            match_data["created_at"] = match_data["created_at"].isoformat()
+        if "updated_at" in match_data and hasattr(
+            match_data["updated_at"], "isoformat"
+        ):
+            match_data["updated_at"] = match_data["updated_at"].isoformat()
+
         prediction_response = await e2e_client.post(
             "/api/v1/predictions", json=match_data
         )
@@ -194,7 +206,7 @@ class TestPredictionWorkflowE2E:
         assert redoc_response.status_code == 200
 
         # 检查OpenAPI JSON
-        openapi_response = await e2e_client.get("/api/v1/openapi.json")
+        openapi_response = await e2e_client.get("/openapi.json")
         assert openapi_response.status_code == 200
         openapi_data = openapi_response.json()
         assert "info" in openapi_data

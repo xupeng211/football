@@ -44,24 +44,36 @@ def test_version_endpoint():
 def test_predict_smoke(monkeypatch):
     """测试预测接口冒烟测试"""
 
-    # Mock the prediction service
-    monkeypatch.setattr(
-        "apps.api.services.prediction_service.prediction_service",
-        lambda: type(
-            "MockPredictionService",
-            (object,),
+    # Mock the prediction service's generate_batch_predictions method
+
+    async def mock_generate_batch_predictions(self, request):
+        return type(
+            "BatchPredictionResponse",
+            (),
             {
-                "predict_batch": lambda self, matches, model_name=None: [
-                    {
-                        "home_win": 0.4,
-                        "draw": 0.3,
-                        "away_win": 0.3,
-                        "model_version": "test_v1",
-                    }
-                    for _ in matches
-                ]
+                "predictions": [
+                    type(
+                        "PredictionResponse",
+                        (),
+                        {
+                            "match_id": "test-id",
+                            "predicted_outcome": "home_win",
+                            "confidence": 0.75,
+                            "odds_home": 2.1,
+                            "odds_draw": 3.3,
+                            "odds_away": 3.2,
+                            "model_version": "test_v1",
+                        },
+                    )()
+                ],
+                "failed_predictions": 0,
+                "total_matches": 1,
             },
-        )(),
+        )()
+
+    monkeypatch.setattr(
+        "football_predict_system.domain.services.PredictionService.generate_batch_predictions",
+        mock_generate_batch_predictions,
     )
 
     # Send a valid request to the correct endpoint

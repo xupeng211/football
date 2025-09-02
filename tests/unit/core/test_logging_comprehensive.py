@@ -207,7 +207,7 @@ class TestErrorProcessor:
 
             result = self.processor(self.mock_logger, "error", event_dict)
 
-            assert result["error"] == e
+            assert result["error"] == str(e)
             assert result["message"] == "test error"
             assert "error_details" in result
             assert result["error_details"]["type"] == "ValueError"
@@ -250,8 +250,11 @@ class TestLoggingSetup:
         with patch(
             "football_predict_system.core.logging.get_settings"
         ) as mock_settings:
-            mock_settings.return_value.environment = "development"
-            mock_settings.return_value.log_level = "DEBUG"
+            mock_settings.return_value.environment.value = "development"
+            mock_settings.return_value.logging.level = "DEBUG"
+            mock_settings.return_value.logging.file_path = None
+            mock_settings.return_value.logging.max_file_size = 10485760
+            mock_settings.return_value.logging.backup_count = 5
 
             setup_logging()
 
@@ -264,8 +267,11 @@ class TestLoggingSetup:
         with patch(
             "football_predict_system.core.logging.get_settings"
         ) as mock_settings:
-            mock_settings.return_value.environment = "production"
-            mock_settings.return_value.log_level = "INFO"
+            mock_settings.return_value.environment.value = "production"
+            mock_settings.return_value.logging.level = "INFO"
+            mock_settings.return_value.logging.file_path = "/tmp/test_app.log"
+            mock_settings.return_value.logging.max_file_size = 10485760
+            mock_settings.return_value.logging.backup_count = 5
 
             setup_logging()
 
