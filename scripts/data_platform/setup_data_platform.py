@@ -8,6 +8,7 @@ Usage:
 
 import argparse
 import asyncio
+import os
 import sys
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -38,8 +39,22 @@ class DataPlatformSetup:
         logger.info("Setting up database schema...")
 
         try:
-            # Read schema file
-            schema_file = Path(__file__).parent.parent.parent / "sql" / "schema.sql"
+            # Determine database type from URL
+            db_url = self.settings.database.url
+            is_postgres = "postgresql" in db_url
+            is_sqlite = "sqlite" in db_url
+
+            # Choose appropriate schema file
+            if is_postgres:
+                schema_file = Path(__file__).parent.parent.parent / "sql" / "schema.sql"
+            else:
+                # For SQLite, use a simplified schema
+                schema_file = Path(__file__).parent.parent.parent / "sql" / "schema_sqlite.sql"
+
+                # If SQLite schema doesn't exist, create it
+                if not schema_file.exists():
+                    await self._create_sqlite_schema()
+                    return True
 
             if not schema_file.exists():
                 logger.error(f"Schema file not found: {schema_file}")
@@ -48,14 +63,25 @@ class DataPlatformSetup:
             with open(schema_file, encoding="utf-8") as f:
                 schema_sql = f.read()
 
-            # Execute schema
+            # Execute schema with database-specific handling
             async with self.db_manager.get_async_session() as session:
-                # Split by semicolon and execute each statement
-                statements = [s.strip() for s in schema_sql.split(";") if s.strip()]
-
-                for statement in statements:
-                    if statement:
-                        await session.execute(text(statement))
+                if is_postgres:
+                    # PostgreSQL: Execute statements as-is
+                    statements = [s.strip() for s in schema_sql.split(";") if s.strip()]
+                    for statement in statements:
+                        if statement:
+                            await session.execute(text(statement))
+                else:
+                    # SQLite: Skip PostgreSQL-specific statements
+                    statements = [s.strip() for s in schema_sql.split(";") if s.strip()]
+                    for statement in statements:
+                        if statement and not any(pg_keyword in statement.upper() for pg_keyword in [
+                            "CREATE EXTENSION", "UUID_GENERATE_V4", "WITH TIME ZONE"
+                        ]):
+                            # Convert PostgreSQL syntax to SQLite
+                            statement = statement.replace("UUID", "TEXT")
+                            statement = statement.replace("NOW()", "CURRENT_TIMESTAMP")
+                            await session.execute(text(statement))
 
                 await session.commit()
 
@@ -66,11 +92,73 @@ class DataPlatformSetup:
             logger.error(f"Database setup failed: {e}")
             return False
 
+    async def _create_sqlite_schema(self) -> None:
+        """Create SQLite-compatible schema."""
+        sqlite_schema = """
+-- SQLite-compatible schema for Football Data Platform
+CREATE TABLE IF NOT EXISTS countries (
+    id TEXT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL UNIQUE,
+    code VARCHAR(3) NOT NULL UNIQUE,
+    fifa_code VARCHAR(3),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS leagues (
+    id TEXT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    short_name VARCHAR(20),
+    country_id TEXT REFERENCES countries(id),
+    level INTEGER DEFAULT 1,
+    season_format VARCHAR(20) DEFAULT 'autumn_spring',
+    external_api_id INTEGER,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS teams (
+    id TEXT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    short_name VARCHAR(50),
+    country_id TEXT REFERENCES countries(id),
+    league_id TEXT REFERENCES leagues(id),
+    external_api_id INTEGER,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS matches (
+    id TEXT PRIMARY KEY,
+    home_team_id TEXT REFERENCES teams(id),
+    away_team_id TEXT REFERENCES teams(id),
+    league_id TEXT REFERENCES leagues(id),
+    match_date TIMESTAMP,
+    status VARCHAR(20),
+    home_score INTEGER,
+    away_score INTEGER,
+    external_api_id INTEGER,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+"""
+
+        async with self.db_manager.get_async_session() as session:
+            statements = [s.strip() for s in sqlite_schema.split(";") if s.strip()]
+            for statement in statements:
+                if statement:
+                    await session.execute(text(statement))
+            await session.commit()
+
+        logger.info("SQLite schema created successfully")
+
     async def verify_api_access(self) -> bool:
         """Verify API access."""
         logger.info("Verifying API access...")
 
-        if not self.settings.football_data_api_key:
+        # Check if API key is configured (use environment variable or default)
+        api_key = getattr(self.settings, 'football_data_api_key', None) or os.getenv('FOOTBALL_DATA_API_KEY')
+        if not api_key:
             logger.error("FOOTBALL_DATA_API_KEY not configured")
             return False
 
