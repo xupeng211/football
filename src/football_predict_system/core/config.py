@@ -157,7 +157,7 @@ class Settings(BaseSettings):
     database: DatabaseConfig = Field(default_factory=DatabaseConfig)
 
     # Direct environment variable support
-    database_url: str = Field(default="sqlite:///./test.db", env="DATABASE_URL")
+    database_url: str = Field(default="sqlite:///./test.db")
     redis: RedisConfig = Field(default_factory=RedisConfig)
     api: APIConfig = Field(default_factory=APIConfig)
     logging: LoggingConfig = Field(default_factory=LoggingConfig)

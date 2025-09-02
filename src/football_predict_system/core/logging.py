@@ -143,7 +143,7 @@ def setup_logging() -> None:
     logging.root.handlers.clear()
 
     # Configure structlog
-    processors: list = [
+    processors: list[Any] = [
         structlog.contextvars.merge_contextvars,
         CorrelationIDProcessor(),
         PerformanceProcessor(),
@@ -250,12 +250,15 @@ def clear_context() -> None:
 class LoggingMiddleware:
     """Middleware for automatic request logging."""
 
-    def __init__(self, app: Callable) -> None:
+    def __init__(self, app: Callable[..., Any]) -> None:
         self.app = app
         self.logger = get_logger(__name__)
 
     async def __call__(
-        self, scope: dict[str, Any], receive: Callable, send: Callable
+        self,
+        scope: dict[str, Any],
+        receive: Callable[..., Any],
+        send: Callable[..., Any],
     ) -> None:
         if scope["type"] != "http":
             await self.app(scope, receive, send)
@@ -298,10 +301,10 @@ class LoggingMiddleware:
             clear_context()
 
 
-def log_performance(operation: str) -> Callable:
+def log_performance(operation: str) -> Callable[..., Any]:
     """Decorator for logging operation performance."""
 
-    def decorator(func: Callable) -> Callable:
+    def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
         async def async_wrapper(*args: Any, **kwargs: Any) -> Any:
             logger = get_logger(func.__module__)
             start_time = time.time()
