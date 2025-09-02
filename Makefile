@@ -328,3 +328,102 @@ ci.fix: ## 🔧 自动修复代码格式问题
 	uv run ruff format .
 	uv run ruff check . --fix
 	@echo "✅ 代码格式修复完成"
+
+# === 🐳 Docker CI 本地演练系统 ===
+.PHONY: ci.docker.new
+ci.docker.new: ## 🐳 运行新Docker化本地CI (完全模拟远程环境)
+	@echo "$(CYAN)🐳 启动Docker化本地CI演练...$(NC)"
+	@if [ ! -f "scripts/ci/local_ci_orchestrator.sh" ]; then \
+		echo "$(RED)❌ CI编排器脚本不存在$(NC)"; \
+		exit 1; \
+	fi
+	@bash scripts/ci/local_ci_orchestrator.sh
+
+.PHONY: ci.docker.build
+ci.docker.build: ## 🐳 构建本地CI Docker镜像
+	@echo "$(CYAN)🐳 构建本地CI Docker镜像...$(NC)"
+	@if [ ! -f "Dockerfile.ci" ]; then \
+		echo "$(RED)❌ Dockerfile.ci 不存在$(NC)"; \
+		exit 1; \
+	fi
+	docker build -t football-predict-ci:latest -f Dockerfile.ci .
+	@echo "$(GREEN)✅ CI镜像构建完成$(NC)"
+
+.PHONY: ci.docker.rebuild
+ci.docker.rebuild: ## 🐳 强制重建CI Docker镜像
+	@echo "$(CYAN)🐳 强制重建CI Docker镜像...$(NC)"
+	docker build --no-cache -t football-predict-ci:latest -f Dockerfile.ci .
+	@echo "$(GREEN)✅ CI镜像重建完成$(NC)"
+
+.PHONY: ci.docker.run
+ci.docker.run: ## 🐳 交互式运行CI容器 (调试用)
+	@echo "$(CYAN)🐳 启动交互式CI容器...$(NC)"
+	docker run -it --rm \
+		--workdir /workspace \
+		--volume "$(PWD):/workspace:ro" \
+		--env PYTHONPATH=/workspace/src \
+		--env ENVIRONMENT=testing \
+		football-predict-ci:latest \
+		/bin/bash
+
+.PHONY: ci.docker.clean
+ci.docker.clean: ## 🐳 清理CI Docker资源
+	@echo "$(CYAN)🐳 清理CI Docker资源...$(NC)"
+	-docker rmi football-predict-ci:latest 2>/dev/null || echo "$(YELLOW)⚠️  镜像不存在$(NC)"
+	-docker system prune -f
+	@echo "$(GREEN)✅ Docker资源清理完成$(NC)"
+
+.PHONY: ci.doctor
+ci.doctor: ## 🏥 CI环境诊断
+	@echo "$(CYAN)🏥 CI环境诊断...$(NC)"
+	@echo ""
+	@echo "📋 环境检查:"
+	@echo "============"
+	@echo "🐍 Python: $$(python3 --version 2>/dev/null || echo '未安装')"
+	@echo "📦 UV: $$(uv --version 2>/dev/null || echo '未安装')"
+	@echo "🐳 Docker: $$(docker --version 2>/dev/null || echo '未安装')"
+	@echo "🔧 Make: $$(make --version | head -1 2>/dev/null || echo '未安装')"
+	@echo ""
+	@echo "📁 项目文件:"
+	@echo "==========="
+	@echo "pyproject.toml: $$([ -f pyproject.toml ] && echo '✅ 存在' || echo '❌ 缺失')"
+	@echo "Dockerfile.ci: $$([ -f Dockerfile.ci ] && echo '✅ 存在' || echo '❌ 缺失')"
+	@echo "CI编排器: $$([ -f scripts/ci/local_ci_orchestrator.sh ] && echo '✅ 存在' || echo '❌ 缺失')"
+	@echo "CI执行器: $$([ -f scripts/ci/local_ci_runner.sh ] && echo '✅ 存在' || echo '❌ 缺失')"
+	@echo ""
+	@echo "🐳 Docker状态:"
+	@echo "============="
+	@if command -v docker >/dev/null 2>&1; then \
+		if docker info >/dev/null 2>&1; then \
+			echo "✅ Docker daemon运行正常"; \
+			echo "📊 镜像: $$(docker images --format 'table {{.Repository}}\t{{.Tag}}\t{{.Size}}' | grep football-predict-ci || echo '无CI镜像')"; \
+		else \
+			echo "❌ Docker daemon未运行"; \
+		fi; \
+	else \
+		echo "❌ Docker未安装"; \
+	fi
+	@echo ""
+	@echo "💡 修复建议:"
+	@echo "==========="
+	@echo "• 构建CI镜像: make ci.docker.build"
+	@echo "• 测试Docker CI: make ci.docker.new"
+	@echo "• 测试本地CI: make ci.local"
+
+.PHONY: ci.enhanced
+ci.enhanced: format lint security ## 🔧 增强版本地CI检查 (替代ci.local)
+	@echo "$(GREEN)✅ 增强版本地CI检查完成$(NC)"
+
+.PHONY: ci.full.new
+ci.full.new: ci.docker.new ## 🔧 完整CI检查 (Docker + 所有测试)
+	@echo "$(GREEN)✅ 完整CI检查完成$(NC)"
+
+# 别名任务 - 便于记忆和使用
+.PHONY: docker-ci
+docker-ci: ci.docker.new ## 🐳 ci.docker.new 的别名
+
+.PHONY: build-ci
+build-ci: ci.docker.build ## 🐳 ci.docker.build 的别名  
+
+.PHONY: clean-ci
+clean-ci: ci.docker.clean ## 🐳 ci.docker.clean 的别名
