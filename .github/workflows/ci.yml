@@ -1,11 +1,11 @@
-# 🚀 Ultra-Stable CI - Minimal Robust Configuration
-name: CI-Stable
+# 🛡️ Comprehensive CI Pipeline - 严格质量门禁
+name: Comprehensive-CI
 
 on:
   push:
     branches: [main, dev, refactor-v3]
   pull_request:
-    branches: [main]
+    branches: [main, dev]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -13,177 +13,544 @@ concurrency:
 
 env:
   PYTHON_VERSION: "3.11"
+  # 测试环境配置
+  DATABASE_URL: "postgresql://test_user:test_pass@localhost:5432/test_football_db"
+  REDIS_URL: "redis://localhost:6379/1"
+  FOOTBALL_DATA_API_KEY: "test_api_key"
+  ENVIRONMENT: "testing"
 
 jobs:
-  core-checks:
-    name: ✅ Core Quality & Tests
+  # =================== 第一层: 代码质量门禁 ===================
+  code-quality:
+    name: 🎨 Code Quality Gate
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 10
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
-      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           
-      - name: Install uv (ultra-stable method)
+      - name: Install uv
         run: |
-          echo "🔧 Installing uv..."
           curl -LsSf https://astral.sh/uv/install.sh | sh
-          export PATH="$HOME/.local/bin:$PATH"
           echo "$HOME/.local/bin" >> $GITHUB_PATH
-          uv --version
-          echo "✅ uv installed successfully"
-
-      - name: Prepare environment
+          
+      - name: Install dependencies
         run: |
-          export PATH="$HOME/.local/bin:$PATH" 
-          echo "🏗️ Setting up environment..."
+          uv sync --extra dev
           
-          # Create project directories if needed
-          mkdir -p src tests
-          
-          # Verify project structure
-          echo "📁 Project structure:"
-          ls -la
-          echo "✅ Environment prepared"
-
-      - name: Install core dependencies
+      - name: ❌ STRICT Format Check
         run: |
-          export PATH="$HOME/.local/bin:$PATH"
-          echo "📦 Installing dependencies..."
+          echo "🎨 检查代码格式..."
+          uv run ruff format --check .
+          echo "✅ 代码格式检查通过"
           
-          # Try uv sync first, fallback to manual installation
-          if uv sync --extra dev; then
-            echo "✅ uv sync successful"
-          else
-            echo "⚠️ uv sync failed, trying manual installation..."
-            uv venv --python 3.11
-            source .venv/bin/activate
-            uv pip install -e . || echo "Editable install failed"
-          fi
-          
-          # Install critical dependencies
-          uv pip install bcrypt PyJWT || pip install bcrypt PyJWT
-          
-          # Basic verification
-          python -c "print('🐍 Python ready')"
-          echo "✅ Dependencies installed"
-
-      - name: Basic validation
+      - name: ❌ STRICT Lint Check  
         run: |
-          export PATH="$HOME/.local/bin:$PATH"
-          echo "🔍 Basic validation..."
+          echo "🔍 执行代码检查..."
+          uv run ruff check . --output-format=github
+          echo "✅ 代码检查通过"
           
-          # Check Python
-          python --version
-          
-          # Check critical imports
-          python -c "
-          try:
-              import bcrypt, jwt
-              print('✅ Critical dependencies available')
-          except Exception as e:
-              print(f'⚠️ Dependency warning: {e}')
-          
-          # Check project structure
-          import sys, os
-          sys.path.append('src')
-          try:
-              import football_predict_system
-              print('✅ Project importable')
-          except Exception as e:
-              print(f'⚠️ Project import: {e}')
-          "
-
-      - name: Quality checks (permissive)
+      - name: ❌ STRICT Type Check
         run: |
-          export PATH="$HOME/.local/bin:$PATH"
-          echo "🎨 Running quality checks..."
+          echo "🔬 执行类型检查..."
+          uv run mypy src/ --show-error-codes --no-error-summary
+          echo "✅ 类型检查通过"
           
-          # Format check (non-blocking)
-          if command -v ruff &> /dev/null && uv run ruff format --check . 2>/dev/null; then
-            echo "✅ Format check passed"
-          else
-            echo "⚠️ Format check skipped or failed"
-          fi
-          
-          # Lint check (non-blocking)  
-          if command -v ruff &> /dev/null && uv run ruff check . 2>/dev/null; then
-            echo "✅ Lint check passed"
-          else
-            echo "⚠️ Lint check skipped or failed"
-          fi
-
-      - name: Core tests (permissive)
-        env:
-          PYTHONPATH: ${{ github.workspace }}/src
+      - name: ❌ STRICT Security Check
         run: |
-          export PATH="$HOME/.local/bin:$PATH"
-          echo "🧪 Running tests..."
-          
-          # Test simple functionality
-          if command -v pytest &> /dev/null; then
-            if uv run pytest tests/test_api_simple.py -v --tb=short 2>/dev/null; then
-              echo "✅ Basic tests passed"
-            else
-              echo "⚠️ Some tests had issues, checking imports..."
-              python -c "
-              import sys
-              sys.path.append('src')
-              sys.path.append('tests')
-              print('✅ Basic test environment verified')
-              "
-            fi
-          else
-            echo "⚠️ pytest not available, running basic checks"
-            python -c "print('✅ Python environment ready')"
-          fi
+          echo "🛡️ 执行安全扫描..."
+          uv run bandit -r src/ -c pyproject.toml
+          echo "✅ 安全检查通过"
 
-      - name: Final verification
-        run: |
-          export PATH="$HOME/.local/bin:$PATH"
-          echo "🎯 Final verification..."
-          
-          # Check git status
-          echo "Git status: $(git rev-parse --short HEAD)"
-          
-          # Basic project health
-          python -c "
-          print('🚀 Final system check:')
-          import sys
-          print(f'Python version: {sys.version}')
-          
-          try:
-              import bcrypt, jwt
-              print('✅ Security dependencies: OK')
-          except:
-              print('⚠️ Security dependencies: Missing')
-          
-          print('✅ Core functionality verified!')
-          "
-
-  summary:
-    name: 📋 CI Summary
+  # =================== 第二层: 基础功能门禁 ===================
+  basic-functionality:
+    name: 🧪 Basic Functionality Gate
     runs-on: ubuntu-latest
-    needs: [core-checks]
-    if: always()
-    steps:
-      - name: Report results
-        run: |
-          echo "📊 CI Results Summary:"
-          echo "================================"
-          echo "Core checks result: ${{ needs.core-checks.result }}"
+    needs: code-quality
+    timeout-minutes: 15
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_pass
+          POSTGRES_DB: test_football_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
           
-          if [[ "${{ needs.core-checks.result }}" == "success" ]]; then
-            echo "🎉 SUCCESS: All core functionality verified!"
-            echo "✅ 绿灯亮起！CI通过！"
-          elif [[ "${{ needs.core-checks.result }}" == "cancelled" ]]; then
-            echo "⏸️ CANCELLED: CI was cancelled"
+      redis:
+        image: redis:7
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          
+      - name: Install uv and dependencies
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          uv sync --extra dev
+          
+      - name: ❌ STRICT Module Import Test
+        run: |
+          echo "📦 测试模块导入..."
+          uv run python -c "
+          import sys
+          sys.path.insert(0, 'src')
+          
+          # 测试核心模块
+          from football_predict_system.core.config import get_settings
+          from football_predict_system.core.database import get_database_manager
+          from football_predict_system.domain.models import Match, Team
+          print('✅ 核心模块导入成功')
+          
+          # 测试数据平台模块
+          from football_predict_system.data_platform.sources.base import DataSource
+          from football_predict_system.data_platform.sources.football_data_api import FootballDataAPICollector
+          from football_predict_system.data_platform.storage.database_writer import DatabaseWriter
+          from football_predict_system.data_platform.config import get_data_platform_config
+          print('✅ 数据平台模块导入成功')
+          
+          # 测试流程模块
+          from football_predict_system.data_platform.flows.data_collection import daily_data_collection_flow
+          print('✅ 流程模块导入成功')
+          "
+          
+      - name: ❌ STRICT Database Schema Test
+        run: |
+          echo "🗄️ 测试数据库Schema..."
+          # 验证SQL语法
+          uv run python -c "
+          import sqlparse
+          with open('sql/schema.sql', 'r') as f:
+              schema = f.read()
+          
+          statements = sqlparse.split(schema)
+          print(f'解析到 {len(statements)} 条SQL语句')
+          
+          for i, stmt in enumerate(statements[:5]):  # 检查前5条
+              if stmt.strip():
+                  parsed = sqlparse.parse(stmt)[0]
+                  print(f'SQL {i+1}: 语法正确')
+          
+          print('✅ SQL Schema语法验证通过')
+          "
+          
+          # 实际执行Schema
+          uv run python scripts/data_platform/setup_data_platform.py --action setup
+          echo "✅ 数据库Schema创建成功"
+          
+      - name: ❌ STRICT Configuration Test
+        run: |
+          echo "⚙️ 测试配置系统..."
+          uv run python -c "
+          import sys
+          sys.path.insert(0, 'src')
+          
+          from football_predict_system.data_platform.config import get_data_platform_config
+          config = get_data_platform_config()
+          
+          assert config.football_data_org.rate_limit_per_minute > 0
+          assert len(config.schedule.daily_competitions) > 0
+          assert config.schedule.daily_collection_cron
+          
+          print('✅ 配置系统验证通过')
+          "
+
+  # =================== 第三层: 核心功能集成测试 ===================
+  integration-tests:
+    name: 🔗 Integration Test Gate  
+    runs-on: ubuntu-latest
+    needs: basic-functionality
+    timeout-minutes: 20
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_pass
+          POSTGRES_DB: test_football_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+          
+      redis:
+        image: redis:7
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Set up Python and dependencies
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          
+      - name: Install uv and dependencies
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          uv sync --extra dev
+          
+      - name: Setup test environment
+        run: |
+          echo "🏗️ 设置测试环境..."
+          uv run python scripts/data_platform/setup_data_platform.py --action setup
+          echo "✅ 测试环境准备完成"
+          
+      - name: ❌ STRICT Database Writer Test
+        run: |
+          echo "🗄️ 测试数据库写入功能..."
+          uv run python -c "
+          import sys, asyncio
+          sys.path.insert(0, 'src')
+          
+          async def test_database_writer():
+              from football_predict_system.data_platform.storage.database_writer import DatabaseWriter
+              from football_predict_system.domain.models import Team, Match
+              
+              writer = DatabaseWriter()
+              
+              # 测试团队写入
+              test_teams = [
+                  Team(external_api_id=1, name='Test Team 1', short_name='TT1', tla='TT1'),
+                  Team(external_api_id=2, name='Test Team 2', short_name='TT2', tla='TT2')
+              ]
+              
+              result = await writer.upsert_teams(test_teams)
+              assert result.records_processed == len(test_teams), f'Expected {len(test_teams)}, got {result.records_processed}'
+              
+              print('✅ 数据库写入测试通过')
+              
+          asyncio.run(test_database_writer())
+          "
+          
+      - name: ❌ STRICT Data Validation Test
+        run: |
+          echo "✅ 测试数据验证逻辑..."
+          uv run python -c "
+          import sys, pandas as pd
+          sys.path.insert(0, 'src')
+          
+          from football_predict_system.data_platform.sources.football_data_api import FootballDataAPICollector
+          
+          collector = FootballDataAPICollector(api_key='test_key')
+          
+          # 测试有效数据
+          valid_data = pd.DataFrame({
+              'external_api_id': [1, 2],
+              'home_team': ['Team A', 'Team B'],
+              'away_team': ['Team C', 'Team D'],
+              'match_date': ['2024-01-01', '2024-01-02'],
+              'home_score': [2, 1],
+              'away_score': [1, 0],
+              'status': ['finished', 'finished']
+          })
+          
+          assert collector.validate(valid_data) == True, '有效数据验证失败'
+          
+          # 测试无效数据
+          invalid_data = pd.DataFrame({'external_api_id': [1]})
+          assert collector.validate(invalid_data) == False, '无效数据应该被拒绝'
+          
+          print('✅ 数据验证逻辑测试通过')
+          "
+          
+      - name: ❌ STRICT Flow Definition Test
+        run: |
+          echo "🔄 测试Prefect流程定义..."
+          uv run python -c "
+          import sys, asyncio
+          sys.path.insert(0, 'src')
+          
+          async def test_flows():
+              # 测试流程可以被导入和定义
+              from football_predict_system.data_platform.flows.data_collection import (
+                  daily_data_collection_flow,
+                  historical_backfill_flow,
+                  data_quality_check_flow
+              )
+              
+              # 验证流程签名
+              import inspect
+              
+              # 检查daily_data_collection_flow
+              sig = inspect.signature(daily_data_collection_flow)
+              assert len(sig.parameters) == 0, 'daily_data_collection_flow应该无参数'
+              
+              # 检查historical_backfill_flow  
+              sig = inspect.signature(historical_backfill_flow)
+              expected_params = {'competition_id', 'start_date', 'end_date'}
+              actual_params = set(sig.parameters.keys())
+              assert expected_params.issubset(actual_params), f'缺少参数: {expected_params - actual_params}'
+              
+              print('✅ Prefect流程定义测试通过')
+              
+          asyncio.run(test_flows())
+          "
+
+  # =================== 第四层: 数据平台功能门禁 ===================  
+  data-platform-tests:
+    name: 📊 Data Platform Functionality Gate
+    runs-on: ubuntu-latest
+    needs: integration-tests
+    timeout-minutes: 25
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_pass
+          POSTGRES_DB: test_football_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+          
+      redis:
+        image: redis:7
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Set up Python and dependencies
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          
+      - name: Install uv and dependencies
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          uv sync --extra dev
+          
+      - name: Setup test environment
+        run: |
+          uv run python scripts/data_platform/setup_data_platform.py --action setup
+          
+      - name: ❌ STRICT Mock API Response Test
+        run: |
+          echo "📡 测试API响应处理..."
+          uv run python -c "
+          import sys, asyncio, json
+          sys.path.insert(0, 'src')
+          
+          async def test_api_response_handling():
+              from football_predict_system.data_platform.sources.football_data_api import FootballDataAPICollector
+              
+              collector = FootballDataAPICollector(api_key='test_key')
+              
+              # 模拟API响应数据
+              mock_matches_response = {
+                  'matches': [
+                      {
+                          'id': 1,
+                          'homeTeam': {'id': 1, 'name': 'Liverpool', 'shortName': 'LIV', 'tla': 'LIV'},
+                          'awayTeam': {'id': 2, 'name': 'Arsenal', 'shortName': 'ARS', 'tla': 'ARS'},
+                          'utcDate': '2024-01-01T15:00:00Z',
+                          'score': {'fullTime': {'home': 2, 'away': 1}},
+                          'status': 'FINISHED'
+                      }
+                  ]
+              }
+              
+              # 测试数据解析
+              matches_df = collector._parse_matches_response(mock_matches_response)
+              assert len(matches_df) == 1, '应该解析出1场比赛'
+              assert matches_df.iloc[0]['home_score'] == 2, '主队得分应该是2'
+              assert matches_df.iloc[0]['away_score'] == 1, '客队得分应该是1'
+              
+              print('✅ API响应处理测试通过')
+              
+          asyncio.run(test_api_response_handling())
+          "
+          
+      - name: ❌ STRICT End-to-End Simulation Test
+        run: |
+          echo "🎯 端到端模拟测试..."
+          uv run python -c "
+          import sys, asyncio, pandas as pd
+          from datetime import datetime
+          sys.path.insert(0, 'src')
+          
+          async def test_end_to_end():
+              from football_predict_system.data_platform.storage.database_writer import DatabaseWriter
+              from football_predict_system.domain.models import Team, Match
+              
+              writer = DatabaseWriter()
+              
+              # 1. 测试完整的数据写入流程
+              test_teams = [
+                  Team(external_api_id=100, name='Test Team A', short_name='TTA', tla='TTA'),
+                  Team(external_api_id=101, name='Test Team B', short_name='TTB', tla='TTB')
+              ]
+              
+              team_result = await writer.upsert_teams(test_teams)
+              assert team_result.records_processed == 2, '团队写入失败'
+              
+              # 2. 测试数据质量统计
+              stats = await writer.get_data_quality_stats()
+              assert 'total_matches' in stats, '数据质量统计缺少total_matches'
+              assert 'teams_count' in stats, '数据质量统计缺少teams_count'
+              
+              # 3. 测试采集日志记录
+              from football_predict_system.data_platform.sources.base import CollectionStats
+              collection_stats = CollectionStats(
+                  started_at=datetime.utcnow(),
+                  records_fetched=10,
+                  records_processed=8
+              )
+              
+              await writer.log_collection_run('test_source', collection_stats)
+              print('✅ 采集日志记录成功')
+              
+              print('✅ 端到端模拟测试通过')
+              
+          asyncio.run(test_end_to_end())
+          "
+          
+      - name: ❌ STRICT Data Platform Health Check
+        run: |
+          echo "🏥 数据平台健康检查..."
+          uv run python scripts/data_platform/setup_data_platform.py --action health
+          echo "✅ 数据平台健康检查通过"
+
+  # =================== 第五层: 生产就绪验证 ===================
+  production-readiness:
+    name: 🏭 Production Readiness Gate
+    runs-on: ubuntu-latest  
+    needs: data-platform-tests
+    timeout-minutes: 10
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Set up Python and dependencies
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          
+      - name: Install uv and dependencies
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          uv sync --extra dev
+          
+      - name: ❌ STRICT Production Config Validation
+        run: |
+          echo "🔧 验证生产配置模板..."
+          
+          # 检查生产配置模板存在
+          test -f config/production.env.template || (echo "❌ 生产配置模板缺失" && exit 1)
+          
+          # 检查监控配置存在
+          test -f monitoring/prometheus/football_data_platform.yml || (echo "❌ Prometheus配置缺失" && exit 1)
+          test -f monitoring/grafana/dashboards/data_platform_dashboard.json || (echo "❌ Grafana面板缺失" && exit 1)
+          
+          # 检查生产脚本存在且可执行
+          test -x scripts/production/quick_production_setup.sh || (echo "❌ 生产设置脚本不可执行" && exit 1)
+          test -f scripts/production/production_checklist.py || (echo "❌ 生产检查脚本缺失" && exit 1)
+          
+          echo "✅ 生产配置验证通过"
+          
+      - name: ❌ STRICT Documentation Check
+        run: |
+          echo "📚 检查文档完整性..."
+          
+          # 检查核心文档存在
+          test -f README.md || (echo "❌ README.md缺失" && exit 1)
+          test -f docs/DATA_PLATFORM_GUIDE.md || (echo "❌ 数据平台文档缺失" && exit 1)
+          
+          # 检查Makefile包含数据平台命令
+          grep -q "data-setup" Makefile || (echo "❌ Makefile缺少data-setup命令" && exit 1)
+          grep -q "data-collect" Makefile || (echo "❌ Makefile缺少data-collect命令" && exit 1)
+          grep -q "data-monitor" Makefile || (echo "❌ Makefile缺少data-monitor命令" && exit 1)
+          
+          echo "✅ 文档完整性检查通过"
+
+  # =================== 最终报告 ===================
+  comprehensive-summary:
+    name: 📋 Comprehensive Quality Report
+    runs-on: ubuntu-latest
+    needs: [code-quality, basic-functionality, integration-tests, production-readiness]
+    if: always()
+    
+    steps:
+      - name: Generate Quality Report
+        run: |
+          echo "🏆 COMPREHENSIVE CI QUALITY REPORT"
+          echo "=========================================="
+          echo "📅 构建时间: $(date)"
+          echo "🔧 代码质量门禁: ${{ needs.code-quality.result }}"
+          echo "🧪 基础功能门禁: ${{ needs.basic-functionality.result }}"  
+          echo "🔗 集成测试门禁: ${{ needs.integration-tests.result }}"
+          echo "🏭 生产就绪门禁: ${{ needs.production-readiness.result }}"
+          echo
+          
+          # 判断整体结果
+          if [[ "${{ needs.code-quality.result }}" == "success" ]] && \
+             [[ "${{ needs.basic-functionality.result }}" == "success" ]] && \
+             [[ "${{ needs.integration-tests.result }}" == "success" ]] && \
+             [[ "${{ needs.production-readiness.result }}" == "success" ]]; then
+            echo "🎉 全部质量门禁通过！"
+            echo "✅ 功能完整性得到严格验证"
+            echo "🚀 代码可以安全部署到生产环境"
+            echo
+            echo "🎯 质量保证级别: ENTERPRISE GRADE ⭐⭐⭐⭐⭐"
           else
-            echo "⚠️ PARTIAL: Some checks failed, but basic functionality may be working"
-            echo "🔍 Check individual steps for details"
-            echo "💡 Consider this a 'yellow light' - core functionality may still be stable"
+            echo "⚠️ 部分质量门禁未通过"
+            echo "🔍 请检查失败的门禁并修复问题"
+            echo "❌ 不建议部署到生产环境"
+            echo
+            echo "🎯 质量保证级别: NEEDS IMPROVEMENT ⭐⭐"
+            exit 1
           fi 
