@@ -11,6 +11,7 @@ This module provides:
 
 import hashlib
 import secrets
+from collections.abc import Callable
 from datetime import datetime, timedelta
 from enum import Enum
 from typing import Any
@@ -424,10 +425,10 @@ rate_limiter = RateLimiter()
 input_validator = InputValidator()
 
 
-def require_permission(permission: Permission) -> Any:
+def require_permission(permission: Permission) -> Callable[..., Any]:
     """Decorator to require specific permission."""
 
-    def decorator(func: Any) -> Any:
+    def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
         def wrapper(*args: Any, **kwargs: Any) -> Any:
             # This would be implemented with dependency injection in FastAPI
             # For now, it's a placeholder for the concept

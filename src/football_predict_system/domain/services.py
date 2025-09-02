@@ -175,14 +175,14 @@ class PredictionService:
         # Placeholder implementation
         return None
 
-    async def _extract_features(self, match: Match) -> dict | None:
+    async def _extract_features(self, match: Match) -> dict[str, Any] | None:
         """Extract features for prediction."""
         # This would integrate with your feature extraction pipeline
         # Placeholder implementation
         return {}
 
     async def _predict_with_model(
-        self, model: Model, features: dict, match: Match
+        self, model: Model, features: dict[str, Any], match: Match
     ) -> Prediction:
         """Make prediction using the model."""
         # This would integrate with your ML model

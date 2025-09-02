@@ -14,7 +14,7 @@ import time
 from collections.abc import Callable
 from datetime import datetime, timedelta
 from functools import wraps
-from typing import Any, cast
+from typing import Any
 
 import redis.asyncio as redis
 from pydantic import BaseModel
@@ -47,13 +47,13 @@ class CacheManager:
     def __init__(self) -> None:
         self.settings = get_settings()
         self.logger = get_logger(__name__)
-        self._redis_client: redis.Redis | None = None
+        self._redis_client: redis.Redis | None = None  # type: ignore
         self._memory_cache: dict[str, dict[str, Any]] = {}
         self._stats = CacheStats()
         self._max_memory_items = 1000
         self._default_ttl = 3600  # 1 hour
 
-    async def get_redis_client(self) -> redis.Redis:
+    async def get_redis_client(self) -> redis.Redis:  # type: ignore
         """Get or create Redis client."""
         if self._redis_client is None:
             self._redis_client = redis.from_url(
@@ -259,7 +259,7 @@ class CacheManager:
 
     def get_stats(self) -> CacheStats:
         """Get cache performance statistics."""
-        return cast(CacheStats, self._stats)
+        return self._stats
 
     def clear_memory_cache(self) -> None:
         """Clear memory cache."""
@@ -322,11 +322,11 @@ async def get_cache_manager() -> CacheManager:
 def cached(
     ttl: int = 3600,
     namespace: str = "default",
-    key_func: Callable | None = None,
-) -> Callable:
+    key_func: Callable[..., Any] | None = None,
+) -> Callable[..., Any]:
     """Decorator for caching function results."""
 
-    def decorator(func: Callable) -> Callable:
+    def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
         @wraps(func)
         async def async_wrapper(*args: Any, **kwargs: Any) -> Any:
             cache_manager = await get_cache_manager()
@@ -379,7 +379,7 @@ class CacheInvalidator:
     def __init__(self, cache_manager: CacheManager):
         self.cache_manager = cache_manager
         self.logger = get_logger(__name__)
-        self._background_tasks: set[asyncio.Task] = set()
+        self._background_tasks: set[asyncio.Task[Any]] = set()
 
     async def invalidate_by_pattern(
         self, pattern: str, namespace: str = "default"

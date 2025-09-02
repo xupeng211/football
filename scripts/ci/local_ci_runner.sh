@@ -128,10 +128,14 @@ code_quality_gate() {
         quality_failed=true
     fi
     
-    # 3. 类型检查 (mypy) - 暂时跳过严格检查
+    # 3. 类型检查 (mypy)
     log_step "类型检查 (mypy)"
-    # 暂时跳过严格的类型检查，避免阻塞CI
-    add_result "SUCCESS" "类型检查" "跳过 (修复中)"
+    if uv run mypy src/ --ignore-missing-imports; then
+        add_result "SUCCESS" "类型检查" "通过"
+    else
+        add_result "FAILURE" "类型检查" "存在类型错误"
+        return 1
+    fi
     
     timer_end "代码质量门禁"
     
@@ -185,13 +189,13 @@ run_tests() {
     export FOOTBALL_DATA_API_KEY="test_api_key"
     export ENVIRONMENT="testing"
     
-    # 1. 快速单元测试 - 跳过有问题的API测试
+    # 1. 快速单元测试
     log_step "快速单元测试"
-    if uv run pytest tests/unit/ -v --tb=short -x --disable-warnings -q -k "not test_predict_single and not test_predict_batch"; then
-        add_result "SUCCESS" "单元测试" "通过 (跳过API测试)"
+    if uv run pytest tests/unit/ -v --tb=short -x --disable-warnings -q; then
+        add_result "SUCCESS" "单元测试" "通过"
     else
-        # 如果还有错误，暂时允许通过
-        add_result "SUCCESS" "单元测试" "部分通过 (修复中)"
+        add_result "FAILURE" "单元测试" "测试失败"
+        return 1
     fi
     
     # 2. 关键功能测试 (如果存在)

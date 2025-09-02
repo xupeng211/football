@@ -24,6 +24,6 @@ router.include_router(models_router, prefix="/models", tags=["models"])
 
 
 @router.get("/status", tags=["general"])
-async def get_api_status() -> dict:
+async def get_api_status() -> dict[str, str]:
     """Get API v1 status."""
     return {"status": "ok", "version": "v1"}
