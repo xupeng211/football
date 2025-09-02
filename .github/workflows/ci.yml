@@ -452,7 +452,11 @@ jobs:
                   records_processed=8
               )
               
-              await writer.log_collection_run('test_source', collection_stats)
+              await writer.log_collection_run(
+                  'test_source', 
+                  'end_to_end_test', 
+                  collection_stats.model_dump()
+              )
               print('✅ 采集日志记录成功')
               
               print('✅ 端到端模拟测试通过')
