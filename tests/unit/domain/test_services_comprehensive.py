@@ -1,16 +1,8 @@
-"""
-Comprehensive tests for the domain services module to improve coverage.
-
-Tests all major functionality including:
-- PredictionService
-- ModelService
-- DataService
-- Business logic validation
-"""
+"""Comprehensive tests for domain services."""
 
 from datetime import datetime, timedelta
 from unittest.mock import AsyncMock, patch
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 import pytest
 
@@ -24,528 +16,717 @@ from football_predict_system.domain.models import (
     BatchPredictionRequest,
     BatchPredictionResponse,
     Match,
+    MatchResult,
     Model,
+    ModelStatus,
+    ModelType,
     Prediction,
+    PredictionConfidence,
     PredictionRequest,
     PredictionResponse,
     Team,
 )
 from football_predict_system.domain.services import (
+    AnalyticsService,
     DataService,
     ModelService,
     PredictionService,
+    analytics_service,
+    data_service,
+    model_service,
+    prediction_service,
 )
 
 
+@pytest.fixture
+def mock_match():
+    """Create a mock match."""
+    return Match(
+        id=uuid4(),
+        home_team_id=uuid4(),
+        away_team_id=uuid4(),
+        scheduled_date=datetime.utcnow(),
+        competition="Premier League",
+        season="2024-25",
+        status="scheduled"
+    )
+
+
+@pytest.fixture
+def mock_model():
+    """Create a mock model."""
+    return Model(
+        id=uuid4(),
+        name="test_model",
+        version="v1.0.0",
+        type=ModelType.XGBOOST,
+        status=ModelStatus.ACTIVE,
+        accuracy=0.85,
+        is_production=True,
+        is_active=True
+    )
+
+
+@pytest.fixture
+def mock_team():
+    """Create a mock team."""
+    return Team(
+        id=uuid4(),
+        name="Arsenal",
+        code="ARS",
+        founded=1886,
+        country="England",
+        stadium="Emirates Stadium"
+    )
+
+
+@pytest.fixture
+def mock_prediction():
+    """Create a mock prediction."""
+    return Prediction(
+        id=uuid4(),
+        match_id=uuid4(),
+        model_version="v1.0.0",
+        predicted_result=MatchResult.HOME_WIN,
+        home_win_probability=0.5,
+        draw_probability=0.3,
+        away_win_probability=0.2,
+        confidence_level=PredictionConfidence.MEDIUM,
+        confidence_score=0.75,
+        created_at=datetime.utcnow()
+    )
+
+
 class TestPredictionService:
-    """Test PredictionService functionality."""
+    """Test PredictionService class."""
 
-    def setup_method(self):
-        """Set up test environment."""
-        self.service = PredictionService()
-
-    @pytest.mark.asyncio
-    async def test_service_initialization(self):
+    def test_prediction_service_initialization(self):
         """Test PredictionService initialization."""
         service = PredictionService()
         assert service.logger is not None
 
+    @patch('football_predict_system.domain.services.get_cache_manager')
     @pytest.mark.asyncio
-    async def test_generate_prediction_cache_hit(self):
-        """Test prediction generation with cache hit."""
-        request = PredictionRequest(match_id=uuid4(), model_version="v1.0")
+    async def test_generate_prediction_from_cache(self, mock_cache, mock_match):
+        """Test prediction generation from cache."""
+        service = PredictionService()
 
-        cached_response = {
+        # Setup cache mock
+        cache_manager = AsyncMock()
+        cached_prediction = {
             "prediction": {
-                "match_id": str(request.match_id),
-                "home_win_probability": 0.6,
-                "draw_probability": 0.25,
-                "away_win_probability": 0.15,
-                "confidence": 0.85,
-                "model_version": "v1.0",
-                "generated_at": "2023-01-01T12:00:00",
+                "id": str(uuid4()),
+                "match_id": str(mock_match.id),
+                "predicted_result": "HOME_WIN",
+                "confidence_score": 0.85
             },
-            "match_info": {"home_team": "1", "away_team": "2"},
-            "model_info": {"version": "v1.0", "accuracy": 0.85},
+            "match_info": {},
+            "model_info": {}
         }
+        cache_manager.get.return_value = cached_prediction
+        mock_cache.return_value = cache_manager
 
-        with patch(
-            "football_predict_system.domain.services.get_cache_manager"
-        ) as mock_cache:
-            mock_cache_manager = AsyncMock()
-            mock_cache_manager.get.return_value = cached_response
-            mock_cache.return_value = mock_cache_manager
+        request = PredictionRequest(
+            match_id=mock_match.id,
+            model_version="v1.0.0"
+        )
 
-            result = await self.service.generate_prediction(request)
+        result = await service.generate_prediction(request)
 
-            assert isinstance(result, PredictionResponse)
-            assert result.prediction.match_id == request.match_id
-            mock_cache_manager.get.assert_called_once()
+        assert isinstance(result, PredictionResponse)
+        cache_manager.get.assert_called_once()
+
+    @patch('football_predict_system.domain.services.get_cache_manager')
+    @pytest.mark.asyncio
+    async def test_generate_prediction_match_not_found(self, mock_cache):
+        """Test prediction when match not found."""
+        service = PredictionService()
+
+        # Setup mocks
+        cache_manager = AsyncMock()
+        cache_manager.get.return_value = None
+        mock_cache.return_value = cache_manager
+
+        service._get_match = AsyncMock(return_value=None)
+
+        request = PredictionRequest(
+            match_id=uuid4(),
+            model_version="v1.0.0"
+        )
+
+        with pytest.raises(NotFoundError):
+            await service.generate_prediction(request)
+
+    @patch('football_predict_system.domain.services.get_cache_manager')
+    @pytest.mark.asyncio
+    async def test_generate_prediction_model_not_found(self, mock_cache, mock_match):
+        """Test prediction when model not found."""
+        service = PredictionService()
+
+        # Setup mocks
+        cache_manager = AsyncMock()
+        cache_manager.get.return_value = None
+        mock_cache.return_value = cache_manager
+
+        service._get_match = AsyncMock(return_value=mock_match)
+        service._get_model = AsyncMock(return_value=None)
+
+        request = PredictionRequest(
+            match_id=mock_match.id,
+            model_version="v1.0.0"
+        )
+
+        with pytest.raises(ModelNotFoundError):
+            await service.generate_prediction(request)
+
+    @patch('football_predict_system.domain.services.get_cache_manager')
+    @pytest.mark.asyncio
+    async def test_generate_prediction_insufficient_data(self, mock_cache,
+                                                         mock_match, mock_model):
+        """Test prediction with insufficient data."""
+        service = PredictionService()
+
+        # Setup mocks
+        cache_manager = AsyncMock()
+        cache_manager.get.return_value = None
+        mock_cache.return_value = cache_manager
+
+        service._get_match = AsyncMock(return_value=mock_match)
+        service._get_model = AsyncMock(return_value=mock_model)
+        service._extract_features = AsyncMock(return_value=None)
+
+        request = PredictionRequest(match_id=mock_match.id)
+
+        with pytest.raises(InsufficientDataError):
+            await service.generate_prediction(request)
+
+    @patch('football_predict_system.domain.services.get_cache_manager')
+    @pytest.mark.asyncio
+    async def test_generate_prediction_success(self, mock_cache, mock_match,
+                                              mock_model, mock_prediction):
+        """Test successful prediction generation."""
+        service = PredictionService()
+
+        # Setup mocks
+        cache_manager = AsyncMock()
+        cache_manager.get.return_value = None
+        cache_manager.set.return_value = True
+        mock_cache.return_value = cache_manager
+
+        service._get_match = AsyncMock(return_value=mock_match)
+        service._get_model = AsyncMock(return_value=mock_model)
+        service._extract_features = AsyncMock(return_value={"feature1": 0.5})
+        service._predict_with_model = AsyncMock(return_value=mock_prediction)
+
+        request = PredictionRequest(match_id=mock_match.id)
+
+        result = await service.generate_prediction(request)
+
+        assert isinstance(result, PredictionResponse)
+        assert result.prediction == mock_prediction
+        assert "home_team" in result.match_info
+        assert "name" in result.model_info
+        cache_manager.set.assert_called_once()
+
+    @patch('football_predict_system.domain.services.get_cache_manager')
+    @pytest.mark.asyncio
+    async def test_generate_prediction_service_error(self, mock_cache,
+                                                     mock_match, mock_model):
+        """Test prediction service error handling."""
+        service = PredictionService()
+
+        # Setup mocks
+        cache_manager = AsyncMock()
+        cache_manager.get.return_value = None
+        mock_cache.return_value = cache_manager
+
+        service._get_match = AsyncMock(return_value=mock_match)
+        service._get_model = AsyncMock(return_value=mock_model)
+        service._extract_features = AsyncMock(return_value={"feature1": 0.5})
+        service._predict_with_model = AsyncMock(
+            side_effect=Exception("Model error")
+        )
+
+        request = PredictionRequest(match_id=mock_match.id)
+
+        with pytest.raises(PredictionError):
+            await service.generate_prediction(request)
 
     @pytest.mark.asyncio
-    async def test_generate_prediction_cache_miss(self):
-        """Test prediction generation with cache miss."""
-        request = PredictionRequest(match_id=uuid4())
+    async def test_generate_batch_predictions_success(self, mock_match):
+        """Test successful batch prediction generation."""
+        service = PredictionService()
 
-        # Mock dependencies
-        mock_match = Match(
-            id=request.match_id,
-            home_team_id=uuid4(),
-            away_team_id=uuid4(),
-            match_date=datetime.now() + timedelta(days=1),
-            status="upcoming",
-        )
-
-        mock_model = Model(
-            id=uuid4(),
-            name="test_model",
-            version="1.0",
-            accuracy=0.85,
-            created_at=datetime.now(),
-        )
-
-        mock_prediction = Prediction(
-            match_id=request.match_id,
-            home_win_probability=0.6,
-            draw_probability=0.25,
-            away_win_probability=0.15,
-            confidence=0.85,
-            model_version="1.0",
-            generated_at=datetime.now(),
-        )
-
-        with (
-            patch.multiple(
-                self.service,
-                _get_match=AsyncMock(return_value=mock_match),
-                _get_model=AsyncMock(return_value=mock_model),
-                _extract_features=AsyncMock(return_value={"feature1": 1.0}),
-                _predict_with_model=AsyncMock(return_value=mock_prediction),
+        # Mock the single prediction method
+        mock_response = PredictionResponse(
+            prediction=Prediction(
+                id=uuid4(),
+                match_id=mock_match.id,
+                model_version="v1.0.0",
+                predicted_result=MatchResult.HOME_WIN,
+                confidence_score=0.75,
+                created_at=datetime.utcnow()
             ),
-            patch(
-                "football_predict_system.domain.services.get_cache_manager"
-            ) as mock_cache,
-        ):
-            mock_cache_manager = AsyncMock()
-            mock_cache_manager.get.return_value = None  # Cache miss
-            mock_cache_manager.set.return_value = True
-            mock_cache.return_value = mock_cache_manager
-
-            result = await self.service.generate_prediction(request)
-
-            assert isinstance(result, PredictionResponse)
-            assert result.prediction.match_id == request.match_id
-            mock_cache_manager.set.assert_called_once()
-
-    @pytest.mark.asyncio
-    async def test_generate_prediction_match_not_found(self):
-        """Test prediction generation when match not found."""
-        request = PredictionRequest(match_id=uuid4())
-
-        with (
-            patch.object(self.service, "_get_match", return_value=None),
-            patch(
-                "football_predict_system.domain.services.get_cache_manager"
-            ) as mock_cache,
-        ):
-            mock_cache_manager = AsyncMock()
-            mock_cache_manager.get.return_value = None
-            mock_cache.return_value = mock_cache_manager
-
-            with pytest.raises(NotFoundError) as exc_info:
-                await self.service.generate_prediction(request)
-
-            assert "match" in str(exc_info.value)
-
-    @pytest.mark.asyncio
-    async def test_generate_prediction_model_not_found(self):
-        """Test prediction generation when model not found."""
-        request = PredictionRequest(match_id=uuid4(), model_version="nonexistent")
-
-        mock_match = Match(
-            id=request.match_id,
-            home_team_id=uuid4(),
-            away_team_id=uuid4(),
-            match_date=datetime.now() + timedelta(days=1),
-            status="upcoming",
+            match_info={},
+            model_info={}
         )
 
-        with (
-            patch.multiple(
-                self.service,
-                _get_match=AsyncMock(return_value=mock_match),
-                _get_model=AsyncMock(return_value=None),
-            ),
-            patch(
-                "football_predict_system.domain.services.get_cache_manager"
-            ) as mock_cache,
-        ):
-            mock_cache_manager = AsyncMock()
-            mock_cache_manager.get.return_value = None
-            mock_cache.return_value = mock_cache_manager
+        service._safe_generate_prediction = AsyncMock(return_value=mock_response)
 
-            with pytest.raises(ModelNotFoundError):
-                await self.service.generate_prediction(request)
+        request = BatchPredictionRequest(
+            match_ids=[uuid4(), uuid4(), uuid4()],
+            model_version="v1.0.0"
+        )
+
+        result = await service.generate_batch_predictions(request)
+
+        assert isinstance(result, BatchPredictionResponse)
+        assert result.total_count == 3
+        assert result.successful_predictions == 3
+        assert result.failed_predictions == 0
+        assert len(result.predictions) == 3
+        assert len(result.errors) == 0
 
     @pytest.mark.asyncio
-    async def test_generate_prediction_insufficient_data(self):
-        """Test prediction generation with insufficient data."""
-        request = PredictionRequest(match_id=uuid4())
+    async def test_generate_batch_predictions_with_errors(self):
+        """Test batch predictions with some errors."""
+        service = PredictionService()
 
-        mock_match = Match(
-            id=request.match_id,
-            home_team_id=uuid4(),
-            away_team_id=uuid4(),
-            match_date=datetime.now() + timedelta(days=1),
-            status="upcoming",
-        )
-
-        mock_model = Model(
-            id=uuid4(),
-            name="test_model",
-            version="1.0",
-            accuracy=0.85,
-            created_at=datetime.now(),
-        )
-
-        with (
-            patch.multiple(
-                self.service,
-                _get_match=AsyncMock(return_value=mock_match),
-                _get_model=AsyncMock(return_value=mock_model),
-                _extract_features=AsyncMock(return_value=None),
-            ),
-            patch(
-                "football_predict_system.domain.services.get_cache_manager"
-            ) as mock_cache,
-        ):
-            mock_cache_manager = AsyncMock()
-            mock_cache_manager.get.return_value = None
-            mock_cache.return_value = mock_cache_manager
-
-            with pytest.raises(InsufficientDataError):
-                await self.service.generate_prediction(request)
-
-    @pytest.mark.asyncio
-    async def test_generate_prediction_model_error(self):
-        """Test prediction generation with model error."""
-        request = PredictionRequest(match_id=uuid4())
-
-        mock_match = Match(
-            id=request.match_id,
-            home_team_id=uuid4(),
-            away_team_id=uuid4(),
-            match_date=datetime.now() + timedelta(days=1),
-            status="upcoming",
-        )
-
-        mock_model = Model(
-            id=uuid4(),
-            name="test_model",
-            version="1.0",
-            accuracy=0.85,
-            created_at=datetime.now(),
-        )
-
-        with (
-            patch.multiple(
-                self.service,
-                _get_match=AsyncMock(return_value=mock_match),
-                _get_model=AsyncMock(return_value=mock_model),
-                _extract_features=AsyncMock(return_value={"feature1": 1.0}),
-                _predict_with_model=AsyncMock(side_effect=Exception("Model error")),
-            ),
-            patch(
-                "football_predict_system.domain.services.get_cache_manager"
-            ) as mock_cache,
-        ):
-            mock_cache_manager = AsyncMock()
-            mock_cache_manager.get.return_value = None
-            mock_cache.return_value = mock_cache_manager
-
-            with pytest.raises(PredictionError):
-                await self.service.generate_prediction(request)
-
-    @pytest.mark.asyncio
-    async def test_generate_batch_predictions(self):
-        """Test batch prediction generation."""
-        match_ids = [uuid4(), uuid4(), uuid4()]
-        request = BatchPredictionRequest(match_ids=match_ids, model_version="v1.0")
-
-        # Mock individual predictions
-        mock_predictions = []
-        for match_id in match_ids:
-            mock_prediction = PredictionResponse(
+        # Mock the single prediction method to return success and error
+        def side_effect(request):
+            if str(request.match_id).endswith('1'):
+                raise Exception("Test error")
+            return PredictionResponse(
                 prediction=Prediction(
-                    match_id=match_id,
-                    home_win_probability=0.6,
-                    draw_probability=0.25,
-                    away_win_probability=0.15,
-                    confidence=0.85,
-                    model_version="v1.0",
-                    generated_at=datetime.now(),
+                    id=uuid4(),
+                    match_id=request.match_id,
+                    model_version="v1.0.0",
+                    predicted_result=MatchResult.HOME_WIN,
+                    confidence_score=0.75,
+                    created_at=datetime.utcnow()
                 ),
-                match_info={"home_team": "1", "away_team": "2"},
-                model_info={"version": "v1.0", "accuracy": 0.85},
+                match_info={},
+                model_info={}
             )
-            mock_predictions.append(mock_prediction)
 
-        with patch.object(
-            self.service, "generate_prediction", side_effect=mock_predictions
-        ):
-            result = await self.service.generate_batch_predictions(request)
+        service._safe_generate_prediction = AsyncMock(side_effect=side_effect)
 
-            assert isinstance(result, BatchPredictionResponse)
-            assert len(result.predictions) == len(match_ids)
-            assert result.batch_id is not None
+        match_ids = [uuid4(), uuid4()]
+        match_ids[1] = UUID(str(match_ids[1])[:-1] + '1')  # Make it end with '1'
 
-    @pytest.mark.asyncio
-    async def test_get_match_success(self):
-        """Test successful match retrieval."""
-        match_id = uuid4()
-        mock_match = Match(
-            id=match_id,
-            home_team_id=uuid4(),
-            away_team_id=uuid4(),
-            match_date=datetime.now() + timedelta(days=1),
-            status="upcoming",
+        request = BatchPredictionRequest(
+            match_ids=match_ids,
+            model_version="v1.0.0"
         )
 
-        # This would normally be implemented to fetch from database
-        with patch.object(
-            self.service, "_fetch_match_from_db", return_value=mock_match
-        ):
-            result = await self.service._get_match(match_id)
-            assert result == mock_match
+        result = await service.generate_batch_predictions(request)
+
+        assert result.total_count == 2
+        assert result.successful_predictions == 1
+        assert result.failed_predictions == 1
+        assert len(result.predictions) == 1
+        assert len(result.errors) == 1
 
     @pytest.mark.asyncio
-    async def test_get_model_success(self):
-        """Test successful model retrieval."""
-        model_version = "v1.0"
-        mock_model = Model(
-            id=uuid4(),
-            name="test_model",
-            version=model_version,
-            accuracy=0.85,
-            created_at=datetime.now(),
+    async def test_safe_generate_prediction_success(self, mock_match):
+        """Test safe prediction generation success."""
+        service = PredictionService()
+
+        mock_response = PredictionResponse(
+            prediction=Prediction(
+                id=uuid4(),
+                match_id=mock_match.id,
+                model_version="v1.0.0",
+                predicted_result=MatchResult.HOME_WIN,
+                confidence_score=0.75,
+                created_at=datetime.utcnow()
+            ),
+            match_info={},
+            model_info={}
         )
 
-        # This would normally be implemented to fetch from model registry
-        with patch.object(
-            self.service, "_fetch_model_from_registry", return_value=mock_model
-        ):
-            result = await self.service._get_model(model_version)
-            assert result == mock_model
+        service.generate_prediction = AsyncMock(return_value=mock_response)
+
+        request = PredictionRequest(match_id=mock_match.id)
+        result = await service._safe_generate_prediction(request)
+
+        assert result == mock_response
 
     @pytest.mark.asyncio
-    async def test_extract_features_success(self):
-        """Test successful feature extraction."""
-        match = Match(
-            id=uuid4(),
-            home_team_id=uuid4(),
-            away_team_id=uuid4(),
-            match_date=datetime.now() + timedelta(days=1),
-            status="upcoming",
+    async def test_safe_generate_prediction_error(self, mock_match):
+        """Test safe prediction generation error handling."""
+        service = PredictionService()
+
+        service.generate_prediction = AsyncMock(
+            side_effect=Exception("Test error")
         )
 
-        expected_features = {
-            "home_team_recent_form": 0.7,
-            "away_team_recent_form": 0.6,
-            "head_to_head_ratio": 0.55,
-        }
+        request = PredictionRequest(match_id=mock_match.id)
+        result = await service._safe_generate_prediction(request)
 
-        # This would normally be implemented to extract features
-        with patch.object(
-            self.service, "_compute_team_features", return_value=expected_features
-        ):
-            result = await self.service._extract_features(match)
-            assert result == expected_features
+        assert result is None
+
+    @pytest.mark.asyncio
+    async def test_get_match_placeholder(self):
+        """Test _get_match placeholder method."""
+        service = PredictionService()
+        result = await service._get_match(uuid4())
+        assert result is None
+
+    @pytest.mark.asyncio
+    async def test_get_model_placeholder(self):
+        """Test _get_model placeholder method."""
+        service = PredictionService()
+        result = await service._get_model("v1.0.0")
+        assert result is None
+
+    @pytest.mark.asyncio
+    async def test_extract_features_placeholder(self, mock_match):
+        """Test _extract_features placeholder method."""
+        service = PredictionService()
+        result = await service._extract_features(mock_match)
+        assert result == {}
+
+    @pytest.mark.asyncio
+    async def test_predict_with_model(self, mock_model, mock_match):
+        """Test _predict_with_model placeholder method."""
+        service = PredictionService()
+        features = {"feature1": 0.5}
+
+        result = await service._predict_with_model(mock_model, features, mock_match)
+
+        assert isinstance(result, Prediction)
+        assert result.match_id == mock_match.id
+        assert result.model_version == mock_model.version
+        assert result.predicted_result == MatchResult.HOME_WIN
+        assert result.confidence_level == PredictionConfidence.MEDIUM
 
 
 class TestModelService:
-    """Test ModelService functionality."""
+    """Test ModelService class."""
 
-    def setup_method(self):
-        """Set up test environment."""
-        self.service = ModelService()
-
-    @pytest.mark.asyncio
-    async def test_service_initialization(self):
+    def test_model_service_initialization(self):
         """Test ModelService initialization."""
         service = ModelService()
         assert service.logger is not None
 
+    @patch('football_predict_system.domain.services.get_cache_manager')
     @pytest.mark.asyncio
-    async def test_get_available_models(self):
-        """Test getting available models."""
-        mock_models = [
-            Model(
-                id=uuid4(),
-                name="model_1",
-                version="1.0",
-                accuracy=0.85,
-                created_at=datetime.now(),
-            ),
-            Model(
-                id=uuid4(),
-                name="model_2",
-                version="2.0",
-                accuracy=0.87,
-                created_at=datetime.now(),
-            ),
-        ]
+    async def test_get_available_models_from_cache(self, mock_cache, mock_model):
+        """Test getting models from cache."""
+        service = ModelService()
 
-        with patch.object(
-            self.service, "_fetch_models_from_registry", return_value=mock_models
-        ):
-            result = await self.service.get_available_models()
-            assert len(result) == 2
-            assert all(isinstance(model, Model) for model in result)
+        cache_manager = AsyncMock()
+        cached_models = [mock_model.dict()]
+        cache_manager.get.return_value = cached_models
+        mock_cache.return_value = cache_manager
+
+        result = await service.get_available_models()
+
+        assert len(result) == 1
+        assert isinstance(result[0], Model)
+        cache_manager.get.assert_called_once_with("available_models", "models")
+
+    @patch('football_predict_system.domain.services.get_cache_manager')
+    @pytest.mark.asyncio
+    async def test_get_available_models_from_registry(self, mock_cache, mock_model):
+        """Test getting models from registry."""
+        service = ModelService()
+
+        cache_manager = AsyncMock()
+        cache_manager.get.return_value = None
+        cache_manager.set.return_value = True
+        mock_cache.return_value = cache_manager
+
+        service._load_models_from_registry = AsyncMock(return_value=[mock_model])
+
+        result = await service.get_available_models()
+
+        assert len(result) == 1
+        assert result[0] == mock_model
+        cache_manager.set.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_get_model_by_version(self):
-        """Test getting model by version."""
-        version = "v1.0"
-        mock_model = Model(
+    async def test_get_model_by_version_found(self, mock_model):
+        """Test getting model by version when found."""
+        service = ModelService()
+
+        service.get_available_models = AsyncMock(return_value=[mock_model])
+
+        result = await service.get_model_by_version("v1.0.0")
+
+        assert result == mock_model
+
+    @pytest.mark.asyncio
+    async def test_get_model_by_version_not_found(self, mock_model):
+        """Test getting model by version when not found."""
+        service = ModelService()
+
+        service.get_available_models = AsyncMock(return_value=[mock_model])
+
+        result = await service.get_model_by_version("v2.0.0")
+
+        assert result is None
+
+    @pytest.mark.asyncio
+    async def test_get_default_model_production(self, mock_model):
+        """Test getting default model (production)."""
+        service = ModelService()
+
+        # Create production and non-production models
+        prod_model = mock_model
+        prod_model.is_production = True
+
+        non_prod_model = Model(
             id=uuid4(),
-            name="test_model",
-            version=version,
-            accuracy=0.85,
-            created_at=datetime.now(),
+            name="non_prod_model",
+            version="v0.9.0",
+            type=ModelType.XGBOOST,
+            status=ModelStatus.ACTIVE,
+            is_production=False,
+            is_active=True
         )
 
-        with patch.object(
-            self.service, "_fetch_model_by_version", return_value=mock_model
-        ):
-            result = await self.service.get_model_by_version(version)
-            assert result == mock_model
+        service.get_available_models = AsyncMock(
+            return_value=[non_prod_model, prod_model]
+        )
+
+        result = await service.get_default_model()
+
+        assert result == prod_model
 
     @pytest.mark.asyncio
-    async def test_get_model_by_version_not_found(self):
-        """Test getting model by version when not found."""
-        version = "nonexistent"
+    async def test_get_default_model_active_fallback(self, mock_model):
+        """Test getting default model fallback to active."""
+        service = ModelService()
 
-        with patch.object(self.service, "_fetch_model_by_version", return_value=None):
-            with pytest.raises(ModelNotFoundError):
-                await self.service.get_model_by_version(version)
+        # Create only active models, no production
+        active_model = mock_model
+        active_model.is_production = False
+        active_model.is_active = True
+
+        service.get_available_models = AsyncMock(return_value=[active_model])
+
+        result = await service.get_default_model()
+
+        assert result == active_model
+
+    @pytest.mark.asyncio
+    async def test_get_default_model_none_available(self):
+        """Test getting default model when none available."""
+        service = ModelService()
+
+        service.get_available_models = AsyncMock(return_value=[])
+
+        result = await service.get_default_model()
+
+        assert result is None
+
+    @pytest.mark.asyncio
+    async def test_load_models_from_registry_placeholder(self):
+        """Test _load_models_from_registry placeholder method."""
+        service = ModelService()
+        result = await service._load_models_from_registry()
+        assert result == []
 
 
 class TestDataService:
-    """Test DataService functionality."""
+    """Test DataService class."""
 
-    def setup_method(self):
-        """Set up test environment."""
-        self.service = DataService()
-
-    @pytest.mark.asyncio
-    async def test_service_initialization(self):
+    def test_data_service_initialization(self):
         """Test DataService initialization."""
         service = DataService()
         assert service.logger is not None
 
+    @patch('football_predict_system.domain.services.get_cache_manager')
     @pytest.mark.asyncio
-    async def test_get_team_data(self):
-        """Test getting team data."""
-        team_id = uuid4()
-        mock_team = Team(
-            id=team_id,
-            name="Test Team",
-            league="Premier League",
-            country="England",
-            founded_year=1900,
+    async def test_get_match_data_from_cache(self, mock_cache, mock_match):
+        """Test getting match data from cache."""
+        service = DataService()
+
+        cache_manager = AsyncMock()
+        cache_manager.get.return_value = mock_match.dict()
+        mock_cache.return_value = cache_manager
+
+        result = await service.get_match_data(mock_match.id)
+
+        assert isinstance(result, Match)
+        cache_manager.get.assert_called_once()
+
+    @patch('football_predict_system.domain.services.get_cache_manager')
+    @pytest.mark.asyncio
+    async def test_get_match_data_from_db(self, mock_cache, mock_match):
+        """Test getting match data from database."""
+        service = DataService()
+
+        cache_manager = AsyncMock()
+        cache_manager.get.return_value = None
+        cache_manager.set.return_value = True
+        mock_cache.return_value = cache_manager
+
+        service._load_match_from_db = AsyncMock(return_value=mock_match)
+
+        result = await service.get_match_data(mock_match.id)
+
+        assert result == mock_match
+        cache_manager.set.assert_called_once()
+
+    @patch('football_predict_system.domain.services.get_cache_manager')
+    @pytest.mark.asyncio
+    async def test_get_team_data_from_cache(self, mock_cache, mock_team):
+        """Test getting team data from cache."""
+        service = DataService()
+
+        cache_manager = AsyncMock()
+        cache_manager.get.return_value = mock_team.dict()
+        mock_cache.return_value = cache_manager
+
+        result = await service.get_team_data(mock_team.id)
+
+        assert isinstance(result, Team)
+        cache_manager.get.assert_called_once()
+
+    @patch('football_predict_system.domain.services.get_cache_manager')
+    @pytest.mark.asyncio
+    async def test_get_upcoming_matches_from_cache(self, mock_cache, mock_match):
+        """Test getting upcoming matches from cache."""
+        service = DataService()
+
+        cache_manager = AsyncMock()
+        cache_manager.get.return_value = [mock_match.dict()]
+        mock_cache.return_value = cache_manager
+
+        result = await service.get_upcoming_matches(7)
+
+        assert len(result) == 1
+        assert isinstance(result[0], Match)
+        cache_manager.get.assert_called_once_with("upcoming_7d", "matches")
+
+    @patch('football_predict_system.domain.services.get_cache_manager')
+    @pytest.mark.asyncio
+    async def test_get_upcoming_matches_from_db(self, mock_cache, mock_match):
+        """Test getting upcoming matches from database."""
+        service = DataService()
+
+        cache_manager = AsyncMock()
+        cache_manager.get.return_value = None
+        cache_manager.set.return_value = True
+        mock_cache.return_value = cache_manager
+
+        service._load_upcoming_matches_from_db = AsyncMock(
+            return_value=[mock_match]
         )
 
-        with patch.object(self.service, "_fetch_team_from_db", return_value=mock_team):
-            result = await self.service.get_team_data(team_id)
-            assert result == mock_team
+        result = await service.get_upcoming_matches(14)
+
+        assert len(result) == 1
+        assert result[0] == mock_match
+        cache_manager.set.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_get_team_data_not_found(self):
-        """Test getting team data when not found."""
-        team_id = uuid4()
-
-        with patch.object(self.service, "_fetch_team_from_db", return_value=None):
-            with pytest.raises(NotFoundError):
-                await self.service.get_team_data(team_id)
+    async def test_load_match_from_db_placeholder(self):
+        """Test _load_match_from_db placeholder method."""
+        service = DataService()
+        result = await service._load_match_from_db(uuid4())
+        assert result is None
 
     @pytest.mark.asyncio
-    async def test_get_match_history(self):
-        """Test getting match history."""
-        team_id = uuid4()
-        limit = 10
-
-        mock_matches = [
-            Match(
-                id=uuid4(),
-                home_team_id=team_id,
-                away_team_id=uuid4(),
-                match_date=datetime.now() - timedelta(days=7),
-                status="completed",
-            )
-            for _ in range(5)
-        ]
-
-        with patch.object(
-            self.service, "_fetch_team_matches", return_value=mock_matches
-        ):
-            result = await self.service.get_match_history(team_id, limit)
-            assert len(result) == 5
-            assert all(isinstance(match, Match) for match in result)
+    async def test_load_team_from_db_placeholder(self):
+        """Test _load_team_from_db placeholder method."""
+        service = DataService()
+        result = await service._load_team_from_db(uuid4())
+        assert result is None
 
     @pytest.mark.asyncio
-    async def test_get_head_to_head_record(self):
-        """Test getting head-to-head record."""
-        team1_id = uuid4()
-        team2_id = uuid4()
+    async def test_load_upcoming_matches_from_db_placeholder(self):
+        """Test _load_upcoming_matches_from_db placeholder method."""
+        service = DataService()
+        end_date = datetime.utcnow() + timedelta(days=7)
+        result = await service._load_upcoming_matches_from_db(end_date)
+        assert result == []
 
-        mock_matches = [
-            Match(
-                id=uuid4(),
-                home_team_id=team1_id,
-                away_team_id=team2_id,
-                match_date=datetime.now() - timedelta(days=30),
-                status="completed",
-            )
-            for _ in range(3)
-        ]
 
-        with patch.object(
-            self.service, "_fetch_head_to_head_matches", return_value=mock_matches
-        ):
-            result = await self.service.get_head_to_head_record(team1_id, team2_id)
-            assert len(result) == 3
-            assert all(isinstance(match, Match) for match in result)
+class TestAnalyticsService:
+    """Test AnalyticsService class."""
+
+    def test_analytics_service_initialization(self):
+        """Test AnalyticsService initialization."""
+        service = AnalyticsService()
+        assert service.logger is not None
 
     @pytest.mark.asyncio
-    async def test_validate_match_data(self):
-        """Test match data validation."""
-        valid_match = Match(
-            id=uuid4(),
-            home_team_id=uuid4(),
-            away_team_id=uuid4(),
-            match_date=datetime.now() + timedelta(days=1),
-            status="upcoming",
-        )
+    async def test_get_prediction_accuracy(self):
+        """Test prediction accuracy calculation."""
+        service = AnalyticsService()
 
-        # Valid match should pass validation
-        result = await self.service.validate_match_data(valid_match)
-        assert result is True
+        result = await service.get_prediction_accuracy("v1.0.0", 30)
+
+        assert "accuracy" in result
+        assert "total_predictions" in result
+        assert "correct_predictions" in result
+        assert "period_days" in result
+        assert "model_version" in result
+        assert result["model_version"] == "v1.0.0"
+        assert result["period_days"] == 30
+        assert 0 <= result["accuracy"] <= 1
 
     @pytest.mark.asyncio
-    async def test_validate_match_data_invalid(self):
-        """Test match data validation with invalid data."""
-        invalid_match = Match(
-            id=uuid4(),
-            home_team_id=uuid4(),
-            away_team_id=uuid4(),
-            match_date=datetime.now() - timedelta(days=1),  # Past date
-            status="upcoming",  # But status says upcoming
-        )
+    async def test_get_prediction_accuracy_no_model(self):
+        """Test prediction accuracy without specific model."""
+        service = AnalyticsService()
 
-        # Invalid match should fail validation
-        with pytest.raises(ValueError):
-            await self.service.validate_match_data(invalid_match)
+        result = await service.get_prediction_accuracy(None, 7)
+
+        assert result["model_version"] is None
+        assert result["period_days"] == 7
+
+    @pytest.mark.asyncio
+    async def test_get_model_performance_comparison(self):
+        """Test model performance comparison."""
+        service = AnalyticsService()
+
+        result = await service.get_model_performance_comparison()
+
+        assert "models" in result
+        assert "comparison_period" in result
+        assert "metrics" in result
+        assert isinstance(result["models"], list)
+        assert result["comparison_period"] == "30_days"
+        assert "accuracy" in result["metrics"]
 
 
-if __name__ == "__main__":
-    pytest.main([__file__])
+class TestGlobalServiceInstances:
+    """Test global service instances."""
+
+    def test_prediction_service_instance(self):
+        """Test global prediction service instance."""
+        assert isinstance(prediction_service, PredictionService)
+
+    def test_model_service_instance(self):
+        """Test global model service instance."""
+        assert isinstance(model_service, ModelService)
+
+    def test_data_service_instance(self):
+        """Test global data service instance."""
+        assert isinstance(data_service, DataService)
+
+    def test_analytics_service_instance(self):
+        """Test global analytics service instance."""
+        assert isinstance(analytics_service, AnalyticsService)
+
+    def test_service_instances_are_singletons(self):
+        """Test that service instances behave like singletons."""
+        # Import again to check if same instances
+        from football_predict_system.domain.services import analytics_service as as1
+        from football_predict_system.domain.services import analytics_service as as2
+        from football_predict_system.domain.services import data_service as ds1
+        from football_predict_system.domain.services import data_service as ds2
+        from football_predict_system.domain.services import model_service as ms1
+        from football_predict_system.domain.services import model_service as ms2
+        from football_predict_system.domain.services import prediction_service as ps1
+        from football_predict_system.domain.services import prediction_service as ps2
+
+        assert ps1 is ps2
+        assert ms1 is ms2
+        assert ds1 is ds2
+        assert as1 is as2

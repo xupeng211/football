@@ -75,9 +75,7 @@ instrumentator = Instrumentator(
     should_ignore_untemplated=True,
     should_respect_env_var=True,
     should_instrument_requests_inprogress=True,
-    excluded_handlers=[
-        "/health", "/health/ready", "/health/live", "/metrics"
-    ],
+    excluded_handlers=["/health", "/health/ready", "/health/live", "/metrics"],
     env_var_name="ENABLE_METRICS",
     inprogress_name="http_requests_inprogress",
     inprogress_labels=True,
@@ -129,9 +127,7 @@ async def application_exception_handler(request: Request, exc: BaseApplicationEr
 @app.exception_handler(Exception)
 async def generic_exception_handler(request: Request, exc: Exception):
     """Handle unexpected exceptions."""
-    logger.critical(
-        "An unexpected error occurred", error=str(exc), exc_info=True
-    )
+    logger.critical("An unexpected error occurred", error=str(exc), exc_info=True)
     return JSONResponse(
         status_code=500,
         content={
@@ -151,7 +147,7 @@ app.include_router(api_v1_router, prefix="/api/v1")
 async def health_check():
     """
     Comprehensive system health check.
-    
+
     Returns detailed health status of all system components including:
     - Database connectivity
     - Redis cache
@@ -166,8 +162,7 @@ async def health_check():
         status_code = 200 if health_report.status == "healthy" else 503
 
         return JSONResponse(
-            content=health_report.model_dump(mode="json"),
-            status_code=status_code
+            content=health_report.model_dump(mode="json"), status_code=status_code
         )
     except Exception as e:
         logger.error("Health check failed", error=str(e), exc_info=True)
@@ -177,8 +172,8 @@ async def health_check():
                 "status": "unhealthy",
                 "timestamp": datetime.utcnow().isoformat(),
                 "error": str(e),
-                "version": settings.app_version
-            }
+                "version": settings.app_version,
+            },
         )
 
 
@@ -186,12 +181,12 @@ async def health_check():
 async def readiness_check():
     """
     Kubernetes readiness probe endpoint.
-    
+
     Checks if the service is ready to accept traffic by verifying:
     - Database connectivity
     - Cache availability
     - Essential dependencies
-    
+
     Returns 200 if ready, 503 if not ready.
     """
     try:
@@ -215,10 +210,7 @@ async def readiness_check():
             return {
                 "status": "ready",
                 "timestamp": datetime.utcnow().isoformat(),
-                "checks": {
-                    "database": "healthy",
-                    "cache": "healthy"
-                }
+                "checks": {"database": "healthy", "cache": "healthy"},
             }
         else:
             raise HTTPException(
@@ -232,9 +224,9 @@ async def readiness_check():
                             if db_check.get("status") == "healthy"
                             else "unhealthy"
                         ),
-                        "cache": "healthy" if cache_healthy else "unhealthy"
-                    }
-                }
+                        "cache": "healthy" if cache_healthy else "unhealthy",
+                    },
+                },
             )
     except Exception as e:
         logger.warning("Readiness check failed", error=str(e))
@@ -243,8 +235,8 @@ async def readiness_check():
             detail={
                 "status": "not_ready",
                 "timestamp": datetime.utcnow().isoformat(),
-                "error": str(e)
-            }
+                "error": str(e),
+            },
         )
 
 
@@ -252,10 +244,10 @@ async def readiness_check():
 async def liveness_check():
     """
     Kubernetes liveness probe endpoint.
-    
+
     Simple endpoint to verify the application process is alive and responding.
     This should only fail if the application is completely unresponsive.
-    
+
     Always returns 200 unless the process is dead.
     """
     return {
@@ -265,7 +257,7 @@ async def liveness_check():
             __import__("time").time()
             - app.state.__dict__.get("start_time", __import__("time").time())
         ),
-        "version": settings.app_version
+        "version": settings.app_version,
     }
 
 
@@ -279,7 +271,7 @@ async def root():
         "environment": settings.environment.value,
         "timestamp": datetime.utcnow().isoformat(),
         "docs_url": "/docs",
-        "health_url": "/health"
+        "health_url": "/health",
     }
 
 
