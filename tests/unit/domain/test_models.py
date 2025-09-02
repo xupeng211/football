@@ -26,7 +26,7 @@ class TestModelType:
         """Test that model type enum has expected values."""
         # These values depend on the actual implementation
         # Update based on actual enum values
-        assert hasattr(ModelType, '__members__')
+        assert hasattr(ModelType, "__members__")
         assert len(ModelType.__members__) > 0
 
 
@@ -44,7 +44,7 @@ class TestModel:
             model_type=ModelType.CLASSIFICATION,
             status=ModelStatus.ACTIVE,
             created_at=datetime.now(),
-            updated_at=datetime.now()
+            updated_at=datetime.now(),
         )
 
         assert model.id == model_id
@@ -64,7 +64,7 @@ class TestModel:
             updated_at=datetime.now(),
             description="Test model description",
             accuracy=0.95,
-            performance_metrics={"precision": 0.94, "recall": 0.96}
+            performance_metrics={"precision": 0.94, "recall": 0.96},
         )
 
         assert model.description == "Test model description"
@@ -80,7 +80,7 @@ class TestModel:
             model_type=ModelType.CLASSIFICATION,
             status=ModelStatus.TRAINING,
             created_at=datetime.now(),
-            updated_at=datetime.now()
+            updated_at=datetime.now(),
         )
 
         # Test status change
@@ -102,7 +102,7 @@ class TestModel:
                 status=ModelStatus.ACTIVE,
                 created_at=datetime.now(),
                 updated_at=datetime.now(),
-                accuracy=1.5  # Invalid - greater than 1.0
+                accuracy=1.5,  # Invalid - greater than 1.0
             )
 
     def test_model_string_representation(self):
@@ -114,7 +114,7 @@ class TestModel:
             model_type=ModelType.CLASSIFICATION,
             status=ModelStatus.ACTIVE,
             created_at=datetime.now(),
-            updated_at=datetime.now()
+            updated_at=datetime.now(),
         )
 
         str_repr = str(model)
@@ -130,7 +130,7 @@ class TestModel:
             model_type=ModelType.CLASSIFICATION,
             status=ModelStatus.ACTIVE,
             created_at=datetime.now(),
-            updated_at=datetime.now()
+            updated_at=datetime.now(),
         )
 
         model_dict = model.model_dump()
@@ -152,7 +152,7 @@ class TestModelMethods:
             model_type=ModelType.CLASSIFICATION,
             status=ModelStatus.ACTIVE,
             created_at=datetime.now(),
-            updated_at=datetime.now()
+            updated_at=datetime.now(),
         )
 
         retired_model = Model(
@@ -162,10 +162,10 @@ class TestModelMethods:
             model_type=ModelType.CLASSIFICATION,
             status=ModelStatus.RETIRED,
             created_at=datetime.now(),
-            updated_at=datetime.now()
+            updated_at=datetime.now(),
         )
 
-        if hasattr(active_model, 'is_active'):
+        if hasattr(active_model, "is_active"):
             assert active_model.is_active() is True
             assert retired_model.is_active() is False
 
@@ -178,7 +178,7 @@ class TestModelMethods:
             model_type=ModelType.CLASSIFICATION,
             status=ModelStatus.ACTIVE,
             created_at=datetime.now(),
-            updated_at=datetime.now()
+            updated_at=datetime.now(),
         )
 
         training_model = Model(
@@ -188,9 +188,9 @@ class TestModelMethods:
             model_type=ModelType.CLASSIFICATION,
             status=ModelStatus.TRAINING,
             created_at=datetime.now(),
-            updated_at=datetime.now()
+            updated_at=datetime.now(),
         )
 
-        if hasattr(active_model, 'can_predict'):
+        if hasattr(active_model, "can_predict"):
             assert active_model.can_predict() is True
             assert training_model.can_predict() is False

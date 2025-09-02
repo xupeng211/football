@@ -31,7 +31,7 @@ class TestComponentHealth:
             name="database",
             status=HealthStatus.HEALTHY,
             message="Connection successful",
-            details={"latency_ms": 50}
+            details={"latency_ms": 50},
         )
 
         assert health.name == "database"
@@ -45,7 +45,7 @@ class TestComponentHealth:
             name="cache",
             status=HealthStatus.UNHEALTHY,
             message="Redis connection failed",
-            details={"error": "Connection timeout"}
+            details={"error": "Connection timeout"},
         )
 
         assert health.status == HealthStatus.UNHEALTHY
@@ -58,14 +58,14 @@ class TestHealthChecker:
     @pytest.fixture
     def health_checker(self):
         """Create a HealthChecker instance."""
-        with patch('football_predict_system.core.health.get_settings') as mock_settings:
+        with patch("football_predict_system.core.health.get_settings") as mock_settings:
             mock_settings.return_value.health_check_timeout = 30
             return HealthChecker()
 
     def test_health_checker_initialization(self, health_checker):
         """Test HealthChecker initialization."""
         assert health_checker is not None
-        assert hasattr(health_checker, 'settings')
+        assert hasattr(health_checker, "settings")
 
     @pytest.mark.asyncio
     async def test_check_database_health_success(self, health_checker):
@@ -74,8 +74,8 @@ class TestHealthChecker:
         mock_db_manager.health_check.return_value = True
 
         with patch(
-            'football_predict_system.core.health.get_database_manager',
-            return_value=mock_db_manager
+            "football_predict_system.core.health.get_database_manager",
+            return_value=mock_db_manager,
         ):
             result = await health_checker.check_database_health()
 
@@ -90,8 +90,8 @@ class TestHealthChecker:
         mock_db_manager.health_check.return_value = False
 
         with patch(
-            'football_predict_system.core.health.get_database_manager',
-            return_value=mock_db_manager
+            "football_predict_system.core.health.get_database_manager",
+            return_value=mock_db_manager,
         ):
             result = await health_checker.check_database_health()
 
@@ -106,8 +106,8 @@ class TestHealthChecker:
         mock_db_manager.health_check.side_effect = Exception("Connection error")
 
         with patch(
-            'football_predict_system.core.health.get_database_manager',
-            return_value=mock_db_manager
+            "football_predict_system.core.health.get_database_manager",
+            return_value=mock_db_manager,
         ):
             result = await health_checker.check_database_health()
 
@@ -124,8 +124,8 @@ class TestHealthChecker:
         mock_cache_manager.get_redis_client.return_value = mock_redis_client
 
         with patch(
-            'football_predict_system.core.health.get_cache_manager',
-            return_value=mock_cache_manager
+            "football_predict_system.core.health.get_cache_manager",
+            return_value=mock_cache_manager,
         ):
             result = await health_checker.check_cache_health()
 
@@ -142,8 +142,8 @@ class TestHealthChecker:
         mock_cache_manager.get_redis_client.return_value = mock_redis_client
 
         with patch(
-            'football_predict_system.core.health.get_cache_manager',
-            return_value=mock_cache_manager
+            "football_predict_system.core.health.get_cache_manager",
+            return_value=mock_cache_manager,
         ):
             result = await health_checker.check_cache_health()
 
@@ -155,21 +155,13 @@ class TestHealthChecker:
     async def test_check_all_components_healthy(self, health_checker):
         """Test checking all components when all are healthy."""
         # Mock all components as healthy
-        with patch.object(
-            health_checker, 'check_database_health'
-        ) as mock_db_check:
-            with patch.object(
-                health_checker, 'check_cache_health'
-            ) as mock_cache_check:
+        with patch.object(health_checker, "check_database_health") as mock_db_check:
+            with patch.object(health_checker, "check_cache_health") as mock_cache_check:
                 mock_db_check.return_value = ComponentHealth(
-                    name="database",
-                    status=HealthStatus.HEALTHY,
-                    message="OK"
+                    name="database", status=HealthStatus.HEALTHY, message="OK"
                 )
                 mock_cache_check.return_value = ComponentHealth(
-                    name="cache",
-                    status=HealthStatus.HEALTHY,
-                    message="OK"
+                    name="cache", status=HealthStatus.HEALTHY, message="OK"
                 )
 
                 result = await health_checker.check_all_components()
@@ -180,21 +172,13 @@ class TestHealthChecker:
     @pytest.mark.asyncio
     async def test_check_all_components_some_unhealthy(self, health_checker):
         """Test checking all components when some are unhealthy."""
-        with patch.object(
-            health_checker, 'check_database_health'
-        ) as mock_db_check:
-            with patch.object(
-                health_checker, 'check_cache_health'
-            ) as mock_cache_check:
+        with patch.object(health_checker, "check_database_health") as mock_db_check:
+            with patch.object(health_checker, "check_cache_health") as mock_cache_check:
                 mock_db_check.return_value = ComponentHealth(
-                    name="database",
-                    status=HealthStatus.HEALTHY,
-                    message="OK"
+                    name="database", status=HealthStatus.HEALTHY, message="OK"
                 )
                 mock_cache_check.return_value = ComponentHealth(
-                    name="cache",
-                    status=HealthStatus.UNHEALTHY,
-                    message="Failed"
+                    name="cache", status=HealthStatus.UNHEALTHY, message="Failed"
                 )
 
                 result = await health_checker.check_all_components()
@@ -210,16 +194,8 @@ class TestHealthChecker:
     async def test_get_overall_status_all_healthy(self, health_checker):
         """Test getting overall status when all components are healthy."""
         components = [
-            ComponentHealth(
-                name="database",
-                status=HealthStatus.HEALTHY,
-                message="OK"
-            ),
-            ComponentHealth(
-                name="cache",
-                status=HealthStatus.HEALTHY,
-                message="OK"
-            )
+            ComponentHealth(name="database", status=HealthStatus.HEALTHY, message="OK"),
+            ComponentHealth(name="cache", status=HealthStatus.HEALTHY, message="OK"),
         ]
 
         status = health_checker.get_overall_status(components)
@@ -229,16 +205,10 @@ class TestHealthChecker:
     async def test_get_overall_status_some_unhealthy(self, health_checker):
         """Test getting overall status when some components are unhealthy."""
         components = [
+            ComponentHealth(name="database", status=HealthStatus.HEALTHY, message="OK"),
             ComponentHealth(
-                name="database",
-                status=HealthStatus.HEALTHY,
-                message="OK"
+                name="cache", status=HealthStatus.UNHEALTHY, message="Failed"
             ),
-            ComponentHealth(
-                name="cache",
-                status=HealthStatus.UNHEALTHY,
-                message="Failed"
-            )
         ]
 
         status = health_checker.get_overall_status(components)
@@ -248,16 +218,8 @@ class TestHealthChecker:
     async def test_get_overall_status_degraded(self, health_checker):
         """Test getting overall status when components are degraded."""
         components = [
-            ComponentHealth(
-                name="database",
-                status=HealthStatus.HEALTHY,
-                message="OK"
-            ),
-            ComponentHealth(
-                name="cache",
-                status=HealthStatus.DEGRADED,
-                message="Slow"
-            )
+            ComponentHealth(name="database", status=HealthStatus.HEALTHY, message="OK"),
+            ComponentHealth(name="cache", status=HealthStatus.DEGRADED, message="Slow"),
         ]
 
         status = health_checker.get_overall_status(components)
@@ -267,7 +229,7 @@ class TestHealthChecker:
 class TestHealthCheckerSingleton:
     """Test HealthChecker singleton pattern."""
 
-    @patch('football_predict_system.core.health.HealthChecker')
+    @patch("football_predict_system.core.health.HealthChecker")
     def test_get_health_checker_singleton(self, mock_health_checker_class):
         """Test that get_health_checker returns singleton instance."""
         mock_instance = Mock()
@@ -291,7 +253,7 @@ class TestHealthCheckerIntegration:
     @pytest.mark.asyncio
     async def test_health_check_with_timeout(self):
         """Test health check with timeout handling."""
-        with patch('football_predict_system.core.health.get_settings') as mock_settings:
+        with patch("football_predict_system.core.health.get_settings") as mock_settings:
             mock_settings.return_value.health_check_timeout = 1  # 1 second timeout
             health_checker = HealthChecker()
 
@@ -300,21 +262,19 @@ class TestHealthCheckerIntegration:
 
             async def slow_health_check():
                 import asyncio
+
                 await asyncio.sleep(2)  # Longer than timeout
                 return True
 
             mock_db_manager.health_check = slow_health_check
 
             with patch(
-                'football_predict_system.core.health.get_database_manager',
-                return_value=mock_db_manager
+                "football_predict_system.core.health.get_database_manager",
+                return_value=mock_db_manager,
             ):
                 result = await health_checker.check_database_health()
 
                 # Should handle timeout gracefully
                 assert result.name == "database"
                 # The exact behavior depends on implementation
-                assert result.status in [
-                    HealthStatus.UNHEALTHY,
-                    HealthStatus.DEGRADED
-                ]
+                assert result.status in [HealthStatus.UNHEALTHY, HealthStatus.DEGRADED]

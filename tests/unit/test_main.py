@@ -30,19 +30,19 @@ class TestApp:
         ]
 
         # Should have CORS middleware
-        assert any('CORS' in cls for cls in middleware_classes)
+        assert any("CORS" in cls for cls in middleware_classes)
 
     def test_app_exception_handlers(self):
         """Test that exception handlers are configured."""
         # Check if exception handlers are registered
-        assert hasattr(app, 'exception_handlers')
+        assert hasattr(app, "exception_handlers")
         assert len(app.exception_handlers) > 0
 
 
 class TestAppConfiguration:
     """Test application configuration."""
 
-    @patch('football_predict_system.main.get_settings')
+    @patch("football_predict_system.main.get_settings")
     def test_app_uses_settings(self, mock_get_settings):
         """Test that app uses settings configuration."""
         mock_settings = Mock()
@@ -59,7 +59,7 @@ class TestAppConfiguration:
         # Check if CORS is properly configured
         cors_middleware = None
         for middleware in app.user_middleware:
-            if 'CORS' in middleware.cls.__name__:
+            if "CORS" in middleware.cls.__name__:
                 cors_middleware = middleware
                 break
 
@@ -70,8 +70,8 @@ class TestLifespan:
     """Test application lifespan events."""
 
     @pytest.mark.asyncio
-    @patch('football_predict_system.main.get_database_manager')
-    @patch('football_predict_system.main.get_cache_manager')
+    @patch("football_predict_system.main.get_database_manager")
+    @patch("football_predict_system.main.get_cache_manager")
     async def test_lifespan_startup(self, mock_get_cache_manager, mock_get_db_manager):
         """Test application startup sequence."""
         # Mock dependencies
@@ -130,6 +130,7 @@ class TestErrorHandling:
 
         # Should return a JSONResponse
         from fastapi.responses import JSONResponse
+
         assert isinstance(response, JSONResponse)
         assert response.status_code == 400
 
@@ -139,22 +140,22 @@ class TestAppMetadata:
 
     def test_app_version(self):
         """Test application version is set."""
-        assert hasattr(app, 'version')
+        assert hasattr(app, "version")
         assert app.version is not None
 
     def test_app_description(self):
         """Test application description is set."""
-        assert hasattr(app, 'description')
+        assert hasattr(app, "description")
         if app.description:
             assert isinstance(app.description, str)
 
     def test_app_docs_configuration(self):
         """Test API documentation configuration."""
         # Should have docs URL configured
-        assert hasattr(app, 'docs_url')
-        assert hasattr(app, 'redoc_url')
+        assert hasattr(app, "docs_url")
+        assert hasattr(app, "redoc_url")
 
     def test_app_tags_metadata(self):
         """Test API tags metadata."""
-        if hasattr(app, 'openapi_tags'):
+        if hasattr(app, "openapi_tags"):
             assert isinstance(app.openapi_tags, list)

@@ -49,7 +49,7 @@ class TestUser:
             username="testuser",
             email="test@example.com",
             role=UserRole.USER,
-            permissions=[Permission.PREDICT_READ]
+            permissions=[Permission.PREDICT_READ],
         )
 
         assert user.id == "test-user-id"
@@ -65,7 +65,7 @@ class TestUser:
             username="testuser",
             email="test@example.com",
             role=UserRole.USER,
-            permissions=[Permission.PREDICT_READ, Permission.MODEL_READ]
+            permissions=[Permission.PREDICT_READ, Permission.MODEL_READ],
         )
 
         assert user.has_permission(Permission.PREDICT_READ)
@@ -79,7 +79,9 @@ class TestAuthenticationService:
     @pytest.fixture
     def auth_service(self):
         """Create AuthenticationService instance."""
-        with patch('football_predict_system.core.security.get_settings') as mock_settings:
+        with patch(
+            "football_predict_system.core.security.get_settings"
+        ) as mock_settings:
             mock_settings.return_value.jwt_secret_key = "test_secret_key"
             mock_settings.return_value.jwt_algorithm = "HS256"
             mock_settings.return_value.jwt_expire_minutes = 30
@@ -112,7 +114,7 @@ class TestJWTManager:
     def jwt_manager(self):
         """Create JWT manager instance."""
         with patch(
-            'football_predict_system.core.security.get_settings'
+            "football_predict_system.core.security.get_settings"
         ) as mock_settings:
             mock_settings.return_value.jwt_secret_key = "test_secret_key"
             mock_settings.return_value.jwt_algorithm = "HS256"
@@ -182,7 +184,7 @@ class TestAPIKeyFunctions:
         assert isinstance(api_key, str)
         assert len(api_key) >= 32  # Should be at least 32 characters
 
-    @patch('football_predict_system.core.security.get_settings')
+    @patch("football_predict_system.core.security.get_settings")
     def test_verify_api_key_valid(self, mock_settings):
         """Test verifying valid API key."""
         mock_settings.return_value.api_keys = ["valid_api_key_123"]
@@ -191,7 +193,7 @@ class TestAPIKeyFunctions:
 
         assert result is True
 
-    @patch('football_predict_system.core.security.get_settings')
+    @patch("football_predict_system.core.security.get_settings")
     def test_verify_api_key_invalid(self, mock_settings):
         """Test verifying invalid API key."""
         mock_settings.return_value.api_keys = ["valid_api_key_123"]
@@ -210,6 +212,7 @@ class TestRequirePermission:
 
     def test_require_permission_with_valid_permission(self):
         """Test permission decorator with valid permission."""
+
         # Create a mock function to decorate
         @require_permission(Permission.PREDICT_READ)
         async def test_function(user: User):

@@ -19,7 +19,7 @@ class TestDatabaseManager:
     def test_database_manager_initialization(self):
         """Test DatabaseManager initialization."""
         with patch(
-            'football_predict_system.core.database.get_settings'
+            "football_predict_system.core.database.get_settings"
         ) as mock_settings:
             mock_settings.return_value.database_url = "postgresql://test"
             db_manager = DatabaseManager()
@@ -28,8 +28,8 @@ class TestDatabaseManager:
             assert db_manager._engine is None
             assert db_manager._async_engine is None
 
-    @patch('football_predict_system.core.database.create_engine')
-    @patch('football_predict_system.core.database.get_settings')
+    @patch("football_predict_system.core.database.create_engine")
+    @patch("football_predict_system.core.database.get_settings")
     def test_get_engine(self, mock_settings, mock_create_engine):
         """Test getting synchronous database engine."""
         # Setup mocks
@@ -45,8 +45,8 @@ class TestDatabaseManager:
         assert engine == mock_engine
         mock_create_engine.assert_called_once()
 
-    @patch('football_predict_system.core.database.create_async_engine')
-    @patch('football_predict_system.core.database.get_settings')
+    @patch("football_predict_system.core.database.create_async_engine")
+    @patch("football_predict_system.core.database.get_settings")
     def test_get_async_engine(self, mock_settings, mock_create_async_engine):
         """Test getting asynchronous database engine."""
         # Setup mocks
@@ -62,8 +62,8 @@ class TestDatabaseManager:
         assert async_engine == mock_async_engine
         mock_create_async_engine.assert_called_once()
 
-    @patch('football_predict_system.core.database.sessionmaker')
-    @patch('football_predict_system.core.database.get_settings')
+    @patch("football_predict_system.core.database.sessionmaker")
+    @patch("football_predict_system.core.database.get_settings")
     def test_get_session_factory(self, mock_settings, mock_sessionmaker):
         """Test getting session factory."""
         mock_settings.return_value.database_url = "postgresql://test"
@@ -71,7 +71,7 @@ class TestDatabaseManager:
         mock_sessionmaker.return_value = mock_factory
 
         db_manager = DatabaseManager()
-        with patch.object(db_manager, 'get_engine') as mock_get_engine:
+        with patch.object(db_manager, "get_engine") as mock_get_engine:
             mock_engine = Mock()
             mock_get_engine.return_value = mock_engine
 
@@ -80,8 +80,8 @@ class TestDatabaseManager:
             assert factory == mock_factory
             mock_sessionmaker.assert_called_once()
 
-    @patch('football_predict_system.core.database.sessionmaker')
-    @patch('football_predict_system.core.database.get_settings')
+    @patch("football_predict_system.core.database.sessionmaker")
+    @patch("football_predict_system.core.database.get_settings")
     def test_get_async_session_factory(self, mock_settings, mock_sessionmaker):
         """Test getting async session factory."""
         mock_settings.return_value.async_database_url = "postgresql+asyncpg://test"
@@ -89,7 +89,7 @@ class TestDatabaseManager:
         mock_sessionmaker.return_value = mock_factory
 
         db_manager = DatabaseManager()
-        with patch.object(db_manager, 'get_async_engine') as mock_get_async_engine:
+        with patch.object(db_manager, "get_async_engine") as mock_get_async_engine:
             mock_async_engine = Mock()
             mock_get_async_engine.return_value = mock_async_engine
 
@@ -99,7 +99,7 @@ class TestDatabaseManager:
             mock_sessionmaker.assert_called_once()
 
     @pytest.mark.asyncio
-    @patch('football_predict_system.core.database.get_settings')
+    @patch("football_predict_system.core.database.get_settings")
     async def test_health_check_success(self, mock_settings):
         """Test successful database health check."""
         mock_settings.return_value.database_url = "postgresql://test"
@@ -113,8 +113,10 @@ class TestDatabaseManager:
         mock_result.scalar.return_value = 1
         mock_session.execute.return_value = mock_result
 
-        with patch.object(db_manager, 'get_async_engine', return_value=mock_async_engine):
-            with patch.object(db_manager, 'get_async_session_factory') as mock_factory:
+        with patch.object(
+            db_manager, "get_async_engine", return_value=mock_async_engine
+        ):
+            with patch.object(db_manager, "get_async_session_factory") as mock_factory:
                 mock_factory.return_value = lambda: mock_session
 
                 # Create async context manager
@@ -129,7 +131,7 @@ class TestDatabaseManager:
                 assert result is True
 
     @pytest.mark.asyncio
-    @patch('football_predict_system.core.database.get_settings')
+    @patch("football_predict_system.core.database.get_settings")
     async def test_health_check_failure(self, mock_settings):
         """Test failed database health check."""
         mock_settings.return_value.database_url = "postgresql://test"
@@ -141,8 +143,10 @@ class TestDatabaseManager:
         mock_session = AsyncMock()
         mock_session.execute.side_effect = SQLAlchemyError("Connection failed")
 
-        with patch.object(db_manager, 'get_async_engine', return_value=mock_async_engine):
-            with patch.object(db_manager, 'get_async_session_factory') as mock_factory:
+        with patch.object(
+            db_manager, "get_async_engine", return_value=mock_async_engine
+        ):
+            with patch.object(db_manager, "get_async_session_factory") as mock_factory:
                 mock_factory.return_value = lambda: mock_session
 
                 mock_session.__aenter__ = AsyncMock(return_value=mock_session)
@@ -153,7 +157,7 @@ class TestDatabaseManager:
                 assert result is False
 
     @pytest.mark.asyncio
-    @patch('football_predict_system.core.database.get_settings')
+    @patch("football_predict_system.core.database.get_settings")
     async def test_close(self, mock_settings):
         """Test closing database connections."""
         mock_settings.return_value.database_url = "postgresql://test"
@@ -176,7 +180,7 @@ class TestDatabaseManager:
 class TestDatabaseFunctions:
     """Test database utility functions."""
 
-    @patch('football_predict_system.core.database.DatabaseManager')
+    @patch("football_predict_system.core.database.DatabaseManager")
     def test_get_database_manager(self, mock_db_manager_class):
         """Test getting database manager singleton."""
         mock_instance = Mock()
@@ -193,7 +197,7 @@ class TestDatabaseFunctions:
         # Should only create one instance
         mock_db_manager_class.assert_called_once()
 
-    @patch('football_predict_system.core.database.get_database_manager')
+    @patch("football_predict_system.core.database.get_database_manager")
     def test_get_session(self, mock_get_db_manager):
         """Test getting database session."""
         mock_db_manager = Mock()
@@ -214,7 +218,7 @@ class TestDatabaseFunctions:
         mock_session.__exit__.assert_called_once()
 
     @pytest.mark.asyncio
-    @patch('football_predict_system.core.database.get_database_manager')
+    @patch("football_predict_system.core.database.get_database_manager")
     async def test_get_async_session(self, mock_get_db_manager):
         """Test getting async database session."""
         mock_db_manager = Mock()
@@ -238,7 +242,7 @@ class TestDatabaseFunctions:
 class TestDatabaseExceptionHandling:
     """Test database exception handling."""
 
-    @patch('football_predict_system.core.database.get_settings')
+    @patch("football_predict_system.core.database.get_settings")
     def test_engine_creation_with_invalid_url(self, mock_settings):
         """Test engine creation with invalid database URL."""
         mock_settings.return_value.database_url = "invalid://url"
@@ -249,14 +253,14 @@ class TestDatabaseExceptionHandling:
         # The exception would be raised when actually trying to connect
         assert db_manager is not None
 
-    @patch('football_predict_system.core.database.get_settings')
+    @patch("football_predict_system.core.database.get_settings")
     def test_session_creation_failure(self, mock_settings):
         """Test handling session creation failures."""
         mock_settings.return_value.database_url = "postgresql://test"
 
         db_manager = DatabaseManager()
 
-        with patch.object(db_manager, 'get_engine') as mock_get_engine:
+        with patch.object(db_manager, "get_engine") as mock_get_engine:
             mock_get_engine.side_effect = SQLAlchemyError("Connection failed")
 
             with pytest.raises(SQLAlchemyError):

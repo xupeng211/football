@@ -14,9 +14,16 @@ from unittest.mock import MagicMock, patch
 import pytest
 import structlog
 
-from football_predict_system.core.logging import (CorrelationIDProcessor, ErrorProcessor, PerformanceProcessor,
-                                                  correlation_id_var, get_logger, request_id_var, setup_logging,
-                                                  user_id_var)
+from football_predict_system.core.logging import (
+    CorrelationIDProcessor,
+    ErrorProcessor,
+    PerformanceProcessor,
+    correlation_id_var,
+    get_logger,
+    request_id_var,
+    setup_logging,
+    user_id_var,
+)
 
 
 class TestCorrelationIDProcessor:
@@ -110,7 +117,7 @@ class TestPerformanceProcessor:
         """Test that processor adds timestamp."""
         event_dict = {"message": "test"}
 
-        with patch('time.time', return_value=1234567890.123):
+        with patch("time.time", return_value=1234567890.123):
             result = self.processor(self.mock_logger, "info", event_dict)
 
         assert result["timestamp"] == 1234567890.123
@@ -240,7 +247,9 @@ class TestLoggingSetup:
 
     def test_setup_logging_development(self):
         """Test logging setup for development environment."""
-        with patch('football_predict_system.core.logging.get_settings') as mock_settings:
+        with patch(
+            "football_predict_system.core.logging.get_settings"
+        ) as mock_settings:
             mock_settings.return_value.environment = "development"
             mock_settings.return_value.log_level = "DEBUG"
 
@@ -252,7 +261,9 @@ class TestLoggingSetup:
 
     def test_setup_logging_production(self):
         """Test logging setup for production environment."""
-        with patch('football_predict_system.core.logging.get_settings') as mock_settings:
+        with patch(
+            "football_predict_system.core.logging.get_settings"
+        ) as mock_settings:
             mock_settings.return_value.environment = "production"
             mock_settings.return_value.log_level = "INFO"
 

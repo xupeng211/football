@@ -28,7 +28,7 @@ class TestEndpointsRouter:
     def test_router_creation(self):
         """Test that the router is created successfully."""
         assert router is not None
-        assert hasattr(router, 'routes')
+        assert hasattr(router, "routes")
         assert len(router.routes) > 0
 
     def test_status_endpoint(self, client):
@@ -49,11 +49,12 @@ class TestEndpointsRouter:
     def test_router_tags(self):
         """Test that routes have appropriate tags."""
         status_routes = [
-            route for route in router.routes
-            if hasattr(route, 'path') and route.path == "/status"
+            route
+            for route in router.routes
+            if hasattr(route, "path") and route.path == "/status"
         ]
         assert len(status_routes) > 0
 
         status_route = status_routes[0]
-        if hasattr(status_route, 'tags'):
+        if hasattr(status_route, "tags"):
             assert "general" in status_route.tags

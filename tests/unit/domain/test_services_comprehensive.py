@@ -14,11 +14,27 @@ from uuid import uuid4
 
 import pytest
 
-from football_predict_system.core.exceptions import (InsufficientDataError, ModelNotFoundError, NotFoundError,
-                                                     PredictionError)
-from football_predict_system.domain.models import (BatchPredictionRequest, BatchPredictionResponse, Match, Model,
-                                                   Prediction, PredictionRequest, PredictionResponse, Team)
-from football_predict_system.domain.services import DataService, ModelService, PredictionService
+from football_predict_system.core.exceptions import (
+    InsufficientDataError,
+    ModelNotFoundError,
+    NotFoundError,
+    PredictionError,
+)
+from football_predict_system.domain.models import (
+    BatchPredictionRequest,
+    BatchPredictionResponse,
+    Match,
+    Model,
+    Prediction,
+    PredictionRequest,
+    PredictionResponse,
+    Team,
+)
+from football_predict_system.domain.services import (
+    DataService,
+    ModelService,
+    PredictionService,
+)
 
 
 class TestPredictionService:
@@ -37,10 +53,7 @@ class TestPredictionService:
     @pytest.mark.asyncio
     async def test_generate_prediction_cache_hit(self):
         """Test prediction generation with cache hit."""
-        request = PredictionRequest(
-            match_id=uuid4(),
-            model_version="v1.0"
-        )
+        request = PredictionRequest(match_id=uuid4(), model_version="v1.0")
 
         cached_response = {
             "prediction": {
@@ -50,13 +63,15 @@ class TestPredictionService:
                 "away_win_probability": 0.15,
                 "confidence": 0.85,
                 "model_version": "v1.0",
-                "generated_at": "2023-01-01T12:00:00"
+                "generated_at": "2023-01-01T12:00:00",
             },
             "match_info": {"home_team": "1", "away_team": "2"},
-            "model_info": {"version": "v1.0", "accuracy": 0.85}
+            "model_info": {"version": "v1.0", "accuracy": 0.85},
         }
 
-        with patch('football_predict_system.domain.services.get_cache_manager') as mock_cache:
+        with patch(
+            "football_predict_system.domain.services.get_cache_manager"
+        ) as mock_cache:
             mock_cache_manager = AsyncMock()
             mock_cache_manager.get.return_value = cached_response
             mock_cache.return_value = mock_cache_manager
@@ -78,7 +93,7 @@ class TestPredictionService:
             home_team_id=uuid4(),
             away_team_id=uuid4(),
             match_date=datetime.now() + timedelta(days=1),
-            status="upcoming"
+            status="upcoming",
         )
 
         mock_model = Model(
@@ -86,7 +101,7 @@ class TestPredictionService:
             name="test_model",
             version="1.0",
             accuracy=0.85,
-            created_at=datetime.now()
+            created_at=datetime.now(),
         )
 
         mock_prediction = Prediction(
@@ -96,16 +111,21 @@ class TestPredictionService:
             away_win_probability=0.15,
             confidence=0.85,
             model_version="1.0",
-            generated_at=datetime.now()
+            generated_at=datetime.now(),
         )
 
-        with patch.multiple(
-            self.service,
-            _get_match=AsyncMock(return_value=mock_match),
-            _get_model=AsyncMock(return_value=mock_model),
-            _extract_features=AsyncMock(return_value={"feature1": 1.0}),
-            _predict_with_model=AsyncMock(return_value=mock_prediction),
-        ), patch('football_predict_system.domain.services.get_cache_manager') as mock_cache:
+        with (
+            patch.multiple(
+                self.service,
+                _get_match=AsyncMock(return_value=mock_match),
+                _get_model=AsyncMock(return_value=mock_model),
+                _extract_features=AsyncMock(return_value={"feature1": 1.0}),
+                _predict_with_model=AsyncMock(return_value=mock_prediction),
+            ),
+            patch(
+                "football_predict_system.domain.services.get_cache_manager"
+            ) as mock_cache,
+        ):
             mock_cache_manager = AsyncMock()
             mock_cache_manager.get.return_value = None  # Cache miss
             mock_cache_manager.set.return_value = True
@@ -122,9 +142,12 @@ class TestPredictionService:
         """Test prediction generation when match not found."""
         request = PredictionRequest(match_id=uuid4())
 
-        with patch.object(self.service, '_get_match', return_value=None), \
-             patch('football_predict_system.domain.services.get_cache_manager') as mock_cache:
-
+        with (
+            patch.object(self.service, "_get_match", return_value=None),
+            patch(
+                "football_predict_system.domain.services.get_cache_manager"
+            ) as mock_cache,
+        ):
             mock_cache_manager = AsyncMock()
             mock_cache_manager.get.return_value = None
             mock_cache.return_value = mock_cache_manager
@@ -144,15 +167,19 @@ class TestPredictionService:
             home_team_id=uuid4(),
             away_team_id=uuid4(),
             match_date=datetime.now() + timedelta(days=1),
-            status="upcoming"
+            status="upcoming",
         )
 
-        with patch.multiple(
-            self.service,
-            _get_match=AsyncMock(return_value=mock_match),
-            _get_model=AsyncMock(return_value=None),
-        ), patch('football_predict_system.domain.services.get_cache_manager') as mock_cache:
-
+        with (
+            patch.multiple(
+                self.service,
+                _get_match=AsyncMock(return_value=mock_match),
+                _get_model=AsyncMock(return_value=None),
+            ),
+            patch(
+                "football_predict_system.domain.services.get_cache_manager"
+            ) as mock_cache,
+        ):
             mock_cache_manager = AsyncMock()
             mock_cache_manager.get.return_value = None
             mock_cache.return_value = mock_cache_manager
@@ -170,7 +197,7 @@ class TestPredictionService:
             home_team_id=uuid4(),
             away_team_id=uuid4(),
             match_date=datetime.now() + timedelta(days=1),
-            status="upcoming"
+            status="upcoming",
         )
 
         mock_model = Model(
@@ -178,16 +205,20 @@ class TestPredictionService:
             name="test_model",
             version="1.0",
             accuracy=0.85,
-            created_at=datetime.now()
+            created_at=datetime.now(),
         )
 
-        with patch.multiple(
-            self.service,
-            _get_match=AsyncMock(return_value=mock_match),
-            _get_model=AsyncMock(return_value=mock_model),
-            _extract_features=AsyncMock(return_value=None),
-        ), patch('football_predict_system.domain.services.get_cache_manager') as mock_cache:
-
+        with (
+            patch.multiple(
+                self.service,
+                _get_match=AsyncMock(return_value=mock_match),
+                _get_model=AsyncMock(return_value=mock_model),
+                _extract_features=AsyncMock(return_value=None),
+            ),
+            patch(
+                "football_predict_system.domain.services.get_cache_manager"
+            ) as mock_cache,
+        ):
             mock_cache_manager = AsyncMock()
             mock_cache_manager.get.return_value = None
             mock_cache.return_value = mock_cache_manager
@@ -205,7 +236,7 @@ class TestPredictionService:
             home_team_id=uuid4(),
             away_team_id=uuid4(),
             match_date=datetime.now() + timedelta(days=1),
-            status="upcoming"
+            status="upcoming",
         )
 
         mock_model = Model(
@@ -213,17 +244,21 @@ class TestPredictionService:
             name="test_model",
             version="1.0",
             accuracy=0.85,
-            created_at=datetime.now()
+            created_at=datetime.now(),
         )
 
-        with patch.multiple(
-            self.service,
-            _get_match=AsyncMock(return_value=mock_match),
-            _get_model=AsyncMock(return_value=mock_model),
-            _extract_features=AsyncMock(return_value={"feature1": 1.0}),
-            _predict_with_model=AsyncMock(side_effect=Exception("Model error")),
-        ), patch('football_predict_system.domain.services.get_cache_manager') as mock_cache:
-
+        with (
+            patch.multiple(
+                self.service,
+                _get_match=AsyncMock(return_value=mock_match),
+                _get_model=AsyncMock(return_value=mock_model),
+                _extract_features=AsyncMock(return_value={"feature1": 1.0}),
+                _predict_with_model=AsyncMock(side_effect=Exception("Model error")),
+            ),
+            patch(
+                "football_predict_system.domain.services.get_cache_manager"
+            ) as mock_cache,
+        ):
             mock_cache_manager = AsyncMock()
             mock_cache_manager.get.return_value = None
             mock_cache.return_value = mock_cache_manager
@@ -235,10 +270,7 @@ class TestPredictionService:
     async def test_generate_batch_predictions(self):
         """Test batch prediction generation."""
         match_ids = [uuid4(), uuid4(), uuid4()]
-        request = BatchPredictionRequest(
-            match_ids=match_ids,
-            model_version="v1.0"
-        )
+        request = BatchPredictionRequest(match_ids=match_ids, model_version="v1.0")
 
         # Mock individual predictions
         mock_predictions = []
@@ -251,14 +283,16 @@ class TestPredictionService:
                     away_win_probability=0.15,
                     confidence=0.85,
                     model_version="v1.0",
-                    generated_at=datetime.now()
+                    generated_at=datetime.now(),
                 ),
                 match_info={"home_team": "1", "away_team": "2"},
-                model_info={"version": "v1.0", "accuracy": 0.85}
+                model_info={"version": "v1.0", "accuracy": 0.85},
             )
             mock_predictions.append(mock_prediction)
 
-        with patch.object(self.service, 'generate_prediction', side_effect=mock_predictions):
+        with patch.object(
+            self.service, "generate_prediction", side_effect=mock_predictions
+        ):
             result = await self.service.generate_batch_predictions(request)
 
             assert isinstance(result, BatchPredictionResponse)
@@ -274,11 +308,13 @@ class TestPredictionService:
             home_team_id=uuid4(),
             away_team_id=uuid4(),
             match_date=datetime.now() + timedelta(days=1),
-            status="upcoming"
+            status="upcoming",
         )
 
         # This would normally be implemented to fetch from database
-        with patch.object(self.service, '_fetch_match_from_db', return_value=mock_match):
+        with patch.object(
+            self.service, "_fetch_match_from_db", return_value=mock_match
+        ):
             result = await self.service._get_match(match_id)
             assert result == mock_match
 
@@ -291,11 +327,13 @@ class TestPredictionService:
             name="test_model",
             version=model_version,
             accuracy=0.85,
-            created_at=datetime.now()
+            created_at=datetime.now(),
         )
 
         # This would normally be implemented to fetch from model registry
-        with patch.object(self.service, '_fetch_model_from_registry', return_value=mock_model):
+        with patch.object(
+            self.service, "_fetch_model_from_registry", return_value=mock_model
+        ):
             result = await self.service._get_model(model_version)
             assert result == mock_model
 
@@ -307,17 +345,19 @@ class TestPredictionService:
             home_team_id=uuid4(),
             away_team_id=uuid4(),
             match_date=datetime.now() + timedelta(days=1),
-            status="upcoming"
+            status="upcoming",
         )
 
         expected_features = {
             "home_team_recent_form": 0.7,
             "away_team_recent_form": 0.6,
-            "head_to_head_ratio": 0.55
+            "head_to_head_ratio": 0.55,
         }
 
         # This would normally be implemented to extract features
-        with patch.object(self.service, '_compute_team_features', return_value=expected_features):
+        with patch.object(
+            self.service, "_compute_team_features", return_value=expected_features
+        ):
             result = await self.service._extract_features(match)
             assert result == expected_features
 
@@ -344,18 +384,20 @@ class TestModelService:
                 name="model_1",
                 version="1.0",
                 accuracy=0.85,
-                created_at=datetime.now()
+                created_at=datetime.now(),
             ),
             Model(
                 id=uuid4(),
                 name="model_2",
                 version="2.0",
                 accuracy=0.87,
-                created_at=datetime.now()
-            )
+                created_at=datetime.now(),
+            ),
         ]
 
-        with patch.object(self.service, '_fetch_models_from_registry', return_value=mock_models):
+        with patch.object(
+            self.service, "_fetch_models_from_registry", return_value=mock_models
+        ):
             result = await self.service.get_available_models()
             assert len(result) == 2
             assert all(isinstance(model, Model) for model in result)
@@ -369,10 +411,12 @@ class TestModelService:
             name="test_model",
             version=version,
             accuracy=0.85,
-            created_at=datetime.now()
+            created_at=datetime.now(),
         )
 
-        with patch.object(self.service, '_fetch_model_by_version', return_value=mock_model):
+        with patch.object(
+            self.service, "_fetch_model_by_version", return_value=mock_model
+        ):
             result = await self.service.get_model_by_version(version)
             assert result == mock_model
 
@@ -381,7 +425,7 @@ class TestModelService:
         """Test getting model by version when not found."""
         version = "nonexistent"
 
-        with patch.object(self.service, '_fetch_model_by_version', return_value=None):
+        with patch.object(self.service, "_fetch_model_by_version", return_value=None):
             with pytest.raises(ModelNotFoundError):
                 await self.service.get_model_by_version(version)
 
@@ -408,10 +452,10 @@ class TestDataService:
             name="Test Team",
             league="Premier League",
             country="England",
-            founded_year=1900
+            founded_year=1900,
         )
 
-        with patch.object(self.service, '_fetch_team_from_db', return_value=mock_team):
+        with patch.object(self.service, "_fetch_team_from_db", return_value=mock_team):
             result = await self.service.get_team_data(team_id)
             assert result == mock_team
 
@@ -420,7 +464,7 @@ class TestDataService:
         """Test getting team data when not found."""
         team_id = uuid4()
 
-        with patch.object(self.service, '_fetch_team_from_db', return_value=None):
+        with patch.object(self.service, "_fetch_team_from_db", return_value=None):
             with pytest.raises(NotFoundError):
                 await self.service.get_team_data(team_id)
 
@@ -436,12 +480,14 @@ class TestDataService:
                 home_team_id=team_id,
                 away_team_id=uuid4(),
                 match_date=datetime.now() - timedelta(days=7),
-                status="completed"
+                status="completed",
             )
             for _ in range(5)
         ]
 
-        with patch.object(self.service, '_fetch_team_matches', return_value=mock_matches):
+        with patch.object(
+            self.service, "_fetch_team_matches", return_value=mock_matches
+        ):
             result = await self.service.get_match_history(team_id, limit)
             assert len(result) == 5
             assert all(isinstance(match, Match) for match in result)
@@ -458,12 +504,14 @@ class TestDataService:
                 home_team_id=team1_id,
                 away_team_id=team2_id,
                 match_date=datetime.now() - timedelta(days=30),
-                status="completed"
+                status="completed",
             )
             for _ in range(3)
         ]
 
-        with patch.object(self.service, '_fetch_head_to_head_matches', return_value=mock_matches):
+        with patch.object(
+            self.service, "_fetch_head_to_head_matches", return_value=mock_matches
+        ):
             result = await self.service.get_head_to_head_record(team1_id, team2_id)
             assert len(result) == 3
             assert all(isinstance(match, Match) for match in result)
@@ -476,7 +524,7 @@ class TestDataService:
             home_team_id=uuid4(),
             away_team_id=uuid4(),
             match_date=datetime.now() + timedelta(days=1),
-            status="upcoming"
+            status="upcoming",
         )
 
         # Valid match should pass validation
@@ -491,7 +539,7 @@ class TestDataService:
             home_team_id=uuid4(),
             away_team_id=uuid4(),
             match_date=datetime.now() - timedelta(days=1),  # Past date
-            status="upcoming"  # But status says upcoming
+            status="upcoming",  # But status says upcoming
         )
 
         # Invalid match should fail validation

@@ -15,7 +15,11 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from football_predict_system.core.cache import CacheManager, CacheStats, get_cache_manager
+from football_predict_system.core.cache import (
+    CacheManager,
+    CacheStats,
+    get_cache_manager,
+)
 
 
 class TestCacheStats:
@@ -79,9 +83,7 @@ class TestCacheManager:
     def test_generate_key(self):
         """Test cache key generation."""
         key = self.cache_manager._generate_key("test_namespace", "test_key")
-        expected = (
-            f"{self.cache_manager.settings.app_name}:test_namespace:test_key"
-        )
+        expected = f"{self.cache_manager.settings.app_name}:test_namespace:test_key"
         assert key == expected
 
     def test_generate_key_default_namespace(self):
@@ -110,7 +112,7 @@ class TestCacheManager:
     @pytest.mark.asyncio
     async def test_get_redis_client(self):
         """Test Redis client creation."""
-        with patch('redis.asyncio.from_url') as mock_redis:
+        with patch("redis.asyncio.from_url") as mock_redis:
             mock_client = AsyncMock()
             mock_redis.return_value = mock_client
 
@@ -132,7 +134,7 @@ class TestCacheManager:
 
         self.cache_manager._memory_cache[cache_key] = {
             "value": test_value,
-            "expires_at": future_time
+            "expires_at": future_time,
         }
 
         result = await self.cache_manager.get("test_key")
@@ -149,10 +151,10 @@ class TestCacheManager:
 
         self.cache_manager._memory_cache[cache_key] = {
             "value": test_value,
-            "expires_at": past_time
+            "expires_at": past_time,
         }
 
-        with patch.object(self.cache_manager, 'get_redis_client') as mock_redis_client:
+        with patch.object(self.cache_manager, "get_redis_client") as mock_redis_client:
             mock_client = AsyncMock()
             mock_client.get.return_value = None
             mock_redis_client.return_value = mock_client
@@ -168,7 +170,7 @@ class TestCacheManager:
         test_value = {"data": "test"}
         serialized_value = json.dumps(test_value).encode("utf-8")
 
-        with patch.object(self.cache_manager, 'get_redis_client') as mock_redis_client:
+        with patch.object(self.cache_manager, "get_redis_client") as mock_redis_client:
             mock_client = AsyncMock()
             mock_client.get.return_value = serialized_value
             mock_redis_client.return_value = mock_client
@@ -182,7 +184,7 @@ class TestCacheManager:
         """Test cache get with invalid JSON from Redis."""
         invalid_data = b"invalid json"
 
-        with patch.object(self.cache_manager, 'get_redis_client') as mock_redis_client:
+        with patch.object(self.cache_manager, "get_redis_client") as mock_redis_client:
             mock_client = AsyncMock()
             mock_client.get.return_value = invalid_data
             mock_client.delete = AsyncMock()
@@ -195,7 +197,7 @@ class TestCacheManager:
     @pytest.mark.asyncio
     async def test_get_cache_miss(self):
         """Test cache get with complete miss."""
-        with patch.object(self.cache_manager, 'get_redis_client') as mock_redis_client:
+        with patch.object(self.cache_manager, "get_redis_client") as mock_redis_client:
             mock_client = AsyncMock()
             mock_client.get.return_value = None
             mock_redis_client.return_value = mock_client
@@ -207,7 +209,7 @@ class TestCacheManager:
     @pytest.mark.asyncio
     async def test_get_exception_handling(self):
         """Test cache get with exception."""
-        with patch.object(self.cache_manager, 'get_redis_client') as mock_redis_client:
+        with patch.object(self.cache_manager, "get_redis_client") as mock_redis_client:
             mock_redis_client.side_effect = Exception("Redis connection failed")
 
             result = await self.cache_manager.get("test_key")
@@ -219,7 +221,7 @@ class TestCacheManager:
         """Test successful cache set operation."""
         test_value = {"data": "test"}
 
-        with patch.object(self.cache_manager, 'get_redis_client') as mock_redis_client:
+        with patch.object(self.cache_manager, "get_redis_client") as mock_redis_client:
             mock_client = AsyncMock()
             mock_client.setex = AsyncMock()
             mock_redis_client.return_value = mock_client
@@ -235,12 +237,14 @@ class TestCacheManager:
         test_value = {"data": "test"}
         custom_ttl = 1800
 
-        with patch.object(self.cache_manager, 'get_redis_client') as mock_redis_client:
+        with patch.object(self.cache_manager, "get_redis_client") as mock_redis_client:
             mock_client = AsyncMock()
             mock_client.setex = AsyncMock()
             mock_redis_client.return_value = mock_client
 
-            result = await self.cache_manager.set("test_key", test_value, ttl=custom_ttl)
+            result = await self.cache_manager.set(
+                "test_key", test_value, ttl=custom_ttl
+            )
             assert result is True
 
             # Check that setex was called with custom TTL
@@ -250,6 +254,7 @@ class TestCacheManager:
     @pytest.mark.asyncio
     async def test_set_serialization_error(self):
         """Test cache set with serialization error."""
+
         # Create an object that can't be JSON serialized
         class UnserializableObject:
             def __init__(self):
@@ -257,7 +262,7 @@ class TestCacheManager:
 
         unserializable_value = UnserializableObject()
 
-        with patch.object(self.cache_manager, 'get_redis_client') as mock_redis_client:
+        with patch.object(self.cache_manager, "get_redis_client") as mock_redis_client:
             mock_client = AsyncMock()
             mock_redis_client.return_value = mock_client
 
@@ -269,7 +274,7 @@ class TestCacheManager:
         """Test cache set with exception."""
         test_value = {"data": "test"}
 
-        with patch.object(self.cache_manager, 'get_redis_client') as mock_redis_client:
+        with patch.object(self.cache_manager, "get_redis_client") as mock_redis_client:
             mock_redis_client.side_effect = Exception("Redis connection failed")
 
             result = await self.cache_manager.set("test_key", test_value)
@@ -282,7 +287,7 @@ class TestCacheManager:
         cache_key = "test_app:default:test_key"
         self.cache_manager._memory_cache[cache_key] = {"value": "test"}
 
-        with patch.object(self.cache_manager, 'get_redis_client') as mock_redis_client:
+        with patch.object(self.cache_manager, "get_redis_client") as mock_redis_client:
             mock_client = AsyncMock()
             mock_client.delete.return_value = 1  # Key found and deleted
             mock_redis_client.return_value = mock_client
@@ -295,7 +300,7 @@ class TestCacheManager:
     @pytest.mark.asyncio
     async def test_delete_key_not_found(self):
         """Test cache delete when key not found."""
-        with patch.object(self.cache_manager, 'get_redis_client') as mock_redis_client:
+        with patch.object(self.cache_manager, "get_redis_client") as mock_redis_client:
             mock_client = AsyncMock()
             mock_client.delete.return_value = 0  # Key not found
             mock_redis_client.return_value = mock_client
@@ -307,7 +312,7 @@ class TestCacheManager:
     @pytest.mark.asyncio
     async def test_delete_exception_handling(self):
         """Test cache delete with exception."""
-        with patch.object(self.cache_manager, 'get_redis_client') as mock_redis_client:
+        with patch.object(self.cache_manager, "get_redis_client") as mock_redis_client:
             mock_redis_client.side_effect = Exception("Redis connection failed")
 
             result = await self.cache_manager.delete("test_key")
@@ -317,7 +322,7 @@ class TestCacheManager:
     @pytest.mark.asyncio
     async def test_clear_namespace(self):
         """Test clearing all keys in a namespace."""
-        with patch.object(self.cache_manager, 'get_redis_client') as mock_redis_client:
+        with patch.object(self.cache_manager, "get_redis_client") as mock_redis_client:
             mock_client = AsyncMock()
             mock_client.keys.return_value = ["key1", "key2", "key3"]
             mock_client.delete.return_value = 3
@@ -329,7 +334,7 @@ class TestCacheManager:
     @pytest.mark.asyncio
     async def test_clear_namespace_no_keys(self):
         """Test clearing namespace with no keys."""
-        with patch.object(self.cache_manager, 'get_redis_client') as mock_redis_client:
+        with patch.object(self.cache_manager, "get_redis_client") as mock_redis_client:
             mock_client = AsyncMock()
             mock_client.keys.return_value = []
             mock_redis_client.return_value = mock_client
@@ -381,10 +386,10 @@ class TestCacheManagerMemoryManagement:
             {"data": "test1"},
             {"data": "test2"},
             {"data": "test3"},
-            {"data": "test4"}  # This should cause eviction
+            {"data": "test4"},  # This should cause eviction
         ]
 
-        with patch.object(self.cache_manager, 'get_redis_client') as mock_redis_client:
+        with patch.object(self.cache_manager, "get_redis_client") as mock_redis_client:
             mock_client = AsyncMock()
             mock_client.setex = AsyncMock()
             mock_redis_client.return_value = mock_client
@@ -394,7 +399,10 @@ class TestCacheManagerMemoryManagement:
                 await self.cache_manager.set(f"key_{i}", value)
 
             # Memory cache should not exceed limit
-            assert len(self.cache_manager._memory_cache) <= self.cache_manager._max_memory_items
+            assert (
+                len(self.cache_manager._memory_cache)
+                <= self.cache_manager._max_memory_items
+            )
 
 
 if __name__ == "__main__":
