@@ -11,6 +11,7 @@ from sqlalchemy import text
 
 from ...core.database import get_database_manager
 from ...core.logging import get_logger
+from ...domain.models import Team
 
 logger = get_logger(__name__)
 
@@ -22,7 +23,9 @@ class DatabaseWriter:
         self.db_manager = get_database_manager()
         self.logger = get_logger(__name__)
 
-    async def upsert_teams(self, teams_data) -> dict[str, int]:
+    async def upsert_teams(
+        self, teams_data: list[Team] | pd.DataFrame
+    ) -> dict[str, int]:
         """Insert or update team data."""
 
         # Handle both DataFrame and list of Team objects
