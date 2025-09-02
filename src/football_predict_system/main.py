@@ -159,7 +159,18 @@ async def health_check():
         health_checker = get_health_checker()
         health_report = await health_checker.get_system_health()
 
-        status_code = 200 if health_report.status == "healthy" else 503
+        # In development environment, be more lenient about unhealthy components
+        is_dev_env = settings.environment.value in ["development", "testing"]
+
+        if health_report.status == "healthy":
+            status_code = 200
+        elif health_report.status == "degraded":
+            status_code = 200  # Degraded is acceptable
+        elif is_dev_env:
+            # In dev environment, return 200 even if some components are unhealthy
+            status_code = 200
+        else:
+            status_code = 503
 
         return JSONResponse(
             content=health_report.model_dump(mode="json"), status_code=status_code

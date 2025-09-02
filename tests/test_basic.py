@@ -8,24 +8,31 @@ from pathlib import Path
 import pytest
 
 
-def test_project_structure():
+def test_project_structure() -> None:
     """测试项目目录结构"""
     root = Path(".")
     assert root.exists(), "The project root directory does not exist."
 
-    # 检查核心模块
-    core_modules = ["apps", "data_pipeline", "models", "trainer", "infra", "evaluation"]
+    # 检查实际的核心模块结构
+    core_modules = ["src", "tests", "docs", "config", "scripts"]
     for module in core_modules:
         module_path = root / module
         assert module_path.exists(), f"模块目录 {module} 不存在"
 
-    # Check other important top-level directories
-    other_dirs = ["docs", "prompts", "tests"]
-    for dir_name in other_dirs:
-        assert (Path(".") / dir_name).exists(), f"目录 {dir_name} 不存在"
+    # 检查src目录下的模块
+    src_modules = ["football_predict_system"]
+    for module in src_modules:
+        module_path = root / "src" / module
+        assert module_path.exists(), f"源码模块 {module} 不存在"
+
+    # 检查football_predict_system下的子模块
+    sub_modules = ["core", "api", "domain", "data_platform"]
+    for module in sub_modules:
+        module_path = root / "src" / "football_predict_system" / module
+        assert module_path.exists(), f"子模块 {module} 不存在"
 
 
-def test_config_files():
+def test_config_files() -> None:
     """测试配置文件存在性"""
     root = Path(".")
 
@@ -40,18 +47,18 @@ def test_config_files():
         assert (root / config_file).exists(), f"配置文件 {config_file} 不存在"
 
 
-def test_docs_structure():
+def test_docs_structure() -> None:
     """测试文档结构"""
     docs_dir = Path("docs")
     assert docs_dir.exists(), "docs目录不存在"
 
     # 检查重要文档文件
-    important_docs = ["TASKS.md", "dev_log.md"]
+    important_docs = ["TASKS.md", "README.md"]
     for doc in important_docs:
         assert (docs_dir / doc).exists(), f"文档 {doc} 不存在"
 
 
-def test_api_module_import():
+def test_api_module_import() -> None:
     """测试API模块导入"""
     try:
         # 测试核心模块导入
@@ -69,11 +76,31 @@ def test_api_module_import():
         pytest.fail(f"API模块导入失败: {e}")
 
 
-@pytest.mark.skip(reason="data_pipeline模块尚未实现")
-def test_data_pipeline_import():
+def test_data_pipeline_import() -> None:
     """测试数据管道模块导入"""
-    # TODO: 实现data_pipeline模块
-    pass
+    try:
+        # 测试已实现的数据平台模块
+        from football_predict_system.data_platform.config import (
+            get_data_platform_config,
+        )
+        from football_predict_system.data_platform.sources.football_data_api import (
+            FootballDataAPICollector,
+        )
+        from football_predict_system.data_platform.storage.database_writer import (
+            DatabaseWriter,
+        )
+
+        config = get_data_platform_config()
+        assert config is not None
+
+        collector = FootballDataAPICollector("test_key")
+        assert collector is not None
+
+        writer = DatabaseWriter()
+        assert writer is not None
+
+    except ImportError as e:
+        pytest.fail(f"数据平台模块导入失败: {e}")
 
 
 @pytest.mark.skip(reason="XGBoostTrainer模块尚未实现")

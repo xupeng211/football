@@ -7,7 +7,7 @@ from unittest.mock import patch
 import pytest
 from fastapi.testclient import TestClient
 
-from football_predict_system.api.main import app
+from football_predict_system.main import app
 
 
 class TestCompleteUserWorkflow:

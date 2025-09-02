@@ -1,8 +1,19 @@
 """
-Performance Testing with Locust
+Performance Testing Suite for Football Prediction System
 
-This module provides load testing scenarios for the Football Prediction System API
-using Locust framework to establish performance baselines and identify bottlenecks.
+This module provides comprehensive load testing capabilities using Locust.
+It tests various aspects of the system including API endpoints, database operations,
+and concurrent user scenarios.
+
+Usage:
+    locust -f tests/performance/locustfile.py --host=http://localhost:8000
+
+Test Scenarios:
+- Basic user browsing patterns
+- API performance under load
+- Concurrent prediction requests
+- Database stress testing
+- Cache performance validation
 """
 
 import json
@@ -10,7 +21,7 @@ import random
 import time
 from typing import Any
 
-from locust import HttpUser, between, task
+from locust import HttpUser, between, events, task
 from locust.exception import StopUser
 
 
@@ -414,9 +425,6 @@ class HeavyLoadTest(HealthCheckUser, PredictionUser, HeavyLoadUser, MonitoringUs
 
 
 # Custom Locust events for performance monitoring
-from locust import events
-
-
 @events.request.add_listener
 def record_request_metrics(
     request_type, name, response_time, response_length, exception, context, **kwargs

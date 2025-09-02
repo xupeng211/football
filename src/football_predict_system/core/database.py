@@ -22,9 +22,7 @@ from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import QueuePool
 
 from .config import get_settings
-from .exceptions import (
-    handle_database_exception,
-)
+from .exceptions import handle_database_exception
 from .logging import get_logger
 
 logger = get_logger(__name__)
@@ -57,26 +55,32 @@ class DatabaseManager:
         """Create synchronous database engine with optimized settings."""
         db_config = self.settings.database
 
-        engine = create_engine(
-            db_config.url,
-            poolclass=QueuePool,
-            pool_size=db_config.pool_size,
-            max_overflow=db_config.max_overflow,
-            pool_timeout=db_config.pool_timeout,
-            pool_recycle=db_config.pool_recycle,
-            echo=db_config.echo,
-            future=True,
-            # Performance optimizations
-            connect_args={
-                "check_same_thread": False,  # For SQLite
-                "connect_timeout": 30,
-            }
-            if "sqlite" in db_config.url
-            else {
-                "connect_timeout": 30,
-                "server_side_cursors": True,
-            },
-        )
+        # Configure engine based on database type
+        if "sqlite" in db_config.url:
+            # SQLite doesn't support connection pooling
+            engine = create_engine(
+                db_config.url,
+                echo=db_config.echo,
+                future=True,
+                connect_args={
+                    "check_same_thread": False,
+                },
+            )
+        else:
+            # PostgreSQL and other databases support connection pooling
+            engine = create_engine(
+                db_config.url,
+                poolclass=QueuePool,
+                pool_size=db_config.pool_size,
+                max_overflow=db_config.max_overflow,
+                pool_timeout=db_config.pool_timeout,
+                pool_recycle=db_config.pool_recycle,
+                echo=db_config.echo,
+                future=True,
+                connect_args={
+                    "server_side_cursors": True,
+                },
+            )
 
         # Add event listeners for monitoring
         self._setup_engine_events(engine)
@@ -90,19 +94,27 @@ class DatabaseManager:
         """Create asynchronous database engine."""
         db_config = self.settings.database
 
-        # Convert sync URL to async URL
-        async_url = db_config.url.replace("postgresql://", "postgresql+asyncpg://")
-        async_url = async_url.replace("sqlite://", "sqlite+aiosqlite://")
-
-        engine = create_async_engine(
-            async_url,
-            pool_size=db_config.pool_size,
-            max_overflow=db_config.max_overflow,
-            pool_timeout=db_config.pool_timeout,
-            pool_recycle=db_config.pool_recycle,
-            echo=db_config.echo,
-            future=True,
-        )
+        # Configure async engine based on database type
+        if "sqlite" in db_config.url:
+            # SQLite async configuration
+            async_url = db_config.url.replace("sqlite://", "sqlite+aiosqlite://")
+            engine = create_async_engine(
+                async_url,
+                echo=db_config.echo,
+                future=True,
+            )
+        else:
+            # PostgreSQL async configuration
+            async_url = db_config.url.replace("postgresql://", "postgresql+asyncpg://")
+            engine = create_async_engine(
+                async_url,
+                pool_size=db_config.pool_size,
+                max_overflow=db_config.max_overflow,
+                pool_timeout=db_config.pool_timeout,
+                pool_recycle=db_config.pool_recycle,
+                echo=db_config.echo,
+                future=True,
+            )
 
         logger.info("Async database engine created", url=async_url)
         return engine
@@ -247,13 +259,17 @@ class DatabaseManager:
             return {}
 
         pool = self._engine.pool
-        return {
-            "size": pool.size(),
-            "checked_in": pool.checkedin(),
-            "checked_out": pool.checkedout(),
-            "overflow": pool.overflow(),
-            "invalid": pool.invalid(),
-        }
+
+        # SQLite doesn't have connection pooling
+        if hasattr(pool, "size"):
+            return {
+                "size": pool.size(),
+                "checked_in": pool.checkedin(),
+                "checked_out": pool.checkedout(),
+                "overflow": pool.overflow(),
+            }
+        else:
+            return {"type": "NullPool", "pooling": "disabled"}
 
     async def close(self) -> None:
         """Close all database connections."""

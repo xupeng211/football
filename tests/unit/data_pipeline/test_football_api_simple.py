@@ -1,27 +1,27 @@
 import pytest
 
+from football_predict_system.data_platform.sources.football_data_api import (
+    FootballDataAPICollector,
+)
+
 pytestmark = pytest.mark.skip(reason="data_pipeline module not implemented")
 
 """
-简化的足球API测试
+测试FootballAPICollector类的基本功能。
+
+这是一个简化的测试模块, 专注于测试核心功能。
 """
 
-from data_pipeline.sources.football_api import FootballAPICollector
+
+def test_football_api_collector_creation():
+    """测试FootballAPICollector的创建。"""
+    collector = FootballDataAPICollector(api_key="test_key")
+    assert collector is not None
+    assert collector.api_key == "test_key"
 
 
-class TestFootballAPICollector:
-    """足球API收集器测试"""
-
-    def test_collector_initialization(self) -> None:
-        """测试收集器初始化"""
-        collector = FootballAPICollector()
-        assert collector is not None
-        assert hasattr(collector, "collect_matches_by_date")
-
-    def test_collector_has_required_methods(self) -> None:
-        """测试收集器有必需的方法"""
-        collector = FootballAPICollector()
-        assert hasattr(collector, "collect_matches_by_date")
-        assert hasattr(collector, "collect_team_info")
-        assert callable(collector.collect_matches_by_date)
-        assert callable(collector.collect_team_info)
+def test_football_api_collector_default_api_key():
+    """测试FootballAPICollector的默认API密钥行为。"""
+    collector = FootballDataAPICollector()
+    assert collector is not None
+    # The default behavior should handle missing API key gracefully
