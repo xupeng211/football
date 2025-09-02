@@ -48,7 +48,7 @@ def mock_match():
         scheduled_date=datetime.utcnow(),
         competition="Premier League",
         season="2024-25",
-        status="scheduled"
+        status="scheduled",
     )
 
 
@@ -63,7 +63,7 @@ def mock_model():
         status=ModelStatus.ACTIVE,
         accuracy=0.85,
         is_production=True,
-        is_active=True
+        is_active=True,
     )
 
 
@@ -76,7 +76,7 @@ def mock_team():
         code="ARS",
         founded=1886,
         country="England",
-        stadium="Emirates Stadium"
+        stadium="Emirates Stadium",
     )
 
 
@@ -93,7 +93,7 @@ def mock_prediction():
         away_win_probability=0.2,
         confidence_level=PredictionConfidence.MEDIUM,
         confidence_score=0.75,
-        created_at=datetime.utcnow()
+        created_at=datetime.utcnow(),
     )
 
 
@@ -105,7 +105,7 @@ class TestPredictionService:
         service = PredictionService()
         assert service.logger is not None
 
-    @patch('football_predict_system.domain.services.get_cache_manager')
+    @patch("football_predict_system.domain.services.get_cache_manager")
     @pytest.mark.asyncio
     async def test_generate_prediction_from_cache(self, mock_cache, mock_match):
         """Test prediction generation from cache."""
@@ -118,25 +118,22 @@ class TestPredictionService:
                 "id": str(uuid4()),
                 "match_id": str(mock_match.id),
                 "predicted_result": "HOME_WIN",
-                "confidence_score": 0.85
+                "confidence_score": 0.85,
             },
             "match_info": {},
-            "model_info": {}
+            "model_info": {},
         }
         cache_manager.get.return_value = cached_prediction
         mock_cache.return_value = cache_manager
 
-        request = PredictionRequest(
-            match_id=mock_match.id,
-            model_version="v1.0.0"
-        )
+        request = PredictionRequest(match_id=mock_match.id, model_version="v1.0.0")
 
         result = await service.generate_prediction(request)
 
         assert isinstance(result, PredictionResponse)
         cache_manager.get.assert_called_once()
 
-    @patch('football_predict_system.domain.services.get_cache_manager')
+    @patch("football_predict_system.domain.services.get_cache_manager")
     @pytest.mark.asyncio
     async def test_generate_prediction_match_not_found(self, mock_cache):
         """Test prediction when match not found."""
@@ -149,15 +146,12 @@ class TestPredictionService:
 
         service._get_match = AsyncMock(return_value=None)
 
-        request = PredictionRequest(
-            match_id=uuid4(),
-            model_version="v1.0.0"
-        )
+        request = PredictionRequest(match_id=uuid4(), model_version="v1.0.0")
 
         with pytest.raises(NotFoundError):
             await service.generate_prediction(request)
 
-    @patch('football_predict_system.domain.services.get_cache_manager')
+    @patch("football_predict_system.domain.services.get_cache_manager")
     @pytest.mark.asyncio
     async def test_generate_prediction_model_not_found(self, mock_cache, mock_match):
         """Test prediction when model not found."""
@@ -171,18 +165,16 @@ class TestPredictionService:
         service._get_match = AsyncMock(return_value=mock_match)
         service._get_model = AsyncMock(return_value=None)
 
-        request = PredictionRequest(
-            match_id=mock_match.id,
-            model_version="v1.0.0"
-        )
+        request = PredictionRequest(match_id=mock_match.id, model_version="v1.0.0")
 
         with pytest.raises(ModelNotFoundError):
             await service.generate_prediction(request)
 
-    @patch('football_predict_system.domain.services.get_cache_manager')
+    @patch("football_predict_system.domain.services.get_cache_manager")
     @pytest.mark.asyncio
-    async def test_generate_prediction_insufficient_data(self, mock_cache,
-                                                         mock_match, mock_model):
+    async def test_generate_prediction_insufficient_data(
+        self, mock_cache, mock_match, mock_model
+    ):
         """Test prediction with insufficient data."""
         service = PredictionService()
 
@@ -200,10 +192,11 @@ class TestPredictionService:
         with pytest.raises(InsufficientDataError):
             await service.generate_prediction(request)
 
-    @patch('football_predict_system.domain.services.get_cache_manager')
+    @patch("football_predict_system.domain.services.get_cache_manager")
     @pytest.mark.asyncio
-    async def test_generate_prediction_success(self, mock_cache, mock_match,
-                                              mock_model, mock_prediction):
+    async def test_generate_prediction_success(
+        self, mock_cache, mock_match, mock_model, mock_prediction
+    ):
         """Test successful prediction generation."""
         service = PredictionService()
 
@@ -228,10 +221,11 @@ class TestPredictionService:
         assert "name" in result.model_info
         cache_manager.set.assert_called_once()
 
-    @patch('football_predict_system.domain.services.get_cache_manager')
+    @patch("football_predict_system.domain.services.get_cache_manager")
     @pytest.mark.asyncio
-    async def test_generate_prediction_service_error(self, mock_cache,
-                                                     mock_match, mock_model):
+    async def test_generate_prediction_service_error(
+        self, mock_cache, mock_match, mock_model
+    ):
         """Test prediction service error handling."""
         service = PredictionService()
 
@@ -243,9 +237,7 @@ class TestPredictionService:
         service._get_match = AsyncMock(return_value=mock_match)
         service._get_model = AsyncMock(return_value=mock_model)
         service._extract_features = AsyncMock(return_value={"feature1": 0.5})
-        service._predict_with_model = AsyncMock(
-            side_effect=Exception("Model error")
-        )
+        service._predict_with_model = AsyncMock(side_effect=Exception("Model error"))
 
         request = PredictionRequest(match_id=mock_match.id)
 
@@ -265,17 +257,16 @@ class TestPredictionService:
                 model_version="v1.0.0",
                 predicted_result=MatchResult.HOME_WIN,
                 confidence_score=0.75,
-                created_at=datetime.utcnow()
+                created_at=datetime.utcnow(),
             ),
             match_info={},
-            model_info={}
+            model_info={},
         )
 
         service._safe_generate_prediction = AsyncMock(return_value=mock_response)
 
         request = BatchPredictionRequest(
-            match_ids=[uuid4(), uuid4(), uuid4()],
-            model_version="v1.0.0"
+            match_ids=[uuid4(), uuid4(), uuid4()], model_version="v1.0.0"
         )
 
         result = await service.generate_batch_predictions(request)
@@ -294,7 +285,7 @@ class TestPredictionService:
 
         # Mock the single prediction method to return success and error
         def side_effect(request):
-            if str(request.match_id).endswith('1'):
+            if str(request.match_id).endswith("1"):
                 raise Exception("Test error")
             return PredictionResponse(
                 prediction=Prediction(
@@ -303,21 +294,18 @@ class TestPredictionService:
                     model_version="v1.0.0",
                     predicted_result=MatchResult.HOME_WIN,
                     confidence_score=0.75,
-                    created_at=datetime.utcnow()
+                    created_at=datetime.utcnow(),
                 ),
                 match_info={},
-                model_info={}
+                model_info={},
             )
 
         service._safe_generate_prediction = AsyncMock(side_effect=side_effect)
 
         match_ids = [uuid4(), uuid4()]
-        match_ids[1] = UUID(str(match_ids[1])[:-1] + '1')  # Make it end with '1'
+        match_ids[1] = UUID(str(match_ids[1])[:-1] + "1")  # Make it end with '1'
 
-        request = BatchPredictionRequest(
-            match_ids=match_ids,
-            model_version="v1.0.0"
-        )
+        request = BatchPredictionRequest(match_ids=match_ids, model_version="v1.0.0")
 
         result = await service.generate_batch_predictions(request)
 
@@ -339,10 +327,10 @@ class TestPredictionService:
                 model_version="v1.0.0",
                 predicted_result=MatchResult.HOME_WIN,
                 confidence_score=0.75,
-                created_at=datetime.utcnow()
+                created_at=datetime.utcnow(),
             ),
             match_info={},
-            model_info={}
+            model_info={},
         )
 
         service.generate_prediction = AsyncMock(return_value=mock_response)
@@ -357,9 +345,7 @@ class TestPredictionService:
         """Test safe prediction generation error handling."""
         service = PredictionService()
 
-        service.generate_prediction = AsyncMock(
-            side_effect=Exception("Test error")
-        )
+        service.generate_prediction = AsyncMock(side_effect=Exception("Test error"))
 
         request = PredictionRequest(match_id=mock_match.id)
         result = await service._safe_generate_prediction(request)
@@ -410,7 +396,7 @@ class TestModelService:
         service = ModelService()
         assert service.logger is not None
 
-    @patch('football_predict_system.domain.services.get_cache_manager')
+    @patch("football_predict_system.domain.services.get_cache_manager")
     @pytest.mark.asyncio
     async def test_get_available_models_from_cache(self, mock_cache, mock_model):
         """Test getting models from cache."""
@@ -427,7 +413,7 @@ class TestModelService:
         assert isinstance(result[0], Model)
         cache_manager.get.assert_called_once_with("available_models", "models")
 
-    @patch('football_predict_system.domain.services.get_cache_manager')
+    @patch("football_predict_system.domain.services.get_cache_manager")
     @pytest.mark.asyncio
     async def test_get_available_models_from_registry(self, mock_cache, mock_model):
         """Test getting models from registry."""
@@ -484,7 +470,7 @@ class TestModelService:
             type=ModelType.XGBOOST,
             status=ModelStatus.ACTIVE,
             is_production=False,
-            is_active=True
+            is_active=True,
         )
 
         service.get_available_models = AsyncMock(
@@ -538,7 +524,7 @@ class TestDataService:
         service = DataService()
         assert service.logger is not None
 
-    @patch('football_predict_system.domain.services.get_cache_manager')
+    @patch("football_predict_system.domain.services.get_cache_manager")
     @pytest.mark.asyncio
     async def test_get_match_data_from_cache(self, mock_cache, mock_match):
         """Test getting match data from cache."""
@@ -553,7 +539,7 @@ class TestDataService:
         assert isinstance(result, Match)
         cache_manager.get.assert_called_once()
 
-    @patch('football_predict_system.domain.services.get_cache_manager')
+    @patch("football_predict_system.domain.services.get_cache_manager")
     @pytest.mark.asyncio
     async def test_get_match_data_from_db(self, mock_cache, mock_match):
         """Test getting match data from database."""
@@ -571,7 +557,7 @@ class TestDataService:
         assert result == mock_match
         cache_manager.set.assert_called_once()
 
-    @patch('football_predict_system.domain.services.get_cache_manager')
+    @patch("football_predict_system.domain.services.get_cache_manager")
     @pytest.mark.asyncio
     async def test_get_team_data_from_cache(self, mock_cache, mock_team):
         """Test getting team data from cache."""
@@ -586,7 +572,7 @@ class TestDataService:
         assert isinstance(result, Team)
         cache_manager.get.assert_called_once()
 
-    @patch('football_predict_system.domain.services.get_cache_manager')
+    @patch("football_predict_system.domain.services.get_cache_manager")
     @pytest.mark.asyncio
     async def test_get_upcoming_matches_from_cache(self, mock_cache, mock_match):
         """Test getting upcoming matches from cache."""
@@ -602,7 +588,7 @@ class TestDataService:
         assert isinstance(result[0], Match)
         cache_manager.get.assert_called_once_with("upcoming_7d", "matches")
 
-    @patch('football_predict_system.domain.services.get_cache_manager')
+    @patch("football_predict_system.domain.services.get_cache_manager")
     @pytest.mark.asyncio
     async def test_get_upcoming_matches_from_db(self, mock_cache, mock_match):
         """Test getting upcoming matches from database."""
@@ -613,9 +599,7 @@ class TestDataService:
         cache_manager.set.return_value = True
         mock_cache.return_value = cache_manager
 
-        service._load_upcoming_matches_from_db = AsyncMock(
-            return_value=[mock_match]
-        )
+        service._load_upcoming_matches_from_db = AsyncMock(return_value=[mock_match])
 
         result = await service.get_upcoming_matches(14)
 

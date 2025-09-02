@@ -36,7 +36,7 @@ def mock_redis():
     redis_mock.info.return_value = {
         "redis_version": "7.0.0",
         "used_memory_human": "10M",
-        "connected_clients": 5
+        "connected_clients": 5,
     }
     redis_mock.keys.return_value = ["key1", "key2"]
     return redis_mock
@@ -94,10 +94,11 @@ class TestCacheManager:
         assert cache_manager._max_memory_items == 1000
         assert cache_manager._default_ttl == 3600
 
-    @patch('football_predict_system.core.cache.redis.from_url')
+    @patch("football_predict_system.core.cache.redis.from_url")
     @pytest.mark.asyncio
-    async def test_get_redis_client_creation(self, mock_redis_from_url,
-                                            cache_manager, mock_redis):
+    async def test_get_redis_client_creation(
+        self, mock_redis_from_url, cache_manager, mock_redis
+    ):
         """Test Redis client creation."""
         mock_redis_from_url.return_value = mock_redis
 
@@ -107,10 +108,11 @@ class TestCacheManager:
         assert cache_manager._redis_client == mock_redis
         mock_redis_from_url.assert_called_once()
 
-    @patch('football_predict_system.core.cache.redis.from_url')
+    @patch("football_predict_system.core.cache.redis.from_url")
     @pytest.mark.asyncio
-    async def test_get_redis_client_reuse(self, mock_redis_from_url,
-                                         cache_manager, mock_redis):
+    async def test_get_redis_client_reuse(
+        self, mock_redis_from_url, cache_manager, mock_redis
+    ):
         """Test Redis client reuse."""
         cache_manager._redis_client = mock_redis
 
@@ -145,7 +147,7 @@ class TestCacheManager:
         cache_key = cache_manager._generate_key("default", "test_key")
         cache_manager._memory_cache[cache_key] = {
             "value": "test_value",
-            "expires_at": datetime.now() + timedelta(minutes=5)
+            "expires_at": datetime.now() + timedelta(minutes=5),
         }
 
         result = await cache_manager.get("test_key", "default")
@@ -159,7 +161,7 @@ class TestCacheManager:
         cache_key = cache_manager._generate_key("default", "test_key")
         cache_manager._memory_cache[cache_key] = {
             "value": "test_value",
-            "expires_at": datetime.now() - timedelta(minutes=5)
+            "expires_at": datetime.now() - timedelta(minutes=5),
         }
 
         cache_manager._redis_client = mock_redis
@@ -346,7 +348,7 @@ class TestCacheManager:
         cache_key = cache_manager._generate_key("default", "test_key")
         cache_manager._memory_cache[cache_key] = {
             "value": "test_value",
-            "expires_at": datetime.now() + timedelta(minutes=5)
+            "expires_at": datetime.now() + timedelta(minutes=5),
         }
 
         result = await cache_manager.exists("test_key", "default")
@@ -359,7 +361,7 @@ class TestCacheManager:
         cache_key = cache_manager._generate_key("default", "test_key")
         cache_manager._memory_cache[cache_key] = {
             "value": "test_value",
-            "expires_at": datetime.now() - timedelta(minutes=5)
+            "expires_at": datetime.now() - timedelta(minutes=5),
         }
         cache_manager._redis_client = mock_redis
 
@@ -475,7 +477,9 @@ class TestCachedDecorator:
             call_count += 1
             return x + y
 
-        with patch('football_predict_system.core.cache.get_cache_manager') as mock_get_cache:
+        with patch(
+            "football_predict_system.core.cache.get_cache_manager"
+        ) as mock_get_cache:
             mock_cache = AsyncMock()
             mock_cache.get.return_value = None  # Cache miss
             mock_cache.set.return_value = True
@@ -502,14 +506,16 @@ class TestCachedDecorator:
             call_count += 1
             return x * 2
 
-        with patch('football_predict_system.core.cache.get_cache_manager') as mock_get_cache:
+        with patch(
+            "football_predict_system.core.cache.get_cache_manager"
+        ) as mock_get_cache:
             mock_cache = AsyncMock()
             mock_cache.get.return_value = None  # Cache miss
             mock_cache.set.return_value = True
             mock_get_cache.return_value = mock_cache
 
             # Mock event loop
-            with patch('asyncio.get_event_loop') as mock_get_loop:
+            with patch("asyncio.get_event_loop") as mock_get_loop:
                 mock_loop = MagicMock()
                 mock_loop.run_until_complete.return_value = 10
                 mock_get_loop.return_value = mock_loop
@@ -520,6 +526,7 @@ class TestCachedDecorator:
     @pytest.mark.asyncio
     async def test_cached_decorator_custom_key_func(self):
         """Test cached decorator with custom key function."""
+
         def custom_key(x, y):
             return f"custom_{x}_{y}"
 
@@ -527,7 +534,9 @@ class TestCachedDecorator:
         async def test_function(x, y):
             return x * y
 
-        with patch('football_predict_system.core.cache.get_cache_manager') as mock_get_cache:
+        with patch(
+            "football_predict_system.core.cache.get_cache_manager"
+        ) as mock_get_cache:
             mock_cache = AsyncMock()
             mock_cache.get.return_value = None
             mock_cache.set.return_value = True
@@ -603,7 +612,9 @@ class TestCacheInvalidator:
         # Wait for the task to complete
         await asyncio.sleep(0.2)
 
-        cache_invalidator.cache_manager.delete.assert_called_once_with("test_key", "default")
+        cache_invalidator.cache_manager.delete.assert_called_once_with(
+            "test_key", "default"
+        )
 
 
 class TestCacheWarmer:
@@ -645,7 +656,9 @@ class TestCacheWarmer:
     @pytest.mark.asyncio
     async def test_warm_predictions_error(self, cache_warmer):
         """Test warm predictions with error."""
-        cache_warmer.cache_manager.exists = AsyncMock(side_effect=Exception("Cache error"))
+        cache_warmer.cache_manager.exists = AsyncMock(
+            side_effect=Exception("Cache error")
+        )
 
         # Should not raise exception, just log error
         await cache_warmer.warm_predictions(["match1"])
