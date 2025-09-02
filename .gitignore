@@ -330,3 +330,13 @@ archive/
 !.gitignore
 !.editorconfig
 !.python-version
+
+# 安全扫描报告
+bandit_report.json
+bandit_report.txt
+*bandit_report*
+
+# 测试数据库文件
+test.db
+*.db.test
+*.test.db
