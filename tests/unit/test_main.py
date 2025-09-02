@@ -132,6 +132,7 @@ class TestErrorHandling:
 
         # Call the async handler
         import asyncio
+
         response = asyncio.run(handler(mock_request, mock_exception))
 
         # Should return a JSONResponse

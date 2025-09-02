@@ -11,10 +11,24 @@ from typing import Any
 from uuid import UUID
 
 from ..core.cache import get_cache_manager
-from ..core.exceptions import InsufficientDataError, ModelNotFoundError, NotFoundError, PredictionError
+from ..core.exceptions import (
+    InsufficientDataError,
+    ModelNotFoundError,
+    NotFoundError,
+    PredictionError,
+)
 from ..core.logging import get_logger, log_performance
-from .models import (BatchPredictionRequest, BatchPredictionResponse, Match, MatchStatus, Model, Prediction,
-                     PredictionRequest, PredictionResponse, Team)
+from .models import (
+    BatchPredictionRequest,
+    BatchPredictionResponse,
+    Match,
+    MatchStatus,
+    Model,
+    Prediction,
+    PredictionRequest,
+    PredictionResponse,
+    Team,
+)
 
 logger = get_logger(__name__)
 
@@ -53,23 +67,33 @@ class PredictionService:
                     home_win_probability=prediction_data["home_win_probability"],
                     draw_probability=prediction_data["draw_probability"],
                     away_win_probability=prediction_data["away_win_probability"],
-                    confidence_level=PredictionConfidence(prediction_data["confidence_level"]),
+                    confidence_level=PredictionConfidence(
+                        prediction_data["confidence_level"]
+                    ),
                     confidence_score=prediction_data["confidence_score"],
                     expected_home_score=prediction_data.get("expected_home_score"),
                     expected_away_score=prediction_data.get("expected_away_score"),
                     features_used=prediction_data.get("features_used", []),
                     model_accuracy=prediction_data.get("model_accuracy"),
-                    created_at=datetime.fromisoformat(prediction_data["created_at"]) if isinstance(prediction_data["created_at"], str) else prediction_data["created_at"],
-                    prediction_date=datetime.fromisoformat(prediction_data["prediction_date"]) if isinstance(prediction_data["prediction_date"], str) else prediction_data["prediction_date"],
+                    created_at=datetime.fromisoformat(prediction_data["created_at"])
+                    if isinstance(prediction_data["created_at"], str)
+                    else prediction_data["created_at"],
+                    prediction_date=datetime.fromisoformat(
+                        prediction_data["prediction_date"]
+                    )
+                    if isinstance(prediction_data["prediction_date"], str)
+                    else prediction_data["prediction_date"],
                 )
 
                 return PredictionResponse(
                     prediction=prediction,
                     match_info=cached_prediction["match_info"],
-                    model_info=cached_prediction["model_info"]
+                    model_info=cached_prediction["model_info"],
                 )
             except (KeyError, ValueError, TypeError) as e:
-                self.logger.warning(f"Failed to reconstruct cached prediction: {e}, generating new prediction")
+                self.logger.warning(
+                    f"Failed to reconstruct cached prediction: {e}, generating new prediction"
+                )
                 # Continue to generate new prediction if cache reconstruction fails
 
         # Get match data
