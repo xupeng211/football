@@ -184,6 +184,44 @@ class FootballDataAPICollector(MatchDataSource, TeamDataSource):
 
         return pd.DataFrame(matches)
 
+    def _parse_matches_response(self, response_data: dict) -> pd.DataFrame:
+        """Parse matches response data into DataFrame format.
+        
+        Args:
+            response_data: Raw API response containing matches data
+            
+        Returns:
+            DataFrame with parsed match data
+        """
+        matches = response_data.get("matches", [])
+
+        if not matches:
+            return pd.DataFrame()
+
+        parsed_matches = []
+
+        for match in matches:
+            # Extract basic match info
+            match_data = {
+                "external_api_id": match.get("id"),
+                "home_team_id": match.get("homeTeam", {}).get("id"),
+                "home_team": match.get("homeTeam", {}).get("name"),
+                "away_team_id": match.get("awayTeam", {}).get("id"),
+                "away_team": match.get("awayTeam", {}).get("name"),
+                "match_date": match.get("utcDate"),
+                "status": match.get("status", "").lower(),
+            }
+
+            # Extract scores if available
+            score = match.get("score", {}).get("fullTime", {})
+            if score:
+                match_data["home_score"] = score.get("home")
+                match_data["away_score"] = score.get("away")
+
+            parsed_matches.append(match_data)
+
+        return pd.DataFrame(parsed_matches)
+
     def _determine_result(
         self, home_score: int | None, away_score: int | None
     ) -> str | None:

@@ -45,8 +45,8 @@ class Team(BaseModel):
     id: UUID = Field(default_factory=uuid4)
     name: str = Field(..., min_length=1, max_length=100)
     short_name: str = Field(..., min_length=1, max_length=10)
-    country: str = Field(..., min_length=2, max_length=50)
-    league: str = Field(..., min_length=1, max_length=100)
+    country: str = Field(default="Unknown", min_length=2, max_length=50)
+    league: str = Field(default="Unknown", min_length=1, max_length=100)
     founded_year: int | None = None
     venue: str | None = None
 
