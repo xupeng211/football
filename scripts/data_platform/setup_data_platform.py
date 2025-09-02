@@ -257,7 +257,7 @@ CREATE TABLE IF NOT EXISTS matches (
                     result = await session.execute(
                         text("""
                         SELECT COUNT(*) FROM matches
-                        WHERE created_at >= NOW() - INTERVAL '24 hours'
+                        WHERE created_at >= datetime('now', '-24 hours')
                         """)
                     )
                     recent_count = result.scalar()

@@ -257,7 +257,7 @@ class DatabaseWriter:
             result = await session.execute(
                 text("""
                 SELECT COUNT(*) FROM matches
-                WHERE match_date >= NOW() - INTERVAL '7 days'
+                WHERE match_date >= datetime('now', '-7 days')
                 """)
             )
             recent_matches = result.scalar()

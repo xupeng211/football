@@ -186,10 +186,10 @@ class FootballDataAPICollector(MatchDataSource, TeamDataSource):
 
     def _parse_matches_response(self, response_data: dict) -> pd.DataFrame:
         """Parse matches response data into DataFrame format.
-        
+
         Args:
             response_data: Raw API response containing matches data
-            
+
         Returns:
             DataFrame with parsed match data
         """
