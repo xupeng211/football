@@ -165,12 +165,6 @@ class TestMiddleware:
         # Basic security headers check
         headers = response.headers
         # Common security headers that might be present
-        security_headers = [
-            "x-content-type-options",
-            "x-frame-options",
-            "x-xss-protection",
-            "strict-transport-security",
-        ]
 
         # At least verify response has headers
         assert len(headers) > 0

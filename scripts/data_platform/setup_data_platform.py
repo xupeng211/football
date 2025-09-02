@@ -160,13 +160,14 @@ class DataPlatformSetup:
                 async with self.db_manager.get_async_session() as session:
                     result = await session.execute(
                         text("""
-                        SELECT COUNT(*) FROM matches 
+                        SELECT COUNT(*) FROM matches
                         WHERE created_at >= NOW() - INTERVAL '24 hours'
                         """)
                     )
                     recent_count = result.scalar()
                     health_status["data_freshness"] = recent_count > 0
-            except:
+            except Exception as e:
+                logger.warning(f"数据新鲜度检查失败: {e}")
                 health_status["data_freshness"] = False
 
             # Overall status

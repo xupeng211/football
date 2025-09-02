@@ -18,7 +18,7 @@ logger = get_logger(__name__)
 class DatabaseWriter:
     """Handle data storage operations."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.db_manager = get_database_manager()
         self.logger = get_logger(__name__)
 
@@ -37,7 +37,7 @@ class DatabaseWriter:
                     # Check if team exists
                     result = await session.execute(
                         text("""
-                        SELECT id FROM teams 
+                        SELECT id FROM teams
                         WHERE external_api_id = :external_api_id
                         """),
                         {"external_api_id": row["external_api_id"]},
@@ -70,7 +70,7 @@ class DatabaseWriter:
                         await session.execute(
                             text("""
                             INSERT INTO teams (
-                                id, name, short_name, venue, 
+                                id, name, short_name, venue,
                                 founded_year, external_api_id
                             ) VALUES (
                                 :id, :name, :short_name, :venue,
@@ -113,7 +113,7 @@ class DatabaseWriter:
                     # Check if match exists
                     result = await session.execute(
                         text("""
-                        SELECT id FROM matches 
+                        SELECT id FROM matches
                         WHERE external_api_id = :external_api_id
                         """),
                         {"external_api_id": row["external_api_id"]},
@@ -224,8 +224,8 @@ class DatabaseWriter:
             # Count finished matches without scores
             result = await session.execute(
                 text("""
-                SELECT COUNT(*) FROM matches 
-                WHERE status = 'finished' 
+                SELECT COUNT(*) FROM matches
+                WHERE status = 'finished'
                 AND (home_score IS NULL OR away_score IS NULL)
                 """)
             )
@@ -234,7 +234,7 @@ class DatabaseWriter:
             # Check for stale data
             result = await session.execute(
                 text("""
-                SELECT EXTRACT(EPOCH FROM NOW() - MAX(updated_at))/3600 
+                SELECT EXTRACT(EPOCH FROM NOW() - MAX(updated_at))/3600
                 FROM matches WHERE status = 'in_progress'
                 """)
             )
@@ -243,7 +243,7 @@ class DatabaseWriter:
             # Get last successful update
             result = await session.execute(
                 text("""
-                SELECT MAX(created_at) FROM data_collection_logs 
+                SELECT MAX(created_at) FROM data_collection_logs
                 WHERE status = 'success'
                 """)
             )
@@ -256,7 +256,7 @@ class DatabaseWriter:
             # Recent matches (last 7 days)
             result = await session.execute(
                 text("""
-                SELECT COUNT(*) FROM matches 
+                SELECT COUNT(*) FROM matches
                 WHERE match_date >= NOW() - INTERVAL '7 days'
                 """)
             )

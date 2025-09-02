@@ -26,7 +26,7 @@ class FootballDataAPICollector(MatchDataSource, TeamDataSource):
 
     BASE_URL = "https://api.football-data.org/v4"
 
-    def __init__(self, api_key: str | None = None):
+    def __init__(self, api_key: str | None = None) -> None:
         super().__init__()
         self.settings = get_settings()
         self.api_key = api_key or getattr(self.settings, "football_data_api_key", None)
@@ -51,7 +51,7 @@ class FootballDataAPICollector(MatchDataSource, TeamDataSource):
             self.session = aiohttp.ClientSession(headers=headers, timeout=timeout)
         return self.session
 
-    async def _make_request(self, endpoint: str, params: dict = None) -> dict:
+    async def _make_request(self, endpoint: str, params: dict | None = None) -> dict:
         """Make rate-limited API request."""
         await self.rate_limiter.wait_if_needed()
 
@@ -201,7 +201,7 @@ class FootballDataAPICollector(MatchDataSource, TeamDataSource):
 class FootballDataHistoryCollector:
     """Specialized collector for historical data backfill."""
 
-    def __init__(self, api_collector: FootballDataAPICollector):
+    def __init__(self, api_collector: FootballDataAPICollector) -> None:
         self.api = api_collector
         self.logger = get_logger(__name__)
 

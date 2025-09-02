@@ -213,7 +213,7 @@ class TestCacheIntegration:
             json=sample_prediction_request,
             headers=api_headers,
         )
-        first_response_time = time.time() - start_time
+        time.time() - start_time
 
         if response1.status_code != 200:
             pytest.skip("Prediction service not available")
@@ -225,7 +225,7 @@ class TestCacheIntegration:
             json=sample_prediction_request,
             headers=api_headers,
         )
-        second_response_time = time.time() - start_time
+        time.time() - start_time
 
         assert response2.status_code == 200
 
@@ -370,7 +370,7 @@ class TestConcurrentRequestsIntegration:
 
         # Create multiple concurrent requests
         tasks = []
-        for i in range(5):
+        for _i in range(5):
             task = async_client.post(
                 "/api/v1/predictions/predict",
                 json=sample_prediction_request,
@@ -409,7 +409,7 @@ class TestConcurrentRequestsIntegration:
 
         # Health checks should always be fast and reliable
         tasks = []
-        for i in range(10):
+        for _i in range(10):
             task = async_client.get("/health/live")
             tasks.append(task)
 

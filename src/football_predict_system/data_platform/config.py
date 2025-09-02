@@ -70,6 +70,7 @@ class DataPlatformConfig(BaseModel):
             rate_limit_per_minute=10,  # Free tier
             headers_template={"Accept": "application/json"},
             auth_method="api_key",
+            reliability_score=0.95,
         )
     )
 
@@ -82,6 +83,7 @@ class DataPlatformConfig(BaseModel):
             rate_limit_per_minute=100,  # Paid tier
             headers_template={"Accept": "application/json"},
             auth_method="api_key",
+            reliability_score=0.90,
         )
     )
 

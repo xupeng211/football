@@ -6,7 +6,7 @@ import asyncio
 import time
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import Any
+from typing import Any, ClassVar
 
 import pandas as pd
 from pydantic import BaseModel
@@ -89,7 +89,7 @@ class DataSource(ABC):
 class MatchDataSource(DataSource):
     """Base class for match data sources."""
 
-    REQUIRED_COLUMNS = [
+    REQUIRED_COLUMNS: ClassVar[list[str]] = [
         "external_api_id",
         "home_team",
         "away_team",
@@ -122,7 +122,7 @@ class MatchDataSource(DataSource):
 class OddsDataSource(DataSource):
     """Base class for odds data sources."""
 
-    REQUIRED_COLUMNS = [
+    REQUIRED_COLUMNS: ClassVar[list[str]] = [
         "match_id",
         "bookmaker",
         "home_odds",
@@ -158,7 +158,12 @@ class OddsDataSource(DataSource):
 class TeamDataSource(DataSource):
     """Base class for team data sources."""
 
-    REQUIRED_COLUMNS = ["external_api_id", "name", "league", "country"]
+    REQUIRED_COLUMNS: ClassVar[list[str]] = [
+        "external_api_id",
+        "name",
+        "league",
+        "country",
+    ]
 
     def validate(self, df: pd.DataFrame) -> bool:
         """Validate team data structure."""
@@ -182,11 +187,11 @@ class TeamDataSource(DataSource):
 class RateLimiter:
     """Rate limiting for API calls."""
 
-    def __init__(self, calls_per_minute: int = 60):
+    def __init__(self, calls_per_minute: int = 60) -> None:
         self.calls_per_minute = calls_per_minute
         self.call_times: list[float] = []
 
-    async def wait_if_needed(self):
+    async def wait_if_needed(self) -> None:
         """Wait if rate limit would be exceeded."""
         now = time.time()
 

@@ -76,7 +76,7 @@ class ProductionChecker:
             "生产数据库配置",
             is_prod_db,
             weight=3,
-            message="应使用远程PostgreSQL，避免本地数据库",
+            message="应使用远程PostgreSQL,避免本地数据库",
         )
 
         # Check Redis config
@@ -210,7 +210,8 @@ class ProductionChecker:
             prom_url = "http://localhost:9090/api/v1/query?query=up"
             response = requests.get(prom_url, timeout=5)
             prom_accessible = response.status_code == 200
-        except:
+        except Exception as e:
+            print(f"Prometheus连接检查失败: {e}")
             prom_accessible = False
 
         self.add_check(

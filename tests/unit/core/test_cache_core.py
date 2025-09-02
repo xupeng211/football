@@ -101,7 +101,7 @@ class TestCacheManager:
             mock_get.return_value = mock_client
             mock_client.get.return_value = b'{"data": "test"}'
 
-            result = await manager.get("key")
+            await manager.get("key")
             # Should increment hits or misses
             assert manager._stats.hits >= 0 or manager._stats.misses >= 0
 

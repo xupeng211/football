@@ -43,6 +43,7 @@ dependencies = [
     "structlog>=23.0.0",
     "python-dotenv>=1.0.0",
     "requests>=2.32.4",
+    "aiohttp>=3.9.0",
     "urllib3>=2.2.2",
     # Monitoring
     "prometheus-fastapi-instrumentator>=7.0.0",

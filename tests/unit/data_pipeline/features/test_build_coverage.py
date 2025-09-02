@@ -1,7 +1,3 @@
-import pytest
-
-pytestmark = pytest.mark.skip(reason="data_pipeline module not implemented")
-
 """
 特征构建模块的覆盖率测试
 """
@@ -18,6 +14,8 @@ from data_pipeline.features.build import (
     create_feature_vector,
     get_default_feature_config,
 )
+
+pytestmark = pytest.mark.skip(reason="data_pipeline module not implemented")
 
 
 @pytest.fixture

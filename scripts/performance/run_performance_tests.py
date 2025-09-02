@@ -35,7 +35,7 @@ class TestScenario:
 class PerformanceTestRunner:
     """Manages execution of performance test scenarios."""
 
-    def __init__(self, project_root: Path = None):
+    def __init__(self, project_root: Path | None = None):
         self.project_root = project_root or Path(__file__).parent.parent.parent
         self.test_dir = self.project_root / "tests" / "performance"
         self.results_dir = self.project_root / "performance_results"
@@ -138,7 +138,7 @@ class PerformanceTestRunner:
             return False
 
     def run_scenario(
-        self, scenario: TestScenario, output_file: Path = None
+        self, scenario: TestScenario, output_file: Path | None = None
     ) -> dict[str, Any]:
         """Run a single performance test scenario."""
 
@@ -341,7 +341,7 @@ class PerformanceTestRunner:
         return evaluation
 
     def run_test_suite(
-        self, scenarios: list[str] = None, host: str = None
+        self, scenarios: list[str] | None = None, host: str | None = None
     ) -> dict[str, Any]:
         """Run a suite of performance tests."""
 

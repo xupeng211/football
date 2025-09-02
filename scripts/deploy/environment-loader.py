@@ -229,6 +229,41 @@ class EnvironmentLoader:
             print()
 
 
+def _handle_list_command(loader: EnvironmentLoader) -> None:
+    """Handle list command."""
+    loader.list_environments()
+
+
+def _handle_validate_command(loader: EnvironmentLoader, env: Environment) -> None:
+    """Handle validate command."""
+    if loader.validate_environment(env):
+        print(f"✅ {env.value} environment is valid")
+        sys.exit(0)
+    else:
+        sys.exit(1)
+
+
+def _handle_load_command(loader: EnvironmentLoader, env: Environment) -> None:
+    """Handle load command."""
+    config = loader.load_environment(env)
+
+    # Print loaded configuration (excluding secrets)
+    print(f"\n📋 Loaded Configuration for {env.value}:")
+    for key, value in config.items():
+        if any(
+            secret_word in key.lower()
+            for secret_word in ["password", "secret", "key", "token"]
+        ):
+            print(f"   {key}=***")
+        else:
+            print(f"   {key}={value}")
+
+
+def _handle_export_command(loader: EnvironmentLoader, env: Environment, output: Path) -> None:
+    """Handle export command."""
+    loader.export_environment(env, output)
+
+
 def main():
     """Main CLI interface."""
     parser = argparse.ArgumentParser(
@@ -251,48 +286,23 @@ def main():
     parser.add_argument("--output", type=Path, help="Output file for export command")
 
     args = parser.parse_args()
-
     loader = EnvironmentLoader()
 
     try:
         if args.command == "list":
-            loader.list_environments()
-
+            _handle_list_command(loader)
         elif args.command == "validate":
             if not args.env:
                 parser.error("--env is required for validate command")
-
-            env = Environment(args.env)
-            if loader.validate_environment(env):
-                print(f"✅ {env.value} environment is valid")
-                sys.exit(0)
-            else:
-                sys.exit(1)
-
+            _handle_validate_command(loader, Environment(args.env))
         elif args.command == "load":
             if not args.env:
                 parser.error("--env is required for load command")
-
-            env = Environment(args.env)
-            config = loader.load_environment(env)
-
-            # Print loaded configuration (excluding secrets)
-            print(f"\n📋 Loaded Configuration for {env.value}:")
-            for key, value in config.items():
-                if any(
-                    secret_word in key.lower()
-                    for secret_word in ["password", "secret", "key", "token"]
-                ):
-                    print(f"   {key}=***")
-                else:
-                    print(f"   {key}={value}")
-
+            _handle_load_command(loader, Environment(args.env))
         elif args.command == "export":
             if not args.env:
                 parser.error("--env is required for export command")
-
-            env = Environment(args.env)
-            loader.export_environment(env, args.output)
+            _handle_export_command(loader, Environment(args.env), args.output)
 
     except Exception as e:
         print(f"❌ Error: {e}")

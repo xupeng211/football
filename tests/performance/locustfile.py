@@ -302,7 +302,7 @@ class HeavyLoadUser(BaseFootballPredictUser):
         for _ in range(random.randint(3, 7)):
             prediction_request = self.test_data.generate_prediction_request()
 
-            response = self.client.post(
+            self.client.post(
                 "/api/v1/predictions/predict",
                 json=prediction_request,
                 headers=self.api_headers,
@@ -344,7 +344,7 @@ class HeavyLoadUser(BaseFootballPredictUser):
             }
         )
 
-        response = self.client.post(
+        self.client.post(
             "/api/v1/predictions/predict",
             json=complex_request,
             headers=self.api_headers,
@@ -390,7 +390,7 @@ class MonitoringUser(BaseFootballPredictUser):
         endpoints_to_check = ["/docs", "/redoc", "/openapi.json"]
 
         for endpoint in endpoints_to_check:
-            response = self.client.get(endpoint)
+            self.client.get(endpoint)
             # These might not be enabled in production, so don't fail
 
 
