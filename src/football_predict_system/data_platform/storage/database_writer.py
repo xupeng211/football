@@ -16,6 +16,28 @@ from ...domain.models import Team
 logger = get_logger(__name__)
 
 
+class UpsertResult:
+    """Result of upsert operation."""
+
+    def __init__(self, inserted: int = 0, updated: int = 0, failed: int = 0):
+        self.inserted = inserted
+        self.updated = updated
+        self.failed = failed
+
+    @property
+    def records_processed(self) -> int:
+        """Total records successfully processed."""
+        return self.inserted + self.updated
+
+    def to_dict(self) -> dict[str, int]:
+        """Convert to dictionary format."""
+        return {
+            "inserted": self.inserted,
+            "updated": self.updated,
+            "failed": self.failed,
+        }
+
+
 class DatabaseWriter:
     """Handle data storage operations."""
 
@@ -23,16 +45,14 @@ class DatabaseWriter:
         self.db_manager = get_database_manager()
         self.logger = get_logger(__name__)
 
-    async def upsert_teams(
-        self, teams_data: list[Team] | pd.DataFrame
-    ) -> dict[str, int]:
+    async def upsert_teams(self, teams_data: list[Team] | pd.DataFrame) -> UpsertResult:
         """Insert or update team data."""
 
         # Handle both DataFrame and list of Team objects
         if isinstance(teams_data, list):
             # Convert Team objects to DataFrame
             if not teams_data:
-                return {"inserted": 0, "updated": 0, "failed": 0}
+                return UpsertResult()
 
             # Convert Team objects to dict for DataFrame
             team_dicts = []
@@ -50,7 +70,7 @@ class DatabaseWriter:
             df = teams_data
 
         if df.empty:
-            return {"inserted": 0, "updated": 0, "failed": 0}
+            return UpsertResult()
 
         inserted = 0
         updated = 0
@@ -121,7 +141,7 @@ class DatabaseWriter:
 
             await session.commit()
 
-        return {"inserted": inserted, "updated": updated, "failed": failed}
+        return UpsertResult(inserted=inserted, updated=updated, failed=failed)
 
     async def upsert_matches(self, df: pd.DataFrame) -> dict[str, int]:
         """Insert or update match data."""
