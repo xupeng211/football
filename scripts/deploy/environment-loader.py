@@ -259,7 +259,9 @@ def _handle_load_command(loader: EnvironmentLoader, env: Environment) -> None:
             print(f"   {key}={value}")
 
 
-def _handle_export_command(loader: EnvironmentLoader, env: Environment, output: Path) -> None:
+def _handle_export_command(
+    loader: EnvironmentLoader, env: Environment, output: Path
+) -> None:
     """Handle export command."""
     loader.export_environment(env, output)
 

@@ -10,6 +10,7 @@ Free tier limitations:
 import asyncio
 import time
 from datetime import datetime, timedelta
+from typing import Any, cast
 
 import aiohttp
 import pandas as pd
@@ -33,7 +34,7 @@ class FootballDataAPICollector(MatchDataSource, TeamDataSource):
         self.rate_limiter = RateLimiter(calls_per_minute=10)  # Free tier limit
         self.session: aiohttp.ClientSession | None = None
 
-    async def fetch(self, **kwargs) -> pd.DataFrame:
+    async def fetch(self, **kwargs: Any) -> pd.DataFrame:
         """Fetch data from the source - delegates to specific methods."""
         competition_id = kwargs.get("competition_id")
         date_from = kwargs.get("date_from")
@@ -46,12 +47,17 @@ class FootballDataAPICollector(MatchDataSource, TeamDataSource):
     async def _get_session(self) -> aiohttp.ClientSession:
         """Get or create HTTP session."""
         if self.session is None:
-            headers = {"X-Auth-Token": self.api_key, "Accept": "application/json"}
+            headers: dict[str, str] = {
+                "X-Auth-Token": self.api_key or "",
+                "Accept": "application/json",
+            }
             timeout = aiohttp.ClientTimeout(total=30)
             self.session = aiohttp.ClientSession(headers=headers, timeout=timeout)
         return self.session
 
-    async def _make_request(self, endpoint: str, params: dict | None = None) -> dict:
+    async def _make_request(
+        self, endpoint: str, params: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
         """Make rate-limited API request."""
         await self.rate_limiter.wait_if_needed()
 
@@ -72,7 +78,8 @@ class FootballDataAPICollector(MatchDataSource, TeamDataSource):
                     return await self._make_request(endpoint, params)
 
                 response.raise_for_status()
-                return await response.json()
+                response_data = await response.json()
+                return cast(dict[str, Any], response_data)
 
         except aiohttp.ClientError as e:
             logger.error(f"API request failed: {e}")
@@ -191,7 +198,7 @@ class FootballDataAPICollector(MatchDataSource, TeamDataSource):
         else:
             return "D"
 
-    async def close(self):
+    async def close(self) -> None:
         """Close HTTP session."""
         if self.session:
             await self.session.close()

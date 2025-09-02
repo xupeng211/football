@@ -44,14 +44,14 @@ class DataSource(ABC):
         self.stats = CollectionStats(started_at=datetime.utcnow())
 
     @abstractmethod
-    async def fetch(self, **kwargs) -> pd.DataFrame:
+    async def fetch(self, **kwargs: Any) -> pd.DataFrame:
         """Fetch data from the source."""
 
     @abstractmethod
     def validate(self, df: pd.DataFrame) -> bool:
         """Validate fetched data."""
 
-    async def collect(self, **kwargs) -> tuple[pd.DataFrame, CollectionStats]:
+    async def collect(self, **kwargs: Any) -> tuple[pd.DataFrame, CollectionStats]:
         """Complete data collection process with stats."""
         start_time = time.time()
 

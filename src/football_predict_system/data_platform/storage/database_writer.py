@@ -205,7 +205,7 @@ class DatabaseWriter:
         return {"inserted": inserted, "updated": updated, "failed": failed}
 
     async def _get_team_id_by_external_id(
-        self, session, external_id: int | None
+        self, session: Any, external_id: int | None
     ) -> str | None:
         """Get internal team ID by external API ID."""
         if not external_id:
