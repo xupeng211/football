@@ -17,6 +17,7 @@ from typing import Any
 
 class Environment(str, Enum):
     """Supported deployment environments."""
+
     DEVELOPMENT = "development"
     STAGING = "staging"
     PRODUCTION = "production"
@@ -25,6 +26,7 @@ class Environment(str, Enum):
 @dataclass
 class EnvironmentConfig:
     """Environment configuration container."""
+
     name: str
     config_file: Path
     required_secrets: list
@@ -49,8 +51,8 @@ class EnvironmentLoader:
                 validation_rules={
                     "DEBUG": True,
                     "LOG_LEVEL": "debug",
-                    "API_WORKERS": 1
-                }
+                    "API_WORKERS": 1,
+                },
             ),
             Environment.STAGING: EnvironmentConfig(
                 name="staging",
@@ -58,17 +60,17 @@ class EnvironmentLoader:
                 required_secrets=[
                     "STAGING_DATABASE_URL",
                     "STAGING_REDIS_URL",
-                    "STAGING_SECRET_KEY"
+                    "STAGING_SECRET_KEY",
                 ],
                 optional_secrets=[
                     "STAGING_FOOTBALL_DATA_API_KEY",
-                    "STAGING_OPENAI_API_KEY"
+                    "STAGING_OPENAI_API_KEY",
                 ],
                 validation_rules={
                     "DEBUG": False,
                     "LOG_LEVEL": "info",
-                    "API_WORKERS": 2
-                }
+                    "API_WORKERS": 2,
+                },
             ),
             Environment.PRODUCTION: EnvironmentConfig(
                 name="production",
@@ -77,17 +79,15 @@ class EnvironmentLoader:
                     "PRODUCTION_DATABASE_URL",
                     "PRODUCTION_REDIS_URL",
                     "PRODUCTION_SECRET_KEY",
-                    "PRODUCTION_FOOTBALL_DATA_API_KEY"
+                    "PRODUCTION_FOOTBALL_DATA_API_KEY",
                 ],
-                optional_secrets=[
-                    "PRODUCTION_OPENAI_API_KEY"
-                ],
+                optional_secrets=["PRODUCTION_OPENAI_API_KEY"],
                 validation_rules={
                     "DEBUG": False,
                     "LOG_LEVEL": "warning",
-                    "API_WORKERS": 4
-                }
-            )
+                    "API_WORKERS": 4,
+                },
+            ),
         }
 
     def load_environment(self, env: Environment) -> dict[str, Any]:
@@ -98,7 +98,9 @@ class EnvironmentLoader:
 
         # Check if config file exists
         if not config.config_file.exists():
-            raise FileNotFoundError(f"Configuration file not found: {config.config_file}")
+            raise FileNotFoundError(
+                f"Configuration file not found: {config.config_file}"
+            )
 
         # Load configuration
         env_vars = self._load_env_file(config.config_file)
@@ -121,12 +123,12 @@ class EnvironmentLoader:
                 line = line.strip()
 
                 # Skip comments and empty lines
-                if line.startswith('#') or not line:
+                if line.startswith("#") or not line:
                     continue
 
                 # Parse key=value pairs
-                if '=' in line:
-                    key, value = line.split('=', 1)
+                if "=" in line:
+                    key, value = line.split("=", 1)
                     key = key.strip()
                     value = value.strip()
 
@@ -156,7 +158,9 @@ class EnvironmentLoader:
                 print(f"   - {secret}")
 
             if env == Environment.PRODUCTION:
-                raise ValueError("Production deployment requires all secrets to be configured")
+                raise ValueError(
+                    "Production deployment requires all secrets to be configured"
+                )
             else:
                 print(f"⚠️  Warning: Missing secrets for {env.value} environment")
 
@@ -170,7 +174,7 @@ class EnvironmentLoader:
 
                 # Type conversion for comparison
                 if isinstance(expected_value, bool):
-                    actual_value = actual_value.lower() in ('true', '1', 'yes', 'on')
+                    actual_value = actual_value.lower() in ("true", "1", "yes", "on")
                 elif isinstance(expected_value, int):
                     try:
                         actual_value = int(actual_value)
@@ -178,7 +182,9 @@ class EnvironmentLoader:
                         pass
 
                 if actual_value != expected_value:
-                    print(f"⚠️  Configuration mismatch for {key}: expected {expected_value}, got {actual_value}")
+                    print(
+                        f"⚠️  Configuration mismatch for {key}: expected {expected_value}, got {actual_value}"
+                    )
 
     def export_environment(self, env: Environment, output_file: Path | None = None):
         """Export environment configuration to a file."""
@@ -189,7 +195,7 @@ class EnvironmentLoader:
 
         print(f"📝 Exporting {env.value} configuration to {output_file}")
 
-        with open(output_file, 'w') as f:
+        with open(output_file, "w") as f:
             f.write(f"# {env.value.title()} Environment Configuration\n")
             f.write("# Generated by environment-loader.py\n\n")
 
@@ -232,21 +238,17 @@ def main():
     parser.add_argument(
         "command",
         choices=["load", "validate", "export", "list"],
-        help="Command to execute"
+        help="Command to execute",
     )
 
     parser.add_argument(
         "--env",
         type=str,
         choices=[e.value for e in Environment],
-        help="Target environment"
+        help="Target environment",
     )
 
-    parser.add_argument(
-        "--output",
-        type=Path,
-        help="Output file for export command"
-    )
+    parser.add_argument("--output", type=Path, help="Output file for export command")
 
     args = parser.parse_args()
 
@@ -277,7 +279,10 @@ def main():
             # Print loaded configuration (excluding secrets)
             print(f"\n📋 Loaded Configuration for {env.value}:")
             for key, value in config.items():
-                if any(secret_word in key.lower() for secret_word in ['password', 'secret', 'key', 'token']):
+                if any(
+                    secret_word in key.lower()
+                    for secret_word in ["password", "secret", "key", "token"]
+                ):
                     print(f"   {key}=***")
                 else:
                     print(f"   {key}={value}")

@@ -50,7 +50,7 @@ class IntegrationTestConfig:
             "metrics": "/metrics",
             "api_v1": "/api/v1",
             "predictions": "/api/v1/predictions",
-            "models": "/api/v1/models"
+            "models": "/api/v1/models",
         }
 
     def setup_temp_directory(self) -> Path:
@@ -132,14 +132,13 @@ async def cache_manager():
     mock_cache.clear = AsyncMock(return_value=True)
     mock_cache.exists = AsyncMock(return_value=False)
     mock_cache.ttl = AsyncMock(return_value=-1)
-    mock_cache.stats = MagicMock(return_value={
-        "hits": 0,
-        "misses": 0,
-        "total_requests": 0,
-        "hit_rate": 0.0
-    })
+    mock_cache.stats = MagicMock(
+        return_value={"hits": 0, "misses": 0, "total_requests": 0, "hit_rate": 0.0}
+    )
 
-    with patch("football_predict_system.core.cache.get_cache_manager") as mock_get_cache:
+    with patch(
+        "football_predict_system.core.cache.get_cache_manager"
+    ) as mock_get_cache:
         mock_get_cache.return_value = mock_cache
         yield mock_cache
 
@@ -159,7 +158,7 @@ def sample_match_data():
         "away_team": "Liverpool",
         "date": "2024-01-15T15:00:00Z",
         "league": "Premier League",
-        "season": "2023-24"
+        "season": "2023-24",
     }
 
 
@@ -171,19 +170,16 @@ def sample_prediction_request():
             "home_team": "Manchester United",
             "away_team": "Liverpool",
             "date": "2024-01-15T15:00:00Z",
-            "league": "Premier League"
+            "league": "Premier League",
         },
         "features": {
             "home_form": [1, 1, 0, 1, 1],  # Last 5 matches
             "away_form": [1, 0, 1, 1, 0],
-            "head_to_head": [0, 1, 0],     # Last 3 H2H
+            "head_to_head": [0, 1, 0],  # Last 3 H2H
             "league_position_home": 3,
-            "league_position_away": 1
+            "league_position_away": 1,
         },
-        "options": {
-            "include_confidence": True,
-            "detailed_analysis": True
-        }
+        "options": {"include_confidence": True, "detailed_analysis": True},
     }
 
 
@@ -196,19 +192,16 @@ def sample_batch_prediction_request():
                 "home_team": "Manchester United",
                 "away_team": "Liverpool",
                 "date": "2024-01-15T15:00:00Z",
-                "league": "Premier League"
+                "league": "Premier League",
             },
             {
                 "home_team": "Arsenal",
                 "away_team": "Chelsea",
                 "date": "2024-01-15T17:30:00Z",
-                "league": "Premier League"
-            }
+                "league": "Premier League",
+            },
         ],
-        "options": {
-            "include_confidence": True,
-            "parallel_processing": True
-        }
+        "options": {"include_confidence": True, "parallel_processing": True},
     }
 
 
@@ -221,24 +214,24 @@ def mock_model_response():
             "draw_probability": 0.25,
             "away_win_probability": 0.30,
             "predicted_result": "home_win",
-            "confidence": 0.78
+            "confidence": 0.78,
         },
         "analysis": {
             "key_factors": [
                 "Home advantage",
                 "Recent form favor home team",
-                "Head-to-head record"
+                "Head-to-head record",
             ],
             "risk_factors": [
                 "Away team has strong away record",
-                "Key player injuries for home team"
-            ]
+                "Key player injuries for home team",
+            ],
         },
         "metadata": {
             "model_version": "v3.0.0",
             "prediction_timestamp": "2024-01-10T10:30:00Z",
-            "features_used": 15
-        }
+            "features_used": 15,
+        },
     }
 
 
@@ -248,7 +241,7 @@ def api_headers():
     return {
         "Content-Type": "application/json",
         "Accept": "application/json",
-        "User-Agent": "FootballPredictIntegrationTest/1.0"
+        "User-Agent": "FootballPredictIntegrationTest/1.0",
     }
 
 
@@ -317,7 +310,7 @@ def integration_test_scenarios():
         "api_health_flow": {
             "description": "Test complete API health check flow",
             "endpoints": ["/health", "/health/ready", "/health/live"],
-            "expected_status": 200
+            "expected_status": 200,
         },
         "prediction_flow": {
             "description": "Test complete prediction flow",
@@ -326,13 +319,13 @@ def integration_test_scenarios():
                 "validate_request",
                 "process_prediction",
                 "cache_result",
-                "return_response"
-            ]
+                "return_response",
+            ],
         },
         "batch_prediction_flow": {
             "description": "Test batch prediction processing",
             "batch_sizes": [1, 5, 10, 25],
-            "parallel_processing": True
+            "parallel_processing": True,
         },
         "cache_integration": {
             "description": "Test cache integration with API",
@@ -340,8 +333,8 @@ def integration_test_scenarios():
                 "cache_miss",
                 "cache_hit",
                 "cache_invalidation",
-                "cache_expiry"
-            ]
+                "cache_expiry",
+            ],
         },
         "database_integration": {
             "description": "Test database integration",
@@ -349,8 +342,8 @@ def integration_test_scenarios():
                 "read_teams",
                 "read_matches",
                 "store_predictions",
-                "query_history"
-            ]
+                "query_history",
+            ],
         },
         "error_handling": {
             "description": "Test error handling across components",
@@ -358,9 +351,9 @@ def integration_test_scenarios():
                 "database_connection_error",
                 "cache_connection_error",
                 "model_service_error",
-                "invalid_request_data"
-            ]
-        }
+                "invalid_request_data",
+            ],
+        },
     }
 
 
@@ -374,7 +367,7 @@ def performance_config():
         "acceptable_response_time": 2.0,  # seconds
         "acceptable_error_rate": 0.01,  # 1%
         "memory_threshold": "500MB",
-        "cpu_threshold": 80  # percent
+        "cpu_threshold": 80,  # percent
     }
 
 
@@ -382,9 +375,18 @@ def performance_config():
 async def stress_test_data():
     """Generate data for stress testing."""
     import random
+
     teams = [
-        "Manchester United", "Liverpool", "Arsenal", "Chelsea", "Manchester City",
-        "Tottenham", "Newcastle", "Brighton", "West Ham", "Aston Villa"
+        "Manchester United",
+        "Liverpool",
+        "Arsenal",
+        "Chelsea",
+        "Manchester City",
+        "Tottenham",
+        "Newcastle",
+        "Brighton",
+        "West Ham",
+        "Aston Villa",
     ]
 
     test_data = []
@@ -392,11 +394,13 @@ async def stress_test_data():
         home_team = random.choice(teams)
         away_team = random.choice([t for t in teams if t != home_team])
 
-        test_data.append({
-            "home_team": home_team,
-            "away_team": away_team,
-            "date": f"2024-01-{(i % 30) + 1:02d}T15:00:00Z",
-            "league": "Premier League"
-        })
+        test_data.append(
+            {
+                "home_team": home_team,
+                "away_team": away_team,
+                "date": f"2024-01-{(i % 30) + 1:02d}T15:00:00Z",
+                "league": "Premier League",
+            }
+        )
 
     return test_data

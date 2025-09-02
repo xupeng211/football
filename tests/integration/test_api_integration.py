@@ -75,7 +75,7 @@ class TestAPIHealthIntegration:
         expected_metrics = [
             "http_requests_total",
             "http_request_duration_seconds",
-            "python_info"
+            "python_info",
         ]
 
         for metric in expected_metrics:
@@ -89,7 +89,7 @@ class TestPredictionAPIIntegration:
         self,
         async_client: AsyncClient,
         sample_prediction_request: dict[str, Any],
-        api_headers: dict[str, str]
+        api_headers: dict[str, str],
     ):
         """Test complete single prediction flow."""
 
@@ -97,7 +97,7 @@ class TestPredictionAPIIntegration:
         response = await async_client.post(
             "/api/v1/predictions/predict",
             json=sample_prediction_request,
-            headers=api_headers
+            headers=api_headers,
         )
 
         # Should return prediction or error
@@ -117,9 +117,9 @@ class TestPredictionAPIIntegration:
 
             # Verify probabilities sum to ~1.0
             total_prob = (
-                prediction["home_win_probability"] +
-                prediction["draw_probability"] +
-                prediction["away_win_probability"]
+                prediction["home_win_probability"]
+                + prediction["draw_probability"]
+                + prediction["away_win_probability"]
             )
             assert 0.99 <= total_prob <= 1.01
 
@@ -133,14 +133,14 @@ class TestPredictionAPIIntegration:
         self,
         async_client: AsyncClient,
         sample_batch_prediction_request: dict[str, Any],
-        api_headers: dict[str, str]
+        api_headers: dict[str, str],
     ):
         """Test batch prediction flow."""
 
         response = await async_client.post(
             "/api/v1/predictions/batch",
             json=sample_batch_prediction_request,
-            headers=api_headers
+            headers=api_headers,
         )
 
         assert response.status_code in [200, 400, 422, 503]
@@ -161,17 +161,13 @@ class TestPredictionAPIIntegration:
                 assert "prediction" in prediction
 
     async def test_prediction_history_flow(
-        self,
-        async_client: AsyncClient,
-        api_headers: dict[str, str]
+        self, async_client: AsyncClient, api_headers: dict[str, str]
     ):
         """Test prediction history retrieval."""
 
         # Test getting prediction history
         response = await async_client.get(
-            "/api/v1/predictions/history",
-            headers=api_headers,
-            params={"limit": 10}
+            "/api/v1/predictions/history", headers=api_headers, params={"limit": 10}
         )
 
         assert response.status_code in [200, 404]
@@ -203,7 +199,7 @@ class TestCacheIntegration:
         async_client: AsyncClient,
         sample_prediction_request: dict[str, Any],
         api_headers: dict[str, str],
-        cache_helper
+        cache_helper,
     ):
         """Test cache miss followed by cache hit."""
 
@@ -215,7 +211,7 @@ class TestCacheIntegration:
         response1 = await async_client.post(
             "/api/v1/predictions/predict",
             json=sample_prediction_request,
-            headers=api_headers
+            headers=api_headers,
         )
         first_response_time = time.time() - start_time
 
@@ -227,7 +223,7 @@ class TestCacheIntegration:
         response2 = await async_client.post(
             "/api/v1/predictions/predict",
             json=sample_prediction_request,
-            headers=api_headers
+            headers=api_headers,
         )
         second_response_time = time.time() - start_time
 
@@ -241,17 +237,13 @@ class TestCacheIntegration:
         # Results should be identical for cache hit
         assert data1["prediction"] == data2["prediction"]
 
-    async def test_cache_invalidation(
-        self,
-        async_client: AsyncClient,
-        cache_helper
-    ):
+    async def test_cache_invalidation(self, async_client: AsyncClient, cache_helper):
         """Test cache invalidation scenarios."""
 
         # Populate test cache
         test_data = {
             "test_prediction_key": {"result": "cached_prediction"},
-            "test_model_key": {"model": "cached_model_data"}
+            "test_model_key": {"model": "cached_model_data"},
         }
 
         await cache_helper.populate_test_cache(test_data)
@@ -267,9 +259,7 @@ class TestDatabaseIntegration:
     """Test database integration with API endpoints."""
 
     async def test_database_connectivity(
-        self,
-        async_client: AsyncClient,
-        database_manager
+        self, async_client: AsyncClient, database_manager
     ):
         """Test database connectivity through health check."""
 
@@ -286,7 +276,7 @@ class TestDatabaseIntegration:
         async_client: AsyncClient,
         sample_prediction_request: dict[str, Any],
         api_headers: dict[str, str],
-        db_helper
+        db_helper,
     ):
         """Test data persistence through API calls."""
 
@@ -294,7 +284,7 @@ class TestDatabaseIntegration:
         response = await async_client.post(
             "/api/v1/predictions/predict",
             json=sample_prediction_request,
-            headers=api_headers
+            headers=api_headers,
         )
 
         if response.status_code != 200:
@@ -302,9 +292,7 @@ class TestDatabaseIntegration:
 
         # Try to retrieve history (should read from database)
         history_response = await async_client.get(
-            "/api/v1/predictions/history",
-            headers=api_headers,
-            params={"limit": 1}
+            "/api/v1/predictions/history", headers=api_headers, params={"limit": 1}
         )
 
         # History endpoint might not be implemented or might require authentication
@@ -315,9 +303,7 @@ class TestErrorHandlingIntegration:
     """Test error handling across integrated components."""
 
     async def test_invalid_prediction_request(
-        self,
-        async_client: AsyncClient,
-        api_headers: dict[str, str]
+        self, async_client: AsyncClient, api_headers: dict[str, str]
     ):
         """Test handling of invalid prediction requests."""
 
@@ -330,9 +316,7 @@ class TestErrorHandlingIntegration:
 
         for invalid_request in invalid_requests:
             response = await async_client.post(
-                "/api/v1/predictions/predict",
-                json=invalid_request,
-                headers=api_headers
+                "/api/v1/predictions/predict", json=invalid_request, headers=api_headers
             )
 
             # Should return validation error
@@ -342,9 +326,7 @@ class TestErrorHandlingIntegration:
             assert "detail" in data  # FastAPI validation error format
 
     async def test_malformed_json_handling(
-        self,
-        async_client: AsyncClient,
-        api_headers: dict[str, str]
+        self, async_client: AsyncClient, api_headers: dict[str, str]
     ):
         """Test handling of malformed JSON requests."""
 
@@ -354,16 +336,13 @@ class TestErrorHandlingIntegration:
         response = await async_client.post(
             "/api/v1/predictions/predict",
             content='{"invalid": json}',  # Malformed JSON
-            headers=malformed_headers
+            headers=malformed_headers,
         )
 
         # Should return JSON decode error
         assert response.status_code == 422
 
-    async def test_service_unavailable_handling(
-        self,
-        async_client: AsyncClient
-    ):
+    async def test_service_unavailable_handling(self, async_client: AsyncClient):
         """Test handling when services are unavailable."""
 
         # Test health check when components might be down
@@ -385,7 +364,7 @@ class TestConcurrentRequestsIntegration:
         self,
         async_client: AsyncClient,
         sample_prediction_request: dict[str, Any],
-        api_headers: dict[str, str]
+        api_headers: dict[str, str],
     ):
         """Test handling multiple concurrent prediction requests."""
 
@@ -395,7 +374,7 @@ class TestConcurrentRequestsIntegration:
             task = async_client.post(
                 "/api/v1/predictions/predict",
                 json=sample_prediction_request,
-                headers=api_headers
+                headers=api_headers,
             )
             tasks.append(task)
 
@@ -425,10 +404,7 @@ class TestConcurrentRequestsIntegration:
         print(f"Errors: {error_responses}")
         print(f"Success rate: {success_rate:.2%}")
 
-    async def test_concurrent_health_checks(
-        self,
-        async_client: AsyncClient
-    ):
+    async def test_concurrent_health_checks(self, async_client: AsyncClient):
         """Test concurrent health check requests."""
 
         # Health checks should always be fast and reliable
@@ -452,7 +428,7 @@ class TestAPIPerformanceBaseline:
         async_client: AsyncClient,
         sample_prediction_request: dict[str, Any],
         api_headers: dict[str, str],
-        performance_config: dict[str, Any]
+        performance_config: dict[str, Any],
     ):
         """Test API response time baseline."""
 
@@ -471,19 +447,18 @@ class TestAPIPerformanceBaseline:
         pred_response = await async_client.post(
             "/api/v1/predictions/predict",
             json=sample_prediction_request,
-            headers=api_headers
+            headers=api_headers,
         )
         pred_time = time.time() - start_time
 
         if pred_response.status_code == 200:
             # Only check performance if service is working
-            assert pred_time < max_response_time, \
+            assert pred_time < max_response_time, (
                 f"Prediction too slow: {pred_time:.3f}s > {max_response_time}s"
+            )
 
     async def test_throughput_baseline(
-        self,
-        async_client: AsyncClient,
-        api_headers: dict[str, str]
+        self, async_client: AsyncClient, api_headers: dict[str, str]
     ):
         """Test API throughput baseline."""
 

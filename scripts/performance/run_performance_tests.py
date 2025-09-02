@@ -19,6 +19,7 @@ from typing import Any
 @dataclass
 class TestScenario:
     """Performance test scenario configuration."""
+
     name: str
     description: str
     users: int
@@ -52,9 +53,8 @@ class PerformanceTestRunner:
                 user_classes=["LightLoadTest"],
                 expected_rps=5.0,
                 max_error_rate=5.0,
-                max_avg_response_time=2000
+                max_avg_response_time=2000,
             ),
-
             "light": TestScenario(
                 name="light",
                 description="Light load simulation - normal usage patterns",
@@ -65,9 +65,8 @@ class PerformanceTestRunner:
                 user_classes=["LightLoadTest"],
                 expected_rps=20.0,
                 max_error_rate=2.0,
-                max_avg_response_time=1500
+                max_avg_response_time=1500,
             ),
-
             "medium": TestScenario(
                 name="medium",
                 description="Medium load simulation - busy periods",
@@ -78,9 +77,8 @@ class PerformanceTestRunner:
                 user_classes=["MediumLoadTest"],
                 expected_rps=80.0,
                 max_error_rate=3.0,
-                max_avg_response_time=2000
+                max_avg_response_time=2000,
             ),
-
             "heavy": TestScenario(
                 name="heavy",
                 description="Heavy load simulation - peak usage",
@@ -91,9 +89,8 @@ class PerformanceTestRunner:
                 user_classes=["HeavyLoadTest"],
                 expected_rps=150.0,
                 max_error_rate=5.0,
-                max_avg_response_time=3000
+                max_avg_response_time=3000,
             ),
-
             "stress": TestScenario(
                 name="stress",
                 description="Stress test - beyond normal capacity",
@@ -104,9 +101,8 @@ class PerformanceTestRunner:
                 user_classes=["HeavyLoadTest"],
                 expected_rps=200.0,
                 max_error_rate=10.0,
-                max_avg_response_time=5000
+                max_avg_response_time=5000,
             ),
-
             "spike": TestScenario(
                 name="spike",
                 description="Spike test - sudden load increase",
@@ -117,15 +113,14 @@ class PerformanceTestRunner:
                 user_classes=["HeavyLoadTest"],
                 expected_rps=300.0,
                 max_error_rate=15.0,
-                max_avg_response_time=8000
-            )
+                max_avg_response_time=8000,
+            ),
         }
 
     def check_dependencies(self) -> bool:
         """Check if required dependencies are available."""
         try:
-            subprocess.run(["locust", "--version"],
-                         capture_output=True, check=True)
+            subprocess.run(["locust", "--version"], capture_output=True, check=True)
             return True
         except (subprocess.CalledProcessError, FileNotFoundError):
             print("❌ Locust not found. Install with: pip install locust")
@@ -135,13 +130,16 @@ class PerformanceTestRunner:
         """Check if API is healthy before running tests."""
         try:
             import requests
+
             response = requests.get(f"{host}/health/live", timeout=10)
             return response.status_code == 200
         except Exception as e:
             print(f"❌ API health check failed: {e}")
             return False
 
-    def run_scenario(self, scenario: TestScenario, output_file: Path = None) -> dict[str, Any]:
+    def run_scenario(
+        self, scenario: TestScenario, output_file: Path = None
+    ) -> dict[str, Any]:
         """Run a single performance test scenario."""
 
         print(f"🚀 Running scenario: {scenario.name}")
@@ -155,7 +153,7 @@ class PerformanceTestRunner:
             return {
                 "scenario": scenario.name,
                 "status": "failed",
-                "error": "API health check failed"
+                "error": "API health check failed",
             }
 
         # Prepare output file
@@ -168,16 +166,23 @@ class PerformanceTestRunner:
 
         cmd = [
             "locust",
-            "-f", str(locust_file),
-            "--host", scenario.host,
-            "--users", str(scenario.users),
-            "--spawn-rate", str(scenario.spawn_rate),
-            "--run-time", f"{scenario.duration}s",
+            "-f",
+            str(locust_file),
+            "--host",
+            scenario.host,
+            "--users",
+            str(scenario.users),
+            "--spawn-rate",
+            str(scenario.spawn_rate),
+            "--run-time",
+            f"{scenario.duration}s",
             "--headless",
             "--only-summary",
-            "--html", str(output_file.with_suffix('.html')),
-            "--csv", str(output_file.with_suffix('')),
-            "--print-stats"
+            "--html",
+            str(output_file.with_suffix(".html")),
+            "--csv",
+            str(output_file.with_suffix("")),
+            "--print-stats",
         ]
 
         # Add user classes if specified
@@ -195,7 +200,7 @@ class PerformanceTestRunner:
                 cwd=self.project_root,
                 capture_output=True,
                 text=True,
-                timeout=scenario.duration + 60  # Extra timeout buffer
+                timeout=scenario.duration + 60,  # Extra timeout buffer
             )
             end_time = time.time()
 
@@ -203,7 +208,7 @@ class PerformanceTestRunner:
             results = self._parse_results(scenario, result, start_time, end_time)
 
             # Save results to JSON
-            with open(output_file, 'w') as f:
+            with open(output_file, "w") as f:
                 json.dump(results, f, indent=2)
 
             print(f"✅ Scenario completed: {scenario.name}")
@@ -215,17 +220,18 @@ class PerformanceTestRunner:
             return {
                 "scenario": scenario.name,
                 "status": "timeout",
-                "error": "Test execution timed out"
+                "error": "Test execution timed out",
             }
         except Exception as e:
-            return {
-                "scenario": scenario.name,
-                "status": "error",
-                "error": str(e)
-            }
+            return {"scenario": scenario.name, "status": "error", "error": str(e)}
 
-    def _parse_results(self, scenario: TestScenario, result: subprocess.CompletedProcess,
-                      start_time: float, end_time: float) -> dict[str, Any]:
+    def _parse_results(
+        self,
+        scenario: TestScenario,
+        result: subprocess.CompletedProcess,
+        start_time: float,
+        end_time: float,
+    ) -> dict[str, Any]:
         """Parse Locust test results."""
 
         execution_time = end_time - start_time
@@ -240,18 +246,18 @@ class PerformanceTestRunner:
                 "users": scenario.users,
                 "spawn_rate": scenario.spawn_rate,
                 "duration": scenario.duration,
-                "host": scenario.host
+                "host": scenario.host,
             },
             "output": {
                 "stdout": result.stdout,
                 "stderr": result.stderr,
-                "return_code": result.returncode
-            }
+                "return_code": result.returncode,
+            },
         }
 
         # Parse performance metrics from output
         try:
-            lines = result.stdout.split('\n')
+            lines = result.stdout.split("\n")
 
             # Look for summary statistics
             for line in lines:
@@ -261,12 +267,22 @@ class PerformanceTestRunner:
                     parts = line.split()
                     if len(parts) >= 8:
                         results["metrics"] = {
-                            "total_requests": int(parts[1]) if parts[1].isdigit() else 0,
+                            "total_requests": int(parts[1])
+                            if parts[1].isdigit()
+                            else 0,
                             "failures": int(parts[2]) if parts[2].isdigit() else 0,
-                            "median_response_time": float(parts[4]) if parts[4].replace('.', '').isdigit() else 0,
-                            "average_response_time": float(parts[5]) if parts[5].replace('.', '').isdigit() else 0,
-                            "min_response_time": float(parts[6]) if parts[6].replace('.', '').isdigit() else 0,
-                            "max_response_time": float(parts[7]) if parts[7].replace('.', '').isdigit() else 0
+                            "median_response_time": float(parts[4])
+                            if parts[4].replace(".", "").isdigit()
+                            else 0,
+                            "average_response_time": float(parts[5])
+                            if parts[5].replace(".", "").isdigit()
+                            else 0,
+                            "min_response_time": float(parts[6])
+                            if parts[6].replace(".", "").isdigit()
+                            else 0,
+                            "max_response_time": float(parts[7])
+                            if parts[7].replace(".", "").isdigit()
+                            else 0,
                         }
                         break
 
@@ -279,7 +295,9 @@ class PerformanceTestRunner:
                 if total_requests > 0:
                     metrics["error_rate"] = (failures / total_requests) * 100
                     metrics["requests_per_second"] = total_requests / execution_time
-                    metrics["success_rate"] = ((total_requests - failures) / total_requests) * 100
+                    metrics["success_rate"] = (
+                        (total_requests - failures) / total_requests
+                    ) * 100
 
                 # Evaluate against scenario expectations
                 results["evaluation"] = self._evaluate_performance(scenario, metrics)
@@ -289,13 +307,12 @@ class PerformanceTestRunner:
 
         return results
 
-    def _evaluate_performance(self, scenario: TestScenario, metrics: dict[str, Any]) -> dict[str, Any]:
+    def _evaluate_performance(
+        self, scenario: TestScenario, metrics: dict[str, Any]
+    ) -> dict[str, Any]:
         """Evaluate performance against scenario expectations."""
 
-        evaluation = {
-            "passed": True,
-            "issues": []
-        }
+        evaluation = {"passed": True, "issues": []}
 
         # Check error rate
         error_rate = metrics.get("error_rate", 0)
@@ -323,8 +340,9 @@ class PerformanceTestRunner:
 
         return evaluation
 
-    def run_test_suite(self, scenarios: list[str] = None,
-                      host: str = None) -> dict[str, Any]:
+    def run_test_suite(
+        self, scenarios: list[str] = None, host: str = None
+    ) -> dict[str, Any]:
         """Run a suite of performance tests."""
 
         if scenarios is None:
@@ -333,11 +351,7 @@ class PerformanceTestRunner:
         print("🎯 Starting Performance Test Suite")
         print(f"Scenarios: {', '.join(scenarios)}")
 
-        results = {
-            "suite_start_time": time.time(),
-            "scenarios": {},
-            "summary": {}
-        }
+        results = {"suite_start_time": time.time(), "scenarios": {}, "summary": {}}
 
         passed_scenarios = 0
         total_scenarios = len(scenarios)
@@ -358,8 +372,9 @@ class PerformanceTestRunner:
             results["scenarios"][scenario_name] = scenario_result
 
             # Check if passed
-            if (scenario_result.get("status") == "completed" and
-                scenario_result.get("evaluation", {}).get("passed", False)):
+            if scenario_result.get("status") == "completed" and scenario_result.get(
+                "evaluation", {}
+            ).get("passed", False):
                 passed_scenarios += 1
                 print(f"✅ {scenario_name}: PASSED")
             else:
@@ -377,8 +392,12 @@ class PerformanceTestRunner:
             "total_scenarios": total_scenarios,
             "passed_scenarios": passed_scenarios,
             "failed_scenarios": total_scenarios - passed_scenarios,
-            "success_rate": (passed_scenarios / total_scenarios) * 100 if total_scenarios > 0 else 0,
-            "overall_status": "PASSED" if passed_scenarios == total_scenarios else "FAILED"
+            "success_rate": (passed_scenarios / total_scenarios) * 100
+            if total_scenarios > 0
+            else 0,
+            "overall_status": "PASSED"
+            if passed_scenarios == total_scenarios
+            else "FAILED",
         }
 
         print("\n📋 Performance Test Suite Summary:")
@@ -407,32 +426,38 @@ class PerformanceTestRunner:
             f"- **Overall Status:** {results['summary']['overall_status']}",
             "",
             "## Scenario Results",
-            ""
+            "",
         ]
 
         for scenario_name, scenario_result in results["scenarios"].items():
-            status_emoji = "✅" if scenario_result.get("status") == "completed" else "❌"
+            status_emoji = (
+                "✅" if scenario_result.get("status") == "completed" else "❌"
+            )
 
-            report_lines.extend([
-                f"### {status_emoji} {scenario_name.title()}",
-                "",
-                f"**Description:** {scenario_result.get('description', 'N/A')}",
-                f"**Status:** {scenario_result.get('status', 'Unknown')}",
-                ""
-            ])
+            report_lines.extend(
+                [
+                    f"### {status_emoji} {scenario_name.title()}",
+                    "",
+                    f"**Description:** {scenario_result.get('description', 'N/A')}",
+                    f"**Status:** {scenario_result.get('status', 'Unknown')}",
+                    "",
+                ]
+            )
 
             # Add metrics if available
             if "metrics" in scenario_result:
                 metrics = scenario_result["metrics"]
-                report_lines.extend([
-                    "**Performance Metrics:**",
-                    "",
-                    f"- Total Requests: {metrics.get('total_requests', 'N/A')}",
-                    f"- Error Rate: {metrics.get('error_rate', 0):.2f}%",
-                    f"- Average Response Time: {metrics.get('average_response_time', 0):.2f}ms",
-                    f"- Requests per Second: {metrics.get('requests_per_second', 0):.2f}",
-                    ""
-                ])
+                report_lines.extend(
+                    [
+                        "**Performance Metrics:**",
+                        "",
+                        f"- Total Requests: {metrics.get('total_requests', 'N/A')}",
+                        f"- Error Rate: {metrics.get('error_rate', 0):.2f}%",
+                        f"- Average Response Time: {metrics.get('average_response_time', 0):.2f}ms",
+                        f"- Requests per Second: {metrics.get('requests_per_second', 0):.2f}",
+                        "",
+                    ]
+                )
 
             # Add evaluation results
             if "evaluation" in scenario_result:
@@ -460,26 +485,22 @@ def main():
     parser.add_argument(
         "--scenario",
         choices=["smoke", "light", "medium", "heavy", "stress", "spike"],
-        help="Run a specific scenario"
+        help="Run a specific scenario",
     )
 
     parser.add_argument(
         "--suite",
         nargs="+",
         default=["smoke", "light", "medium"],
-        help="Run a suite of scenarios"
+        help="Run a suite of scenarios",
     )
 
     parser.add_argument(
-        "--host",
-        default="http://localhost:8000",
-        help="Target host for testing"
+        "--host", default="http://localhost:8000", help="Target host for testing"
     )
 
     parser.add_argument(
-        "--report",
-        action="store_true",
-        help="Generate detailed report"
+        "--report", action="store_true", help="Generate detailed report"
     )
 
     args = parser.parse_args()
@@ -509,8 +530,10 @@ def main():
                 report = runner.generate_report(results)
 
                 # Save report
-                report_file = runner.results_dir / f"performance_report_{int(time.time())}.md"
-                with open(report_file, 'w') as f:
+                report_file = (
+                    runner.results_dir / f"performance_report_{int(time.time())}.md"
+                )
+                with open(report_file, "w") as f:
                     f.write(report)
 
                 print(f"\n📄 Report saved to: {report_file}")

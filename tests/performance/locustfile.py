@@ -19,16 +19,36 @@ class PerformanceTestData:
 
     def __init__(self):
         self.teams = [
-            "Manchester United", "Liverpool", "Arsenal", "Chelsea",
-            "Manchester City", "Tottenham", "Newcastle", "Brighton",
-            "West Ham", "Aston Villa", "Crystal Palace", "Wolves",
-            "Leicester", "Leeds United", "Everton", "Southampton",
-            "Burnley", "Watford", "Norwich", "Brentford"
+            "Manchester United",
+            "Liverpool",
+            "Arsenal",
+            "Chelsea",
+            "Manchester City",
+            "Tottenham",
+            "Newcastle",
+            "Brighton",
+            "West Ham",
+            "Aston Villa",
+            "Crystal Palace",
+            "Wolves",
+            "Leicester",
+            "Leeds United",
+            "Everton",
+            "Southampton",
+            "Burnley",
+            "Watford",
+            "Norwich",
+            "Brentford",
         ]
 
         self.leagues = [
-            "Premier League", "Championship", "La Liga", "Serie A",
-            "Bundesliga", "Ligue 1", "Eredivisie"
+            "Premier League",
+            "Championship",
+            "La Liga",
+            "Serie A",
+            "Bundesliga",
+            "Ligue 1",
+            "Eredivisie",
         ]
 
     def generate_match_data(self) -> dict[str, Any]:
@@ -40,7 +60,7 @@ class PerformanceTestData:
             "home_team": home_team,
             "away_team": away_team,
             "date": f"2024-{random.randint(1, 12):02d}-{random.randint(1, 28):02d}T15:00:00Z",
-            "league": random.choice(self.leagues)
+            "league": random.choice(self.leagues),
         }
 
     def generate_prediction_request(self) -> dict[str, Any]:
@@ -54,12 +74,12 @@ class PerformanceTestData:
                 "away_form": [random.randint(0, 1) for _ in range(5)],
                 "head_to_head": [random.randint(0, 1) for _ in range(3)],
                 "league_position_home": random.randint(1, 20),
-                "league_position_away": random.randint(1, 20)
+                "league_position_away": random.randint(1, 20),
             },
             "options": {
                 "include_confidence": random.choice([True, False]),
-                "detailed_analysis": random.choice([True, False])
-            }
+                "detailed_analysis": random.choice([True, False]),
+            },
         }
 
     def generate_batch_request(self, batch_size: int = 5) -> dict[str, Any]:
@@ -68,10 +88,7 @@ class PerformanceTestData:
 
         return {
             "matches": matches,
-            "options": {
-                "include_confidence": True,
-                "parallel_processing": True
-            }
+            "options": {"include_confidence": True, "parallel_processing": True},
         }
 
 
@@ -87,7 +104,7 @@ class BaseFootballPredictUser(HttpUser):
         self.api_headers = {
             "Content-Type": "application/json",
             "Accept": "application/json",
-            "User-Agent": "LocustPerformanceTest/1.0"
+            "User-Agent": "LocustPerformanceTest/1.0",
         }
 
         # Verify API is accessible
@@ -168,9 +185,8 @@ class PredictionUser(BaseFootballPredictUser):
             "/api/v1/predictions/predict",
             json=prediction_request,
             headers=self.api_headers,
-            catch_response=True
+            catch_response=True,
         ) as response:
-
             if response.status_code == 200:
                 response.success()
 
@@ -185,7 +201,7 @@ class PredictionUser(BaseFootballPredictUser):
                             "home_win_probability",
                             "draw_probability",
                             "away_win_probability",
-                            "predicted_result"
+                            "predicted_result",
                         ]
 
                         for field in required_fields:
@@ -195,13 +211,15 @@ class PredictionUser(BaseFootballPredictUser):
                         else:
                             # Check probability sum
                             total_prob = (
-                                prediction.get("home_win_probability", 0) +
-                                prediction.get("draw_probability", 0) +
-                                prediction.get("away_win_probability", 0)
+                                prediction.get("home_win_probability", 0)
+                                + prediction.get("draw_probability", 0)
+                                + prediction.get("away_win_probability", 0)
                             )
 
                             if not (0.99 <= total_prob <= 1.01):
-                                response.failure(f"Invalid probability sum: {total_prob}")
+                                response.failure(
+                                    f"Invalid probability sum: {total_prob}"
+                                )
 
                 except json.JSONDecodeError:
                     response.failure("Invalid JSON in prediction response")
@@ -227,9 +245,8 @@ class PredictionUser(BaseFootballPredictUser):
             "/api/v1/predictions/batch",
             json=batch_request,
             headers=self.api_headers,
-            catch_response=True
+            catch_response=True,
         ) as response:
-
             if response.status_code == 200:
                 response.success()
 
@@ -256,16 +273,15 @@ class PredictionUser(BaseFootballPredictUser):
         """Test prediction history endpoint."""
         params = {
             "limit": random.choice([5, 10, 20]),
-            "offset": random.choice([0, 10, 20])
+            "offset": random.choice([0, 10, 20]),
         }
 
         with self.client.get(
             "/api/v1/predictions/history",
             params=params,
             headers=self.api_headers,
-            catch_response=True
+            catch_response=True,
         ) as response:
-
             if response.status_code == 200:
                 response.success()
             elif response.status_code in [404, 401]:
@@ -289,7 +305,7 @@ class HeavyLoadUser(BaseFootballPredictUser):
             response = self.client.post(
                 "/api/v1/predictions/predict",
                 json=prediction_request,
-                headers=self.api_headers
+                headers=self.api_headers,
             )
 
             # Brief pause between rapid requests
@@ -306,9 +322,8 @@ class HeavyLoadUser(BaseFootballPredictUser):
             "/api/v1/predictions/batch",
             json=large_batch,
             headers=self.api_headers,
-            catch_response=True
+            catch_response=True,
         ) as response:
-
             # Large batches might take longer or fail
             if response.status_code in [200, 422, 503, 504]:
                 response.success()
@@ -321,16 +336,18 @@ class HeavyLoadUser(BaseFootballPredictUser):
         complex_request = self.test_data.generate_prediction_request()
 
         # Add complexity
-        complex_request["options"].update({
-            "detailed_analysis": True,
-            "include_confidence": True,
-            "advanced_features": True
-        })
+        complex_request["options"].update(
+            {
+                "detailed_analysis": True,
+                "include_confidence": True,
+                "advanced_features": True,
+            }
+        )
 
         response = self.client.post(
             "/api/v1/predictions/predict",
             json=complex_request,
-            headers=self.api_headers
+            headers=self.api_headers,
         )
 
 
@@ -380,16 +397,19 @@ class MonitoringUser(BaseFootballPredictUser):
 # Performance Test Scenarios
 class LightLoadTest(HealthCheckUser, PredictionUser):
     """Light load test - simulates normal usage."""
+
     wait_time = between(2, 5)
 
 
 class MediumLoadTest(HealthCheckUser, PredictionUser, MonitoringUser):
     """Medium load test - simulates busy periods."""
+
     wait_time = between(1, 3)
 
 
 class HeavyLoadTest(HealthCheckUser, PredictionUser, HeavyLoadUser, MonitoringUser):
     """Heavy load test - simulates peak usage and stress scenarios."""
+
     wait_time = between(0.5, 2)
 
 
@@ -398,7 +418,9 @@ from locust import events
 
 
 @events.request.add_listener
-def record_request_metrics(request_type, name, response_time, response_length, exception, context, **kwargs):
+def record_request_metrics(
+    request_type, name, response_time, response_length, exception, context, **kwargs
+):
     """Record custom metrics for analysis."""
 
     # Log slow requests
@@ -429,7 +451,9 @@ def on_locust_init(environment, **kwargs):
 def on_test_start(environment, **kwargs):
     """Actions to perform when test starts."""
     print("📊 Performance test started")
-    print(f"Users: {environment.runner.user_count if hasattr(environment.runner, 'user_count') else 'N/A'}")
+    print(
+        f"Users: {environment.runner.user_count if hasattr(environment.runner, 'user_count') else 'N/A'}"
+    )
 
 
 @events.test_stop.add_listener
@@ -443,7 +467,9 @@ def on_test_stop(environment, **kwargs):
         print(f"Total requests: {stats.total.num_requests}")
         print(f"Failed requests: {stats.total.num_failures}")
         print(f"Average response time: {stats.total.avg_response_time:.2f}ms")
-        print(f"95th percentile: {stats.total.get_response_time_percentile(0.95):.2f}ms")
+        print(
+            f"95th percentile: {stats.total.get_response_time_percentile(0.95):.2f}ms"
+        )
         print(f"Requests per second: {stats.total.current_rps:.2f}")
 
         # Performance benchmarks
@@ -451,14 +477,18 @@ def on_test_stop(environment, **kwargs):
 
         print("\n🎯 Performance Baseline Results:")
         print(f"Error rate: {error_rate:.2f}% (target: <1%)")
-        print(f"Average response time: {stats.total.avg_response_time:.2f}ms (target: <2000ms)")
-        print(f"95th percentile: {stats.total.get_response_time_percentile(0.95):.2f}ms (target: <5000ms)")
+        print(
+            f"Average response time: {stats.total.avg_response_time:.2f}ms (target: <2000ms)"
+        )
+        print(
+            f"95th percentile: {stats.total.get_response_time_percentile(0.95):.2f}ms (target: <5000ms)"
+        )
 
         # Determine if performance baseline is met
         baseline_met = (
-            error_rate < 1.0 and
-            stats.total.avg_response_time < 2000 and
-            stats.total.get_response_time_percentile(0.95) < 5000
+            error_rate < 1.0
+            and stats.total.avg_response_time < 2000
+            and stats.total.get_response_time_percentile(0.95) < 5000
         )
 
         if baseline_met:
