@@ -194,7 +194,9 @@ class Settings(BaseSettings):
     def get_database_url(self) -> str:
         """Get database URL with environment-specific modifications."""
         # Use direct environment variable if available, otherwise fallback to config
-        db_url = self.database_url if hasattr(self, 'database_url') else self.database.url
+        db_url = (
+            self.database_url if hasattr(self, "database_url") else self.database.url
+        )
         if self.is_development() and "@db:" in db_url:
             return db_url.replace("@db:", "@localhost:")
         return db_url

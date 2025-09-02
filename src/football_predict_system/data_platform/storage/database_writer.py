@@ -34,7 +34,7 @@ class DatabaseWriter:
             # Convert Team objects to dict for DataFrame
             team_dicts = []
             for team in teams_data:
-                if hasattr(team, 'model_dump'):
+                if hasattr(team, "model_dump"):
                     team_dict = team.model_dump()
                 else:
                     # Fallback for other types
