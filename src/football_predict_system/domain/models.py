@@ -43,8 +43,12 @@ class Team(BaseModel):
     """Team domain model."""
 
     id: UUID = Field(default_factory=uuid4)
+    external_api_id: int | None = Field(
+        default=None, description="External API identifier"
+    )
     name: str = Field(..., min_length=1, max_length=100)
     short_name: str = Field(..., min_length=1, max_length=10)
+    tla: str = Field(default="", max_length=3, description="Three Letter Abbreviation")
     country: str = Field(default="Unknown", min_length=2, max_length=50)
     league: str = Field(default="Unknown", min_length=1, max_length=100)
     founded_year: int | None = None

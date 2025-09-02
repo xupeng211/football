@@ -59,9 +59,17 @@ class DatabaseWriter:
             for team in teams_data:
                 if hasattr(team, "model_dump"):
                     team_dict = team.model_dump()
+                elif hasattr(team, "__dict__"):
+                    # Fallback for non-Pydantic objects
+                    team_dict = team.__dict__
                 else:
-                    # Fallback for other types
-                    team_dict = teams_data
+                    # Last resort - convert to dict
+                    team_dict = {
+                        "external_api_id": getattr(team, "external_api_id", None),
+                        "name": getattr(team, "name", ""),
+                        "short_name": getattr(team, "short_name", ""),
+                        "tla": getattr(team, "tla", ""),
+                    }
                 team_dicts.append(team_dict)
 
             df = pd.DataFrame(team_dicts)
@@ -96,48 +104,58 @@ class DatabaseWriter:
                             UPDATE teams SET
                                 name = :name,
                                 short_name = :short_name,
-                                venue = :venue,
-                                founded_year = :founded_year,
+                                tla = :tla,
                                 updated_at = NOW()
                             WHERE external_api_id = :external_api_id
                             """),
                             {
-                                "name": row["name"],
-                                "short_name": row.get("short_name"),
-                                "venue": row.get("venue"),
-                                "founded_year": row.get("founded_year"),
                                 "external_api_id": row["external_api_id"],
+                                "name": row["name"],
+                                "short_name": row["short_name"],
+                                "tla": row.get("tla", ""),
                             },
                         )
                         updated += 1
+                        self.logger.info(
+                            "Updated existing team",
+                            team_name=row["name"],
+                            external_api_id=row["external_api_id"],
+                        )
                     else:
                         # Insert new team
+                        team_id = str(uuid.uuid4())
                         await session.execute(
                             text("""
                             INSERT INTO teams (
-                                id, name, short_name, venue,
-                                founded_year, external_api_id
+                                id, external_api_id, name, short_name, tla,
+                                created_at, updated_at
                             ) VALUES (
-                                :id, :name, :short_name, :venue,
-                                :founded_year, :external_api_id
+                                :id, :external_api_id, :name, :short_name, :tla,
+                                NOW(), NOW()
                             )
                             """),
                             {
-                                "id": str(uuid.uuid4()),
-                                "name": row["name"],
-                                "short_name": row.get("short_name"),
-                                "venue": row.get("venue"),
-                                "founded_year": row.get("founded_year"),
+                                "id": team_id,
                                 "external_api_id": row["external_api_id"],
+                                "name": row["name"],
+                                "short_name": row["short_name"],
+                                "tla": row.get("tla", ""),
                             },
                         )
                         inserted += 1
+                        self.logger.info(
+                            "Inserted new team",
+                            team_name=row["name"],
+                            external_api_id=row["external_api_id"],
+                        )
 
                 except Exception as e:
-                    self.logger.error(
-                        "Failed to upsert team", team_name=row.get("name"), error=str(e)
-                    )
                     failed += 1
+                    self.logger.error(
+                        "Failed to upsert team",
+                        error=str(e),
+                        team_name=row.get("name", "Unknown"),
+                    )
 
             await session.commit()
 

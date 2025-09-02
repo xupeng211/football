@@ -38,6 +38,7 @@ CREATE TABLE teams (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name VARCHAR(100) NOT NULL,
     short_name VARCHAR(20),
+    tla VARCHAR(3), -- Three Letter Abbreviation
     country_id UUID REFERENCES countries(id),
     league_id UUID REFERENCES leagues(id),
     founded_year INTEGER,
