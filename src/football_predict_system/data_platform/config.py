@@ -31,22 +31,26 @@ class CollectionSchedule(BaseModel):
 
     # Daily collection
     daily_collection_cron: str = "0 */6 * * *"  # Every 6 hours
-    daily_competitions: list[int] = Field(default_factory=lambda: [
-        2021,  # Premier League
-        2014,  # La Liga
-        2002,  # Bundesliga
-        2019,  # Serie A
-        2015   # Ligue 1
-    ])
+    daily_competitions: list[int] = Field(
+        default_factory=lambda: [
+            2021,  # Premier League
+            2014,  # La Liga
+            2002,  # Bundesliga
+            2019,  # Serie A
+            2015,  # Ligue 1
+        ]
+    )
     daily_date_range_days: int = 7
 
     # Quality monitoring
     quality_check_cron: str = "0 * * * *"  # Every hour
-    quality_thresholds: dict[str, Any] = Field(default_factory=lambda: {
-        "max_stale_hours": 24,
-        "min_quality_score": 80,
-        "max_missing_scores_percent": 5
-    })
+    quality_thresholds: dict[str, Any] = Field(
+        default_factory=lambda: {
+            "max_stale_hours": 24,
+            "min_quality_score": 80,
+            "max_missing_scores_percent": 5,
+        }
+    )
 
     # Historical backfill
     backfill_batch_days: int = 30
@@ -57,25 +61,29 @@ class DataPlatformConfig(BaseModel):
     """Complete data platform configuration."""
 
     # Data sources
-    football_data_org: DataSourceConfig = Field(default_factory=lambda: DataSourceConfig(
-        name="football-data-org",
-        source_type="api",
-        base_url="https://api.football-data.org/v4",
-        api_key_required=True,
-        rate_limit_per_minute=10,  # Free tier
-        headers_template={"Accept": "application/json"},
-        auth_method="api_key"
-    ))
+    football_data_org: DataSourceConfig = Field(
+        default_factory=lambda: DataSourceConfig(
+            name="football-data-org",
+            source_type="api",
+            base_url="https://api.football-data.org/v4",
+            api_key_required=True,
+            rate_limit_per_minute=10,  # Free tier
+            headers_template={"Accept": "application/json"},
+            auth_method="api_key",
+        )
+    )
 
-    api_football: DataSourceConfig = Field(default_factory=lambda: DataSourceConfig(
-        name="api-football",
-        source_type="api",
-        base_url="https://v3.football.api-sports.io",
-        api_key_required=True,
-        rate_limit_per_minute=100,  # Paid tier
-        headers_template={"Accept": "application/json"},
-        auth_method="api_key"
-    ))
+    api_football: DataSourceConfig = Field(
+        default_factory=lambda: DataSourceConfig(
+            name="api-football",
+            source_type="api",
+            base_url="https://v3.football.api-sports.io",
+            api_key_required=True,
+            rate_limit_per_minute=100,  # Paid tier
+            headers_template={"Accept": "application/json"},
+            auth_method="api_key",
+        )
+    )
 
     # Scheduling
     schedule: CollectionSchedule = Field(default_factory=CollectionSchedule)
@@ -109,78 +117,54 @@ COMPETITION_MAPPINGS = {
         "id": 2021,
         "name": "Premier League",
         "country": "England",
-        "priority": 1
+        "priority": 1,
     },
     "la_liga": {
         "id": 2014,
         "name": "Primera Division",
         "country": "Spain",
-        "priority": 1
+        "priority": 1,
     },
     "bundesliga": {
         "id": 2002,
         "name": "Bundesliga",
         "country": "Germany",
-        "priority": 1
+        "priority": 1,
     },
-    "serie_a": {
-        "id": 2019,
-        "name": "Serie A",
-        "country": "Italy",
-        "priority": 1
-    },
-    "ligue_1": {
-        "id": 2015,
-        "name": "Ligue 1",
-        "country": "France",
-        "priority": 1
-    },
-
+    "serie_a": {"id": 2019, "name": "Serie A", "country": "Italy", "priority": 1},
+    "ligue_1": {"id": 2015, "name": "Ligue 1", "country": "France", "priority": 1},
     # European Competitions
     "champions_league": {
         "id": 2001,
         "name": "UEFA Champions League",
         "country": "Europe",
-        "priority": 2
+        "priority": 2,
     },
     "europa_league": {
         "id": 2018,
         "name": "UEFA Europa League",
         "country": "Europe",
-        "priority": 3
+        "priority": 3,
     },
-
     # International
     "world_cup": {
         "id": 2000,
         "name": "FIFA World Cup",
         "country": "International",
-        "priority": 1
+        "priority": 1,
     },
     "euros": {
         "id": 2018,
         "name": "European Championship",
         "country": "Europe",
-        "priority": 1
-    }
+        "priority": 1,
+    },
 }
 
 
 # Data collection priorities
 COLLECTION_PRIORITIES = {
-    1: {
-        "frequency_hours": 6,
-        "lookback_days": 7,
-        "quality_threshold": 0.95
-    },
-    2: {
-        "frequency_hours": 12,
-        "lookback_days": 14,
-        "quality_threshold": 0.90
-    },
-    3: {
-        "frequency_hours": 24,
-        "lookback_days": 30,
-        "quality_threshold": 0.85
-    }
+    1: {"frequency_hours": 6, "lookback_days": 7, "quality_threshold": 0.95},
+    2: {"frequency_hours": 12, "lookback_days": 14, "quality_threshold": 0.90},
+    3: {"frequency_hours": 24, "lookback_days": 30, "quality_threshold": 0.85},
 }

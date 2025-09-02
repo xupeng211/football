@@ -36,15 +36,9 @@ class FootballDataAPICollector(MatchDataSource, TeamDataSource):
     async def _get_session(self) -> aiohttp.ClientSession:
         """Get or create HTTP session."""
         if self.session is None:
-            headers = {
-                "X-Auth-Token": self.api_key,
-                "Accept": "application/json"
-            }
+            headers = {"X-Auth-Token": self.api_key, "Accept": "application/json"}
             timeout = aiohttp.ClientTimeout(total=30)
-            self.session = aiohttp.ClientSession(
-                headers=headers,
-                timeout=timeout
-            )
+            self.session = aiohttp.ClientSession(headers=headers, timeout=timeout)
         return self.session
 
     async def _make_request(self, endpoint: str, params: dict = None) -> dict:
@@ -80,14 +74,16 @@ class FootballDataAPICollector(MatchDataSource, TeamDataSource):
 
         competitions = []
         for comp in data.get("competitions", []):
-            competitions.append({
-                "external_api_id": comp["id"],
-                "name": comp["name"],
-                "code": comp.get("code"),
-                "country": comp.get("area", {}).get("name"),
-                "type": comp.get("type", "LEAGUE"),
-                "plan": comp.get("plan", "TIER_FOUR")
-            })
+            competitions.append(
+                {
+                    "external_api_id": comp["id"],
+                    "name": comp["name"],
+                    "code": comp.get("code"),
+                    "country": comp.get("area", {}).get("name"),
+                    "type": comp.get("type", "LEAGUE"),
+                    "plan": comp.get("plan", "TIER_FOUR"),
+                }
+            )
 
         return pd.DataFrame(competitions)
 
@@ -98,17 +94,19 @@ class FootballDataAPICollector(MatchDataSource, TeamDataSource):
 
         teams = []
         for team in data.get("teams", []):
-            teams.append({
-                "external_api_id": team["id"],
-                "name": team["name"],
-                "short_name": team.get("shortName", team["name"][:10]),
-                "country": team.get("area", {}).get("name"),
-                "league": data.get("competition", {}).get("name"),
-                "founded_year": team.get("founded"),
-                "venue": team.get("venue"),
-                "website": team.get("website"),
-                "crest": team.get("crest")
-            })
+            teams.append(
+                {
+                    "external_api_id": team["id"],
+                    "name": team["name"],
+                    "short_name": team.get("shortName", team["name"][:10]),
+                    "country": team.get("area", {}).get("name"),
+                    "league": data.get("competition", {}).get("name"),
+                    "founded_year": team.get("founded"),
+                    "venue": team.get("venue"),
+                    "website": team.get("website"),
+                    "crest": team.get("crest"),
+                }
+            )
 
         return pd.DataFrame(teams)
 
@@ -116,7 +114,7 @@ class FootballDataAPICollector(MatchDataSource, TeamDataSource):
         self,
         competition_id: int | None = None,
         date_from: datetime | None = None,
-        date_to: datetime | None = None
+        date_to: datetime | None = None,
     ) -> pd.DataFrame:
         """Fetch matches data."""
 
@@ -142,32 +140,36 @@ class FootballDataAPICollector(MatchDataSource, TeamDataSource):
             away_team = match.get("awayTeam", {})
             score = match.get("score", {})
 
-            matches.append({
-                "external_api_id": match["id"],
-                "competition_name": match.get("competition", {}).get("name"),
-                "season": match.get("season", {}).get("startDate", "")[:4],
-                "matchday": match.get("matchday"),
-                "home_team": home_team.get("name"),
-                "home_team_id": home_team.get("id"),
-                "away_team": away_team.get("name"),
-                "away_team_id": away_team.get("id"),
-                "match_date": match.get("utcDate"),
-                "status": match.get("status"),
-                "venue": match.get("venue"),
-                "home_score": score.get("fullTime", {}).get("home"),
-                "away_score": score.get("fullTime", {}).get("away"),
-                "home_score_ht": score.get("halfTime", {}).get("home"),
-                "away_score_ht": score.get("halfTime", {}).get("away"),
-                "result": self._determine_result(
-                    score.get("fullTime", {}).get("home"),
-                    score.get("fullTime", {}).get("away")
-                ),
-                "last_updated": match.get("lastUpdated")
-            })
+            matches.append(
+                {
+                    "external_api_id": match["id"],
+                    "competition_name": match.get("competition", {}).get("name"),
+                    "season": match.get("season", {}).get("startDate", "")[:4],
+                    "matchday": match.get("matchday"),
+                    "home_team": home_team.get("name"),
+                    "home_team_id": home_team.get("id"),
+                    "away_team": away_team.get("name"),
+                    "away_team_id": away_team.get("id"),
+                    "match_date": match.get("utcDate"),
+                    "status": match.get("status"),
+                    "venue": match.get("venue"),
+                    "home_score": score.get("fullTime", {}).get("home"),
+                    "away_score": score.get("fullTime", {}).get("away"),
+                    "home_score_ht": score.get("halfTime", {}).get("home"),
+                    "away_score_ht": score.get("halfTime", {}).get("away"),
+                    "result": self._determine_result(
+                        score.get("fullTime", {}).get("home"),
+                        score.get("fullTime", {}).get("away"),
+                    ),
+                    "last_updated": match.get("lastUpdated"),
+                }
+            )
 
         return pd.DataFrame(matches)
 
-    def _determine_result(self, home_score: int | None, away_score: int | None) -> str | None:
+    def _determine_result(
+        self, home_score: int | None, away_score: int | None
+    ) -> str | None:
         """Determine match result."""
         if home_score is None or away_score is None:
             return None
@@ -198,7 +200,7 @@ class FootballDataHistoryCollector:
         competition_id: int,
         season_start: datetime,
         season_end: datetime,
-        batch_size_days: int = 30
+        batch_size_days: int = 30,
     ) -> list[pd.DataFrame]:
         """Backfill historical data for a complete season."""
 
@@ -206,29 +208,26 @@ class FootballDataHistoryCollector:
             "Starting historical backfill",
             competition_id=competition_id,
             season_start=season_start.date(),
-            season_end=season_end.date()
+            season_end=season_end.date(),
         )
 
         all_data = []
         current_date = season_start
 
         while current_date < season_end:
-            batch_end = min(
-                current_date + timedelta(days=batch_size_days),
-                season_end
-            )
+            batch_end = min(current_date + timedelta(days=batch_size_days), season_end)
 
             try:
                 self.logger.info(
                     "Collecting batch",
                     date_from=current_date.date(),
-                    date_to=batch_end.date()
+                    date_to=batch_end.date(),
                 )
 
                 df = await self.api.fetch_matches(
                     competition_id=competition_id,
                     date_from=current_date,
-                    date_to=batch_end
+                    date_to=batch_end,
                 )
 
                 if not df.empty:
@@ -242,28 +241,25 @@ class FootballDataHistoryCollector:
                 self.logger.error(
                     "Batch collection failed",
                     date_from=current_date.date(),
-                    error=str(e)
+                    error=str(e),
                 )
                 # Continue with next batch
 
             current_date = batch_end
 
-        self.logger.info(
-            "Historical backfill completed",
-            total_batches=len(all_data)
-        )
+        self.logger.info("Historical backfill completed", total_batches=len(all_data))
 
         return all_data
 
 
 # Popular competition IDs for quick reference
 POPULAR_COMPETITIONS = {
-    "premier_league": 2021,      # English Premier League
-    "la_liga": 2014,            # Spanish La Liga
-    "bundesliga": 2002,         # German Bundesliga
-    "serie_a": 2019,            # Italian Serie A
-    "ligue_1": 2015,            # French Ligue 1
-    "champions_league": 2001,    # UEFA Champions League
-    "europa_league": 2018,      # UEFA Europa League
-    "world_cup": 2000,          # FIFA World Cup
+    "premier_league": 2021,  # English Premier League
+    "la_liga": 2014,  # Spanish La Liga
+    "bundesliga": 2002,  # German Bundesliga
+    "serie_a": 2019,  # Italian Serie A
+    "ligue_1": 2015,  # French Ligue 1
+    "champions_league": 2001,  # UEFA Champions League
+    "europa_league": 2018,  # UEFA Europa League
+    "world_cup": 2000,  # FIFA World Cup
 }

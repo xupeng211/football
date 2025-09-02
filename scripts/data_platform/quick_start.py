@@ -19,7 +19,7 @@ async def quick_start():
     """Quick start the data platform."""
 
     print("🏆 Football Data Platform - Quick Start")
-    print("="*60)
+    print("=" * 60)
 
     setup = DataPlatformSetup()
 
@@ -61,9 +61,9 @@ async def quick_start():
     print("5️⃣ Final verification...")
     final_health = await setup.health_check()
 
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("📊 SETUP COMPLETE")
-    print("="*60)
+    print("=" * 60)
     print(f"Status: {final_health['overall_status'].upper()}")
     print(f"Database: {'✅' if final_health['database'] else '❌'}")
     print(f"API Access: {'✅' if final_health['api_access'] else '❌'}")

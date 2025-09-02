@@ -45,13 +45,13 @@ class DataPlatformSetup:
                 logger.error(f"Schema file not found: {schema_file}")
                 return False
 
-            with open(schema_file, encoding='utf-8') as f:
+            with open(schema_file, encoding="utf-8") as f:
                 schema_sql = f.read()
 
             # Execute schema
             async with self.db_manager.get_async_session() as session:
                 # Split by semicolon and execute each statement
-                statements = [s.strip() for s in schema_sql.split(';') if s.strip()]
+                statements = [s.strip() for s in schema_sql.split(";") if s.strip()]
 
                 for statement in statements:
                     if statement:
@@ -75,7 +75,9 @@ class DataPlatformSetup:
             return False
 
         try:
-            from football_predict_system.data_platform.sources.football_data_api import FootballDataAPICollector
+            from football_predict_system.data_platform.sources.football_data_api import (
+                FootballDataAPICollector,
+            )
 
             collector = FootballDataAPICollector()
             df = await collector.fetch_competitions()
@@ -93,9 +95,13 @@ class DataPlatformSetup:
         logger.info("Creating sample data...")
 
         try:
-            from football_predict_system.data_platform.sources.football_data_api import (POPULAR_COMPETITIONS,
-                                                                                         FootballDataAPICollector)
-            from football_predict_system.data_platform.storage.database_writer import DatabaseWriter
+            from football_predict_system.data_platform.sources.football_data_api import (
+                POPULAR_COMPETITIONS,
+                FootballDataAPICollector,
+            )
+            from football_predict_system.data_platform.storage.database_writer import (
+                DatabaseWriter,
+            )
 
             collector = FootballDataAPICollector()
             writer = DatabaseWriter()
@@ -113,7 +119,7 @@ class DataPlatformSetup:
             recent_matches = await collector.fetch_matches(
                 competition_id=POPULAR_COMPETITIONS["premier_league"],
                 date_from=datetime.utcnow() - timedelta(days=7),
-                date_to=datetime.utcnow()
+                date_to=datetime.utcnow(),
             )
 
             if not recent_matches.empty:
@@ -137,7 +143,7 @@ class DataPlatformSetup:
             "database": False,
             "api_access": False,
             "data_freshness": False,
-            "overall_status": "unhealthy"
+            "overall_status": "unhealthy",
         }
 
         try:
@@ -164,10 +170,7 @@ class DataPlatformSetup:
                 health_status["data_freshness"] = False
 
             # Overall status
-            if all([
-                health_status["database"],
-                health_status["api_access"]
-            ]):
+            if all([health_status["database"], health_status["api_access"]]):
                 health_status["overall_status"] = "healthy"
             elif health_status["database"]:
                 health_status["overall_status"] = "degraded"
@@ -182,19 +185,15 @@ class DataPlatformSetup:
 
 async def main():
     """Main setup function."""
-    parser = argparse.ArgumentParser(
-        description="Football Data Platform Setup"
-    )
+    parser = argparse.ArgumentParser(description="Football Data Platform Setup")
     parser.add_argument(
         "--action",
         choices=["setup", "verify", "sample", "health"],
         default="setup",
-        help="Action to perform"
+        help="Action to perform",
     )
     parser.add_argument(
-        "--force",
-        action="store_true",
-        help="Force setup (recreate schema)"
+        "--force", action="store_true", help="Force setup (recreate schema)"
     )
 
     args = parser.parse_args()
@@ -242,21 +241,21 @@ async def main():
 
         health = await setup.health_check()
 
-        print("\n" + "="*50)
+        print("\n" + "=" * 50)
         print("📊 DATA PLATFORM HEALTH REPORT")
-        print("="*50)
+        print("=" * 50)
         print(f"Timestamp: {health['timestamp']}")
         print(f"Database: {'✅' if health['database'] else '❌'}")
         print(f"API Access: {'✅' if health['api_access'] else '❌'}")
         print(f"Data Freshness: {'✅' if health['data_freshness'] else '❌'}")
         print(f"Overall Status: {health['overall_status'].upper()}")
 
-        if 'error' in health:
+        if "error" in health:
             print(f"Error: {health['error']}")
 
-        print("="*50)
+        print("=" * 50)
 
-        return 0 if health['overall_status'] == 'healthy' else 1
+        return 0 if health["overall_status"] == "healthy" else 1
 
     return 0
 

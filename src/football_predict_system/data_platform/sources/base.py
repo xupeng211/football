@@ -56,10 +56,7 @@ class DataSource(ABC):
         start_time = time.time()
 
         try:
-            self.logger.info(
-                "Starting data collection",
-                source=self.__class__.__name__
-            )
+            self.logger.info("Starting data collection", source=self.__class__.__name__)
 
             # Fetch data
             df = await self.fetch(**kwargs)
@@ -71,14 +68,12 @@ class DataSource(ABC):
 
             self.stats.records_processed = len(df)
             self.stats.finished_at = datetime.utcnow()
-            self.stats.total_execution_time_ms = int(
-                (time.time() - start_time) * 1000
-            )
+            self.stats.total_execution_time_ms = int((time.time() - start_time) * 1000)
 
             self.logger.info(
                 "Data collection completed",
                 records=len(df),
-                duration_ms=self.stats.total_execution_time_ms
+                duration_ms=self.stats.total_execution_time_ms,
             )
 
             return df, self.stats
@@ -86,9 +81,7 @@ class DataSource(ABC):
         except Exception as e:
             self.stats.finished_at = datetime.utcnow()
             self.stats.error_message = str(e)
-            self.stats.total_execution_time_ms = int(
-                (time.time() - start_time) * 1000
-            )
+            self.stats.total_execution_time_ms = int((time.time() - start_time) * 1000)
             self.logger.error("Data collection failed", error=str(e))
             raise DataSourceError(f"Collection failed: {e}") from e
 
@@ -97,8 +90,13 @@ class MatchDataSource(DataSource):
     """Base class for match data sources."""
 
     REQUIRED_COLUMNS = [
-        "external_api_id", "home_team", "away_team", "match_date",
-        "home_score", "away_score", "status"
+        "external_api_id",
+        "home_team",
+        "away_team",
+        "match_date",
+        "home_score",
+        "away_score",
+        "status",
     ]
 
     def validate(self, df: pd.DataFrame) -> bool:
@@ -108,18 +106,14 @@ class MatchDataSource(DataSource):
 
         missing_cols = set(self.REQUIRED_COLUMNS) - set(df.columns)
         if missing_cols:
-            self.logger.error(
-                "Missing required columns", missing=missing_cols
-            )
+            self.logger.error("Missing required columns", missing=missing_cols)
             return False
 
         # Check data types
         numeric_cols = ["home_score", "away_score"]
         for col in numeric_cols:
             if col in df.columns and not pd.api.types.is_numeric_dtype(df[col]):
-                self.logger.error(
-                    "Invalid data type", column=col, expected="numeric"
-                )
+                self.logger.error("Invalid data type", column=col, expected="numeric")
                 return False
 
         return True
@@ -129,8 +123,12 @@ class OddsDataSource(DataSource):
     """Base class for odds data sources."""
 
     REQUIRED_COLUMNS = [
-        "match_id", "bookmaker", "home_odds", "draw_odds",
-        "away_odds", "odds_time"
+        "match_id",
+        "bookmaker",
+        "home_odds",
+        "draw_odds",
+        "away_odds",
+        "odds_time",
     ]
 
     def validate(self, df: pd.DataFrame) -> bool:
@@ -140,9 +138,7 @@ class OddsDataSource(DataSource):
 
         missing_cols = set(self.REQUIRED_COLUMNS) - set(df.columns)
         if missing_cols:
-            self.logger.error(
-                "Missing required columns", missing=missing_cols
-            )
+            self.logger.error("Missing required columns", missing=missing_cols)
             return False
 
         # Check odds values
@@ -152,9 +148,7 @@ class OddsDataSource(DataSource):
                 invalid_odds = df[df[col] <= 1.0]
                 if not invalid_odds.empty:
                     self.logger.error(
-                        "Invalid odds values",
-                        column=col,
-                        count=len(invalid_odds)
+                        "Invalid odds values", column=col, count=len(invalid_odds)
                     )
                     return False
 
@@ -173,9 +167,7 @@ class TeamDataSource(DataSource):
 
         missing_cols = set(self.REQUIRED_COLUMNS) - set(df.columns)
         if missing_cols:
-            self.logger.error(
-                "Missing required columns", missing=missing_cols
-            )
+            self.logger.error("Missing required columns", missing=missing_cols)
             return False
 
         # Check for duplicate team names within same league
