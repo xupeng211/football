@@ -104,7 +104,6 @@ class DatabaseWriter:
                             UPDATE teams SET
                                 name = :name,
                                 short_name = :short_name,
-                                tla = :tla,
                                 updated_at = NOW()
                             WHERE external_api_id = :external_api_id
                             """),
@@ -112,7 +111,6 @@ class DatabaseWriter:
                                 "external_api_id": row["external_api_id"],
                                 "name": row["name"],
                                 "short_name": row["short_name"],
-                                "tla": row.get("tla", ""),
                             },
                         )
                         updated += 1
@@ -127,10 +125,10 @@ class DatabaseWriter:
                         await session.execute(
                             text("""
                             INSERT INTO teams (
-                                id, external_api_id, name, short_name, tla,
+                                id, external_api_id, name, short_name,
                                 created_at, updated_at
                             ) VALUES (
-                                :id, :external_api_id, :name, :short_name, :tla,
+                                :id, :external_api_id, :name, :short_name,
                                 NOW(), NOW()
                             )
                             """),
@@ -139,7 +137,6 @@ class DatabaseWriter:
                                 "external_api_id": row["external_api_id"],
                                 "name": row["name"],
                                 "short_name": row["short_name"],
-                                "tla": row.get("tla", ""),
                             },
                         )
                         inserted += 1
