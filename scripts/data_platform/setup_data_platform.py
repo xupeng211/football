@@ -147,6 +147,40 @@ CREATE TABLE IF NOT EXISTS matches (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS data_sources (
+    id TEXT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL UNIQUE,
+    source_type VARCHAR(30) NOT NULL,
+    base_url TEXT,
+    api_key_required BOOLEAN DEFAULT false,
+    rate_limit_per_minute INTEGER DEFAULT 60,
+    reliability_score DECIMAL(3,2) DEFAULT 0.8,
+    is_active BOOLEAN DEFAULT true,
+    headers_template TEXT,
+    auth_method VARCHAR(20),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS data_collection_logs (
+    id TEXT PRIMARY KEY,
+    source_id TEXT REFERENCES data_sources(id),
+    task_name VARCHAR(100) NOT NULL,
+    started_at TIMESTAMP NOT NULL,
+    finished_at TIMESTAMP,
+    status VARCHAR(20) NOT NULL,
+    records_fetched INTEGER DEFAULT 0,
+    records_processed INTEGER DEFAULT 0,
+    records_inserted INTEGER DEFAULT 0,
+    records_updated INTEGER DEFAULT 0,
+    records_failed INTEGER DEFAULT 0,
+    error_message TEXT,
+    error_details TEXT,
+    api_response_time_ms INTEGER,
+    total_execution_time_ms INTEGER,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 """
 
         async with self.db_manager.get_async_session() as session:
