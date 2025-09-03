@@ -19,12 +19,15 @@ from sqlalchemy import create_engine, event, text
 from sqlalchemy.engine import Engine
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.orm import Session, declarative_base, sessionmaker
 from sqlalchemy.pool import QueuePool
 
 from .config import get_settings
 from .exceptions import handle_database_exception
 from .logging import get_logger
+
+# SQLAlchemy declarative base
+Base = declarative_base()
 
 logger = get_logger(__name__)
 
@@ -339,6 +342,12 @@ class DatabaseManager:
         """Create and return connection pool info."""
         self.get_engine()  # Ensure engine is created
         return self._get_pool_info()
+
+    async def init_database(self) -> None:
+        """Initialize database tables."""
+        engine = self.get_engine()
+        # Create all tables defined in Base metadata
+        Base.metadata.create_all(bind=engine.sync_engine if hasattr(engine, 'sync_engine') else engine)
 
 
 # Global database manager instance

@@ -27,7 +27,9 @@ class TestDatabaseManager:
     @pytest.mark.asyncio
     async def test_create_engine(self, db_manager):
         """Test engine creation."""
-        with patch("football_predict_system.core.database.create_async_engine") as mock_create:
+        with patch(
+            "football_predict_system.core.database.create_async_engine"
+        ) as mock_create:
             mock_engine = AsyncMock()
             mock_create.return_value = mock_engine
 

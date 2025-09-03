@@ -8,6 +8,8 @@ This package provides production-grade caching capabilities with:
 - Distributed caching support
 """
 
+import redis
+
 from .decorators import cached
 from .invalidator import CacheInvalidator
 from .manager import CacheManager
@@ -33,4 +35,5 @@ __all__ = [
     "CacheWarmer",
     "cached",
     "get_cache_manager",
+    "redis",
 ]
