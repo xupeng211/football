@@ -154,6 +154,10 @@ ci-check: ## 🚀 CI级别严格检查 (与GitHub CI完全一致)
 	uv run pytest --maxfail=1 --disable-warnings -q
 	@echo "$(GREEN)✅ 所有CI检查通过! 可以安全提交$(NC)"
 
+ci-check-enhanced: ## 🚀 增强版CI检查 (完全模拟远程CI环境)
+	@echo "$(CYAN)🎭 运行增强版CI检查...$(NC)"
+	uv run python scripts/enhanced_local_ci.py
+
 ci: format lint type security test ## 🔧 运行所有CI检查 (兼容性保留)
 	@echo "$(GREEN)🎉 所有检查通过! 代码可以提交$(NC)"
 
