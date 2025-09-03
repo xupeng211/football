@@ -185,6 +185,10 @@ class Settings(BaseSettings):
 
     def model_post_init(self, __context: Any) -> None:
         """Post initialization to sync values."""
+        # Sync database URL: if database_url is set from env var, update database config
+        if self.database_url and self.database_url != "sqlite:///./test.db":
+            self.database.url = self.database_url
+
         # Sync JWT settings with API config if not explicitly set
         if not self.jwt_secret_key:
             self.jwt_secret_key = self.api.secret_key
@@ -229,10 +233,12 @@ class Settings(BaseSettings):
 
     def get_database_url(self) -> str:
         """Get database URL with environment-specific modifications."""
-        # Use direct environment variable if available, otherwise fallback
-        db_url = (
-            self.database_url if hasattr(self, "database_url") else self.database.url
-        )
+        # Use direct environment variable if available, otherwise fallback to database config
+        if self.database_url and self.database_url != "sqlite:///./test.db":
+            db_url = self.database_url
+        else:
+            db_url = self.database.url
+
         if self.is_development() and "@db:" in db_url:
             return db_url.replace("@db:", "@localhost:")
         return db_url

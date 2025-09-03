@@ -68,7 +68,7 @@ class DatabaseManager:
         if "sqlite" in database_url:
             # SQLite doesn't support connection pooling
             engine = create_engine(
-                db_config.url,
+                database_url,
                 echo=db_config.echo,
                 future=True,
                 connect_args={
@@ -78,7 +78,7 @@ class DatabaseManager:
         else:
             # PostgreSQL and other databases support connection pooling
             engine = create_engine(
-                db_config.url,
+                database_url,
                 poolclass=QueuePool,
                 pool_size=db_config.pool_size,
                 max_overflow=db_config.max_overflow,
@@ -95,7 +95,7 @@ class DatabaseManager:
         self._setup_engine_events(engine)
 
         logger.info(
-            "Database engine created", url=db_config.url, pool_size=db_config.pool_size
+            "Database engine created", url=database_url, pool_size=db_config.pool_size
         )
         return engine
 

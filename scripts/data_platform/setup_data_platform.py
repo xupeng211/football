@@ -39,9 +39,14 @@ class DataPlatformSetup:
         logger.info("Setting up database schema...")
 
         try:
-            # Determine database type from URL
-            db_url = self.settings.database.url
+            # Determine database type from URL - use environment-aware URL
+            db_url = self.settings.get_database_url()
             is_postgres = "postgresql" in db_url
+
+            # For CI environments, wait for database to be ready
+            if is_postgres and os.getenv("CI"):
+                await self._wait_for_database_ready()
+                logger.info("Database connection verified for CI environment")
 
             # Choose appropriate schema file
             if is_postgres:
@@ -191,6 +196,22 @@ CREATE TABLE IF NOT EXISTS data_collection_logs (
             await session.commit()
 
         logger.info("SQLite schema created successfully")
+
+    async def _wait_for_database_ready(self, max_attempts: int = 30, delay: float = 1.0) -> None:
+        """Wait for database to be ready in CI environment."""
+        for attempt in range(max_attempts):
+            try:
+                async with self.db_manager.get_async_session() as session:
+                    await session.execute(text("SELECT 1"))
+                    logger.info(f"Database ready after {attempt + 1} attempts")
+                    return
+            except Exception as e:
+                if attempt < max_attempts - 1:
+                    logger.info(f"Database not ready (attempt {attempt + 1}/{max_attempts}): {e}")
+                    await asyncio.sleep(delay)
+                else:
+                    logger.error(f"Database failed to become ready after {max_attempts} attempts")
+                    raise
 
     async def verify_api_access(self) -> bool:
         """Verify API access configuration."""
