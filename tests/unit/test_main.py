@@ -1,14 +1,16 @@
-"""Tests for main application module."""
-
+import asyncio
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+
+from football_predict_system.core.exceptions import BaseApplicationError, ErrorCode
+from football_predict_system.main import app, lifespan
+
+pytestmark = pytest.mark.skip_for_ci
+"""Tests for main application module."""
 
 # 跳过有Mock配置问题的主应用测试
-pytestmark = pytest.mark.skip_for_ci
-
-from football_predict_system.main import app
 
 
 class TestApp:
@@ -91,7 +93,6 @@ class TestLifespan:
         mock_get_cache_manager.return_value = mock_cache_manager
 
         # Test lifespan context manager
-        from football_predict_system.main import lifespan
 
         async with lifespan(app):
             # During startup, managers should be initialized
@@ -108,21 +109,13 @@ class TestErrorHandling:
 
     def test_base_application_error_handler_exists(self):
         """Test that BaseApplicationError handler exists."""
-        from football_predict_system.core.exceptions import BaseApplicationError
 
         # Check if handler is registered
         assert BaseApplicationError in app.exception_handlers
 
     def test_error_handler_returns_json_response(self):
         """Test that error handler returns proper JSON response."""
-        from unittest.mock import Mock
-
-        from fastapi import Request
-
-        from football_predict_system.core.exceptions import (
-            BaseApplicationError,
-            ErrorCode,
-        )
+        from fastapi.responses import JSONResponse
 
         # Get the error handler
         handler = app.exception_handlers[BaseApplicationError]
@@ -134,13 +127,10 @@ class TestErrorHandling:
         )
 
         # Call the async handler
-        import asyncio
 
         response = asyncio.run(handler(mock_request, mock_exception))
 
         # Should return a JSONResponse
-        from fastapi.responses import JSONResponse
-
         assert isinstance(response, JSONResponse)
         assert response.status_code == 400
 

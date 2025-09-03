@@ -39,63 +39,79 @@ class DataPlatformSetup:
         logger.info("Setting up database schema...")
 
         try:
-            # Determine database type from URL - use environment-aware URL
-            db_url = self.settings.get_database_url()
-            is_postgres = "postgresql" in db_url
+            is_postgres = await self._verify_database_connection()
+            schema_file = await self._get_schema_file(is_postgres)
 
-            # For CI environments, wait for database to be ready
-            if is_postgres and os.getenv("CI"):
-                await self._wait_for_database_ready()
-                logger.info("Database connection verified for CI environment")
-            elif is_postgres:
-                # For non-CI PostgreSQL, check if service is available
-                try:
-                    # Quick connection test
-                    async with self.db_manager.get_async_session() as session:
-                        await session.execute(text("SELECT 1"))
-                    logger.info("PostgreSQL connection verified")
-                except Exception as e:
-                    logger.warning(f"PostgreSQL连接失败,将使用SQLite fallback: {e}")
-                    # 自动降级到SQLite
-                    os.environ["DATABASE_URL"] = "sqlite:///./football_dev.db"
-                    self.settings = get_settings()  # 重新加载设置
-                    self.db_manager = get_database_manager()  # 重新初始化数据库管理器
-                    is_postgres = False
-
-            # Choose appropriate schema file
-            if is_postgres:
-                schema_file = Path(__file__).parent.parent.parent / "sql" / "schema.sql"
-            else:
-                # For SQLite, use a simplified schema
-                schema_file = (
-                    Path(__file__).parent.parent.parent / "sql" / "schema_sqlite.sql"
-                )
-
-                # If SQLite schema doesn't exist, create it
-                if not schema_file.exists():
-                    await self._create_sqlite_schema()
-                    return True
-
-            if not schema_file.exists():
-                logger.error(f"Schema file not found: {schema_file}")
+            if not schema_file:
                 return False
 
-            with open(schema_file, encoding="utf-8") as f:
-                schema_sql = f.read()
+            return await self._execute_schema(schema_file, is_postgres)
 
-            # Execute schema with database-specific handling
-            async with self.db_manager.get_async_session() as session:
-                if is_postgres:
-                    # PostgreSQL: Execute statements as-is
-                    statements = [s.strip() for s in schema_sql.split(";") if s.strip()]
-                    for statement in statements:
-                        if statement:
-                            await session.execute(text(statement))
-                else:
-                    # SQLite: Skip PostgreSQL-specific statements
-                    statements = [s.strip() for s in schema_sql.split(";") if s.strip()]
-                    for statement in statements:
-                        if statement and not any(
+        except Exception as e:
+            logger.error(f"Database setup failed: {e}")
+            return False
+
+    async def _verify_database_connection(self) -> bool:
+        """Verify database connection and determine type."""
+        db_url = self.settings.get_database_url()
+        is_postgres = "postgresql" in db_url
+
+        if is_postgres and os.getenv("CI"):
+            await self._wait_for_database_ready()
+            logger.info("Database connection verified for CI environment")
+        elif is_postgres:
+            # For non-CI PostgreSQL, check if service is available
+            try:
+                async with self.db_manager.get_async_session() as session:
+                    await session.execute(text("SELECT 1"))
+                logger.info("PostgreSQL connection verified")
+            except Exception as e:
+                logger.warning(f"PostgreSQL连接失败,将使用SQLite fallback: {e}")
+                await self._fallback_to_sqlite()
+                is_postgres = False
+
+        return is_postgres
+
+    async def _fallback_to_sqlite(self) -> None:
+        """Fallback to SQLite database."""
+        os.environ["DATABASE_URL"] = "sqlite:///./football_dev.db"
+        self.settings = get_settings()
+        self.db_manager = get_database_manager()
+
+    async def _get_schema_file(self, is_postgres: bool) -> Path | None:
+        """Get appropriate schema file."""
+        if is_postgres:
+            schema_file = Path(__file__).parent.parent.parent / "sql" / "schema.sql"
+        else:
+            schema_file = (
+                Path(__file__).parent.parent.parent / "sql" / "schema_sqlite.sql"
+            )
+
+            if not schema_file.exists():
+                await self._create_sqlite_schema()
+                return None
+
+        if not schema_file.exists():
+            logger.error(f"Schema file not found: {schema_file}")
+            return None
+
+        return schema_file
+
+    async def _execute_schema(self, schema_file: Path, is_postgres: bool) -> bool:
+        """Execute schema SQL statements."""
+        with open(schema_file, encoding="utf-8") as f:
+            schema_sql = f.read()
+
+        async with self.db_manager.get_async_session() as session:
+            statements = [s.strip() for s in schema_sql.split(";") if s.strip()]
+
+            for statement in statements:
+                if statement:
+                    if is_postgres:
+                        await session.execute(text(statement))
+                    else:
+                        # SQLite: Skip PostgreSQL-specific statements
+                        if not any(
                             pg_keyword in statement.upper()
                             for pg_keyword in [
                                 "CREATE EXTENSION",
@@ -108,14 +124,10 @@ class DataPlatformSetup:
                             statement = statement.replace("NOW()", "CURRENT_TIMESTAMP")
                             await session.execute(text(statement))
 
-                await session.commit()
+            await session.commit()
 
-            logger.info("Database schema setup completed")
-            return True
-
-        except Exception as e:
-            logger.error(f"Database setup failed: {e}")
-            return False
+        logger.info("Database schema setup completed")
+        return True
 
     async def _create_sqlite_schema(self) -> None:
         """Create SQLite-compatible schema."""

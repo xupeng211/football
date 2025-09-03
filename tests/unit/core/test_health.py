@@ -1,11 +1,7 @@
-"""Tests for core health module."""
-
+import asyncio
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
-
-# 跳过有Mock配置问题的健康检查测试
-pytestmark = pytest.mark.skip_for_ci
 
 from football_predict_system.core.health import (
     ComponentHealth,
@@ -13,6 +9,11 @@ from football_predict_system.core.health import (
     HealthStatus,
     get_health_checker,
 )
+
+pytestmark = pytest.mark.skip_for_ci
+"""Tests for core health module."""
+
+# 跳过有Mock配置问题的健康检查测试
 
 
 class TestHealthStatus:
@@ -344,8 +345,6 @@ class TestHealthCheckerIntegration:
             mock_db_manager = AsyncMock()
 
             async def slow_health_check():
-                import asyncio
-
                 await asyncio.sleep(2)  # Longer than timeout
                 return True
 

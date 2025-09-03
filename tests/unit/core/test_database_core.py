@@ -1,12 +1,15 @@
-"""Core database functionality tests."""
-
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
-pytestmark = pytest.mark.skip_for_ci  # 跳过此文件用于CI
+from football_predict_system.core.database import (
+    DatabaseManager,
+    get_database_manager,
+    get_session,
+)
 
-from football_predict_system.core.database import DatabaseManager, get_database_manager
+pytestmark = pytest.mark.skip_for_ci  # 跳过此文件用于CI
+"""Core database functionality tests."""
 
 
 class TestDatabaseManager:
@@ -223,7 +226,6 @@ class TestDatabaseContext:
             mock_get.return_value = mock_manager
 
             # Import and test session context
-            from football_predict_system.core.database import get_session
 
             async with get_session() as session:
                 assert session == mock_session
