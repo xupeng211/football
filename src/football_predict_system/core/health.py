@@ -16,8 +16,8 @@ from typing import Any
 
 import psutil
 from pydantic import BaseModel
-from sqlalchemy.exc import SQLAlchemyError
 
+from .cache import get_cache_manager
 from .config import get_settings
 from .database import get_database_manager
 from .logging import get_logger
@@ -78,24 +78,28 @@ class HealthChecker:
 
             if health_result["status"] == "healthy":
                 status = HealthStatus.HEALTHY
+                message = "Database is operational and responding normally"
             else:
                 status = HealthStatus.UNHEALTHY
+                message = f"Database is unhealthy: {health_result.get('error', 'Unknown error')}"
 
             return ComponentHealth(
                 name="database",
                 status=status,
+                message=message,
                 response_time=response_time,
                 details=health_result,
                 last_check=datetime.utcnow(),
             )
 
-        except (SQLAlchemyError, ConnectionError) as e:
+        except Exception as e:
             response_time = time.time() - start_time
             self.logger.error("Database health check failed", error=str(e))
 
             return ComponentHealth(
                 name="database",
                 status=HealthStatus.UNHEALTHY,
+                message=f"Database health check failed: {e!s}",
                 response_time=response_time,
                 details={},
                 last_check=datetime.utcnow(),
@@ -155,6 +159,48 @@ class HealthChecker:
             return ComponentHealth(
                 name="redis",
                 status=HealthStatus.UNHEALTHY,
+                response_time=response_time,
+                details={},
+                last_check=datetime.utcnow(),
+                error=str(e),
+            )
+
+    async def check_cache_health(self) -> ComponentHealth:
+        """Check cache system health."""
+        start_time = time.time()
+
+        try:
+            cache_manager = await get_cache_manager()
+            health_result = await cache_manager.health_check()
+
+            response_time = time.time() - start_time
+
+            if health_result.get("status") == "healthy":
+                status = HealthStatus.HEALTHY
+                message = "Cache is operational and responding normally"
+            else:
+                status = HealthStatus.UNHEALTHY
+                message = (
+                    f"Cache is unhealthy: {health_result.get('error', 'Unknown error')}"
+                )
+
+            return ComponentHealth(
+                name="cache",
+                status=status,
+                message=message,
+                response_time=response_time,
+                details=health_result,
+                last_check=datetime.utcnow(),
+            )
+
+        except Exception as e:
+            response_time = time.time() - start_time
+            self.logger.error("Cache health check failed", error=str(e))
+
+            return ComponentHealth(
+                name="cache",
+                status=HealthStatus.UNHEALTHY,
+                message=f"Cache health check failed: {e!s}",
                 response_time=response_time,
                 details={},
                 last_check=datetime.utcnow(),
@@ -440,6 +486,23 @@ class HealthChecker:
                 self.logger.error("Health check failed", error=str(result))
 
         return components
+
+    def get_overall_status(self, components: list[ComponentHealth]) -> HealthStatus:
+        """Determine overall system status from component health."""
+        component_statuses = [comp.status for comp in components]
+
+        if all(status == HealthStatus.HEALTHY for status in component_statuses):
+            return HealthStatus.HEALTHY
+        elif any(status == HealthStatus.UNHEALTHY for status in component_statuses):
+            return HealthStatus.UNHEALTHY
+        elif any(status == HealthStatus.DEGRADED for status in component_statuses):
+            return HealthStatus.DEGRADED
+        else:
+            return HealthStatus.UNKNOWN
+
+    async def check_all_components(self) -> list[ComponentHealth]:
+        """Check all system components and return health status."""
+        return await self._check_all_components()
 
 
 # Global health checker instance

@@ -1,0 +1,92 @@
+# CI环境Dockerfile - 模拟GitHub Actions环境
+FROM python:3.11-slim
+
+# 设置环境变量
+ENV PYTHONPATH=/app/src
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+# 安装系统依赖
+RUN apt-get update && apt-get install -y \
+    curl \
+    git \
+    build-essential \
+    postgresql-client \
+    && rm -rf /var/lib/apt/lists/*
+
+# 安装uv (与CI环境一致)
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+ENV PATH="/root/.local/bin:$PATH"
+
+# 设置工作目录
+WORKDIR /app
+
+# 复制项目文件
+COPY . /app/
+
+# 安装Python依赖 (与CI环境一致)
+RUN uv sync --extra dev
+
+# 创建CI测试脚本
+RUN echo '#!/bin/bash\n\
+    set -euo pipefail\n\
+    \n\
+    echo "🧪 Running CI Quality Gate Tests..."\n\
+    \n\
+    # 代码质量检查\n\
+    echo "🎨 Format Check..."\n\
+    uv run ruff format --check .\n\
+    \n\
+    echo "🔍 Lint Check..."\n\
+    uv run ruff check src/ --output-format=github\n\
+    \n\
+    echo "🔒 Security Check..."\n\
+    uv run bandit -r src/ -c pyproject.toml\n\
+    \n\
+    echo "🧪 Running Tests..."\n\
+    uv run pytest tests/ -v --tb=short --cov=src --cov-report=xml --cov-report=term\n\
+    \n\
+    echo "✅ All CI checks passed!"\n\
+    ' > /app/run_ci_tests.sh
+
+RUN chmod +x /app/run_ci_tests.sh
+
+# 创建快速测试脚本
+RUN echo '#!/bin/bash\n\
+    set -euo pipefail\n\
+    \n\
+    echo "🚀 Quick Test - Module Import & Basic Functionality"\n\
+    \n\
+    # 模块导入测试\n\
+    python -c "\n\
+    import sys\n\
+    sys.path.insert(0, \"src\")\n\
+    \n\
+    print(\"✅ Testing core modules...\")\n\
+    from football_predict_system.core.config import get_settings\n\
+    from football_predict_system.core.database import get_database_manager\n\
+    from football_predict_system.domain.models import Match, Team\n\
+    print(\"✅ Core modules imported successfully\")\n\
+    \n\
+    print(\"✅ Testing data platform modules...\")\n\
+    from football_predict_system.data_platform.sources.base import DataSource\n\
+    from football_predict_system.data_platform.sources.football_data_api import FootballDataAPICollector\n\
+    from football_predict_system.data_platform.storage.database_writer import DatabaseWriter\n\
+    from football_predict_system.data_platform.config import get_data_platform_config\n\
+    print(\"✅ Data platform modules imported successfully\")\n\
+    \n\
+    print(\"✅ Testing cache modules...\")\n\
+    from football_predict_system.core.cache import get_cache_manager\n\
+    print(\"✅ Cache modules imported successfully\")\n\
+    \n\
+    print(\"🎉 All module imports successful!\")\n\
+    "\n\
+    ' > /app/quick_test.sh
+
+RUN chmod +x /app/quick_test.sh
+
+# 暴露端口
+EXPOSE 8000
+
+# 默认命令
+CMD ["/bin/bash"] 

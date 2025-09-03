@@ -276,6 +276,58 @@ class CacheManager:
 
         return decorator
 
+    async def health_check(self) -> dict[str, Any]:
+        """Perform cache health check."""
+        start_time = datetime.now()
+
+        try:
+            # Test Redis connection
+            redis_client = await self.get_redis_client()
+            await redis_client.ping()
+
+            # Test basic operations
+            test_key = "health_check_test"
+            test_value = "ok"
+            await redis_client.set(test_key, test_value, ex=60)
+            result = await redis_client.get(test_key)
+            await redis_client.delete(test_key)
+
+            # Get Redis info
+            info = await redis_client.info()
+
+            response_time = (datetime.now() - start_time).total_seconds()
+
+            health_status = {
+                "status": "healthy" if result.decode() == test_value else "degraded",
+                "redis_connection": True,
+                "response_time": response_time,
+                "redis_version": info.get("redis_version"),
+                "connected_clients": info.get("connected_clients"),
+                "used_memory": info.get("used_memory_human"),
+                "cache_stats": {
+                    "hits": self._stats.hits,
+                    "misses": self._stats.misses,
+                    "hit_rate": self._stats.hit_rate,
+                },
+                "memory_cache_size": len(self._memory_cache),
+            }
+
+            self.logger.debug("Cache health check passed", **health_status)
+            return health_status
+
+        except Exception as e:
+            response_time = (datetime.now() - start_time).total_seconds()
+
+            health_status = {
+                "status": "unhealthy",
+                "error": str(e),
+                "response_time": response_time,
+                "redis_connection": False,
+            }
+
+            self.logger.error("Cache health check failed", **health_status)
+            return health_status
+
     async def close(self) -> None:
         """Close Redis connection."""
         if self._redis_client:

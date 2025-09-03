@@ -71,7 +71,13 @@ class TestHealthChecker:
     async def test_check_database_health_success(self, health_checker):
         """Test successful database health check."""
         mock_db_manager = AsyncMock()
-        mock_db_manager.health_check.return_value = True
+        mock_db_manager.health_check.return_value = {
+            "status": "healthy",
+            "sync_connection": True,
+            "async_connection": True,
+            "response_time": 0.1,
+            "pool_info": {"size": 10, "checked_in": 8, "checked_out": 2},
+        }
 
         with patch(
             "football_predict_system.core.health.get_database_manager",
@@ -87,7 +93,11 @@ class TestHealthChecker:
     async def test_check_database_health_failure(self, health_checker):
         """Test failed database health check."""
         mock_db_manager = AsyncMock()
-        mock_db_manager.health_check.return_value = False
+        mock_db_manager.health_check.return_value = {
+            "status": "unhealthy",
+            "error": "Connection failed",
+            "response_time": 5.0,
+        }
 
         with patch(
             "football_predict_system.core.health.get_database_manager",
@@ -119,9 +129,16 @@ class TestHealthChecker:
     async def test_check_cache_health_success(self, health_checker):
         """Test successful cache health check."""
         mock_cache_manager = AsyncMock()
-        mock_redis_client = AsyncMock()
-        mock_redis_client.ping.return_value = True
-        mock_cache_manager.get_redis_client.return_value = mock_redis_client
+        mock_cache_manager.health_check.return_value = {
+            "status": "healthy",
+            "redis_connection": True,
+            "response_time": 0.05,
+            "redis_version": "6.2.0",
+            "connected_clients": 1,
+            "used_memory": "1.5M",
+            "cache_stats": {"hits": 100, "misses": 10, "hit_rate": 0.91},
+            "memory_cache_size": 50,
+        }
 
         with patch(
             "football_predict_system.core.health.get_cache_manager",
@@ -137,9 +154,12 @@ class TestHealthChecker:
     async def test_check_cache_health_failure(self, health_checker):
         """Test failed cache health check."""
         mock_cache_manager = AsyncMock()
-        mock_redis_client = AsyncMock()
-        mock_redis_client.ping.side_effect = Exception("Redis not available")
-        mock_cache_manager.get_redis_client.return_value = mock_redis_client
+        mock_cache_manager.health_check.return_value = {
+            "status": "unhealthy",
+            "error": "Redis connection failed",
+            "response_time": 5.0,
+            "redis_connection": False,
+        }
 
         with patch(
             "football_predict_system.core.health.get_cache_manager",
@@ -156,39 +176,99 @@ class TestHealthChecker:
         """Test checking all components when all are healthy."""
         # Mock all components as healthy
         with patch.object(health_checker, "check_database_health") as mock_db_check:
-            with patch.object(health_checker, "check_cache_health") as mock_cache_check:
-                mock_db_check.return_value = ComponentHealth(
-                    name="database", status=HealthStatus.HEALTHY, message="OK"
-                )
-                mock_cache_check.return_value = ComponentHealth(
-                    name="cache", status=HealthStatus.HEALTHY, message="OK"
-                )
+            with patch.object(health_checker, "check_redis_health") as mock_redis_check:
+                with patch.object(
+                    health_checker, "check_model_registry"
+                ) as mock_model_check:
+                    with patch.object(
+                        health_checker, "check_external_apis"
+                    ) as mock_api_check:
+                        with patch.object(
+                            health_checker, "check_system_resources"
+                        ) as mock_sys_check:
+                            mock_db_check.return_value = ComponentHealth(
+                                name="database",
+                                status=HealthStatus.HEALTHY,
+                                message="OK",
+                            )
+                            mock_redis_check.return_value = ComponentHealth(
+                                name="redis", status=HealthStatus.HEALTHY, message="OK"
+                            )
+                            mock_model_check.return_value = ComponentHealth(
+                                name="model_registry",
+                                status=HealthStatus.HEALTHY,
+                                message="OK",
+                            )
+                            mock_api_check.return_value = ComponentHealth(
+                                name="external_apis",
+                                status=HealthStatus.HEALTHY,
+                                message="OK",
+                            )
+                            mock_sys_check.return_value = ComponentHealth(
+                                name="system_resources",
+                                status=HealthStatus.HEALTHY,
+                                message="OK",
+                            )
 
-                result = await health_checker.check_all_components()
+                            result = await health_checker.check_all_components()
 
-                assert len(result) == 2
-                assert all(comp.status == HealthStatus.HEALTHY for comp in result)
+                            assert len(result) == 5
+                            assert all(
+                                comp.status == HealthStatus.HEALTHY for comp in result
+                            )
 
     @pytest.mark.asyncio
     async def test_check_all_components_some_unhealthy(self, health_checker):
         """Test checking all components when some are unhealthy."""
         with patch.object(health_checker, "check_database_health") as mock_db_check:
-            with patch.object(health_checker, "check_cache_health") as mock_cache_check:
-                mock_db_check.return_value = ComponentHealth(
-                    name="database", status=HealthStatus.HEALTHY, message="OK"
-                )
-                mock_cache_check.return_value = ComponentHealth(
-                    name="cache", status=HealthStatus.UNHEALTHY, message="Failed"
-                )
+            with patch.object(health_checker, "check_redis_health") as mock_redis_check:
+                with patch.object(
+                    health_checker, "check_model_registry"
+                ) as mock_model_check:
+                    with patch.object(
+                        health_checker, "check_external_apis"
+                    ) as mock_api_check:
+                        with patch.object(
+                            health_checker, "check_system_resources"
+                        ) as mock_sys_check:
+                            mock_db_check.return_value = ComponentHealth(
+                                name="database",
+                                status=HealthStatus.HEALTHY,
+                                message="OK",
+                            )
+                            mock_redis_check.return_value = ComponentHealth(
+                                name="redis",
+                                status=HealthStatus.UNHEALTHY,
+                                message="Failed",
+                            )
+                            mock_model_check.return_value = ComponentHealth(
+                                name="model_registry",
+                                status=HealthStatus.HEALTHY,
+                                message="OK",
+                            )
+                            mock_api_check.return_value = ComponentHealth(
+                                name="external_apis",
+                                status=HealthStatus.HEALTHY,
+                                message="OK",
+                            )
+                            mock_sys_check.return_value = ComponentHealth(
+                                name="system_resources",
+                                status=HealthStatus.HEALTHY,
+                                message="OK",
+                            )
 
-                result = await health_checker.check_all_components()
+                            result = await health_checker.check_all_components()
 
-                assert len(result) == 2
-                db_health = next(comp for comp in result if comp.name == "database")
-                cache_health = next(comp for comp in result if comp.name == "cache")
-
-                assert db_health.status == HealthStatus.HEALTHY
-                assert cache_health.status == HealthStatus.UNHEALTHY
+                            assert len(result) == 5
+                            assert any(
+                                comp.status == HealthStatus.UNHEALTHY for comp in result
+                            )
+                            unhealthy_comp = next(
+                                comp
+                                for comp in result
+                                if comp.status == HealthStatus.UNHEALTHY
+                            )
+                            assert unhealthy_comp.name == "redis"
 
     @pytest.mark.asyncio
     async def test_get_overall_status_all_healthy(self, health_checker):
