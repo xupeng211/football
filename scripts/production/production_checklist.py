@@ -20,7 +20,7 @@ class CheckStatus(Enum):
     PASS = "✅"
     FAIL = "❌"
     WARN = "⚠️"
-    INFO = "ℹ️"
+    INFO = "i"
 
 
 @dataclass

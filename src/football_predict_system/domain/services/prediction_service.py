@@ -82,10 +82,15 @@ class PredictionService:
                 )
 
                 response = PredictionResponse(
-                    match_id=request.match_id,
                     prediction=prediction,
-                    predicted_result=prediction.predicted_result,
-                    confidence=prediction.confidence_score,
+                    match_info={
+                        "match_id": str(request.match_id),
+                        "match_date": datetime.utcnow(),
+                    },
+                    model_info={
+                        "model_version": request.model_version or "default",
+                        "accuracy": prediction.model_accuracy or 0.75,
+                    },
                 )
 
                 return response
@@ -123,10 +128,15 @@ class PredictionService:
             await cache_manager.set(cache_key, cache_data, 3600, "predictions")
 
             response = PredictionResponse(
-                match_id=request.match_id,
                 prediction=prediction,
-                predicted_result=prediction.predicted_result,
-                confidence=prediction.confidence_score,
+                match_info={
+                    "match_id": str(request.match_id),
+                    "match_date": datetime.utcnow(),
+                },
+                model_info={
+                    "model_version": request.model_version or "default",
+                    "accuracy": prediction.model_accuracy or 0.75,
+                },
             )
 
             return response
@@ -175,7 +185,8 @@ class PredictionService:
             PredictionRequest(
                 match_id=match_id,
                 model_version=request.model_version,
-                include_features=request.include_features,
+                include_probabilities=request.include_probabilities,
+                include_expected_scores=request.include_expected_scores,
             )
             for match_id in request.match_ids
         ]
@@ -183,7 +194,7 @@ class PredictionService:
         # Process predictions concurrently with controlled concurrency
         semaphore = asyncio.Semaphore(5)  # Limit concurrent predictions
 
-        async def predict_with_semaphore(req: PredictionRequest):
+        async def predict_with_semaphore(req: PredictionRequest) -> PredictionResponse | None:
             async with semaphore:
                 return await self.generate_prediction_safely(req)
 
@@ -210,19 +221,19 @@ class PredictionService:
 
         return BatchPredictionResponse(
             predictions=successful_predictions,
-            total_requested=len(request.match_ids),
-            successful_count=len(successful_predictions),
-            failed_count=failed_count,
+            total_count=len(request.match_ids),
+            successful_predictions=len(successful_predictions),
+            failed_predictions=failed_count,
         )
 
-    async def _generate_prediction_internal(self, match, model) -> Prediction:
+    async def _generate_prediction_internal(self, match: Any, model: Any) -> Prediction:
         """Internal prediction generation logic."""
         # Placeholder implementation - replace with actual ML logic
         import uuid
         from random import uniform
 
         return Prediction(
-            id=str(uuid.uuid4()),
+            id=uuid.uuid4(),
             match_id=match.id,
             model_version=model.version,
             predicted_result=MatchResult.HOME_WIN,
@@ -231,6 +242,8 @@ class PredictionService:
             away_win_probability=uniform(0.1, 0.5),  # nosec B311
             confidence_level=PredictionConfidence.MEDIUM,
             confidence_score=uniform(0.6, 0.9),  # nosec B311
+            expected_home_score=uniform(0.5, 3.5),  # nosec B311
+            expected_away_score=uniform(0.5, 3.5),  # nosec B311
             features_used=["team_form", "head_to_head", "home_advantage"],
             model_accuracy=model.accuracy if hasattr(model, "accuracy") else 0.75,
             created_at=datetime.utcnow(),

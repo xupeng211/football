@@ -8,6 +8,7 @@ This service handles:
 - Model lifecycle management
 """
 
+from datetime import datetime
 from typing import Any
 from uuid import UUID
 
@@ -77,7 +78,13 @@ class ModelService:
                 algorithm="XGBoost",
                 description="XGBoost model trained on historical match data",
                 accuracy=0.75,
-                created_at="2024-01-01T00:00:00Z",
+                precision=0.73,
+                recall=0.77,
+                f1_score=0.75,
+                roc_auc=0.78,
+                log_loss=0.45,
+                training_data_size=10000,
+                created_at=datetime(2024, 1, 1),
                 is_active=True,
             ),
             Model(
@@ -87,7 +94,13 @@ class ModelService:
                 algorithm="Neural Network",
                 description="Deep learning model with advanced features",
                 accuracy=0.82,
-                created_at="2024-02-01T00:00:00Z",
+                precision=0.80,
+                recall=0.84,
+                f1_score=0.82,
+                roc_auc=0.85,
+                log_loss=0.38,
+                training_data_size=15000,
+                created_at=datetime(2024, 2, 1),
                 is_active=True,
             ),
         ]

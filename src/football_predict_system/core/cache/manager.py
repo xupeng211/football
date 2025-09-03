@@ -233,9 +233,7 @@ class CacheManager:
             )
             return 0
 
-    def get_stats(self) -> CacheStats:
-        """Get cache performance statistics."""
-        return self._stats
+# Removed duplicate get_stats method - kept the one at line 347
 
     def cache(
         self,

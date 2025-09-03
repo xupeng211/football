@@ -311,7 +311,7 @@ class DatabaseManager:
         """Create async session factory (public method for tests)."""
         return self.get_async_session_factory()
 
-    async def execute_query(self, query: str, params: tuple = None) -> Any:
+    async def execute_query(self, query: str, params: tuple | None = None) -> Any:
         """Execute a database query."""
         async with self.get_async_session() as session:
             if params:

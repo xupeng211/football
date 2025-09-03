@@ -12,7 +12,12 @@ from uuid import UUID
 from fastapi import APIRouter, HTTPException, Query, status
 from pydantic import BaseModel, Field
 
-from ...core.exceptions import BaseApplicationError, InsufficientDataError, ModelNotFoundError, PredictionError
+from ...core.exceptions import (
+    BaseApplicationError,
+    InsufficientDataError,
+    ModelNotFoundError,
+    PredictionError,
+)
 from ...core.logging import get_logger
 from ...core.security import Permission, User, require_permission
 from ...domain.models import BatchPredictionRequest, MatchResult, PredictionRequest
@@ -98,14 +103,14 @@ async def get_current_user() -> User:
     """Get current authenticated user."""
     # This would be implemented with proper authentication
     # For now, return a mock user
-    from ...core.security import UserRole
+    from uuid import UUID
 
+    from ...core.security import UserRole
     return User(
-        id="mock-user-id",
+        id=UUID("12345678-1234-5678-9abc-123456789def"),
         username="api_user",
         email="user@example.com",
         role=UserRole.USER,
-        created_at=datetime.utcnow(),
     )
 
 
