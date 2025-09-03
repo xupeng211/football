@@ -1,78 +1,48 @@
-# Football Data Platform Monitoring Rules
+# Football Data Platform Prometheus Configuration
 
-groups:
-  - name: football_data_platform
-    rules:
-      # 数据新鲜度监控
-      - alert: DataPlatformStale
-        expr: time() - football_last_update_timestamp > 21600  # 6小时
-        for: 5m
-        labels:
-          severity: warning
-          component: data_platform
-        annotations:
-          summary: "足球数据超过6小时未更新"
-          description: "数据平台已{{ $value | humanizeDuration }}未更新数据"
-          runbook_url: "https://github.com/your-repo/wiki/DataPlatform-Troubleshooting"
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
 
-      # API调用失败率
-      - alert: DataCollectionFailureRate
-        expr: (
-          rate(football_api_requests_failed_total[5m]) / 
-          rate(football_api_requests_total[5m])
-        ) > 0.1
-        for: 2m
-        labels:
-          severity: critical
-          component: data_collection
-        annotations:
-          summary: "数据采集失败率过高"
-          description: "API调用失败率 {{ $value | humanizePercentage }} 超过10%阈值"
+rule_files:
+  - "alert_rules.yml"
 
-      # 数据质量下降
-      - alert: DataQualityDegraded
-        expr: football_data_quality_score < 80
-        for: 10m
-        labels:
-          severity: warning
-          component: data_quality
-        annotations:
-          summary: "数据质量评分下降"
-          description: "当前数据质量评分 {{ $value }}，低于80分阈值"
+scrape_configs:
+  # Football Predict System API
+  - job_name: "football-predict-api"
+    static_configs:
+      - targets: ["localhost:8000"]
+    metrics_path: "/metrics"
+    scrape_interval: 30s
+    scrape_timeout: 10s
 
-      # 数据库连接问题
-      - alert: DatabaseConnectionFailure
-        expr: football_database_connection_failures_total > 0
-        for: 1m
-        labels:
-          severity: critical
-          component: database
-        annotations:
-          summary: "数据库连接失败"
-          description: "数据库连接出现 {{ $value }} 次失败"
+  # Data Platform Metrics
+  - job_name: "data-platform-metrics"
+    static_configs:
+      - targets: ["localhost:8090"]
+    metrics_path: "/metrics"
+    scrape_interval: 60s
 
-      # 磁盘空间监控
-      - alert: DataStorageSpaceHigh
-        expr: (
-          (node_filesystem_size_bytes{mountpoint="/var/lib/postgresql"} - 
-           node_filesystem_avail_bytes{mountpoint="/var/lib/postgresql"}) /
-          node_filesystem_size_bytes{mountpoint="/var/lib/postgresql"}
-        ) > 0.85
-        for: 5m
-        labels:
-          severity: warning
-          component: storage
-        annotations:
-          summary: "数据存储空间不足"
-          description: "数据库存储使用率 {{ $value | humanizePercentage }} 超过85%"
+  # PostgreSQL Database Metrics
+  - job_name: "postgres-exporter"
+    static_configs:
+      - targets: ["localhost:9187"]
+    scrape_interval: 30s
 
-      # Prefect任务监控
-      - alert: PrefectFlowFailures
-        expr: increase(prefect_flow_run_failed_total[1h]) > 2
-        for: 0m
-        labels:
-          severity: warning
-          component: scheduler
-        annotations:
-          summary: "Prefect任务失败频繁"
-          description: "过去1小时内有 {{ $value }} 个任务失败" 
+  # Redis Cache Metrics
+  - job_name: "redis-exporter"
+    static_configs:
+      - targets: ["localhost:9121"]
+    scrape_interval: 30s
+
+  # Node Exporter for System Metrics
+  - job_name: "node-exporter"
+    static_configs:
+      - targets: ["localhost:9100"]
+    scrape_interval: 30s
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - alertmanager:9093

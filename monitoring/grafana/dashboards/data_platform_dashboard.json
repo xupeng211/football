@@ -1,7 +1,8 @@
 {
     "dashboard": {
         "id": null,
-        "title": "⚽ Football Data Platform Dashboard",
+        "title": "Football Data Platform Dashboard",
+        "description": "Monitoring dashboard for football data platform",
         "tags": [
             "football",
             "data-platform",
@@ -11,165 +12,51 @@
         "panels": [
             {
                 "id": 1,
-                "title": "📊 数据采集概览",
-                "type": "stat",
+                "title": "API Request Rate",
+                "type": "graph",
                 "targets": [
                     {
-                        "expr": "football_matches_collected_total",
-                        "legendFormat": "总比赛数",
+                        "expr": "rate(http_requests_total[5m])",
                         "refId": "A"
-                    },
-                    {
-                        "expr": "football_teams_collected_total",
-                        "legendFormat": "总球队数",
-                        "refId": "B"
-                    },
-                    {
-                        "expr": "rate(football_api_requests_total[5m]) * 60",
-                        "legendFormat": "API调用/分钟",
-                        "refId": "C"
                     }
-                ],
-                "fieldConfig": {
-                    "defaults": {
-                        "color": {
-                            "mode": "palette-classic"
-                        },
-                        "unit": "short"
-                    }
-                },
-                "gridPos": {
-                    "h": 8,
-                    "w": 12,
-                    "x": 0,
-                    "y": 0
-                }
+                ]
             },
             {
                 "id": 2,
-                "title": "📈 数据质量趋势",
-                "type": "timeseries",
-                "targets": [
-                    {
-                        "expr": "football_data_quality_score",
-                        "legendFormat": "质量评分",
-                        "refId": "A"
-                    },
-                    {
-                        "expr": "football_api_success_rate * 100",
-                        "legendFormat": "API成功率 (%)",
-                        "refId": "B"
-                    }
-                ],
-                "fieldConfig": {
-                    "defaults": {
-                        "min": 0,
-                        "max": 100,
-                        "unit": "percent"
-                    }
-                },
-                "gridPos": {
-                    "h": 8,
-                    "w": 12,
-                    "x": 12,
-                    "y": 0
-                }
-            },
-            {
-                "id": 3,
-                "title": "🔄 任务执行状态",
-                "type": "table",
-                "targets": [
-                    {
-                        "expr": "prefect_flow_run_duration_seconds",
-                        "legendFormat": "执行时长",
-                        "refId": "A"
-                    }
-                ],
-                "gridPos": {
-                    "h": 8,
-                    "w": 24,
-                    "x": 0,
-                    "y": 8
-                }
-            },
-            {
-                "id": 4,
-                "title": "⚡ 性能指标",
-                "type": "timeseries",
-                "targets": [
-                    {
-                        "expr": "football_api_response_time_seconds",
-                        "legendFormat": "API响应时间",
-                        "refId": "A"
-                    },
-                    {
-                        "expr": "football_database_query_duration_seconds",
-                        "legendFormat": "数据库查询时间",
-                        "refId": "B"
-                    }
-                ],
-                "fieldConfig": {
-                    "defaults": {
-                        "unit": "s"
-                    }
-                },
-                "gridPos": {
-                    "h": 8,
-                    "w": 12,
-                    "x": 0,
-                    "y": 16
-                }
-            },
-            {
-                "id": 5,
-                "title": "🚨 错误统计",
+                "title": "Data Collection Status",
                 "type": "stat",
                 "targets": [
                     {
-                        "expr": "rate(football_api_errors_total[1h])",
-                        "legendFormat": "API错误率/小时",
+                        "expr": "data_collection_success_total",
                         "refId": "A"
-                    },
+                    }
+                ]
+            },
+            {
+                "id": 3,
+                "title": "Database Connection Pool",
+                "type": "graph",
+                "targets": [
                     {
-                        "expr": "rate(football_database_errors_total[1h])",
-                        "legendFormat": "数据库错误率/小时",
-                        "refId": "B"
+                        "expr": "pg_stat_database_numbackends",
+                        "refId": "A"
                     }
-                ],
-                "fieldConfig": {
-                    "defaults": {
-                        "color": {
-                            "mode": "thresholds"
-                        },
-                        "thresholds": {
-                            "steps": [
-                                {
-                                    "color": "green",
-                                    "value": 0
-                                },
-                                {
-                                    "color": "yellow",
-                                    "value": 1
-                                },
-                                {
-                                    "color": "red",
-                                    "value": 5
-                                }
-                            ]
-                        }
+                ]
+            },
+            {
+                "id": 4,
+                "title": "Cache Hit Rate",
+                "type": "graph",
+                "targets": [
+                    {
+                        "expr": "redis_keyspace_hits_total / (redis_keyspace_hits_total + redis_keyspace_misses_total)",
+                        "refId": "A"
                     }
-                },
-                "gridPos": {
-                    "h": 8,
-                    "w": 12,
-                    "x": 12,
-                    "y": 16
-                }
+                ]
             }
         ],
         "time": {
-            "from": "now-6h",
+            "from": "now-1h",
             "to": "now"
         },
         "refresh": "30s"
