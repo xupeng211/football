@@ -13,15 +13,17 @@ concurrency:
 
 env:
   PYTHON_VERSION: "3.11"
-  # 测试环境配置
-  DATABASE_URL: "postgresql://test_user:test_pass@localhost:5432/test_football_db"
+  # 测试环境配置 - 优先使用SQLite以确保CI稳定性
+  DATABASE_URL: "sqlite:///./test_football.db"
+  # PostgreSQL backup (如果需要可以切换)
+  # DATABASE_URL: "postgresql://test_user:test_pass@localhost:5432/test_football_db"
   REDIS_URL: "redis://localhost:6379/1"
   FOOTBALL_DATA_API_KEY: "test_api_key"
   ENVIRONMENT: "testing"
   CI: "true"
   # 确保CI环境标识
   POSTGRES_HOST: "localhost"
-  POSTGRES_PORT: "5432"
+  POSTGRES_PORT: "5432" 
   POSTGRES_USER: "test_user"
   POSTGRES_PASSWORD: "test_pass"
   POSTGRES_DB: "test_football_db"
