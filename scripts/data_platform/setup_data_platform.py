@@ -74,7 +74,10 @@ class DataPlatformSetup:
 
     async def _fallback_to_sqlite(self) -> None:
         """Fallback to SQLite database."""
+        logger.warning("PostgreSQL连接失败,将使用SQLite fallback")
         os.environ["DATABASE_URL"] = "sqlite:///./football_dev.db"
+
+        # 重新获取设置和数据库管理器以使用新的环境变量
         self.settings = get_settings()
         self.db_manager = get_database_manager()
 

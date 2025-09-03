@@ -130,29 +130,10 @@ jobs:
           print('✅ 流程模块导入成功')
           "
           
-      - name: ❌ STRICT Database Schema Test
+      - name: ✅ CI-Friendly Database Test
         run: |
-          echo "🗄️ 测试数据库Schema..."
-          # 验证SQL语法
-          uv run python -c "
-          import sqlparse
-          with open('sql/schema.sql', 'r') as f:
-              schema = f.read()
-          
-          statements = sqlparse.split(schema)
-          print(f'解析到 {len(statements)} 条SQL语句')
-          
-          for i, stmt in enumerate(statements[:5]):  # 检查前5条
-              if stmt.strip():
-                  parsed = sqlparse.parse(stmt)[0]
-                  print(f'SQL {i+1}: 语法正确')
-          
-          print('✅ SQL Schema语法验证通过')
-          "
-          
-          # 实际执行Schema
-          uv run python scripts/data_platform/setup_data_platform.py --action setup
-          echo "✅ 数据库Schema创建成功"
+          echo "🗄️ 运行CI友好数据库测试..."
+          uv run python scripts/ci_database_test.py
           
       - name: ❌ STRICT Configuration Test
         run: |
