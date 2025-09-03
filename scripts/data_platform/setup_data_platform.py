@@ -197,7 +197,9 @@ CREATE TABLE IF NOT EXISTS data_collection_logs (
 
         logger.info("SQLite schema created successfully")
 
-    async def _wait_for_database_ready(self, max_attempts: int = 30, delay: float = 1.0) -> None:
+    async def _wait_for_database_ready(
+        self, max_attempts: int = 30, delay: float = 1.0
+    ) -> None:
         """Wait for database to be ready in CI environment."""
         for attempt in range(max_attempts):
             try:
@@ -207,10 +209,14 @@ CREATE TABLE IF NOT EXISTS data_collection_logs (
                     return
             except Exception as e:
                 if attempt < max_attempts - 1:
-                    logger.info(f"Database not ready (attempt {attempt + 1}/{max_attempts}): {e}")
+                    logger.info(
+                        f"Database not ready (attempt {attempt + 1}/{max_attempts}): {e}"
+                    )
                     await asyncio.sleep(delay)
                 else:
-                    logger.error(f"Database failed to become ready after {max_attempts} attempts")
+                    logger.error(
+                        f"Database failed to become ready after {max_attempts} attempts"
+                    )
                     raise
 
     async def verify_api_access(self) -> bool:
