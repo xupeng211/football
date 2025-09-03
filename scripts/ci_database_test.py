@@ -85,7 +85,9 @@ def test_configuration() -> bool:
     print("⚙️ 测试配置系统...")
 
     try:
-        from football_predict_system.data_platform.config import get_data_platform_config
+        from football_predict_system.data_platform.config import (
+            get_data_platform_config,
+        )
 
         config = get_data_platform_config()
 

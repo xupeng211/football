@@ -1,37 +1,58 @@
 {
-  "last_scan": 1756741724.5065565,
+  "last_scan": 1756924504.8904133,
   "checks": [
+    {
+      "file": "scripts/ci_database_test.py",
+      "exit_code": 0,
+      "output": "🤖 AI文件操作检查\n========================================\n📁 相似文件:\n  • ./tests/fixtures/database_fixtures.py (0.77)\n  • ./src/football_predict_system/data_platform/storage/database_writer.py (0.76)\n  • ./src/football_predict_system/core/database.py (0.73)\n📍 推荐路径:\n  1. src/ci_database_test.py\n========================================\n",
+      "error": "",
+      "timestamp": 1756924504.7654436
+    },
     {
       "file": "data/feedback/ai_environment_status.json",
       "exit_code": 0,
       "output": "🤖 AI文件操作检查\n========================================\n📍 推荐路径:\n  1. src/ai_environment_status.json\n========================================\n",
       "error": "",
-      "timestamp": 1756741724.4466572
+      "timestamp": 1756924504.786314
     },
     {
-      "file": "scripts/ai_file_guard.py",
+      "file": "scripts/data_platform/setup_data_platform.py",
       "exit_code": 0,
-      "output": "🤖 AI文件操作检查\n========================================\n📁 相似文件:\n  • ./scripts/ai_file_monitor.py (0.71)\n  • ./tests/evaluation/test_data_leakage_guard.py (0.62)\n📍 推荐路径:\n  1. src/ai_file_guard.py\n========================================\n",
+      "output": "🤖 AI文件操作检查\n========================================\n📁 相似文件:\n  • ./tests/unit/core/test_database_core.py (0.60)\n📍 推荐路径:\n  1. src/setup_data_platform.py\n========================================\n",
       "error": "",
-      "timestamp": 1756741724.4673948
+      "timestamp": 1756924504.8065584
     },
     {
-      "file": "data/feedback/ai_file_status.json",
+      "file": "tests/unit/core/test_database.py",
       "exit_code": 0,
-      "output": "🤖 AI文件操作检查\n========================================\n📍 推荐路径:\n  1. src/ai_file_status.json\n========================================\n",
+      "output": "🤖 AI文件操作检查\n========================================\n⚠️  注意:\n  • 发现相似文件: ./tests/unit/core/test_database_core.py (0.86)\n  • 发现相似文件: ./tests/integration/database/test_async_database.py (0.84)\n💡 建议:\n  • 考虑修改 ./tests/unit/core/test_database_core.py 而不是创建新文件\n  • 考虑修改 ./tests/integration/database/test_async_database.py 而不是创建新文件\n📁 相似文件:\n  • ./tests/unit/core/test_database_core.py (0.86)\n  • ./tests/integration/database/test_async_database.py (0.84)\n  • ./src/football_predict_system/core/database.py (0.81)\n📍 推荐路径:\n  1. tests/unit/test_database.py\n  2. tests/integration/test_database.py\n========================================\n",
       "error": "",
-      "timestamp": 1756741724.4871745
+      "timestamp": 1756924504.8286169
     },
     {
-      "file": "scripts/ai_file_monitor.py",
+      "file": "src/football_predict_system/core/database.py",
       "exit_code": 0,
-      "output": "🤖 AI文件操作检查\n========================================\n📁 相似文件:\n  • ./scripts/ai_file_guard.py (0.71)\n📍 推荐路径:\n  1. src/ai_file_monitor.py\n========================================\n",
+      "output": "🤖 AI文件操作检查\n========================================\n⚠️  注意:\n  • 发现相似文件: ./tests/unit/core/test_database.py (0.81)\n💡 建议:\n  • 考虑修改 ./tests/unit/core/test_database.py 而不是创建新文件\n📁 相似文件:\n  • ./tests/unit/core/test_database.py (0.81)\n  • ./src/football_predict_system/data_platform/sources/base.py (0.78)\n  • ./src/football_predict_system/data_platform/storage/database_writer.py (0.76)\n📍 推荐路径:\n  1. src/database.py\n========================================\n",
       "error": "",
-      "timestamp": 1756741724.5065088
+      "timestamp": 1756924504.849951
+    },
+    {
+      "file": "tests/unit/core/test_cache_comprehensive.py",
+      "exit_code": 0,
+      "output": "🤖 AI文件操作检查\n========================================\n📁 相似文件:\n  • ./tests/unit/core/test_cache_core.py (0.80)\n  • ./tests/unit/core/test_logging_comprehensive.py (0.79)\n  • ./tests/unit/api/v1/test_predictions_comprehensive.py (0.77)\n📍 推荐路径:\n  1. tests/unit/test_cache_comprehensive.py\n  2. tests/integration/test_cache_comprehensive.py\n========================================\n",
+      "error": "",
+      "timestamp": 1756924504.8711746
+    },
+    {
+      "file": "src/football_predict_system/core/config.py",
+      "exit_code": 0,
+      "output": "🤖 AI文件操作检查\n========================================\n📁 相似文件:\n  • ./tests/unit/core/test_config.py (0.78)\n  • ./tests/conftest.py (0.70)\n  • ./tests/integration/conftest.py (0.70)\n📍 推荐路径:\n  1. src/config.py\n========================================\n",
+      "error": "",
+      "timestamp": 1756924504.8902326
     }
   ],
   "summary": {
-    "total_files": 4,
+    "total_files": 7,
     "warnings": 0,
     "errors": 0
   }
