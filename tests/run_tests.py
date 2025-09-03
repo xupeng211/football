@@ -15,7 +15,7 @@ def run_command(cmd: list[str], description: str) -> int:
     print(f"命令: {' '.join(cmd)}")
     print("-" * 60)
 
-    result = subprocess.run(cmd, capture_output=False)
+    result = subprocess.run(cmd, check=False, capture_output=False)
 
     if result.returncode == 0:
         print(f"✅ {description} 成功")
@@ -63,10 +63,9 @@ def main():
         if scenario_name in scenarios_map:
             scenario = scenarios_map[scenario_name]
             return run_command(scenario["cmd"], scenario["desc"])
-        else:
-            print(f"❌ 未知的测试场景: {scenario_name}")
-            print("可用场景:", ", ".join(scenarios_map.keys()))
-            return 1
+        print(f"❌ 未知的测试场景: {scenario_name}")
+        print("可用场景:", ", ".join(scenarios_map.keys()))
+        return 1
 
     # 运行所有场景
     failed_count = 0

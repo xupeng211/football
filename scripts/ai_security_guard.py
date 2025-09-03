@@ -277,25 +277,21 @@ class AISecurityGuard:
         """确定严重性级别"""
         if any(x in pattern for x in ["password", "secret", "api_key"]):
             return "HIGH"
-        elif "debug.*True" in pattern:
+        if "debug.*True" in pattern or "0\\.0\\.0\\.0" in pattern:
             return "MEDIUM"
-        elif "0\\.0\\.0\\.0" in pattern:
-            return "MEDIUM"
-        else:
-            return "LOW"
+        return "LOW"
 
     def _determine_category(self, pattern: str) -> str:
         """确定问题类别"""
         if any(x in pattern for x in ["password", "secret", "api_key", "token"]):
             return "HARDCODED_SECRET"
-        elif "debug" in pattern:
+        if "debug" in pattern:
             return "INFO_DISCLOSURE"
-        elif "host" in pattern:
+        if "host" in pattern:
             return "NETWORK_CONFIG"
-        elif "cors" in pattern:
+        if "cors" in pattern:
             return "ACCESS_CONTROL"
-        else:
-            return "MISC"
+        return "MISC"
 
     def _get_pattern_suggestion(self, pattern: str) -> str:
         """获取模式建议"""
@@ -303,36 +299,33 @@ class AISecurityGuard:
 
         if "password" in pattern or "secret" in pattern:
             return templates.get("hardcoded_secret", "使用环境变量")
-        elif "debug" in pattern:
+        if "debug" in pattern:
             return templates.get("debug_in_prod", "生产环境应关闭debug")
-        elif "0\\.0\\.0\\.0" in pattern:
+        if "0\\.0\\.0\\.0" in pattern:
             return templates.get("insecure_binding", "使用具体IP地址")
-        elif "cors" in pattern:
+        if "cors" in pattern:
             return templates.get("cors_wildcard", "指定具体域名")
-        else:
-            return "查看安全最佳实践"
+        return "查看安全最佳实践"
 
     def _generate_auto_fix(self, pattern: str, line: str) -> str:
         """生成自动修复建议"""
         if "pickle" in pattern:
             return "# 替换为: import json  # 或 import joblib (for ML models)"
-        elif "exec" in pattern:
+        if "exec" in pattern:
             return "# 替换为: ast.literal_eval() 或其他安全方法"
-        else:
-            return "# 查看安全最佳实践文档"
+        return "# 查看安全最佳实践文档"
 
     def _generate_pattern_fix(self, pattern: str, line: str) -> str:
         """生成模式修复建议"""
         if "password.*=" in pattern:
             return "password = os.environ.get('DB_PASSWORD')"
-        elif "secret.*=" in pattern:
+        if "secret.*=" in pattern:
             return "secret_key = os.environ.get('SECRET_KEY')"
-        elif "debug.*=.*True" in pattern:
+        if "debug.*=.*True" in pattern:
             return "debug = False  # 或使用环境变量控制"
-        elif "0\\.0\\.0\\.0" in pattern:
+        if "0\\.0\\.0\\.0" in pattern:
             return "host = '127.0.0.1'  # 或具体的内网IP"
-        else:
-            return "# 参考安全配置最佳实践"
+        return "# 参考安全配置最佳实践"
 
     def _generate_secret_fix(self, forbidden: str, line: str) -> str:
         """生成密钥修复建议"""
@@ -371,8 +364,7 @@ class AISecurityGuard:
         """生成安全报告"""
         if format == "json":
             return self._generate_json_report()
-        else:
-            return self._generate_text_report()
+        return self._generate_text_report()
 
     def _generate_text_report(self) -> str:
         """生成文本报告"""

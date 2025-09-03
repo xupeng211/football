@@ -280,8 +280,7 @@ class DatabaseManager:
                 "checked_out": pool.checkedout(),
                 "overflow": pool.overflow(),
             }
-        else:
-            return {"type": "NullPool", "pooling": "disabled"}
+        return {"type": "NullPool", "pooling": "disabled"}
 
     async def close(self) -> None:
         """Close all database connections."""

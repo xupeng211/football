@@ -12,14 +12,14 @@ import asyncio
 from datetime import datetime
 from typing import Any
 
-from ...core.cache import get_cache_manager
-from ...core.exceptions import (
+from football_predict_system.core.cache import get_cache_manager
+from football_predict_system.core.exceptions import (
     InsufficientDataError,
     ModelNotFoundError,
     PredictionError,
 )
-from ...core.logging import get_logger, log_performance
-from ..models import (
+from football_predict_system.core.logging import get_logger, log_performance
+from football_predict_system.domain.models import (
     BatchPredictionRequest,
     BatchPredictionResponse,
     MatchResult,
@@ -82,7 +82,7 @@ class PredictionService:
                     else prediction_data["created_at"],
                 )
 
-                response = PredictionResponse(
+                return PredictionResponse(
                     prediction=prediction,
                     match_info={
                         "match_id": str(request.match_id),
@@ -93,8 +93,6 @@ class PredictionService:
                         "accuracy": prediction.model_accuracy or 0.75,
                     },
                 )
-
-                return response
 
             except (KeyError, ValueError, TypeError) as e:
                 self.logger.warning(
@@ -128,7 +126,7 @@ class PredictionService:
             }
             await cache_manager.set(cache_key, cache_data, 3600, "predictions")
 
-            response = PredictionResponse(
+            return PredictionResponse(
                 prediction=prediction,
                 match_info={
                     "match_id": str(request.match_id),
@@ -139,8 +137,6 @@ class PredictionService:
                     "accuracy": prediction.model_accuracy or 0.75,
                 },
             )
-
-            return response
 
         except (InsufficientDataError, ModelNotFoundError, PredictionError) as e:
             self.logger.error(

@@ -124,6 +124,6 @@ def test_environment():
 def cleanup_environment():
     """自动清理测试环境"""
     # 测试前设置
-    yield
+    return
     # 测试后清理
     # 这里可以添加清理逻辑

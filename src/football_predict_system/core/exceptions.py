@@ -353,28 +353,27 @@ def handle_database_exception(exc: Exception) -> DatabaseError:
         return DatabaseConnectionError(
             "Database connection lost", details={"original_error": str(exc)}
         )
-    elif isinstance(exc, sa_exc.TimeoutError):
+    if isinstance(exc, sa_exc.TimeoutError):
         return DatabaseError(
             "Database query timeout",
             ErrorCode.DATABASE_TIMEOUT_ERROR,
             details={"original_error": str(exc)},
         )
-    elif isinstance(exc, sa_exc.IntegrityError):
+    if isinstance(exc, sa_exc.IntegrityError):
         return DatabaseError(
             "Database integrity constraint violation",
             ErrorCode.DATABASE_INTEGRITY_ERROR,
             details={"original_error": str(exc)},
         )
-    elif isinstance(exc, sa_exc.SQLAlchemyError):
+    if isinstance(exc, sa_exc.SQLAlchemyError):
         return DatabaseQueryError(
             "Database query failed", details={"original_error": str(exc)}
         )
-    else:
-        return DatabaseError(
-            "Unknown database error",
-            ErrorCode.DATABASE_CONNECTION_ERROR,
-            details={"original_error": str(exc)},
-        )
+    return DatabaseError(
+        "Unknown database error",
+        ErrorCode.DATABASE_CONNECTION_ERROR,
+        details={"original_error": str(exc)},
+    )
 
 
 def handle_external_api_exception(
@@ -389,13 +388,13 @@ def handle_external_api_exception(
             api_name=api_name,
             details={"original_error": str(exc)},
         )
-    elif isinstance(exc, req_exc.Timeout):
+    if isinstance(exc, req_exc.Timeout):
         return ExternalAPIError(
             "External API request timeout",
             api_name=api_name,
             details={"original_error": str(exc)},
         )
-    elif isinstance(exc, req_exc.HTTPError):
+    if isinstance(exc, req_exc.HTTPError):
         status_code = (
             getattr(exc.response, "status_code", None)
             if hasattr(exc, "response")
@@ -407,9 +406,8 @@ def handle_external_api_exception(
             status_code=status_code,
             details={"original_error": str(exc)},
         )
-    else:
-        return ExternalAPIError(
-            "Unknown external API error",
-            api_name=api_name,
-            details={"original_error": str(exc)},
-        )
+    return ExternalAPIError(
+        "Unknown external API error",
+        api_name=api_name,
+        details={"original_error": str(exc)},
+    )

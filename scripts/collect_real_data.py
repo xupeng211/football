@@ -118,10 +118,9 @@ class RealDataCollector:
                     teams = data.get("teams", [])
                     print(f"  📊 {league_name}: 获取到 {len(teams)} 支球队")
                     return teams
-                else:
-                    await response.text()
-                    print(f"  ❌ {league_name}: 球队获取失败 ({response.status})")
-                    return []
+                await response.text()
+                print(f"  ❌ {league_name}: 球队获取失败 ({response.status})")
+                return []
 
         except Exception as e:
             print(f"  ❌ {league_name}: 网络错误 - {e}")
@@ -156,12 +155,11 @@ class RealDataCollector:
                     matches = data.get("matches", [])
                     print(f"  📈 {league_name}: 获取到 {len(matches)} 场比赛")
                     return matches
-                else:
-                    error_text = await response.text()
-                    print(f"  ❌ {league_name}: 比赛获取失败 ({response.status})")
-                    if "subscription" in error_text.lower():
-                        print(f"  💡 {league_name}: 可能需要付费版本访问")
-                    return []
+                error_text = await response.text()
+                print(f"  ❌ {league_name}: 比赛获取失败 ({response.status})")
+                if "subscription" in error_text.lower():
+                    print(f"  💡 {league_name}: 可能需要付费版本访问")
+                return []
 
         except Exception as e:
             print(f"  ❌ {league_name}: 网络错误 - {e}")

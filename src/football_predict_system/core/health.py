@@ -493,12 +493,11 @@ class HealthChecker:
 
         if all(status == HealthStatus.HEALTHY for status in component_statuses):
             return HealthStatus.HEALTHY
-        elif any(status == HealthStatus.UNHEALTHY for status in component_statuses):
+        if any(status == HealthStatus.UNHEALTHY for status in component_statuses):
             return HealthStatus.UNHEALTHY
-        elif any(status == HealthStatus.DEGRADED for status in component_statuses):
+        if any(status == HealthStatus.DEGRADED for status in component_statuses):
             return HealthStatus.DEGRADED
-        else:
-            return HealthStatus.UNKNOWN
+        return HealthStatus.UNKNOWN
 
     async def check_all_components(self) -> list[ComponentHealth]:
         """Check all system components and return health status."""

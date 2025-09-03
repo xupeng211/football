@@ -37,7 +37,7 @@ async def async_db_session() -> AsyncGenerator[AsyncSession, None]:
 def clean_database():
     """清理数据库"""
     # 在测试前后清理数据库
-    yield
+    return
     # 这里可以添加实际的数据库清理逻辑
 
 

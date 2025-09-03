@@ -239,16 +239,15 @@ class ProductionChecker:
                 f"   Please fix {fail_count} critical issue(s) before deploying to production."
             )
             return False
-        elif warn_count > 0:
+        if warn_count > 0:
             print("\n⚠️  Production readiness check PASSED with warnings")
             print(
                 f"   Consider addressing {warn_count} warning(s) for optimal production setup."
             )
             return True
-        else:
-            print("\n🎉 Production readiness check PASSED")
-            print("   System is ready for production deployment!")
-            return True
+        print("\n🎉 Production readiness check PASSED")
+        print("   System is ready for production deployment!")
+        return True
 
     def save_report(self, filename: str = "production_readiness_report.json") -> None:
         """Save results to JSON file."""

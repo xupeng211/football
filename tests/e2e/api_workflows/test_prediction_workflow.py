@@ -103,11 +103,13 @@ class TestPredictionWorkflowE2E:
             # 导入并创建异步客户端
             from src.football_predict_system.main import app
 
-            async with asgi_lifespan.LifespanManager(app):
-                async with AsyncClient(
+            async with (
+                asgi_lifespan.LifespanManager(app),
+                AsyncClient(
                     transport=httpx.ASGITransport(app=app), base_url="http://test"
-                ) as client:
-                    yield client
+                ) as client,
+            ):
+                yield client
 
     async def test_complete_prediction_workflow(self, e2e_client: AsyncClient):
         """测试完整的预测工作流"""
@@ -236,11 +238,13 @@ class TestSystemIntegrationE2E:
 
             from src.football_predict_system.main import app
 
-            async with asgi_lifespan.LifespanManager(app):
-                async with AsyncClient(
+            async with (
+                asgi_lifespan.LifespanManager(app),
+                AsyncClient(
                     transport=httpx.ASGITransport(app=app), base_url="http://test"
-                ) as client:
-                    yield client
+                ) as client,
+            ):
+                yield client
 
     async def test_application_startup_shutdown(self, integration_client):
         """测试应用启动和关闭流程"""

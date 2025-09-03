@@ -197,6 +197,7 @@ class PerformanceTestRunner:
             start_time = time.time()
             result = subprocess.run(
                 cmd,
+                check=False,
                 cwd=self.project_root,
                 capture_output=True,
                 text=True,

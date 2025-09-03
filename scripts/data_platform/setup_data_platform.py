@@ -109,20 +109,19 @@ class DataPlatformSetup:
                 if statement:
                     if is_postgres:
                         await session.execute(text(statement))
-                    else:
-                        # SQLite: Skip PostgreSQL-specific statements
-                        if not any(
-                            pg_keyword in statement.upper()
-                            for pg_keyword in [
-                                "CREATE EXTENSION",
-                                "UUID_GENERATE_V4",
-                                "WITH TIME ZONE",
-                            ]
-                        ):
-                            # Convert PostgreSQL syntax to SQLite
-                            statement = statement.replace("UUID", "TEXT")
-                            statement = statement.replace("NOW()", "CURRENT_TIMESTAMP")
-                            await session.execute(text(statement))
+                    # SQLite: Skip PostgreSQL-specific statements
+                    elif not any(
+                        pg_keyword in statement.upper()
+                        for pg_keyword in [
+                            "CREATE EXTENSION",
+                            "UUID_GENERATE_V4",
+                            "WITH TIME ZONE",
+                        ]
+                    ):
+                        # Convert PostgreSQL syntax to SQLite
+                        statement = statement.replace("UUID", "TEXT")
+                        statement = statement.replace("NOW()", "CURRENT_TIMESTAMP")
+                        await session.execute(text(statement))
 
             await session.commit()
 

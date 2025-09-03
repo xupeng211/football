@@ -43,7 +43,7 @@ async def redis_client() -> AsyncGenerator[AsyncMock, None]:
 def clean_cache():
     """清理缓存"""
     # 测试前后清理缓存的逻辑
-    yield
+    return
     # 这里可以添加实际的缓存清理逻辑
 
 

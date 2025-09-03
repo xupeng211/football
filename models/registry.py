@@ -226,7 +226,7 @@ class ModelRegistry:
 
     def get_active_version(self, model_id: str) -> str | None:
         """获取活跃版本"""
-        return cast(str | None, self.index["active_versions"].get(model_id))
+        return cast("str | None", self.index["active_versions"].get(model_id))
 
     def list_models(self) -> dict[str, list[str]]:
         """列出所有模型和版本"""
@@ -311,7 +311,7 @@ class ModelRegistry:
 
     def get_registry_stats(self) -> dict[str, Any]:
         """获取注册表统计信息"""
-        stats = {
+        return {
             "total_models": len(self.index["models"]),
             "total_versions": sum(
                 len(versions) for versions in self.index["models"].values()
@@ -320,5 +320,3 @@ class ModelRegistry:
             "registry_path": str(self.registry_path),
             "created_date": self.index["created_date"],
         }
-
-        return stats

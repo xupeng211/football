@@ -56,22 +56,21 @@ async def test_api_key(api_key: str):
 
                     return True, available_leagues
 
-                elif response.status == 401:
+                if response.status == 401:
                     print("❌ API密钥无效或已过期")
                     error_text = await response.text()
                     print(f"错误详情: {error_text}")
                     return False, []
 
-                elif response.status == 403:
+                if response.status == 403:
                     print("❌ 权限不足 - 可能需要验证邮箱或升级账户")
                     error_text = await response.text()
                     print(f"错误详情: {error_text}")
                     return False, []
 
-                else:
-                    error_text = await response.text()
-                    print(f"❌ 请求失败 ({response.status}): {error_text}")
-                    return False, []
+                error_text = await response.text()
+                print(f"❌ 请求失败 ({response.status}): {error_text}")
+                return False, []
 
         except Exception as e:
             print(f"❌ 网络连接错误: {e}")
@@ -150,8 +149,7 @@ async def main():
             print("\n🎉 API密钥验证成功! 可以开始抓取数据了")
             print(f"📊 可用联赛数量: {len(available_leagues)}")
             return True
-        else:
-            print("\n❌ 当前API密钥无效")
+        print("\n❌ 当前API密钥无效")
     else:
         print("❌ 未检测到有效的API密钥配置")
 

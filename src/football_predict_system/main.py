@@ -229,22 +229,21 @@ async def readiness_check():
                 "timestamp": datetime.utcnow().isoformat(),
                 "checks": {"database": "healthy", "cache": "healthy"},
             }
-        else:
-            raise HTTPException(
-                status_code=503,
-                detail={
-                    "status": "not_ready",
-                    "timestamp": datetime.utcnow().isoformat(),
-                    "checks": {
-                        "database": (
-                            "healthy"
-                            if db_check.get("status") == "healthy"
-                            else "unhealthy"
-                        ),
-                        "cache": "healthy" if cache_healthy else "unhealthy",
-                    },
+        raise HTTPException(
+            status_code=503,
+            detail={
+                "status": "not_ready",
+                "timestamp": datetime.utcnow().isoformat(),
+                "checks": {
+                    "database": (
+                        "healthy"
+                        if db_check.get("status") == "healthy"
+                        else "unhealthy"
+                    ),
+                    "cache": "healthy" if cache_healthy else "unhealthy",
                 },
-            )
+            },
+        )
     except Exception as e:
         logger.warning("Readiness check failed", error=str(e))
         raise HTTPException(

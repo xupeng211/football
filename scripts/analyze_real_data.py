@@ -166,18 +166,14 @@ class RealDataAnalyzer:
         if avg_goals >= 2.7:
             if high_scoring_rate >= 0.4:
                 return "高进球攻击型"
-            else:
-                return "进攻平衡型"
-        elif avg_goals <= 2.3:
+            return "进攻平衡型"
+        if avg_goals <= 2.3:
             if home_win_rate >= 0.5:
                 return "防守主场型"
-            else:
-                return "低进球防守型"
-        else:
-            if home_win_rate >= 0.5:
-                return "主场优势型"
-            else:
-                return "均衡竞争型"
+            return "低进球防守型"
+        if home_win_rate >= 0.5:
+            return "主场优势型"
+        return "均衡竞争型"
 
     def analyze_recent_trends(self, matches):
         """分析最近趋势"""
@@ -362,7 +358,7 @@ class RealDataAnalyzer:
 
         if not matches:
             print("❌ 没有找到比赛数据")
-            return
+            return None
 
         # 执行各种分析
         league_analysis = self.analyze_league_characteristics(matches)

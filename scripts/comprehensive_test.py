@@ -184,12 +184,11 @@ class FootballSystemTester:
                         print("  ✅ API连接正常")
                         print(f"  ✅ 可访问 {comp_count} 个联赛")
                         return True
-                    else:
-                        error_text = await response.text()
-                        self.issues.append(
-                            f"API请求失败: {response.status} - {error_text[:100]}"
-                        )
-                        return False
+                    error_text = await response.text()
+                    self.issues.append(
+                        f"API请求失败: {response.status} - {error_text[:100]}"
+                    )
+                    return False
 
         except Exception as e:
             self.issues.append(f"API连接错误: {e}")
@@ -302,10 +301,9 @@ class FootballSystemTester:
 
                 conn.close()
                 return prediction_ready
-            else:
-                self.issues.append("训练数据不足,无法进行预测")
-                conn.close()
-                return False
+            self.issues.append("训练数据不足,无法进行预测")
+            conn.close()
+            return False
 
         except Exception as e:
             self.issues.append(f"预测能力测试错误: {e}")
@@ -476,10 +474,9 @@ class FootballSystemTester:
 
         if success_rate >= 90:
             return ["系统运行良好", "可以开始生产使用", "建议添加监控机制"]
-        elif success_rate >= 70:
+        if success_rate >= 70:
             return ["系统基本正常", "需要修复部分问题", "建议增加错误处理"]
-        else:
-            return ["系统存在重要问题", "需要全面检查和修复", "暂不建议生产使用"]
+        return ["系统存在重要问题", "需要全面检查和修复", "暂不建议生产使用"]
 
     def provide_fix_suggestions(self):
         """提供修复建议"""

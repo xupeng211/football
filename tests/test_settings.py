@@ -56,4 +56,3 @@ def test_settings_defaults():
 def test_logging_setup():
     """测试日志设置"""
     # TODO: 实现日志配置测试
-    pass

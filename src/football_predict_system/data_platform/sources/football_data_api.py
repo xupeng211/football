@@ -15,8 +15,9 @@ from typing import Any, cast
 import aiohttp
 import pandas as pd
 
-from ...core.config import get_settings
-from ...core.logging import get_logger
+from football_predict_system.core.config import get_settings
+from football_predict_system.core.logging import get_logger
+
 from .base import MatchDataSource, RateLimiter, TeamDataSource
 
 logger = get_logger(__name__)
@@ -79,7 +80,7 @@ class FootballDataAPICollector(MatchDataSource, TeamDataSource):
 
                 response.raise_for_status()
                 response_data = await response.json()
-                return cast(dict[str, Any], response_data)
+                return cast("dict[str, Any]", response_data)
 
         except aiohttp.ClientError as e:
             logger.error(f"API request failed: {e}")
@@ -231,10 +232,9 @@ class FootballDataAPICollector(MatchDataSource, TeamDataSource):
 
         if home_score > away_score:
             return "H"
-        elif home_score < away_score:
+        if home_score < away_score:
             return "A"
-        else:
-            return "D"
+        return "D"
 
     async def close(self) -> None:
         """Close HTTP session."""

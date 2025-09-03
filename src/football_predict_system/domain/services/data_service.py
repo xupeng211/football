@@ -8,9 +8,9 @@ This service handles:
 - Historical data access
 """
 
-from ...core.cache import get_cache_manager
-from ...core.logging import get_logger, log_performance
-from ..models import Match, Team
+from football_predict_system.core.cache import get_cache_manager
+from football_predict_system.core.logging import get_logger, log_performance
+from football_predict_system.domain.models import Match, Team
 
 logger = get_logger(__name__)
 

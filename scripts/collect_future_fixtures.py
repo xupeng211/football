@@ -123,7 +123,7 @@ async def _process_league(
                 _display_sample_matches(future_matches)
                 return saved_count
 
-            elif response.status == 403:
+            if response.status == 403:
                 print("  ❌ 权限不足,可能需要付费版")
             else:
                 error_text = await response.text()
@@ -140,7 +140,7 @@ async def collect_future_fixtures():
     headers, params, date_range = _get_api_config()
     if not headers:
         print("❌ API密钥未配置")
-        return
+        return None
 
     print("📅 抓取未来赛程")
     print("=" * 60)

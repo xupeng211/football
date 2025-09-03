@@ -47,7 +47,7 @@ def main() -> None:
         "timestamp": "2024-12-19",
         "python_version": sys.version.split()[0],
         "project_path": str(Path.cwd()),
-        "tools_available": [t for t in tools.keys() if check_tool(t)],
+        "tools_available": [t for t in tools if check_tool(t)],
         "project_files_ok": [f for f in files if Path(f).exists()],
     }
 

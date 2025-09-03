@@ -10,14 +10,15 @@ from datetime import datetime, timedelta
 from typing import Any
 from uuid import UUID
 
-from ..core.cache import get_cache_manager
-from ..core.exceptions import (
+from football_predict_system.core.cache import get_cache_manager
+from football_predict_system.core.exceptions import (
     InsufficientDataError,
     ModelNotFoundError,
     NotFoundError,
     PredictionError,
 )
-from ..core.logging import get_logger, log_performance
+from football_predict_system.core.logging import get_logger, log_performance
+
 from .models import (
     BatchPredictionRequest,
     BatchPredictionResponse,
@@ -219,8 +220,7 @@ class PredictionService:
         """Get model from registry."""
         if model_version:
             return await self._model_service.get_model_by_version(model_version)  # type: ignore[no-any-return]
-        else:
-            return await self._model_service.get_default_model()  # type: ignore[no-any-return]
+        return await self._model_service.get_default_model()  # type: ignore[no-any-return]
 
     async def _extract_features(self, match: Match) -> dict[str, Any] | None:
         """Extract features for prediction."""

@@ -114,23 +114,25 @@ class TestDatabaseManager:
         mock_result.scalar.return_value = 1
         mock_session.execute.return_value = mock_result
 
-        with patch.object(
-            db_manager, "get_async_engine", return_value=mock_async_engine
+        with (
+            patch.object(
+                db_manager, "get_async_engine", return_value=mock_async_engine
+            ),
+            patch.object(db_manager, "get_async_session_factory") as mock_factory,
         ):
-            with patch.object(db_manager, "get_async_session_factory") as mock_factory:
-                mock_factory.return_value = lambda: mock_session
+            mock_factory.return_value = lambda: mock_session
 
-                # Create async context manager
-                async def async_context():
-                    return mock_session
+            # Create async context manager
+            async def async_context():
+                return mock_session
 
-                mock_session.__aenter__ = AsyncMock(return_value=mock_session)
-                mock_session.__aexit__ = AsyncMock(return_value=None)
+            mock_session.__aenter__ = AsyncMock(return_value=mock_session)
+            mock_session.__aexit__ = AsyncMock(return_value=None)
 
-                result = await db_manager.health_check()
+            result = await db_manager.health_check()
 
-                assert result["status"] == "healthy"
-                assert isinstance(result, dict)
+            assert result["status"] == "healthy"
+            assert isinstance(result, dict)
 
     @pytest.mark.asyncio
     @patch("football_predict_system.core.database.get_settings")
@@ -145,19 +147,21 @@ class TestDatabaseManager:
         mock_session = AsyncMock()
         mock_session.execute.side_effect = SQLAlchemyError("Connection failed")
 
-        with patch.object(
-            db_manager, "get_async_engine", return_value=mock_async_engine
+        with (
+            patch.object(
+                db_manager, "get_async_engine", return_value=mock_async_engine
+            ),
+            patch.object(db_manager, "get_async_session_factory") as mock_factory,
         ):
-            with patch.object(db_manager, "get_async_session_factory") as mock_factory:
-                mock_factory.return_value = lambda: mock_session
+            mock_factory.return_value = lambda: mock_session
 
-                mock_session.__aenter__ = AsyncMock(return_value=mock_session)
-                mock_session.__aexit__ = AsyncMock(return_value=None)
+            mock_session.__aenter__ = AsyncMock(return_value=mock_session)
+            mock_session.__aexit__ = AsyncMock(return_value=None)
 
-                result = await db_manager.health_check()
+            result = await db_manager.health_check()
 
-                assert result["status"] == "unhealthy"
-                assert isinstance(result, dict)
+            assert result["status"] == "unhealthy"
+            assert isinstance(result, dict)
 
     @pytest.mark.asyncio
     @patch("football_predict_system.core.database.get_settings")

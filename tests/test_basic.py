@@ -10,7 +10,7 @@ import pytest
 
 def test_project_structure() -> None:
     """测试项目目录结构"""
-    root = Path(".")
+    root = Path()
     assert root.exists(), "The project root directory does not exist."
 
     # 检查实际的核心模块结构
@@ -34,7 +34,7 @@ def test_project_structure() -> None:
 
 def test_config_files() -> None:
     """测试配置文件存在性"""
-    root = Path(".")
+    root = Path()
 
     config_files = [
         "pyproject.toml",

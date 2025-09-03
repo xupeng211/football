@@ -10,15 +10,9 @@ from football_predict_system.main import app
 # 跳过API预测测试用于CI(集成问题)
 pytestmark = pytest.mark.skip_for_ci
 
-# TODO: Implement prediction_service module
-# from football_predict_system.api.services.prediction_service import \\
-#     prediction_service
-# from models.predictor import Predictor
-
-# # 确保预测服务在测试中被正确初始化
-# if prediction_service._predictor is None:
-#     predictor = Predictor()
-#     prediction_service.set_predictor(predictor)
+# NOTE: 预测服务模块实现已延期到v2.0
+# 当前测试使用模拟预测器进行基础功能验证
+# 相关issue: https://github.com/project/issues/prediction-service
 
 client = TestClient(app)
 

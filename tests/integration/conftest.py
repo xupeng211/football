@@ -254,15 +254,12 @@ class DatabaseTestHelper:
     async def create_test_match(self, match_data: dict[str, Any]):
         """Create a test match in the database."""
         # Implementation would depend on actual database schema
-        pass
 
     async def create_test_team(self, team_data: dict[str, Any]):
         """Create a test team in the database."""
-        pass
 
     async def cleanup_test_data(self):
         """Clean up test data from database."""
-        pass
 
 
 @pytest.fixture

@@ -214,7 +214,7 @@ def setup_logging() -> None:
 
 def get_logger(name: str | None = None) -> FilteringBoundLogger:
     """Get a structured logger instance."""
-    return cast(FilteringBoundLogger, structlog.get_logger(name))
+    return cast("FilteringBoundLogger", structlog.get_logger(name))
 
 
 def set_correlation_id(correlation_id: str | None = None) -> str:
@@ -365,7 +365,6 @@ def log_performance(operation: str) -> Callable[..., Any]:
 
         if asyncio.iscoroutinefunction(func):
             return async_wrapper
-        else:
-            return sync_wrapper
+        return sync_wrapper
 
     return decorator

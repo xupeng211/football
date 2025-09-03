@@ -79,10 +79,9 @@ async def get_all_competitions():
 
                     return competitions
 
-                else:
-                    print(f"❌ API请求失败: {response.status}")
-                    print(f"响应: {await response.text()}")
-                    return []
+                print(f"❌ API请求失败: {response.status}")
+                print(f"响应: {await response.text()}")
+                return []
 
         except Exception as e:
             print(f"❌ 网络错误: {e}")

@@ -12,9 +12,10 @@ from typing import Any
 import bcrypt
 import jwt
 
-from ..config import get_settings
-from ..exceptions import UnauthorizedError
-from ..logging import get_logger
+from football_predict_system.core.config import get_settings
+from football_predict_system.core.exceptions import UnauthorizedError
+from football_predict_system.core.logging import get_logger
+
 from .models import SecurityConfig, TokenPayload, UserRole
 
 logger = get_logger(__name__)

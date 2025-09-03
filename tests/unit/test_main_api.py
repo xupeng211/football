@@ -1,5 +1,6 @@
-"""Comprehensive tests for main.py FastAPI application to boost coverage."""
+"""Main API application tests."""
 
+import concurrent.futures
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -156,7 +157,7 @@ class TestMiddleware:
         # Check if timing headers are present
         headers = response.headers
         # May have x-process-time or similar timing headers
-        assert any("time" in k.lower() for k in headers.keys()) or True
+        assert any("time" in k.lower() for k in headers) or True
 
     def test_security_headers_middleware(self, client):
         """Test security headers."""
@@ -274,7 +275,6 @@ class TestFullAPIIntegration:
 
     def test_concurrent_requests(self, client):
         """Test handling of concurrent requests."""
-        import concurrent.futures
 
         def make_request():
             response = client.get("/health")

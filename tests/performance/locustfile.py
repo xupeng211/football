@@ -126,10 +126,10 @@ class BaseFootballPredictUser(HttpUser):
             response = self.client.get("/health/live")
             if response.status_code != 200:
                 print(f"API health check failed: {response.status_code}")
-                raise StopUser()
+                raise StopUser
         except Exception as e:
             print(f"Failed to connect to API: {e}")
-            raise StopUser() from e
+            raise StopUser from e
 
 
 class HealthCheckUser(BaseFootballPredictUser):

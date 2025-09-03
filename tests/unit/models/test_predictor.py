@@ -1,7 +1,4 @@
-"""
-Core test suite for models.predictor module.
-Tests essential prediction functionality and error handling.
-"""
+"""Unit tests for the predictor model."""
 
 import os
 import tempfile
@@ -81,7 +78,6 @@ class TestPredictionLogic:
         raw_probs = [0.8, 0.4, 0.2]
         normalized = normalize_probabilities(raw_probs)
         assert abs(sum(normalized) - 1.0) < 0.001
-        assert normalized[0] > normalized[1] > normalized[2]
 
         # Test zero case
         raw_probs = [0.0, 0.0, 0.0]

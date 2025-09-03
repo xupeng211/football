@@ -11,7 +11,7 @@ from typing import Any, ClassVar
 import pandas as pd
 from pydantic import BaseModel
 
-from ...core.logging import get_logger
+from football_predict_system.core.logging import get_logger
 
 logger = get_logger(__name__)
 

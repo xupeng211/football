@@ -51,9 +51,8 @@ class FootballDataCollector:
                         teams = data.get("teams", [])
                         print(f"  📍 获取到 {len(teams)} 支球队")
                         return teams
-                    else:
-                        print(f"  ❌ 球队数据获取失败: {response.status}")
-                        return []
+                    print(f"  ❌ 球队数据获取失败: {response.status}")
+                    return []
 
             except Exception as e:
                 print(f"  ❌ 网络错误: {e}")
@@ -86,11 +85,10 @@ class FootballDataCollector:
                             f"  📊 获取到 {len(matches)} 场比赛 ({date_from} 到 {date_to})"
                         )
                         return matches
-                    else:
-                        print(f"  ❌ 比赛数据获取失败: {response.status}")
-                        error_text = await response.text()
-                        print(f"  错误详情: {error_text[:200]}")
-                        return []
+                    print(f"  ❌ 比赛数据获取失败: {response.status}")
+                    error_text = await response.text()
+                    print(f"  错误详情: {error_text[:200]}")
+                    return []
 
             except Exception as e:
                 print(f"  ❌ 网络错误: {e}")

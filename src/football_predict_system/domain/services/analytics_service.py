@@ -10,7 +10,7 @@ This service handles:
 
 from typing import Any
 
-from ...core.logging import get_logger, log_performance
+from football_predict_system.core.logging import get_logger, log_performance
 
 logger = get_logger(__name__)
 

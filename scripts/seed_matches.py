@@ -31,11 +31,10 @@ def seed_matches() -> None:
     """
 
     try:
-        with psycopg2.connect(db_conn_str_local) as conn:
-            with conn.cursor() as cur:
-                cur.executemany(insert_sql, matches_data)
-                conn.commit()
-                logger.info("Successfully seeded matches table", count=cur.rowcount)
+        with psycopg2.connect(db_conn_str_local) as conn, conn.cursor() as cur:
+            cur.executemany(insert_sql, matches_data)
+            conn.commit()
+            logger.info("Successfully seeded matches table", count=cur.rowcount)
     except psycopg2.Error as e:
         logger.error("Database error during matches seeding", error=str(e))
         raise

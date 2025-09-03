@@ -95,11 +95,13 @@ class TestMigratedAPIEndpoints:
             from src.football_predict_system.main import app
 
             # 使用asgi-lifespan管理应用生命周期
-            async with asgi_lifespan.LifespanManager(app):
-                async with AsyncClient(
+            async with (
+                asgi_lifespan.LifespanManager(app),
+                AsyncClient(
                     transport=httpx.ASGITransport(app=app), base_url="http://test"
-                ) as client:
-                    yield client
+                ) as client,
+            ):
+                yield client
 
     async def test_health_endpoint_migrated(self, async_client: AsyncClient):
         """测试健康检查端点(已迁移到异步)"""

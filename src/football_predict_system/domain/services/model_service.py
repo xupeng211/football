@@ -12,9 +12,9 @@ from datetime import datetime
 from typing import Any
 from uuid import UUID
 
-from ...core.cache import get_cache_manager
-from ...core.logging import get_logger, log_performance
-from ..models import Model
+from football_predict_system.core.cache import get_cache_manager
+from football_predict_system.core.logging import get_logger, log_performance
+from football_predict_system.domain.models import Model
 
 logger = get_logger(__name__)
 

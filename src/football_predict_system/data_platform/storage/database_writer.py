@@ -9,9 +9,9 @@ import pandas as pd
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
-from ...core.database import get_database_manager
-from ...core.logging import get_logger
-from ...domain.models import Team
+from football_predict_system.core.database import get_database_manager
+from football_predict_system.core.logging import get_logger
+from football_predict_system.domain.models import Team
 
 logger = get_logger(__name__)
 

@@ -20,7 +20,7 @@ def create_test_data():
     # Target variable that depends on the future value of feature1
     target = (np.roll(feature1, -5) > feature1).astype(int)
 
-    df = pd.DataFrame(
+    return pd.DataFrame(
         {
             "date": dates,
             "feature1": feature1,
@@ -28,7 +28,6 @@ def create_test_data():
             "target": target,
         }
     )
-    return df
 
 
 def train_model(X_train, y_train):

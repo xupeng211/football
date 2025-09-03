@@ -48,6 +48,7 @@ class AIFileMonitor:
         try:
             result = subprocess.run(
                 [sys.executable, str(self.guard_script), file_path],
+                check=False,
                 capture_output=True,
                 text=True,
                 timeout=10,
