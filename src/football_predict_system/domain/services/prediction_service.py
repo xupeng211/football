@@ -226,11 +226,11 @@ class PredictionService:
             match_id=match.id,
             model_version=model.version,
             predicted_result=MatchResult.HOME_WIN,
-            home_win_probability=uniform(0.3, 0.7),
-            draw_probability=uniform(0.2, 0.4),
-            away_win_probability=uniform(0.1, 0.5),
+            home_win_probability=uniform(0.3, 0.7),  # nosec B311
+            draw_probability=uniform(0.2, 0.4),  # nosec B311
+            away_win_probability=uniform(0.1, 0.5),  # nosec B311
             confidence_level=PredictionConfidence.MEDIUM,
-            confidence_score=uniform(0.6, 0.9),
+            confidence_score=uniform(0.6, 0.9),  # nosec B311
             features_used=["team_form", "head_to_head", "home_advantage"],
             model_accuracy=model.accuracy if hasattr(model, "accuracy") else 0.75,
             created_at=datetime.utcnow(),

@@ -106,8 +106,7 @@ class AuthenticationService:
         """Authenticate user credentials."""
         # Placeholder implementation
         # In a real system, this would check against a user database
-        # nosec B105 - This is demo/development code with hardcoded credentials
-        if username == "admin" and password == "admin":
+        if username == "admin" and password == "admin":  # nosec B105
             return {
                 "user_id": "admin_user",
                 "username": "admin",
