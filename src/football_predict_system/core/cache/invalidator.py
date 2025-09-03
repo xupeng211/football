@@ -5,7 +5,10 @@ Handles cache invalidation patterns and strategies for maintaining cache consist
 """
 
 import asyncio
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from .manager import CacheManager
 
 import redis.asyncio as redis
 
@@ -17,7 +20,7 @@ logger = get_logger(__name__)
 class CacheInvalidator:
     """Handles cache invalidation strategies."""
 
-    def __init__(self, cache_manager):
+    def __init__(self, cache_manager: "CacheManager") -> None:
         self.cache_manager = cache_manager
         self.logger = get_logger(__name__)
         self._background_tasks: set[asyncio.Task[Any]] = set()
@@ -74,7 +77,7 @@ class CacheInvalidator:
     ) -> None:
         """Schedule cache invalidation after a delay."""
 
-        async def delayed_invalidation():
+        async def delayed_invalidation() -> None:
             await asyncio.sleep(delay_seconds)
             try:
                 await self.invalidate_by_pattern(pattern, namespace)

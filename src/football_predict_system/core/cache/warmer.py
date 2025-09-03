@@ -5,6 +5,10 @@ Handles cache warming to improve performance by pre-loading frequently accessed 
 """
 
 import asyncio
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .manager import CacheManager
 
 from ..logging import get_logger
 
@@ -14,7 +18,7 @@ logger = get_logger(__name__)
 class CacheWarmer:
     """Handles cache warming strategies."""
 
-    def __init__(self, cache_manager):
+    def __init__(self, cache_manager: "CacheManager") -> None:
         self.cache_manager = cache_manager
         self.logger = get_logger(__name__)
 

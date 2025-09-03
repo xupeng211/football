@@ -213,14 +213,14 @@ class PredictionService:
 
     async def _get_match(self, match_id: UUID) -> Match | None:
         """Get match data from database."""
-        return await self._data_service.get_match_data(match_id)
+        return await self._data_service.get_match_data(match_id)  # type: ignore[no-any-return]
 
     async def _get_model(self, model_version: str | None) -> Model | None:
         """Get model from registry."""
         if model_version:
-            return await self._model_service.get_model_by_version(model_version)
+            return await self._model_service.get_model_by_version(model_version)  # type: ignore[no-any-return]
         else:
-            return await self._model_service.get_default_model()
+            return await self._model_service.get_default_model()  # type: ignore[no-any-return]
 
     async def _extract_features(self, match: Match) -> dict[str, Any] | None:
         """Extract features for prediction."""

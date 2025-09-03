@@ -73,7 +73,7 @@ class JWTManager:
 class AuthenticationService:
     """Handles user authentication and authorization."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.settings = get_settings()
         self.logger = get_logger(__name__)
         self.jwt_manager = JWTManager(

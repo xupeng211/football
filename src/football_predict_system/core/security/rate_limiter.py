@@ -16,7 +16,7 @@ class RateLimiter:
     def __init__(self, config: SecurityConfig) -> None:
         """Initialize rate limiter with configuration."""
         self.config = config
-        self.requests: dict[str, list] = defaultdict(list)
+        self.requests: dict[str, list[float]] = defaultdict(list)
 
     def is_allowed(
         self, identifier: str, window_seconds: int = 60, max_requests: int = 100

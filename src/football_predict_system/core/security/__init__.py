@@ -9,6 +9,9 @@ Provides production-grade security features including:
 - Input validation and sanitization
 """
 
+from collections.abc import Callable
+from typing import Any
+
 from .auth import AuthenticationService, JWTManager
 from .headers import SecurityHeaders
 from .models import Permission, SecurityConfig, User, UserRole
@@ -16,11 +19,13 @@ from .rate_limiter import RateLimiter
 
 
 # Placeholder for require_permission decorator
-def require_permission(permission: Permission):
+def require_permission(
+    permission: Permission,
+) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
     """Decorator for requiring specific permissions."""
 
-    def decorator(func):
-        def wrapper(*args, **kwargs):
+    def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
+        def wrapper(*args: Any, **kwargs: Any) -> Any:
             # In a real implementation, this would check user permissions
             return func(*args, **kwargs)
 

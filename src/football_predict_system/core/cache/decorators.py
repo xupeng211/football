@@ -7,13 +7,16 @@ Provides decorators for caching function results with various strategies.
 import functools
 import inspect
 from collections.abc import Callable
+from typing import Any, TypeVar
+
+T = TypeVar('T')
 
 from .manager import CacheManager
 
 
 def cached(
     ttl: int = 300, key_prefix: str = "", namespace: str = "default"
-) -> Callable:
+) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
     """
     Decorator for caching function results.
 
@@ -26,9 +29,9 @@ def cached(
         Decorated function with caching capability
     """
 
-    def decorator(func: Callable) -> Callable:
+    def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
         @functools.wraps(func)
-        async def async_wrapper(*args, **kwargs):
+        async def async_wrapper(*args: Any, **kwargs: Any) -> Any:
             # Create cache manager instance
             cache_manager = CacheManager()
 
@@ -60,7 +63,7 @@ def cached(
             return result
 
         @functools.wraps(func)
-        def sync_wrapper(*args, **kwargs):
+        def sync_wrapper(*args: Any, **kwargs: Any) -> Any:
             # For synchronous functions, just return the result without caching
             # In a real implementation, you might want to use a synchronous cache
             return func(*args, **kwargs)

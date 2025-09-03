@@ -137,4 +137,4 @@ def get_model_service() -> ModelService:
 async def get_available_models() -> list[Model]:
     """Get list of available prediction models (convenience function)."""
     service = get_model_service()
-    return await service.get_available_models()
+    return await service.get_available_models()  # type: ignore[no-any-return]

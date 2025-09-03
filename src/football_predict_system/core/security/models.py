@@ -1,6 +1,7 @@
 """Security data models and enums."""
 
 from enum import Enum
+from typing import Any
 from uuid import UUID
 
 from pydantic import BaseModel, validator
@@ -83,10 +84,10 @@ class SecurityConfig(BaseModel):
     api_key_expire_days: int = 365
 
     @validator("jwt_secret_key")
-    def jwt_key_not_empty(cls, v):
+    def jwt_key_not_empty(cls, v: Any) -> str:
         if not v or v.strip() == "":
             raise ValueError("JWT secret key cannot be empty")
-        return v
+        return str(v)
 
 
 class TokenPayload(BaseModel):
