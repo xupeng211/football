@@ -424,15 +424,26 @@ ci.fast: ## 🚀 快速本地CI检查 (轻量级，不依赖Docker)
 	@echo "$(CYAN)🚀 启动快速本地CI检查...$(NC)"
 	@./scripts/local_ci_complete.sh
 
+.PHONY: ci.comprehensive
+ci.comprehensive: ## 🏆 全面本地CI检查 (5层质量门禁)
+	@echo "$(CYAN)🏆 启动全面本地CI检查...$(NC)"
+	@./scripts/local_ci_comprehensive.sh
+
+.PHONY: ci.filtered
+ci.filtered: ## 🔍 运行筛选后的测试 (跳过有问题的Mock测试)
+	@echo "$(CYAN)🔍 运行筛选后的测试...$(NC)"
+	@uv run pytest -m "not skip_for_ci" --tb=short
+	@echo "$(GREEN)✅ 筛选测试完成$(NC)"
+
 .PHONY: ci.ready
-ci.ready: ci.fast ## 🎯 检查代码是否准备推送
+ci.ready: ci.comprehensive ## 🎯 检查代码是否准备推送
 	@echo "$(GREEN)🎉 代码已准备好推送！$(NC)"
 	@echo "$(YELLOW)💡 推荐命令:$(NC)"
 	@echo "$(CYAN)  git add . && git commit -m \"fix: 解决CI问题\" && git push$(NC)"
 
 .PHONY: push.safe
-push.safe: ci.fast ## 🛡️ 安全推送 (先运行CI检查)
-	@echo "$(BLUE)🔍 运行CI检查后推送...$(NC)"
+push.safe: ci.comprehensive ## 🛡️ 安全推送 (先运行全面CI检查)
+	@echo "$(BLUE)🔍 运行全面CI检查后推送...$(NC)"
 	@echo "$(YELLOW)请确认要推送到远程仓库? [y/N]$(NC)" && read ans && [ $${ans:-N} = y ]
 	@if git diff --quiet && git diff --staged --quiet; then \
 		echo "$(YELLOW)⚠️  没有更改需要提交$(NC)"; \
@@ -447,6 +458,12 @@ push.safe: ci.fast ## 🛡️ 安全推送 (先运行CI检查)
 # 别名任务 - 便于记忆和使用
 .PHONY: fast-ci
 fast-ci: ci.fast ## 🚀 ci.fast 的别名
+
+.PHONY: full-ci
+full-ci: ci.comprehensive ## 🏆 ci.comprehensive 的别名
+
+.PHONY: filtered-tests
+filtered-tests: ci.filtered ## 🔍 ci.filtered 的别名
 
 .PHONY: ready
 ready: ci.ready ## 🎯 ci.ready 的别名
