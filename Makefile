@@ -144,8 +144,22 @@ test-cov: ## 🧪 运行测试并生成覆盖率报告
 	@echo "$(GREEN)✅ 覆盖率报告生成在 htmlcov/index.html$(NC)"
 
 # === 质量检查 ===
-ci: format lint type security test ## 🔧 运行所有CI检查
+ci-check: ## 🚀 CI级别严格检查 (与GitHub CI完全一致)
+	@echo "$(CYAN)🚀 运行CI级别检查...$(NC)"
+	@echo "$(BLUE)1️⃣ Ruff代码检查...$(NC)"
+	uv run ruff check .
+	@echo "$(BLUE)2️⃣ MyPy类型检查...$(NC)"
+	uv run mypy .
+	@echo "$(BLUE)3️⃣ 运行测试...$(NC)"
+	uv run pytest --maxfail=1 --disable-warnings -q
+	@echo "$(GREEN)✅ 所有CI检查通过! 可以安全提交$(NC)"
+
+ci: format lint type security test ## 🔧 运行所有CI检查 (兼容性保留)
 	@echo "$(GREEN)🎉 所有检查通过! 代码可以提交$(NC)"
+
+local-ci: ## 🐳 本地Docker环境模拟完整CI流程
+	@echo "$(CYAN)🐳 在本地Docker环境中运行完整CI流程...$(NC)"
+	docker compose -f docker-compose.ci.yml up --build --exit-code-from app
 
 doctor: ## 🔧 环境健康检查
 	@echo "$(BLUE)🩺 环境健康检查...$(NC)"

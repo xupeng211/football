@@ -4,14 +4,14 @@ from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
-pytestmark = pytest.mark.skip_for_ci  # 跳过此文件用于CI
-
 from football_predict_system.core.database import (
     DatabaseManager,
     get_async_session,
     get_database_manager,
     get_session,
 )
+
+pytestmark = pytest.mark.skip_for_ci  # 跳过此文件用于CI
 
 
 class TestDatabaseManager:

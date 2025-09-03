@@ -34,16 +34,10 @@ jobs:
           echo "$HOME/.local/bin" >> $GITHUB_PATH
           uv sync --extra dev
           
-      - name: ✅ Code Quality Check
+      - name: ✅ Run CI Checks (本地=CI一致)
         run: |
-          echo "🎨 代码格式检查..."
-          uv run ruff format --check .
-          
-          echo "🔍 代码规范检查..."
-          uv run ruff check src/ --output-format=github
-          
-          echo "🔬 基础类型检查..."
-          uv run mypy src/football_predict_system/core/ --ignore-missing-imports || echo "类型检查警告（非阻断）"
+          echo "🚀 运行CI级别检查 (与本地make ci-check完全一致)..."
+          make ci-check
           
       - name: ✅ Basic Module Import Test
         run: |

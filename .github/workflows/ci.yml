@@ -53,32 +53,10 @@ jobs:
         run: |
           uv sync --extra dev
           
-      - name: ❌ STRICT Format Check
+      - name: ✅ Run CI Checks (本地=CI完全一致)
         run: |
-          echo "🎨 检查代码格式..."
-          uv run ruff format --check .
-          echo "✅ 代码格式检查通过"
-          
-      - name: ❌ STRICT Lint Check  
-        run: |
-          echo "🔍 执行代码检查..."
-          uv run ruff check src/ --output-format=github
-          echo "🔍 检查测试文件关键错误..."
-          uv run ruff check tests/ --select=E,F,B --ignore=E402 --output-format=github
-          echo "✅ 代码检查通过"
-          
-      - name: ❌ STRICT Type Check (Data Platform Focus)
-        run: |
-          echo "🔬 执行类型检查..."
-          echo "📊 检查数据平台模块 (核心功能)..."
-          uv run mypy src/football_predict_system/data_platform/ --show-error-codes --no-error-summary --ignore-missing-imports
-          echo "✅ 数据平台类型检查通过"
-          
-      - name: ❌ STRICT Security Check
-        run: |
-          echo "🛡️ 执行安全扫描..."
-          uv run bandit -r src/ -c pyproject.toml
-          echo "✅ 安全检查通过"
+          echo "🚀 运行CI级别检查 (与本地make ci-check完全一致)..."
+          make ci-check
 
   # =================== 第二层: 基础功能门禁 ===================
   basic-functionality:

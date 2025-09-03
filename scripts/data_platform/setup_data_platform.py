@@ -55,7 +55,7 @@ class DataPlatformSetup:
                         await session.execute(text("SELECT 1"))
                     logger.info("PostgreSQL connection verified")
                 except Exception as e:
-                    logger.warning(f"PostgreSQL连接失败，将使用SQLite fallback: {e}")
+                    logger.warning(f"PostgreSQL连接失败,将使用SQLite fallback: {e}")
                     # 自动降级到SQLite
                     os.environ["DATABASE_URL"] = "sqlite:///./football_dev.db"
                     self.settings = get_settings()  # 重新加载设置

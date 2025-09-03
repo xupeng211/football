@@ -52,6 +52,7 @@ dependencies = [
     "opentelemetry-instrumentation-asyncpg>=0.47b0",
     "opentelemetry-instrumentation-redis>=0.47b0",
     "psycopg2-binary>=2.9.10",
+    "pre-commit>=4.3.0",
 ]
 
 [project.optional-dependencies]

@@ -65,8 +65,57 @@ make dev
 ### 3. 质量检查
 
 ```bash
+# CI级别检查 (与GitHub CI完全一致)
+make ci-check
+
+# 传统检查 (兼容性保留)
 make ci
 ```
+
+### 4. 设置Pre-commit Hook (推荐)
+
+**🚀 一键升级方式 (推荐):**
+
+```bash
+# 升级到现代化pre-commit系统 (解决hooks冲突)
+chmod +x scripts/upgrade_to_modern_hooks.sh
+bash scripts/upgrade_to_modern_hooks.sh
+```
+
+**📋 或者手动安装方式:**
+
+```bash
+# 运行自动安装脚本
+chmod +x scripts/install_pre_commit.sh
+bash scripts/install_pre_commit.sh
+```
+
+**📋 手动安装方式:**
+
+```bash
+# 激活虚拟环境并设置环境
+source .venv/bin/activate
+source scripts/setup_env.sh development
+
+# 安装依赖和pre-commit
+uv sync --extra dev
+uv add pre-commit
+
+# 安装hooks
+pre-commit install
+
+# 手动运行一次 (可选)
+pre-commit run --all-files
+```
+
+**🔍 验证安装:**
+
+```bash
+# 验证所有验收标准
+bash scripts/verify_standards.sh
+```
+
+> 💡 **设置成功后，每次提交代码都会自动运行质量检查，避免CI红灯！**
 
 就这么简单！🎉
 
