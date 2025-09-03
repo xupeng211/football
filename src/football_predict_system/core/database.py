@@ -34,10 +34,12 @@ class DatabaseManager:
 
     def __init__(self):
         self.settings = get_settings()
+        self.logger = get_logger(__name__)
         self._engine: Engine | None = None
         self._async_engine: AsyncEngine | None = None
         self._session_factory: sessionmaker | None = None
         self._async_session_factory: sessionmaker | None = None
+        self._connection_pool = None
         self._health_check_query = text("SELECT 1")
 
     def get_engine(self) -> Engine:
@@ -287,6 +289,56 @@ class DatabaseManager:
         if self._async_engine:
             await self._async_engine.dispose()
             logger.info("Asynchronous database engine disposed")
+
+    async def create_engine(self) -> AsyncEngine:
+        """Create database engine (public method for tests)."""
+        if self._async_engine is None:
+            self._async_engine = self._create_async_engine()
+        # Also set _engine for compatibility with tests
+        self._engine = self._async_engine
+        return self._async_engine
+
+    async def create_session_factory(self) -> sessionmaker:
+        """Create async session factory (public method for tests)."""
+        return self.get_async_session_factory()
+
+    async def execute_query(self, query: str, params: tuple = None) -> Any:
+        """Execute a database query."""
+        async with self.get_async_session() as session:
+            if params:
+                result = await session.execute(text(query), params)
+            else:
+                result = await session.execute(text(query))
+            return result
+
+    async def execute_transaction(self, operations: list[tuple[str, tuple]]) -> None:
+        """Execute multiple operations in a transaction."""
+        async with self.get_async_session() as session:
+            try:
+                for query, params in operations:
+                    await session.execute(text(query), params)
+                await session.commit()
+            except Exception:
+                await session.rollback()
+                raise
+
+    async def get_connection_info(self) -> dict:
+        """Get database connection information."""
+        return {
+            "url": str(self.settings.database.url).replace(
+                self.settings.database.url.password or "", "***"
+            ),
+            "pool_info": self._get_pool_info(),
+            "engine_info": {
+                "name": self.get_engine().name if self._engine else None,
+                "echo": self.settings.database.echo,
+            },
+        }
+
+    async def create_connection_pool(self) -> dict:
+        """Create and return connection pool info."""
+        self.get_engine()  # Ensure engine is created
+        return self._get_pool_info()
 
 
 # Global database manager instance

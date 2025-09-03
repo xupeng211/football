@@ -3,7 +3,7 @@ Caching system package.
 
 This package provides production-grade caching capabilities with:
 - Multi-level caching (memory + Redis)
-- Cache invalidation strategies  
+- Cache invalidation strategies
 - Performance monitoring
 - Distributed caching support
 """
@@ -32,5 +32,5 @@ __all__ = [
     "CacheStats",
     "CacheWarmer",
     "cached",
-    "get_cache_manager"
+    "get_cache_manager",
 ]

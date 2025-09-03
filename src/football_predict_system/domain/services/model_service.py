@@ -126,3 +126,21 @@ class ModelService:
             "correct_predictions": 75,
             "period_days": days_back,
         }
+
+
+# Global service instance
+_model_service: ModelService | None = None
+
+
+def get_model_service() -> ModelService:
+    """Get global model service instance."""
+    global _model_service
+    if _model_service is None:
+        _model_service = ModelService()
+    return _model_service
+
+
+async def get_available_models() -> list[Model]:
+    """Get list of available prediction models (convenience function)."""
+    service = get_model_service()
+    return await service.get_available_models()

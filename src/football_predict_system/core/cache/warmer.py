@@ -105,3 +105,22 @@ class CacheWarmer:
                 self.logger.error(
                     "League data warming error", league_id=league_id, error=str(e)
                 )
+
+    async def warm_model_metadata(self) -> None:
+        """Pre-warm model metadata cache."""
+        try:
+            self.logger.info("Starting model metadata cache warming")
+
+            # Generate model metadata (placeholder)
+            metadata = {
+                "available_models": ["xgboost_v1", "lightgbm_v1", "neural_network_v1"],
+                "last_updated": "2024-01-01T00:00:00Z",
+                "model_count": 3,
+            }
+
+            await self.cache_manager.set("models_metadata", metadata, 3600, "models")
+
+            self.logger.info("Model metadata cache warming completed")
+
+        except Exception as e:
+            self.logger.error("Model metadata warming error", error=str(e))

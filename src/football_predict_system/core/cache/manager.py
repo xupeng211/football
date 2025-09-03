@@ -328,6 +328,26 @@ class CacheManager:
             self.logger.error("Cache health check failed", **health_status)
             return health_status
 
+    async def get_ttl(self, key: str, namespace: str = "default") -> int:
+        """Get TTL for a cache key."""
+        try:
+            cache_key = self._generate_key(namespace, key)
+            redis_client = await self.get_redis_client()
+            ttl = await redis_client.ttl(cache_key)
+            return ttl
+        except Exception as e:
+            self.logger.error("Failed to get TTL", key=key, error=str(e))
+            return -1
+
+    def clear_memory_cache(self) -> None:
+        """Clear all items from memory cache."""
+        self._memory_cache.clear()
+        self.logger.info("Memory cache cleared")
+
+    def get_stats(self) -> CacheStats:
+        """Get cache statistics."""
+        return self._stats
+
     async def close(self) -> None:
         """Close Redis connection."""
         if self._redis_client:
