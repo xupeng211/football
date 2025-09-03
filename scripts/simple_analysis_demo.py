@@ -15,7 +15,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 try:
     import pandas as pd
 except ImportError:
-    print("❌ pandas未安装，使用基础Python进行分析...")
+    print("❌ pandas未安装,使用基础Python进行分析...")
     pd = None
 
 
@@ -35,7 +35,7 @@ class SimpleFootballAnalyzer:
             "德甲": {"teams": 18, "style": "attacking"},
             "意甲": {"teams": 20, "style": "defensive"},
             "法甲": {"teams": 20, "style": "balanced"},
-            "英冠": {"teams": 24, "style": "competitive"}
+            "英冠": {"teams": 24, "style": "competitive"},
         }
 
         matches = []
@@ -59,7 +59,7 @@ class SimpleFootballAnalyzer:
                 # 每天1-2场比赛
                 daily_matches = random.randint(1, 2)
 
-                for i in range(daily_matches):
+                for _i in range(daily_matches):
                     # 生成符合联赛特点的比分
                     total_goals = max(0, int(random.normalvariate(avg_goals, 1.2)))
                     home_score = random.randint(0, total_goals)
@@ -73,7 +73,7 @@ class SimpleFootballAnalyzer:
                     else:
                         result = "D"
 
-                    # 生成赔率（基于结果的反向计算）
+                    # 生成赔率(基于结果的反向计算)
                     if result == "H":
                         home_odds = round(random.uniform(1.4, 2.5), 2)
                         away_odds = round(random.uniform(2.5, 5.0), 2)
@@ -98,7 +98,7 @@ class SimpleFootballAnalyzer:
                         "result": result,
                         "home_odds": home_odds,
                         "draw_odds": draw_odds,
-                        "away_odds": away_odds
+                        "away_odds": away_odds,
                     }
                     matches.append(match)
                     match_id += 1
@@ -113,39 +113,42 @@ class SimpleFootballAnalyzer:
 
         # 总体统计
         total_matches = len(matches)
-        total_goals = sum(m['total_goals'] for m in matches)
+        total_goals = sum(m["total_goals"] for m in matches)
 
         print("📈 总体数据:")
         print(f"  • 总比赛数: {total_matches}")
         print(f"  • 总进球数: {total_goals}")
-        print(f"  • 场均进球: {total_goals/total_matches:.2f}")
+        print(f"  • 场均进球: {total_goals / total_matches:.2f}")
 
         # 按联赛统计
         print("\n🏆 各联赛统计:")
         leagues = {}
 
         for match in matches:
-            league = match['league']
+            league = match["league"]
             if league not in leagues:
                 leagues[league] = {
-                    'matches': 0, 'goals': 0, 'home_wins': 0,
-                    'draws': 0, 'away_wins': 0
+                    "matches": 0,
+                    "goals": 0,
+                    "home_wins": 0,
+                    "draws": 0,
+                    "away_wins": 0,
                 }
 
-            leagues[league]['matches'] += 1
-            leagues[league]['goals'] += match['total_goals']
+            leagues[league]["matches"] += 1
+            leagues[league]["goals"] += match["total_goals"]
 
-            if match['result'] == 'H':
-                leagues[league]['home_wins'] += 1
-            elif match['result'] == 'D':
-                leagues[league]['draws'] += 1
+            if match["result"] == "H":
+                leagues[league]["home_wins"] += 1
+            elif match["result"] == "D":
+                leagues[league]["draws"] += 1
             else:
-                leagues[league]['away_wins'] += 1
+                leagues[league]["away_wins"] += 1
 
         for league, stats in leagues.items():
-            matches_count = stats['matches']
-            avg_goals = stats['goals'] / matches_count
-            home_win_rate = stats['home_wins'] / matches_count * 100
+            matches_count = stats["matches"]
+            avg_goals = stats["goals"] / matches_count
+            home_win_rate = stats["home_wins"] / matches_count * 100
 
             print(f"  • {league}:")
             print(f"    📊 {matches_count} 场比赛, 场均{avg_goals:.2f}球")
@@ -164,42 +167,44 @@ class SimpleFootballAnalyzer:
         for match in matches:
             # 找出最低赔率对应的预测结果
             odds = {
-                'H': match['home_odds'],
-                'D': match['draw_odds'],
-                'A': match['away_odds']
+                "H": match["home_odds"],
+                "D": match["draw_odds"],
+                "A": match["away_odds"],
             }
 
             predicted = min(odds, key=odds.get)  # 最低赔率
-            actual = match['result']
+            actual = match["result"]
 
             if predicted == actual:
                 correct_predictions += 1
             total_predictions += 1
 
         accuracy = correct_predictions / total_predictions
-        print(f"🎯 赔率预测准确率: {accuracy:.1%} ({correct_predictions}/{total_predictions})")
+        print(
+            f"🎯 赔率预测准确率: {accuracy:.1%} ({correct_predictions}/{total_predictions})"
+        )
 
         # 按联赛分析准确率
         league_accuracy = {}
         for match in matches:
-            league = match['league']
+            league = match["league"]
             if league not in league_accuracy:
-                league_accuracy[league] = {'correct': 0, 'total': 0}
+                league_accuracy[league] = {"correct": 0, "total": 0}
 
             odds = {
-                'H': match['home_odds'],
-                'D': match['draw_odds'],
-                'A': match['away_odds']
+                "H": match["home_odds"],
+                "D": match["draw_odds"],
+                "A": match["away_odds"],
             }
             predicted = min(odds, key=odds.get)
 
-            league_accuracy[league]['total'] += 1
-            if predicted == match['result']:
-                league_accuracy[league]['correct'] += 1
+            league_accuracy[league]["total"] += 1
+            if predicted == match["result"]:
+                league_accuracy[league]["correct"] += 1
 
         print("\n📊 各联赛预测准确率:")
         for league, stats in league_accuracy.items():
-            rate = stats['correct'] / stats['total']
+            rate = stats["correct"] / stats["total"]
             print(f"  • {league}: {rate:.1%}")
 
         return accuracy
@@ -216,7 +221,7 @@ class SimpleFootballAnalyzer:
 
         # 保存原始数据
         matches_file = results_dir / f"demo_matches_{timestamp}.json"
-        with open(matches_file, 'w', encoding='utf-8') as f:
+        with open(matches_file, "w", encoding="utf-8") as f:
             json.dump(matches, f, ensure_ascii=False, indent=2)
         print(f"📁 比赛数据: {matches_file}")
 
@@ -227,24 +232,30 @@ class SimpleFootballAnalyzer:
             "分析结果": {
                 "总比赛数": len(matches),
                 "联赛数量": len(leagues_stats),
-                "平均场均进球": sum(s['goals']/s['matches'] for s in leagues_stats.values()) / len(leagues_stats),
-                "整体主场胜率": sum(s['home_wins']/s['matches'] for s in leagues_stats.values()) / len(leagues_stats),
-                "赔率预测准确率": accuracy
+                "平均场均进球": sum(
+                    s["goals"] / s["matches"] for s in leagues_stats.values()
+                )
+                / len(leagues_stats),
+                "整体主场胜率": sum(
+                    s["home_wins"] / s["matches"] for s in leagues_stats.values()
+                )
+                / len(leagues_stats),
+                "赔率预测准确率": accuracy,
             },
             "联赛详情": {
                 name: {
-                    "比赛场次": stats['matches'],
-                    "场均进球": round(stats['goals']/stats['matches'], 2),
-                    "主场胜率": round(stats['home_wins']/stats['matches'], 3),
-                    "平局率": round(stats['draws']/stats['matches'], 3),
-                    "客场胜率": round(stats['away_wins']/stats['matches'], 3)
+                    "比赛场次": stats["matches"],
+                    "场均进球": round(stats["goals"] / stats["matches"], 2),
+                    "主场胜率": round(stats["home_wins"] / stats["matches"], 3),
+                    "平局率": round(stats["draws"] / stats["matches"], 3),
+                    "客场胜率": round(stats["away_wins"] / stats["matches"], 3),
                 }
                 for name, stats in leagues_stats.items()
-            }
+            },
         }
 
         report_file = results_dir / f"analysis_report_{timestamp}.json"
-        with open(report_file, 'w', encoding='utf-8') as f:
+        with open(report_file, "w", encoding="utf-8") as f:
             json.dump(report, f, ensure_ascii=False, indent=2)
         print(f"📋 分析报告: {report_file}")
 
@@ -279,7 +290,7 @@ def main():
     print("4. 免费版限制: 12个联赛, 最近6个月数据, 每分钟10次请求")
     print("5. 包含五大联赛和英冠! ✅")
 
-    print("\n💡 有了API密钥后，我们可以:")
+    print("\n💡 有了API密钥后,我们可以:")
     print("  • 抓取真实的比赛数据和赔率")
     print("  • 训练机器学习预测模型")
     print("  • 实时分析和预测")

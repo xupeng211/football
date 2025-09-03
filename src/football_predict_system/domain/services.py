@@ -11,10 +11,24 @@ from typing import Any
 from uuid import UUID
 
 from ..core.cache import get_cache_manager
-from ..core.exceptions import InsufficientDataError, ModelNotFoundError, NotFoundError, PredictionError
+from ..core.exceptions import (
+    InsufficientDataError,
+    ModelNotFoundError,
+    NotFoundError,
+    PredictionError,
+)
 from ..core.logging import get_logger, log_performance
-from .models import (BatchPredictionRequest, BatchPredictionResponse, Match, MatchStatus, Model, Prediction,
-                     PredictionRequest, PredictionResponse, Team)
+from .models import (
+    BatchPredictionRequest,
+    BatchPredictionResponse,
+    Match,
+    MatchStatus,
+    Model,
+    Prediction,
+    PredictionRequest,
+    PredictionResponse,
+    Team,
+)
 
 logger = get_logger(__name__)
 

@@ -16,15 +16,14 @@ async def test_api_key(api_key: str):
     print(f"🔑 测试API密钥: {api_key[:8]}...***")
 
     base_url = "https://api.football-data.org/v4"
-    headers = {
-        "Accept": "application/json",
-        "X-Auth-Token": api_key
-    }
+    headers = {"Accept": "application/json", "X-Auth-Token": api_key}
 
     async with aiohttp.ClientSession() as session:
         # 测试基本连接
         try:
-            async with session.get(f"{base_url}/competitions", headers=headers) as response:
+            async with session.get(
+                f"{base_url}/competitions", headers=headers
+            ) as response:
                 print(f"📡 请求状态: {response.status}")
 
                 if response.status == 200:
@@ -39,7 +38,7 @@ async def test_api_key(api_key: str):
                         "Primera Division": 2014,
                         "Bundesliga": 2002,
                         "Serie A": 2019,
-                        "Ligue 1": 2015
+                        "Ligue 1": 2015,
                     }
 
                     print("\n🎯 检查目标联赛可用性:")
@@ -88,9 +87,9 @@ def get_api_key_from_user():
     api_key = input("API密钥: ").strip()
 
     if len(api_key) < 20:
-        print("⚠️ API密钥长度似乎不正确，通常应该是32个字符")
+        print("⚠️ API密钥长度似乎不正确,通常应该是32个字符")
         confirm = input("确定要使用这个密钥吗? (y/N): ").strip().lower()
-        if confirm != 'y':
+        if confirm != "y":
             return None
 
     return api_key
@@ -109,20 +108,19 @@ def update_env_file(api_key: str):
         # 替换API密钥
         updated_content = content.replace(
             "FOOTBALL_DATA_API_KEY=your_football_data_api_key_here",
-            f"FOOTBALL_DATA_API_KEY={api_key}"
+            f"FOOTBALL_DATA_API_KEY={api_key}",
         )
 
-        # 如果没有找到占位符，尝试其他可能的格式
+        # 如果没有找到占位符,尝试其他可能的格式
         if updated_content == content:
             import re
+
             updated_content = re.sub(
-                r'FOOTBALL_DATA_API_KEY=.*',
-                f'FOOTBALL_DATA_API_KEY={api_key}',
-                content
+                r"FOOTBALL_DATA_API_KEY=.*", f"FOOTBALL_DATA_API_KEY={api_key}", content
             )
 
         # 写回文件
-        with open(env_path, 'w') as f:
+        with open(env_path, "w") as f:
             f.write(updated_content)
 
         print(f"✅ API密钥已更新到 {env_path}")
@@ -175,7 +173,7 @@ async def main():
             print("\n🎉 配置完成! 现在可以开始抓取数据了")
             return True
     else:
-        print("\n❌ 提供的API密钥无效，请检查后重试")
+        print("\n❌ 提供的API密钥无效,请检查后重试")
         return False
 
 

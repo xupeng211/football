@@ -33,13 +33,13 @@ def setup_env_file():
     if env_path.exists():
         print("⚠️ .env 文件已存在")
         response = input("是否覆盖现有配置? (y/N): ").strip().lower()
-        if response != 'y':
+        if response != "y":
             print("❌ 取消配置")
             return False
 
     # 获取API密钥
     print("\n🔑 请输入您的 Football-Data.org API 密钥:")
-    print("(如果还没有，请访问: https://www.football-data.org/client/register)")
+    print("(如果还没有,请访问: https://www.football-data.org/client/register)")
     api_key = input("API密钥: ").strip()
 
     if not api_key:
@@ -54,11 +54,11 @@ def setup_env_file():
         # 替换API密钥
         content = template_content.replace(
             "FOOTBALL_DATA_API_KEY=your_api_key_here",
-            f"FOOTBALL_DATA_API_KEY={api_key}"
+            f"FOOTBALL_DATA_API_KEY={api_key}",
         )
 
         # 写入.env文件
-        with open(env_path, 'w') as f:
+        with open(env_path, "w") as f:
             f.write(content)
 
         print(f"✅ API密钥已配置到 {env_path}")
@@ -76,32 +76,29 @@ async def test_api_connection(api_key: str):
     print("=" * 50)
 
     base_url = "https://api.football-data.org/v4"
-    headers = {
-        "Accept": "application/json",
-        "X-Auth-Token": api_key
-    }
+    headers = {"Accept": "application/json", "X-Auth-Token": api_key}
 
     # 测试用例 - 从免费版可访问的开始测试
     test_cases = [
         {
             "name": "获取联赛列表",
             "url": f"{base_url}/competitions",
-            "expected_field": "competitions"
+            "expected_field": "competitions",
         },
         {
             "name": "测试世界杯数据",
             "url": f"{base_url}/competitions/2000",
-            "expected_field": "name"
+            "expected_field": "name",
         },
         {
             "name": "测试英超比赛 (最近7天)",
             "url": f"{base_url}/competitions/2021/matches",
             "params": {
                 "dateFrom": (datetime.now() - timedelta(days=7)).strftime("%Y-%m-%d"),
-                "dateTo": datetime.now().strftime("%Y-%m-%d")
+                "dateTo": datetime.now().strftime("%Y-%m-%d"),
             },
-            "expected_field": "matches"
-        }
+            "expected_field": "matches",
+        },
     ]
 
     async with aiohttp.ClientSession() as session:
@@ -110,8 +107,9 @@ async def test_api_connection(api_key: str):
 
             try:
                 params = test.get("params", {})
-                async with session.get(test["url"], headers=headers, params=params) as response:
-
+                async with session.get(
+                    test["url"], headers=headers, params=params
+                ) as response:
                     if response.status == 200:
                         data = await response.json()
 
@@ -122,12 +120,20 @@ async def test_api_connection(api_key: str):
 
                                 # 显示免费版可用的联赛
                                 print("   📋 免费版可用联赛:")
-                                target_leagues = ["Premier League", "Championship", "Primera Division",
-                                                "Bundesliga", "Serie A", "Ligue 1"]
+                                target_leagues = [
+                                    "Premier League",
+                                    "Championship",
+                                    "Primera Division",
+                                    "Bundesliga",
+                                    "Serie A",
+                                    "Ligue 1",
+                                ]
 
                                 for comp in data["competitions"]:
                                     if comp.get("name") in target_leagues:
-                                        print(f"      • {comp['name']} (ID: {comp['id']})")
+                                        print(
+                                            f"      • {comp['name']} (ID: {comp['id']})"
+                                        )
 
                             elif test["expected_field"] == "matches":
                                 count = len(data["matches"])
@@ -135,7 +141,7 @@ async def test_api_connection(api_key: str):
                             else:
                                 print(f"   ✅ 成功! 获取到: {data.get('name', '数据')}")
                         else:
-                            print("   ✅ 连接成功，但数据格式异常")
+                            print("   ✅ 连接成功,但数据格式异常")
 
                     elif response.status == 403:
                         error_text = await response.text()
@@ -178,8 +184,8 @@ def print_next_steps():
    🥇 Priority 1 (每天更新):
       • 英超 (ID: 2021) - 最受关注
       • 英冠 (ID: 2016) - 您特别要求
-   
-   🥈 Priority 2 (每2天更新):  
+
+   🥈 Priority 2 (每2天更新):
       • 西甲 (ID: 2014)
       • 德甲 (ID: 2002)
       • 意甲 (ID: 2019)
@@ -192,10 +198,10 @@ def print_next_steps():
    • 总时间: 约需要3-4小时完成所有联赛
 
 4️⃣ 存储容量估算:
-   🏆 6个联赛 × 6个月 ≈ 1,800场比赛
-   📊 每场比赛数据 ≈ 2KB (基础数据 + 赔率)  
+   🏆 6个联赛 x 6个月 ≈ 1,800场比赛
+   📊 每场比赛数据 ≈ 2KB (基础数据 + 赔率)
    💾 总容量需求 ≈ 3.6MB + 索引 ≈ 10MB
-   
+
    对于SQLite数据库: 50MB已绰绰有余! 🎉
 
 5️⃣ 分析能力:
@@ -227,10 +233,11 @@ def main():
         # 询问是否要配置
         response = input("\n是否现在配置API密钥? (y/N): ").strip().lower()
 
-        if response == 'y':
+        if response == "y":
             if setup_env_file():
                 # 重新读取密钥并测试
                 from dotenv import load_dotenv
+
                 load_dotenv()
                 new_key = os.getenv("FOOTBALL_DATA_API_KEY")
 

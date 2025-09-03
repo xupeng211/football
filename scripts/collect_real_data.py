@@ -23,7 +23,7 @@ TARGET_LEAGUES = {
     "西甲": {"id": 2014, "name": "Primera Division", "priority": 2},
     "德甲": {"id": 2002, "name": "Bundesliga", "priority": 2},
     "意甲": {"id": 2019, "name": "Serie A", "priority": 2},
-    "法甲": {"id": 2015, "name": "Ligue 1", "priority": 2}
+    "法甲": {"id": 2015, "name": "Ligue 1", "priority": 2},
 }
 
 
@@ -48,7 +48,7 @@ class RealDataCollector:
         cursor = conn.cursor()
 
         # 创建比赛表
-        cursor.execute('''
+        cursor.execute("""
             CREATE TABLE IF NOT EXISTS real_matches (
                 id INTEGER PRIMARY KEY,
                 api_id INTEGER UNIQUE,
@@ -60,17 +60,17 @@ class RealDataCollector:
                 utc_date TEXT,
                 home_team_id INTEGER,
                 home_team_name TEXT,
-                away_team_id INTEGER, 
+                away_team_id INTEGER,
                 away_team_name TEXT,
                 home_score INTEGER,
                 away_score INTEGER,
                 result TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
-        ''')
+        """)
 
         # 创建球队表
-        cursor.execute('''
+        cursor.execute("""
             CREATE TABLE IF NOT EXISTS real_teams (
                 id INTEGER PRIMARY KEY,
                 api_id INTEGER UNIQUE,
@@ -82,10 +82,10 @@ class RealDataCollector:
                 league_id INTEGER,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
-        ''')
+        """)
 
         # 创建收集日志表
-        cursor.execute('''
+        cursor.execute("""
             CREATE TABLE IF NOT EXISTS collection_logs (
                 id INTEGER PRIMARY KEY,
                 league_name TEXT,
@@ -96,20 +96,18 @@ class RealDataCollector:
                 error_message TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
-        ''')
+        """)
 
         conn.commit()
         conn.close()
         print("✅ 数据库表结构已设置")
 
-    async def collect_league_teams(self, session: aiohttp.ClientSession,
-                                 league_id: int, league_name: str) -> list[dict]:
+    async def collect_league_teams(
+        self, session: aiohttp.ClientSession, league_id: int, league_name: str
+    ) -> list[dict]:
         """收集联赛球队信息"""
 
-        headers = {
-            "Accept": "application/json",
-            "X-Auth-Token": self.api_key
-        }
+        headers = {"Accept": "application/json", "X-Auth-Token": self.api_key}
 
         url = f"{self.base_url}/competitions/{league_id}/teams"
 
@@ -121,7 +119,7 @@ class RealDataCollector:
                     print(f"  📊 {league_name}: 获取到 {len(teams)} 支球队")
                     return teams
                 else:
-                    error_text = await response.text()
+                    await response.text()
                     print(f"  ❌ {league_name}: 球队获取失败 ({response.status})")
                     return []
 
@@ -129,15 +127,16 @@ class RealDataCollector:
             print(f"  ❌ {league_name}: 网络错误 - {e}")
             return []
 
-    async def collect_league_matches(self, session: aiohttp.ClientSession,
-                                   league_id: int, league_name: str,
-                                   days_back: int = 180) -> list[dict]:
+    async def collect_league_matches(
+        self,
+        session: aiohttp.ClientSession,
+        league_id: int,
+        league_name: str,
+        days_back: int = 180,
+    ) -> list[dict]:
         """收集联赛比赛数据"""
 
-        headers = {
-            "Accept": "application/json",
-            "X-Auth-Token": self.api_key
-        }
+        headers = {"Accept": "application/json", "X-Auth-Token": self.api_key}
 
         # 计算日期范围 (免费版通常限制6个月)
         end_date = datetime.now()
@@ -145,7 +144,7 @@ class RealDataCollector:
 
         params = {
             "dateFrom": start_date.strftime("%Y-%m-%d"),
-            "dateTo": end_date.strftime("%Y-%m-%d")
+            "dateTo": end_date.strftime("%Y-%m-%d"),
         }
 
         url = f"{self.base_url}/competitions/{league_id}/matches"
@@ -181,19 +180,22 @@ class RealDataCollector:
 
         for team in teams:
             try:
-                cursor.execute('''
-                    INSERT OR IGNORE INTO real_teams 
+                cursor.execute(
+                    """
+                    INSERT OR IGNORE INTO real_teams
                     (api_id, name, short_name, crest, founded, venue, league_id)
                     VALUES (?, ?, ?, ?, ?, ?, ?)
-                ''', (
-                    team.get("id"),
-                    team.get("name"),
-                    team.get("shortName"),
-                    team.get("crest"),
-                    team.get("founded"),
-                    team.get("venue"),
-                    league_id
-                ))
+                """,
+                    (
+                        team.get("id"),
+                        team.get("name"),
+                        team.get("shortName"),
+                        team.get("crest"),
+                        team.get("founded"),
+                        team.get("venue"),
+                        league_id,
+                    ),
+                )
 
                 if cursor.rowcount > 0:
                     saved_count += 1
@@ -235,28 +237,31 @@ class RealDataCollector:
                     else:
                         result = "D"
 
-                cursor.execute('''
+                cursor.execute(
+                    """
                     INSERT OR IGNORE INTO real_matches
-                    (api_id, league_id, league_name, season, matchday, status, 
-                     utc_date, home_team_id, home_team_name, away_team_id, 
+                    (api_id, league_id, league_name, season, matchday, status,
+                     utc_date, home_team_id, home_team_name, away_team_id,
                      away_team_name, home_score, away_score, result)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ''', (
-                    match.get("id"),
-                    league_id,
-                    league_name,
-                    match.get("season", {}).get("id"),
-                    match.get("matchday"),
-                    match.get("status"),
-                    match.get("utcDate"),
-                    match.get("homeTeam", {}).get("id"),
-                    match.get("homeTeam", {}).get("name"),
-                    match.get("awayTeam", {}).get("id"),
-                    match.get("awayTeam", {}).get("name"),
-                    home_score,
-                    away_score,
-                    result
-                ))
+                """,
+                    (
+                        match.get("id"),
+                        league_id,
+                        league_name,
+                        match.get("season", {}).get("id"),
+                        match.get("matchday"),
+                        match.get("status"),
+                        match.get("utcDate"),
+                        match.get("homeTeam", {}).get("id"),
+                        match.get("homeTeam", {}).get("name"),
+                        match.get("awayTeam", {}).get("id"),
+                        match.get("awayTeam", {}).get("name"),
+                        home_score,
+                        away_score,
+                        result,
+                    ),
+                )
 
                 if cursor.rowcount > 0:
                     saved_count += 1
@@ -269,21 +274,34 @@ class RealDataCollector:
 
         return saved_count
 
-    def log_collection(self, league_name: str, league_id: int,
-                      matches_count: int, status: str, error: str = None):
+    def log_collection(
+        self,
+        league_name: str,
+        league_id: int,
+        matches_count: int,
+        status: str,
+        error: str | None = None,
+    ):
         """记录收集日志"""
 
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
 
-        cursor.execute('''
-            INSERT INTO collection_logs 
+        cursor.execute(
+            """
+            INSERT INTO collection_logs
             (league_name, league_id, collection_date, matches_collected, status, error_message)
             VALUES (?, ?, ?, ?, ?, ?)
-        ''', (
-            league_name, league_id, datetime.now().strftime("%Y-%m-%d"),
-            matches_count, status, error
-        ))
+        """,
+            (
+                league_name,
+                league_id,
+                datetime.now().strftime("%Y-%m-%d"),
+                matches_count,
+                status,
+                error,
+            ),
+        )
 
         conn.commit()
         conn.close()
@@ -299,20 +317,25 @@ class RealDataCollector:
 
         async with aiohttp.ClientSession() as session:
             # 按优先级排序
-            sorted_leagues = sorted(TARGET_LEAGUES.items(),
-                                  key=lambda x: x[1]["priority"])
+            sorted_leagues = sorted(
+                TARGET_LEAGUES.items(), key=lambda x: x[1]["priority"]
+            )
 
             for league_name, league_info in sorted_leagues:
                 league_id = league_info["id"]
                 priority = league_info["priority"]
 
-                print(f"\n🏆 抓取 {league_name} (ID: {league_id}, Priority: {priority})")
+                print(
+                    f"\n🏆 抓取 {league_name} (ID: {league_id}, Priority: {priority})"
+                )
                 print("-" * 40)
 
                 try:
                     # 1. 收集球队信息
                     print("  👥 收集球队信息...")
-                    teams = await self.collect_league_teams(session, league_id, league_name)
+                    teams = await self.collect_league_teams(
+                        session, league_id, league_name
+                    )
                     teams_saved = self.save_teams_to_db(teams, league_id)
                     print(f"  💾 保存了 {teams_saved} 支球队")
 
@@ -321,12 +344,18 @@ class RealDataCollector:
 
                     # 2. 收集比赛数据
                     print("  ⚽ 收集比赛数据 (最近6个月)...")
-                    matches = await self.collect_league_matches(session, league_id, league_name)
-                    matches_saved = self.save_matches_to_db(matches, league_id, league_name)
+                    matches = await self.collect_league_matches(
+                        session, league_id, league_name
+                    )
+                    matches_saved = self.save_matches_to_db(
+                        matches, league_id, league_name
+                    )
                     print(f"  💾 保存了 {matches_saved} 场比赛")
 
                     # 记录成功日志
-                    self.log_collection(league_name, league_id, matches_saved, "success")
+                    self.log_collection(
+                        league_name, league_id, matches_saved, "success"
+                    )
                     print(f"  ✅ {league_name} 数据收集完成!")
 
                 except Exception as e:
@@ -350,26 +379,26 @@ class RealDataCollector:
         cursor = conn.cursor()
 
         # 统计收集结果
-        cursor.execute('''
-            SELECT league_name, COUNT(*) as match_count 
-            FROM real_matches 
+        cursor.execute("""
+            SELECT league_name, COUNT(*) as match_count
+            FROM real_matches
             GROUP BY league_name
-        ''')
+        """)
         match_stats = cursor.fetchall()
 
-        cursor.execute('''
-            SELECT league_id, COUNT(*) as team_count 
-            FROM real_teams 
+        cursor.execute("""
+            SELECT league_id, COUNT(*) as team_count
+            FROM real_teams
             GROUP BY league_id
-        ''')
+        """)
         team_stats = cursor.fetchall()
 
         # 收集日志
-        cursor.execute('''
-            SELECT * FROM collection_logs 
-            ORDER BY created_at DESC 
+        cursor.execute("""
+            SELECT * FROM collection_logs
+            ORDER BY created_at DESC
             LIMIT 10
-        ''')
+        """)
         logs = cursor.fetchall()
 
         conn.close()
@@ -400,21 +429,20 @@ class RealDataCollector:
             "API版本": "免费版",
             "总比赛数": total_matches,
             "总球队数": total_teams,
-            "按联赛统计": {name: count for name, count in match_stats},
+            "按联赛统计": dict(match_stats),
             "收集日志": [
-                {
-                    "联赛": log[1],
-                    "状态": log[5],
-                    "比赛数": log[4],
-                    "时间": log[7]
-                } for log in logs
-            ]
+                {"联赛": log[1], "状态": log[5], "比赛数": log[4], "时间": log[7]}
+                for log in logs
+            ],
         }
 
-        report_file = Path("data/analysis_results") / f"collection_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        report_file = (
+            Path("data/analysis_results")
+            / f"collection_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        )
         report_file.parent.mkdir(exist_ok=True)
 
-        with open(report_file, 'w', encoding='utf-8') as f:
+        with open(report_file, "w", encoding="utf-8") as f:
             json.dump(report, f, ensure_ascii=False, indent=2)
 
         print(f"📄 详细报告已保存: {report_file}")
@@ -422,7 +450,7 @@ class RealDataCollector:
         if total_matches > 0:
             print("\n🎉 数据收集成功! 现在可以进行分析了")
         else:
-            print("\n⚠️ 未收集到比赛数据，请检查API限制")
+            print("\n⚠️ 未收集到比赛数据,请检查API限制")
 
 
 async def main():

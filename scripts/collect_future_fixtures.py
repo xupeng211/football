@@ -17,7 +17,7 @@ TARGET_LEAGUES = {
     "西甲": {"id": 2014, "name": "Primera Division"},
     "德甲": {"id": 2002, "name": "Bundesliga"},
     "意甲": {"id": 2019, "name": "Serie A"},
-    "法甲": {"id": 2015, "name": "Ligue 1"}
+    "法甲": {"id": 2015, "name": "Ligue 1"},
 }
 
 
@@ -33,10 +33,7 @@ async def collect_future_fixtures():
     print("=" * 60)
 
     base_url = "https://api.football-data.org/v4"
-    headers = {
-        "Accept": "application/json",
-        "X-Auth-Token": api_key
-    }
+    headers = {"Accept": "application/json", "X-Auth-Token": api_key}
 
     # 设置未来时间范围 (接下来30天)
     start_date = datetime.now()
@@ -44,7 +41,7 @@ async def collect_future_fixtures():
 
     params = {
         "dateFrom": start_date.strftime("%Y-%m-%d"),
-        "dateTo": end_date.strftime("%Y-%m-%d")
+        "dateTo": end_date.strftime("%Y-%m-%d"),
     }
 
     print(f"🗓️ 查询时间范围: {params['dateFrom']} 到 {params['dateTo']}")
@@ -73,7 +70,11 @@ async def collect_future_fixtures():
                         # 筛选真正的未来比赛
                         future_matches = []
                         for match in matches:
-                            if match.get("status") in ["SCHEDULED", "TIMED", "POSTPONED"]:
+                            if match.get("status") in [
+                                "SCHEDULED",
+                                "TIMED",
+                                "POSTPONED",
+                            ]:
                                 future_matches.append(match)
 
                         print(f"  📈 找到 {len(future_matches)} 场未来比赛")
@@ -82,55 +83,62 @@ async def collect_future_fixtures():
                         saved_count = 0
                         for match in future_matches:
                             try:
-                                cursor.execute('''
+                                cursor.execute(
+                                    """
                                     INSERT OR IGNORE INTO real_matches
-                                    (api_id, league_id, league_name, season, matchday, status, 
-                                     utc_date, home_team_id, home_team_name, away_team_id, 
+                                    (api_id, league_id, league_name, season, matchday, status,
+                                     utc_date, home_team_id, home_team_name, away_team_id,
                                      away_team_name, home_score, away_score, result)
                                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                                ''', (
-                                    match.get('id'),
-                                    league_id,
-                                    league_name,
-                                    match.get('season', {}).get('id'),
-                                    match.get('matchday'),
-                                    match.get('status'),
-                                    match.get('utcDate'),
-                                    match.get('homeTeam', {}).get('id'),
-                                    match.get('homeTeam', {}).get('name'),
-                                    match.get('awayTeam', {}).get('id'),
-                                    match.get('awayTeam', {}).get('name'),
-                                    None,  # home_score
-                                    None,  # away_score
-                                    None   # result
-                                ))
+                                """,
+                                    (
+                                        match.get("id"),
+                                        league_id,
+                                        league_name,
+                                        match.get("season", {}).get("id"),
+                                        match.get("matchday"),
+                                        match.get("status"),
+                                        match.get("utcDate"),
+                                        match.get("homeTeam", {}).get("id"),
+                                        match.get("homeTeam", {}).get("name"),
+                                        match.get("awayTeam", {}).get("id"),
+                                        match.get("awayTeam", {}).get("name"),
+                                        None,  # home_score
+                                        None,  # away_score
+                                        None,  # result
+                                    ),
+                                )
 
                                 if cursor.rowcount > 0:
                                     saved_count += 1
 
                             except Exception as e:
-                                print(f'    ⚠️ 保存错误: {e}')
+                                print(f"    ⚠️ 保存错误: {e}")
 
-                        print(f'  💾 保存了 {saved_count} 场新的未来比赛')
+                        print(f"  💾 保存了 {saved_count} 场新的未来比赛")
                         total_future_matches += saved_count
 
                         # 显示一些示例
                         if future_matches:
-                            print('  📋 即将到来的比赛:')
+                            print("  📋 即将到来的比赛:")
                             for i, match in enumerate(future_matches[:3]):
-                                date_str = match.get('utcDate', '')[:10] if match.get('utcDate') else '未定'
-                                home = match.get('homeTeam', {}).get('name', '未知')
-                                away = match.get('awayTeam', {}).get('name', '未知')
-                                print(f'    {i+1}. {date_str} | {home} vs {away}')
+                                date_str = (
+                                    match.get("utcDate", "")[:10]
+                                    if match.get("utcDate")
+                                    else "未定"
+                                )
+                                home = match.get("homeTeam", {}).get("name", "未知")
+                                away = match.get("awayTeam", {}).get("name", "未知")
+                                print(f"    {i + 1}. {date_str} | {home} vs {away}")
 
                     elif response.status == 403:
-                        print('  ❌ 权限不足，可能需要付费版')
+                        print("  ❌ 权限不足,可能需要付费版")
                     else:
                         error_text = await response.text()
-                        print(f'  ❌ 请求失败 ({response.status}): {error_text[:100]}')
+                        print(f"  ❌ 请求失败 ({response.status}): {error_text[:100]}")
 
             except Exception as e:
-                print(f'  ❌ 网络错误: {e}')
+                print(f"  ❌ 网络错误: {e}")
 
             # 避免速率限制
             await asyncio.sleep(6)
@@ -138,11 +146,11 @@ async def collect_future_fixtures():
     conn.commit()
     conn.close()
 
-    print('\n🎯 未来赛程抓取总结:')
-    print(f'  • 新增未来比赛: {total_future_matches} 场')
+    print("\n🎯 未来赛程抓取总结:")
+    print(f"  • 新增未来比赛: {total_future_matches} 场")
 
     return total_future_matches
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     asyncio.run(collect_future_fixtures())

@@ -20,9 +20,7 @@ async def get_all_competitions():
     # 免费API的基本URL
     base_url = "https://api.football-data.org/v4"
 
-    headers = {
-        "Accept": "application/json"
-    }
+    headers = {"Accept": "application/json"}
 
     async with aiohttp.ClientSession() as session:
         try:
@@ -39,14 +37,16 @@ async def get_all_competitions():
                     # 创建DataFrame便于查看
                     df_data = []
                     for comp in competitions:
-                        df_data.append({
-                            "ID": comp.get("id"),
-                            "名称": comp.get("name"),
-                            "代码": comp.get("code"),
-                            "国家": comp.get("area", {}).get("name", ""),
-                            "类型": comp.get("type", ""),
-                            "计划": comp.get("plan", "")
-                        })
+                        df_data.append(
+                            {
+                                "ID": comp.get("id"),
+                                "名称": comp.get("name"),
+                                "代码": comp.get("code"),
+                                "国家": comp.get("area", {}).get("name", ""),
+                                "类型": comp.get("type", ""),
+                                "计划": comp.get("plan", ""),
+                            }
+                        )
 
                     df = pd.DataFrame(df_data)
 
@@ -64,16 +64,18 @@ async def get_all_competitions():
                         "Serie A": "意甲",
                         "Ligue 1": "法甲",
                         "Championship": "英冠",
-                        "EFL Championship": "英冠"
+                        "EFL Championship": "英冠",
                     }
 
                     for comp in competitions:
                         name = comp.get("name", "")
                         for target_name, chinese_name in target_leagues.items():
                             if target_name.lower() in name.lower():
-                                area_name = comp.get('area', {}).get('name', '')
-                                comp_id = comp.get('id')
-                                print(f"✅ {chinese_name}: ID={comp_id} | {name} | {area_name}")
+                                area_name = comp.get("area", {}).get("name", "")
+                                comp_id = comp.get("id")
+                                print(
+                                    f"✅ {chinese_name}: ID={comp_id} | {name} | {area_name}"
+                                )
 
                     return competitions
 

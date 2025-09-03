@@ -38,14 +38,14 @@ class FootballSystemTester:
             ("API连接测试", self.test_api_connection),
             ("系统功能测试", self.test_system_functions),
             ("预测模型测试", self.test_prediction_capability),
-            ("性能压力测试", self.test_performance)
+            ("性能压力测试", self.test_performance),
         ]
 
         passed_tests = 0
         total_tests = len(tests)
 
         for test_name, test_func in tests:
-            print(f"\n{'='*20} {test_name} {'='*20}")
+            print(f"\n{'=' * 20} {test_name} {'=' * 20}")
 
             try:
                 if asyncio.iscoroutinefunction(test_func):
@@ -87,7 +87,7 @@ class FootballSystemTester:
             cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
             tables = [row[0] for row in cursor.fetchall()]
 
-            required_tables = ['real_matches', 'real_teams', 'collection_logs']
+            required_tables = ["real_matches", "real_teams", "collection_logs"]
             missing_tables = [t for t in required_tables if t not in tables]
 
             if missing_tables:
@@ -125,13 +125,13 @@ class FootballSystemTester:
 
             # 数据质量检查
             cursor.execute("""
-                SELECT COUNT(*) FROM real_matches 
+                SELECT COUNT(*) FROM real_matches
                 WHERE home_team_name IS NULL OR away_team_name IS NULL
             """)
             missing_teams = cursor.fetchone()[0]
 
             cursor.execute("""
-                SELECT COUNT(*) FROM real_matches 
+                SELECT COUNT(*) FROM real_matches
                 WHERE utc_date IS NULL
             """)
             missing_dates = cursor.fetchone()[0]
@@ -141,10 +141,14 @@ class FootballSystemTester:
             data_quality_good = missing_teams == 0 and missing_dates == 0
 
             if not data_sufficient:
-                self.issues.append(f"数据量不足: {match_count}场比赛, {team_count}支球队")
+                self.issues.append(
+                    f"数据量不足: {match_count}场比赛, {team_count}支球队"
+                )
 
             if not data_quality_good:
-                self.issues.append(f"数据质量问题: {missing_teams}缺失球队, {missing_dates}缺失日期")
+                self.issues.append(
+                    f"数据质量问题: {missing_teams}缺失球队, {missing_dates}缺失日期"
+                )
 
             print(f"  ✅ 数据量充足: {data_sufficient}")
             print(f"  ✅ 数据质量良好: {data_quality_good}")
@@ -167,14 +171,13 @@ class FootballSystemTester:
 
         try:
             base_url = "https://api.football-data.org/v4"
-            headers = {
-                "Accept": "application/json",
-                "X-Auth-Token": self.api_key
-            }
+            headers = {"Accept": "application/json", "X-Auth-Token": self.api_key}
 
             async with aiohttp.ClientSession() as session:
                 # 测试基本连接
-                async with session.get(f"{base_url}/competitions", headers=headers) as response:
+                async with session.get(
+                    f"{base_url}/competitions", headers=headers
+                ) as response:
                     if response.status == 200:
                         data = await response.json()
                         comp_count = len(data.get("competitions", []))
@@ -183,7 +186,9 @@ class FootballSystemTester:
                         return True
                     else:
                         error_text = await response.text()
-                        self.issues.append(f"API请求失败: {response.status} - {error_text[:100]}")
+                        self.issues.append(
+                            f"API请求失败: {response.status} - {error_text[:100]}"
+                        )
                         return False
 
         except Exception as e:
@@ -203,9 +208,9 @@ class FootballSystemTester:
             # 1. 测试联赛统计查询
             cursor.execute("""
                 SELECT league_name, COUNT(*) as match_count,
-                       AVG(CASE WHEN home_score IS NOT NULL AND away_score IS NOT NULL 
+                       AVG(CASE WHEN home_score IS NOT NULL AND away_score IS NOT NULL
                            THEN home_score + away_score END) as avg_goals
-                FROM real_matches 
+                FROM real_matches
                 GROUP BY league_name
                 HAVING match_count > 10
             """)
@@ -219,7 +224,7 @@ class FootballSystemTester:
 
             # 2. 测试时间范围查询
             cursor.execute("""
-                SELECT COUNT(*) FROM real_matches 
+                SELECT COUNT(*) FROM real_matches
                 WHERE utc_date >= date('now', '-30 days')
             """)
             recent_matches = cursor.fetchone()[0]
@@ -261,16 +266,16 @@ class FootballSystemTester:
 
             # 检查是否有足够的历史数据进行预测
             cursor.execute("""
-                SELECT COUNT(*) FROM real_matches 
-                WHERE status = 'FINISHED' 
-                AND home_score IS NOT NULL 
+                SELECT COUNT(*) FROM real_matches
+                WHERE status = 'FINISHED'
+                AND home_score IS NOT NULL
                 AND away_score IS NOT NULL
             """)
             finished_matches = cursor.fetchone()[0]
 
             # 检查是否有未来比赛可以预测
             cursor.execute("""
-                SELECT COUNT(*) FROM real_matches 
+                SELECT COUNT(*) FROM real_matches
                 WHERE status IN ('SCHEDULED', 'TIMED')
             """)
             future_matches = cursor.fetchone()[0]
@@ -282,9 +287,9 @@ class FootballSystemTester:
             if finished_matches >= 100:
                 # 计算主场胜率作为基础预测
                 cursor.execute("""
-                    SELECT 
+                    SELECT
                         SUM(CASE WHEN result = 'H' THEN 1 ELSE 0 END) * 1.0 / COUNT(*) as home_win_rate
-                    FROM real_matches 
+                    FROM real_matches
                     WHERE status = 'FINISHED'
                 """)
                 home_win_rate = cursor.fetchone()[0]
@@ -298,7 +303,7 @@ class FootballSystemTester:
                 conn.close()
                 return prediction_ready
             else:
-                self.issues.append("训练数据不足，无法进行预测")
+                self.issues.append("训练数据不足,无法进行预测")
                 conn.close()
                 return False
 
@@ -322,9 +327,9 @@ class FootballSystemTester:
 
             # 执行复杂查询测试
             cursor.execute("""
-                SELECT league_name, home_team_name, away_team_name, 
+                SELECT league_name, home_team_name, away_team_name,
                        home_score, away_score, utc_date
-                FROM real_matches 
+                FROM real_matches
                 WHERE status = 'FINISHED'
                 ORDER BY utc_date DESC
                 LIMIT 100
@@ -361,28 +366,37 @@ class FootballSystemTester:
 
             # 测试各种分析查询
             analysis_tests = [
-                ("联赛统计", """
+                (
+                    "联赛统计",
+                    """
                     SELECT league_name, COUNT(*) as matches,
                            AVG(home_score + away_score) as avg_goals
-                    FROM real_matches 
+                    FROM real_matches
                     WHERE status = 'FINISHED'
                     GROUP BY league_name
-                """),
-                ("主场优势分析", """
+                """,
+                ),
+                (
+                    "主场优势分析",
+                    """
                     SELECT league_name,
                            SUM(CASE WHEN result = 'H' THEN 1 ELSE 0 END) * 1.0 / COUNT(*) as home_rate
-                    FROM real_matches 
+                    FROM real_matches
                     WHERE status = 'FINISHED'
                     GROUP BY league_name
-                """),
-                ("时间趋势分析", """
+                """,
+                ),
+                (
+                    "时间趋势分析",
+                    """
                     SELECT DATE(utc_date) as match_date, COUNT(*) as daily_matches
-                    FROM real_matches 
+                    FROM real_matches
                     WHERE utc_date IS NOT NULL
                     GROUP BY DATE(utc_date)
                     ORDER BY match_date DESC
                     LIMIT 10
-                """)
+                """,
+                ),
             ]
 
             analysis_passed = 0
@@ -414,86 +428,6 @@ class FootballSystemTester:
             self.issues.append(f"分析功能测试错误: {e}")
             return False
 
-    async def test_api_connection(self):
-        """测试API连接和权限"""
-
-        print("🔑 测试API连接...")
-
-        if not self.api_key:
-            self.issues.append("API密钥未设置")
-            return False
-
-        try:
-            base_url = "https://api.football-data.org/v4"
-            headers = {
-                "Accept": "application/json",
-                "X-Auth-Token": self.api_key
-            }
-
-            async with aiohttp.ClientSession() as session:
-                # 测试基础API访问
-                async with session.get(f"{base_url}/competitions/2021", headers=headers) as response:
-                    if response.status == 200:
-                        data = await response.json()
-                        league_name = data.get('name', '未知')
-                        print(f"  ✅ API访问正常: {league_name}")
-
-                        # 测试请求限制
-                        await asyncio.sleep(1)  # 短暂等待
-                        async with session.get(f"{base_url}/competitions", headers=headers) as response2:
-                            if response2.status == 200:
-                                print("  ✅ 速率限制内正常工作")
-                                return True
-                            elif response2.status == 429:
-                                print("  ⚠️ 触及速率限制，但密钥有效")
-                                return True
-                            else:
-                                self.issues.append(f"第二次API请求失败: {response2.status}")
-                                return False
-                    else:
-                        error_text = await response.text()
-                        self.issues.append(f"API请求失败: {response.status} - {error_text[:100]}")
-                        return False
-
-        except Exception as e:
-            self.issues.append(f"API连接测试错误: {e}")
-            return False
-
-    def test_system_functions(self):
-        """测试系统核心功能"""
-
-        print("🔧 测试系统核心功能...")
-
-        # 测试1: 数据分析功能
-        analysis_test = self.test_data_analysis_functions()
-
-        # 测试2: 文件操作
-        try:
-            test_file = Path("test_file_operations.tmp")
-            test_data = {"test": "data", "timestamp": datetime.now().isoformat()}
-
-            # 写入测试
-            with open(test_file, 'w') as f:
-                json.dump(test_data, f)
-
-            # 读取测试
-            with open(test_file) as f:
-                loaded_data = json.load(f)
-
-            file_ops_ok = loaded_data["test"] == "data"
-
-            # 清理
-            test_file.unlink()
-
-            print(f"  ✅ 文件操作正常: {file_ops_ok}")
-
-        except Exception as e:
-            print(f"  ❌ 文件操作测试失败: {e}")
-            self.issues.append(f"文件操作错误: {e}")
-            file_ops_ok = False
-
-        return analysis_test and file_ops_ok
-
     def generate_test_report(self, passed, total):
         """生成测试报告"""
 
@@ -518,13 +452,16 @@ class FootballSystemTester:
             "通过测试": passed,
             "总测试数": total,
             "发现问题": self.issues,
-            "建议": self.generate_recommendations(success_rate)
+            "建议": self.generate_recommendations(success_rate),
         }
 
-        report_file = Path("data/analysis_results") / f"system_test_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        report_file = (
+            Path("data/analysis_results")
+            / f"system_test_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        )
         report_file.parent.mkdir(exist_ok=True)
 
-        with open(report_file, 'w', encoding='utf-8') as f:
+        with open(report_file, "w", encoding="utf-8") as f:
             json.dump(report, f, ensure_ascii=False, indent=2)
 
         print(f"📄 详细报告已保存: {report_file}")
@@ -570,10 +507,10 @@ def main():
         print("🎉 所有测试通过! 系统运行完美!")
         print("✅ 您的足球预测系统已ready for action!")
     elif passed >= total * 0.8:
-        print("⚠️ 大部分测试通过，有少量问题需要修复")
+        print("⚠️ 大部分测试通过,有少量问题需要修复")
         print("🔧 建议先修复问题再继续")
     else:
-        print("❌ 发现多个重要问题，需要全面检查")
+        print("❌ 发现多个重要问题,需要全面检查")
         print("🚨 建议先解决关键问题")
 
 

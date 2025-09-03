@@ -26,7 +26,7 @@ FREE_TIER_LEAGUES = [
     {"id": 2003, "name": "Eredivisie", "country": "Netherlands"},
     {"id": 2017, "name": "Primeira Liga", "country": "Portugal"},
     {"id": 2013, "name": "Campeonato Brasileiro Série A", "country": "Brazil"},
-    {"id": 2000, "name": "FIFA World Cup", "country": "World"}
+    {"id": 2000, "name": "FIFA World Cup", "country": "World"},
 ]
 
 
@@ -47,7 +47,7 @@ async def test_league_access(league_info: dict[str, Any]) -> dict[str, Any]:
         "matches_accessible": False,
         "teams_count": 0,
         "recent_matches_count": 0,
-        "error_message": None
+        "error_message": None,
     }
 
     async with aiohttp.ClientSession() as session:
@@ -141,13 +141,13 @@ async def main():
                 "name": result["league_info"]["name"],
                 "country": result["league_info"]["country"],
                 "teams_count": result["teams_count"],
-                "recent_matches": result["recent_matches_count"]
+                "recent_matches": result["recent_matches_count"],
             }
             for result in accessible_leagues
         ]
 
         config_file = Path("data") / "accessible_leagues.json"
-        with open(config_file, 'w', encoding='utf-8') as f:
+        with open(config_file, "w", encoding="utf-8") as f:
             json.dump(accessible_config, f, ensure_ascii=False, indent=2)
 
         print(f"\n💾 可访问联赛配置已保存: {config_file}")
