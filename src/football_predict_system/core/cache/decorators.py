@@ -9,7 +9,7 @@ import inspect
 from collections.abc import Callable
 from typing import Any, TypeVar
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 from .manager import CacheManager
 

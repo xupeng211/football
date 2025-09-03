@@ -233,7 +233,7 @@ class CacheManager:
             )
             return 0
 
-# Removed duplicate get_stats method - kept the one at line 347
+    # Removed duplicate get_stats method - kept the one at line 347
 
     def cache(
         self,
@@ -296,7 +296,9 @@ class CacheManager:
             response_time = (datetime.now() - start_time).total_seconds()
 
             health_status = {
-                "status": "healthy" if result and result.decode() == test_value else "degraded",
+                "status": "healthy"
+                if result and result.decode() == test_value
+                else "degraded",
                 "redis_connection": True,
                 "response_time": response_time,
                 "redis_version": info.get("redis_version"),

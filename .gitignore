@@ -40,10 +40,12 @@ pip-log.txt
 pip-delete-this-directory.txt
 
 # Environments
+# Environment & Configuration
+# ============================================================================
 .env
 .env.*
 !.env.template
-!env.template
+!.env.example
 .venv
 env/
 venv/
