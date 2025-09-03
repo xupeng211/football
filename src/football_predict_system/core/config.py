@@ -8,6 +8,7 @@ This module provides a unified configuration system that supports:
 - Secret management
 """
 
+import os
 from enum import Enum
 from typing import Any
 
@@ -66,7 +67,10 @@ class APIConfig(BaseModel):
     log_level: str = "info"
 
     # Security
-    secret_key: str = "a-secret-key"
+    secret_key: str = Field(
+        default_factory=lambda: os.urandom(32).hex(),
+        description="API secret key - use env var in production",
+    )
     access_token_expire_minutes: int = 30
 
     # CORS

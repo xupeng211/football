@@ -17,6 +17,7 @@ from typing import Any
 
 from sqlalchemy import create_engine, event, text
 from sqlalchemy.engine import Engine
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import QueuePool
@@ -338,10 +339,10 @@ class TransactionManager:
                         # Session is automatically committed in context manager
                         return
 
-            except Exception as e:
+            except (SQLAlchemyError, ConnectionError) as e:
                 if attempt < self.max_retries:
                     self.logger.warning(
-                        "Transaction failed, retrying",
+                        "Database operation failed, retrying",
                         attempt=attempt + 1,
                         max_retries=self.max_retries,
                         error=str(e),
@@ -350,9 +351,13 @@ class TransactionManager:
                     continue
                 else:
                     self.logger.error(
-                        "Transaction failed after all retries", error=str(e)
+                        "Database operation failed after all retries", error=str(e)
                     )
                     raise handle_database_exception(e)
+            except Exception as e:
+                # Unexpected errors should not be retried
+                self.logger.error("Unexpected error in transaction", error=str(e))
+                raise
 
     @asynccontextmanager
     async def async_transaction(self, session: AsyncSession = None):

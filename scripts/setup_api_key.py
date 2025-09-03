@@ -69,17 +69,9 @@ def setup_env_file():
         return False
 
 
-async def test_api_connection(api_key: str):
-    """测试API连接"""
-
-    print("\n🧪 测试API连接")
-    print("=" * 50)
-
-    base_url = "https://api.football-data.org/v4"
-    headers = {"Accept": "application/json", "X-Auth-Token": api_key}
-
-    # 测试用例 - 从免费版可访问的开始测试
-    test_cases = [
+def _get_test_cases(base_url: str):
+    """获取API测试用例配置"""
+    return [
         {
             "name": "获取联赛列表",
             "url": f"{base_url}/competitions",
@@ -101,65 +93,84 @@ async def test_api_connection(api_key: str):
         },
     ]
 
+
+def _display_available_leagues(competitions):
+    """显示免费版可用的联赛"""
+    print("   📋 免费版可用联赛:")
+    target_leagues = [
+        "Premier League",
+        "Championship",
+        "Primera Division",
+        "Bundesliga",
+        "Serie A",
+        "Ligue 1",
+    ]
+
+    for comp in competitions:
+        if comp.get("name") in target_leagues:
+            print(f"      • {comp['name']} (ID: {comp['id']})")
+
+
+def _handle_success_response(data, expected_field):
+    """处理成功响应"""
+    if expected_field not in data:
+        print("   ✅ 连接成功,但数据格式异常")
+        return
+
+    if expected_field == "competitions":
+        count = len(data["competitions"])
+        print(f"   ✅ 成功! 获取到 {count} 个联赛")
+        _display_available_leagues(data["competitions"])
+    elif expected_field == "matches":
+        count = len(data["matches"])
+        print(f"   ✅ 成功! 获取到 {count} 场比赛")
+    else:
+        print(f"   ✅ 成功! 获取到: {data.get('name', '数据')}")
+
+
+async def _handle_error_response(response):
+    """处理错误响应"""
+    if response.status == 403:
+        error_text = await response.text()
+        print("   ❌ 权限被拒 (403)")
+        if "subscription" in error_text.lower():
+            print("   💡 提示: 该联赛需要付费订阅")
+        else:
+            print("   💡 提示: 检查API密钥是否正确")
+    elif response.status == 429:
+        print("   ⏳ 请求过于频繁 (429) - 免费版每分钟最多10次")
+    else:
+        error_text = await response.text()
+        print(f"   ❌ 请求失败 ({response.status}): {error_text[:100]}")
+
+
+async def _execute_test_case(session, test, headers):
+    """执行单个测试用例"""
+    params = test.get("params", {})
+    try:
+        async with session.get(test["url"], headers=headers, params=params) as response:
+            if response.status == 200:
+                data = await response.json()
+                _handle_success_response(data, test["expected_field"])
+            else:
+                await _handle_error_response(response)
+    except Exception as e:
+        print(f"   ❌ 网络错误: {e}")
+
+
+async def test_api_connection(api_key: str):
+    """测试API连接"""
+    print("\n🧪 测试API连接")
+    print("=" * 50)
+
+    base_url = "https://api.football-data.org/v4"
+    headers = {"Accept": "application/json", "X-Auth-Token": api_key}
+    test_cases = _get_test_cases(base_url)
+
     async with aiohttp.ClientSession() as session:
         for i, test in enumerate(test_cases, 1):
             print(f"\n{i}. {test['name']}")
-
-            try:
-                params = test.get("params", {})
-                async with session.get(
-                    test["url"], headers=headers, params=params
-                ) as response:
-                    if response.status == 200:
-                        data = await response.json()
-
-                        if test["expected_field"] in data:
-                            if test["expected_field"] == "competitions":
-                                count = len(data["competitions"])
-                                print(f"   ✅ 成功! 获取到 {count} 个联赛")
-
-                                # 显示免费版可用的联赛
-                                print("   📋 免费版可用联赛:")
-                                target_leagues = [
-                                    "Premier League",
-                                    "Championship",
-                                    "Primera Division",
-                                    "Bundesliga",
-                                    "Serie A",
-                                    "Ligue 1",
-                                ]
-
-                                for comp in data["competitions"]:
-                                    if comp.get("name") in target_leagues:
-                                        print(
-                                            f"      • {comp['name']} (ID: {comp['id']})"
-                                        )
-
-                            elif test["expected_field"] == "matches":
-                                count = len(data["matches"])
-                                print(f"   ✅ 成功! 获取到 {count} 场比赛")
-                            else:
-                                print(f"   ✅ 成功! 获取到: {data.get('name', '数据')}")
-                        else:
-                            print("   ✅ 连接成功,但数据格式异常")
-
-                    elif response.status == 403:
-                        error_text = await response.text()
-                        print("   ❌ 权限被拒 (403)")
-                        if "subscription" in error_text.lower():
-                            print("   💡 提示: 该联赛需要付费订阅")
-                        else:
-                            print("   💡 提示: 检查API密钥是否正确")
-
-                    elif response.status == 429:
-                        print("   ⏳ 请求过于频繁 (429) - 免费版每分钟最多10次")
-
-                    else:
-                        error_text = await response.text()
-                        print(f"   ❌ 请求失败 ({response.status}): {error_text[:100]}")
-
-            except Exception as e:
-                print(f"   ❌ 网络错误: {e}")
+            await _execute_test_case(session, test, headers)
 
             # 遵守速率限制
             if i < len(test_cases):

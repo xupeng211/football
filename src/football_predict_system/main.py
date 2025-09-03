@@ -181,7 +181,7 @@ async def health_check():
         return JSONResponse(
             content=health_report.model_dump(mode="json"), status_code=status_code
         )
-    except Exception as e:
+    except (ImportError, ValueError, ConnectionError) as e:
         logger.error("Health check failed", error=str(e), exc_info=True)
         return JSONResponse(
             status_code=503,

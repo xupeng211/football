@@ -143,7 +143,7 @@ class PredictionService:
 
             return response
 
-        except Exception as e:
+        except (InsufficientDataError, ModelNotFoundError, PredictionError) as e:
             self.logger.error(
                 "Prediction generation failed",
                 match_id=request.match_id,
@@ -198,7 +198,12 @@ class PredictionService:
         try:
             result = await self.generate_prediction(request)
             return result if isinstance(result, PredictionResponse) else None
-        except Exception as e:
+        except (
+            InsufficientDataError,
+            ModelNotFoundError,
+            PredictionError,
+            ValueError,
+        ) as e:
             self.logger.warning(
                 "Prediction failed for match",
                 match_id=request.match_id,

@@ -16,6 +16,7 @@ from typing import Any
 
 import psutil
 from pydantic import BaseModel
+from sqlalchemy.exc import SQLAlchemyError
 
 from .config import get_settings
 from .database import get_database_manager
@@ -88,8 +89,9 @@ class HealthChecker:
                 last_check=datetime.utcnow(),
             )
 
-        except Exception as e:
+        except (SQLAlchemyError, ConnectionError) as e:
             response_time = time.time() - start_time
+            self.logger.error("Database health check failed", error=str(e))
 
             return ComponentHealth(
                 name="database",
@@ -146,8 +148,9 @@ class HealthChecker:
                 details={"message": "Redis client not installed"},
                 last_check=datetime.utcnow(),
             )
-        except Exception as e:
+        except ConnectionError as e:
             response_time = time.time() - start_time
+            self.logger.error("Redis health check failed", error=str(e))
 
             return ComponentHealth(
                 name="redis",

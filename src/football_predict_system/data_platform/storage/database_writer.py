@@ -7,6 +7,7 @@ from typing import Any
 
 import pandas as pd
 from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
 
 from ...core.database import get_database_manager
 from ...core.logging import get_logger
@@ -145,7 +146,7 @@ class DatabaseWriter:
                             external_api_id=row["external_api_id"],
                         )
 
-                except Exception as e:
+                except (SQLAlchemyError, ValueError, KeyError) as e:
                     failed += 1
                     self.logger.error(
                         "Failed to upsert team",
@@ -251,7 +252,7 @@ class DatabaseWriter:
                         )
                         inserted += 1
 
-                except Exception as e:
+                except (SQLAlchemyError, ValueError, KeyError) as e:
                     self.logger.error(
                         "Failed to upsert match",
                         external_api_id=row.get("external_api_id"),

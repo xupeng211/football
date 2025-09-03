@@ -214,7 +214,7 @@ class AuthenticationService:
         except jwt.InvalidTokenError as e:
             self.logger.warning("Invalid token provided", error=str(e))
             raise UnauthorizedError("Invalid token")
-        except Exception as e:
+        except (ValueError, KeyError) as e:
             self.logger.error("Token verification failed", error=str(e))
             raise UnauthorizedError("Token verification failed")
 
