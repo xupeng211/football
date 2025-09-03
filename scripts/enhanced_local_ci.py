@@ -18,6 +18,7 @@ def set_ci_environment():
     os.environ["FOOTBALL_DATA_API_KEY"] = "test_api_key"
     print("✅ CI环境变量已设置")
 
+
 def run_command(cmd: str, description: str) -> bool:
     """运行命令并返回是否成功"""
     print(f"\n🔄 {description}...")
@@ -25,11 +26,7 @@ def run_command(cmd: str, description: str) -> bool:
 
     try:
         result = subprocess.run(
-            cmd,
-            shell=True,
-            check=True,
-            capture_output=True,
-            text=True
+            cmd, shell=True, check=True, capture_output=True, text=True
         )
         print(f"✅ {description} - 成功")
         if result.stdout:
@@ -41,6 +38,7 @@ def run_command(cmd: str, description: str) -> bool:
         if e.stdout:
             print(f"📄 输出: {e.stdout.strip()}")
         return False
+
 
 def main():
     """主函数"""
@@ -57,20 +55,20 @@ def main():
         # 1. 基础代码质量检查
         ("uv run ruff check .", "Ruff代码检查"),
         ("uv run mypy .", "MyPy类型检查"),
-
         # 2. CI专有的严格模块导入测试
         ("uv run python scripts/ci_database_test.py", "CI友好数据库测试"),
-
         # 3. 配置系统测试
-        ('''uv run python -c "
+        (
+            '''uv run python -c "
 import sys
 sys.path.insert(0, 'src')
 from football_predict_system.data_platform.config import get_data_platform_config
 config = get_data_platform_config()
 assert config.football_data_org.rate_limit_per_minute > 0
 print('✅ 配置系统验证通过')
-"''', "配置系统验证"),
-
+"''',
+            "配置系统验证",
+        ),
         # 4. 测试执行
         ("uv run pytest --maxfail=1 --disable-warnings -q", "测试执行"),
     ]
@@ -99,6 +97,7 @@ print('✅ 配置系统验证通过')
         print("  2. 检查类型注解和导入语句")
         print("  3. 确保所有测试通过")
         return 1
+
 
 if __name__ == "__main__":
     exit(main())
