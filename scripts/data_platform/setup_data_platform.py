@@ -47,6 +47,20 @@ class DataPlatformSetup:
             if is_postgres and os.getenv("CI"):
                 await self._wait_for_database_ready()
                 logger.info("Database connection verified for CI environment")
+            elif is_postgres:
+                # For non-CI PostgreSQL, check if service is available
+                try:
+                    # Quick connection test
+                    async with self.db_manager.get_async_session() as session:
+                        await session.execute(text("SELECT 1"))
+                    logger.info("PostgreSQL connection verified")
+                except Exception as e:
+                    logger.warning(f"PostgreSQL连接失败，将使用SQLite fallback: {e}")
+                    # 自动降级到SQLite
+                    os.environ["DATABASE_URL"] = "sqlite:///./football_dev.db"
+                    self.settings = get_settings()  # 重新加载设置
+                    self.db_manager = get_database_manager()  # 重新初始化数据库管理器
+                    is_postgres = False
 
             # Choose appropriate schema file
             if is_postgres:

@@ -19,6 +19,12 @@ env:
   FOOTBALL_DATA_API_KEY: "test_api_key"
   ENVIRONMENT: "testing"
   CI: "true"
+  # 确保CI环境标识
+  POSTGRES_HOST: "localhost"
+  POSTGRES_PORT: "5432"
+  POSTGRES_USER: "test_user"
+  POSTGRES_PASSWORD: "test_pass"
+  POSTGRES_DB: "test_football_db"
 
 jobs:
   # =================== 第一层: 代码质量门禁 ===================
@@ -235,6 +241,20 @@ jobs:
       - name: Setup test environment
         run: |
           echo "🏗️ 设置测试环境..."
+          echo "⏳ 等待数据库服务就绪..."
+          for i in {1..30}; do
+            if pg_isready -h localhost -p 5432 -U test_user; then
+              echo "✅ PostgreSQL服务已就绪"
+              break
+            fi
+            echo "⏳ 等待PostgreSQL服务启动... ($i/30)"
+            sleep 2
+          done
+          
+          echo "🔧 创建数据库..."
+          PGPASSWORD=test_pass psql -h localhost -U test_user -d postgres -c "CREATE DATABASE test_football_db;" || echo "数据库可能已存在"
+          
+          echo "🏗️ 运行数据库设置..."
           uv run python scripts/data_platform/setup_data_platform.py --action setup
           echo "✅ 测试环境准备完成"
           
@@ -378,6 +398,21 @@ jobs:
           
       - name: Setup test environment
         run: |
+          echo "🏗️ 设置数据平台测试环境..."
+          echo "⏳ 验证数据库连接..."
+          for i in {1..30}; do
+            if pg_isready -h localhost -p 5432 -U test_user; then
+              echo "✅ PostgreSQL服务已就绪"
+              break
+            fi
+            echo "⏳ 等待PostgreSQL服务启动... ($i/30)"
+            sleep 2
+          done
+          
+          echo "🔧 确保数据库存在..."
+          PGPASSWORD=test_pass psql -h localhost -U test_user -d postgres -c "CREATE DATABASE test_football_db;" || echo "数据库可能已存在"
+          
+          echo "🏗️ 运行数据库设置..."
           uv run python scripts/data_platform/setup_data_platform.py --action setup
           
       - name: ❌ STRICT Mock API Response Test
