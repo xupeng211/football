@@ -418,12 +418,38 @@ ci.enhanced: format lint security ## 🔧 增强版本地CI检查 (替代ci.loca
 ci.full.new: ci.docker.new ## 🔧 完整CI检查 (Docker + 所有测试)
 	@echo "$(GREEN)✅ 完整CI检查完成$(NC)"
 
+# === 轻量级本地CI流程 ===
+.PHONY: ci.fast
+ci.fast: ## 🚀 快速本地CI检查 (轻量级，不依赖Docker)
+	@echo "$(CYAN)🚀 启动快速本地CI检查...$(NC)"
+	@./scripts/local_ci_complete.sh
+
+.PHONY: ci.ready
+ci.ready: ci.fast ## 🎯 检查代码是否准备推送
+	@echo "$(GREEN)🎉 代码已准备好推送！$(NC)"
+	@echo "$(YELLOW)💡 推荐命令:$(NC)"
+	@echo "$(CYAN)  git add . && git commit -m \"fix: 解决CI问题\" && git push$(NC)"
+
+.PHONY: push.safe
+push.safe: ci.fast ## 🛡️ 安全推送 (先运行CI检查)
+	@echo "$(BLUE)🔍 运行CI检查后推送...$(NC)"
+	@echo "$(YELLOW)请确认要推送到远程仓库? [y/N]$(NC)" && read ans && [ $${ans:-N} = y ]
+	@if git diff --quiet && git diff --staged --quiet; then \
+		echo "$(YELLOW)⚠️  没有更改需要提交$(NC)"; \
+	else \
+		git add . && \
+		echo "$(BLUE)请输入提交信息:$(NC)" && read -r msg && \
+		git commit -m "$$msg" && \
+		git push; \
+	fi
+	@echo "$(GREEN)✅ 推送完成！$(NC)"
+
 # 别名任务 - 便于记忆和使用
-.PHONY: docker-ci
-docker-ci: ci.docker.new ## 🐳 ci.docker.new 的别名
+.PHONY: fast-ci
+fast-ci: ci.fast ## 🚀 ci.fast 的别名
 
-.PHONY: build-ci
-build-ci: ci.docker.build ## 🐳 ci.docker.build 的别名  
+.PHONY: ready
+ready: ci.ready ## 🎯 ci.ready 的别名
 
-.PHONY: clean-ci
-clean-ci: ci.docker.clean ## 🐳 ci.docker.clean 的别名
+.PHONY: safe-push  
+safe-push: push.safe ## 🛡️ push.safe 的别名

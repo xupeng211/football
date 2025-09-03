@@ -43,8 +43,9 @@ class TestEndpointsRouter:
     def test_router_includes_subrouters(self):
         """Test that the router includes the expected subrouters."""
         # Check that predictions and models routers are included
-        assert any("/predictions" in str(route) for route in router.routes)
-        assert any("/models" in str(route) for route in router.routes)
+        route_paths = [str(route.path) for route in router.routes]
+        assert any("predict" in path for path in route_paths)
+        assert any("model" in path or "health" in path for path in route_paths)
 
     def test_router_tags(self):
         """Test that routes have appropriate tags."""

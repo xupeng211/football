@@ -128,7 +128,8 @@ class TestDatabaseManager:
 
                 result = await db_manager.health_check()
 
-                assert result is True
+                assert result["status"] == "healthy"
+                assert isinstance(result, dict)
 
     @pytest.mark.asyncio
     @patch("football_predict_system.core.database.get_settings")
@@ -154,7 +155,8 @@ class TestDatabaseManager:
 
                 result = await db_manager.health_check()
 
-                assert result is False
+                assert result["status"] == "unhealthy"
+                assert isinstance(result, dict)
 
     @pytest.mark.asyncio
     @patch("football_predict_system.core.database.get_settings")

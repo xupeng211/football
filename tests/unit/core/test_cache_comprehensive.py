@@ -414,17 +414,28 @@ class TestCacheManager:
     @pytest.mark.asyncio
     async def test_health_check_success(self, cache_manager, mock_redis):
         """Test successful health check."""
+        # Configure mock Redis responses properly
+        mock_redis.ping.return_value = True
+        mock_redis.set.return_value = True
+        mock_redis.get.return_value = b"ok"  # Return bytes as Redis does
+        mock_redis.delete.return_value = 1
+        mock_redis.info.return_value = {
+            "redis_version": "6.0.0",
+            "connected_clients": 1,
+            "used_memory_human": "1.5MB",
+        }
+
         cache_manager._redis_client = mock_redis
         cache_manager._memory_cache["key1"] = {"value": "test1"}
 
         result = await cache_manager.health_check()
 
         assert result["status"] == "healthy"
-        assert result["redis_connected"] is True
-        assert "redis_response_time" in result
+        assert result["redis_connection"] is True
+        assert "response_time" in result
         assert result["memory_cache_size"] == 1
-        assert "stats" in result
-        assert "redis_info" in result
+        assert "cache_stats" in result
+        assert result["redis_version"] == "6.0.0"
         mock_redis.ping.assert_called_once()
         mock_redis.info.assert_called_once()
 
