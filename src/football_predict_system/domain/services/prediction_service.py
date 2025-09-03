@@ -10,6 +10,7 @@ This service handles:
 
 import asyncio
 from datetime import datetime
+from typing import Any
 
 from ...core.cache import get_cache_manager
 from ...core.exceptions import (
@@ -194,7 +195,9 @@ class PredictionService:
         # Process predictions concurrently with controlled concurrency
         semaphore = asyncio.Semaphore(5)  # Limit concurrent predictions
 
-        async def predict_with_semaphore(req: PredictionRequest) -> PredictionResponse | None:
+        async def predict_with_semaphore(
+            req: PredictionRequest,
+        ) -> PredictionResponse | None:
             async with semaphore:
                 return await self.generate_prediction_safely(req)
 
