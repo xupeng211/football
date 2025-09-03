@@ -136,13 +136,13 @@ class DatabaseManager:
 
         @event.listens_for(engine, "before_cursor_execute")
         def before_cursor_execute(
-            conn, cursor, statement, parameters, context, executemany
+            _conn, _cursor, statement, parameters, context, _executemany
         ):
             context._query_start_time = time.time()
 
         @event.listens_for(engine, "after_cursor_execute")
         def after_cursor_execute(
-            conn, cursor, statement, parameters, context, executemany
+            _conn, _cursor, statement, parameters, context, _executemany
         ):
             total = time.time() - context._query_start_time
 

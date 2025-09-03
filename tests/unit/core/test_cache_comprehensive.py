@@ -97,7 +97,7 @@ class TestCacheManager:
         assert cache_manager._max_memory_items == 1000
         assert cache_manager._default_ttl == 3600
 
-    @patch("football_predict_system.core.cache.redis.from_url")
+    @patch("football_predict_system.core.cache.manager.redis.from_url")
     @pytest.mark.asyncio
     async def test_get_redis_client_creation(
         self, mock_redis_from_url, cache_manager, mock_redis

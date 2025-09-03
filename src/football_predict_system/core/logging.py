@@ -9,9 +9,12 @@ This module provides:
 - Error tracking integration
 """
 
+from __future__ import annotations
+
 import json
 import logging
 import logging.handlers
+import re
 import sys
 import time
 import traceback
@@ -135,6 +138,45 @@ class CustomJSONRenderer:
         return json.dumps(event_dict, default=str, ensure_ascii=False)
 
 
+def _parse_file_size(size_str: str | int) -> int:
+    """Parse file size string like '10MB' to bytes."""
+    if isinstance(size_str, int):
+        return size_str
+
+    size_str = size_str.upper().strip()
+
+    # Handle plain numbers (assume bytes)
+    if size_str.isdigit():
+        return int(size_str)
+
+    # Parse size with units
+    pattern = r"^(\d+(?:\.\d+)?)\s*([KMGTPE]?B?)$"
+    match = re.match(pattern, size_str)
+
+    if not match:
+        # Default to 10MB if parsing fails
+        return 10 * 1024 * 1024
+
+    size_value = float(match.group(1))
+    size_unit = match.group(2)
+
+    # Convert to bytes
+    multipliers = {
+        "B": 1,
+        "KB": 1024,
+        "MB": 1024 * 1024,
+        "GB": 1024 * 1024 * 1024,
+        "TB": 1024 * 1024 * 1024 * 1024,
+        "K": 1024,  # Alternative format
+        "M": 1024 * 1024,
+        "G": 1024 * 1024 * 1024,
+        "T": 1024 * 1024 * 1024 * 1024,
+    }
+
+    multiplier = multipliers.get(size_unit, 1)
+    return int(size_value * multiplier)
+
+
 def setup_logging() -> None:
     """Configure structured logging for the application."""
     settings = get_settings()
@@ -176,13 +218,13 @@ def setup_logging() -> None:
     handler: logging.Handler
 
     if settings.logging.file_path:
-        # File logging with rotation
+        # File logging
         log_path = Path(settings.logging.file_path)
         log_path.parent.mkdir(parents=True, exist_ok=True)
 
         handler = logging.handlers.RotatingFileHandler(
             filename=log_path,
-            maxBytes=settings.logging.max_file_size,
+            maxBytes=_parse_file_size(settings.logging.max_file_size),
             backupCount=settings.logging.backup_count,
             encoding="utf-8",
         )

@@ -3,6 +3,7 @@
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
+from sqlalchemy.exc import SQLAlchemyError
 
 from football_predict_system.core.database import (
     DatabaseManager,
@@ -29,22 +30,26 @@ class TestDatabaseManager:
             assert db_manager._engine is None
             assert db_manager._async_engine is None
 
-    @patch("football_predict_system.core.database.create_engine")
     @patch("football_predict_system.core.database.get_settings")
-    def test_get_engine(self, mock_settings, mock_create_engine):
-        """Test getting synchronous database engine."""
-        # Setup mocks
+    def test_get_engine(self, mock_settings):
+        """Test getting database engine."""
         mock_settings.return_value.database_url = "postgresql://test"
-        mock_settings.return_value.database_pool_size = 5
-        mock_settings.return_value.database_max_overflow = 10
-        mock_engine = Mock()
-        mock_create_engine.return_value = mock_engine
 
         db_manager = DatabaseManager()
-        engine = db_manager.get_engine()
 
-        assert engine == mock_engine
-        mock_create_engine.assert_called_once()
+        # Mock the _setup_engine_events to avoid event listener issues
+        with patch.object(db_manager, "_setup_engine_events"):
+            with patch(
+                "football_predict_system.core.database.create_engine"
+            ) as mock_create:
+                mock_engine = Mock()
+                mock_create.return_value = mock_engine
+
+                engine = db_manager.get_engine()
+
+                assert engine == mock_engine
+                assert db_manager._engine == mock_engine
+                mock_create.assert_called_once()
 
     @patch("football_predict_system.core.database.create_async_engine")
     @patch("football_predict_system.core.database.get_settings")
@@ -107,32 +112,53 @@ class TestDatabaseManager:
 
         db_manager = DatabaseManager()
 
-        # Mock async engine and session
-        mock_async_engine = AsyncMock()
-        mock_session = AsyncMock()
+        # Mock sync engine and session
+        mock_engine = Mock()
+        mock_session = Mock()
         mock_result = Mock()
         mock_result.scalar.return_value = 1
         mock_session.execute.return_value = mock_result
 
+        # Mock pool info
+        mock_pool = Mock()
+        mock_pool.size.return_value = 5
+        mock_pool.checkedin.return_value = 3
+        mock_pool.checkedout.return_value = 2
+        mock_pool.overflow.return_value = 0
+        mock_engine.pool = mock_pool
+
+        # Mock async engine and session
+        mock_async_engine = AsyncMock()
+        mock_async_session = AsyncMock()
+        mock_async_result = Mock()
+        mock_async_result.scalar.return_value = 1
+        mock_async_session.execute.return_value = mock_async_result
+
         with (
+            patch.object(db_manager, "get_engine", return_value=mock_engine),
             patch.object(
                 db_manager, "get_async_engine", return_value=mock_async_engine
             ),
-            patch.object(db_manager, "get_async_session_factory") as mock_factory,
+            patch.object(db_manager, "get_session_factory") as mock_sync_factory,
+            patch.object(db_manager, "get_async_session_factory") as mock_async_factory,
         ):
-            mock_factory.return_value = lambda: mock_session
+            # Configure session factories
+            mock_sync_factory.return_value = lambda: mock_session
+            mock_async_factory.return_value = lambda: mock_async_session
 
-            # Create async context manager
-            async def async_context():
-                return mock_session
-
-            mock_session.__aenter__ = AsyncMock(return_value=mock_session)
-            mock_session.__aexit__ = AsyncMock(return_value=None)
+            # Configure context managers
+            mock_session.__enter__ = Mock(return_value=mock_session)
+            mock_session.__exit__ = Mock(return_value=None)
+            mock_async_session.__aenter__ = AsyncMock(return_value=mock_async_session)
+            mock_async_session.__aexit__ = AsyncMock(return_value=None)
 
             result = await db_manager.health_check()
 
             assert result["status"] == "healthy"
-            assert isinstance(result, dict)
+            assert result["sync_connection"] is True
+            assert result["async_connection"] is True
+            assert "response_time" in result
+            assert "pool_info" in result
 
     @pytest.mark.asyncio
     @patch("football_predict_system.core.database.get_settings")

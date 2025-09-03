@@ -46,29 +46,45 @@ def test_predict_smoke(monkeypatch):
     # Mock the prediction service's generate_batch_predictions method
 
     async def mock_generate_batch_predictions(self, request):
-        return type(
-            "BatchPredictionResponse",
-            (),
-            {
-                "predictions": [
-                    type(
-                        "PredictionResponse",
-                        (),
-                        {
-                            "match_id": "test-id",
-                            "predicted_outcome": "home_win",
-                            "confidence": 0.75,
-                            "odds_home": 2.1,
-                            "odds_draw": 3.3,
-                            "odds_away": 3.2,
-                            "model_version": "test_v1",
-                        },
-                    )()
-                ],
-                "failed_predictions": 0,
-                "total_matches": 1,
-            },
-        )()
+        from datetime import datetime
+        from uuid import uuid4
+
+        from football_predict_system.domain.models import (
+            BatchPredictionResponse,
+            MatchResult,
+            Prediction,
+            PredictionConfidence,
+            PredictionResponse,
+        )
+
+        # Create a proper Prediction object
+        prediction = Prediction(
+            id=uuid4(),
+            match_id=uuid4(),
+            model_version="test_v1",
+            predicted_result=MatchResult.HOME_WIN,
+            home_win_probability=0.6,
+            draw_probability=0.2,
+            away_win_probability=0.2,
+            confidence_level=PredictionConfidence.HIGH,
+            confidence_score=0.75,
+            created_at=datetime.utcnow(),
+            prediction_date=datetime.utcnow(),
+        )
+
+        # Create proper PredictionResponse
+        prediction_response = PredictionResponse(
+            prediction=prediction,
+            match_info={"home_team": "Arsenal", "away_team": "Chelsea"},
+            model_info={"version": "test_v1", "accuracy": 0.85},
+        )
+
+        return BatchPredictionResponse(
+            predictions=[prediction_response],
+            total_count=1,
+            successful_predictions=1,
+            failed_predictions=0,
+        )
 
     monkeypatch.setattr(
         "football_predict_system.domain.services.PredictionService.generate_batch_predictions",
@@ -116,13 +132,14 @@ def test_predict_too_many_matches():
             "match_date": "2025-08-30",
             "home_odds": 2.0,
             "draw_odds": 3.0,
-            "away_odds": 3.0,
+            "away_odds": 3.5,
         }
-        for i in range(101)  # 超过100场
+        for i in range(101)  # 超过最大100场比赛限制
     ]
 
     response = client.post("/api/v1/predict/batch", json={"matches": matches})
-    assert response.status_code == HTTPStatus.OK  # No max limit by default
+    # 应该期望422状态码, 因为超过了最大比赛数量限制
+    assert response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
 
 
 def test_root_endpoint():

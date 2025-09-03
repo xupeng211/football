@@ -53,6 +53,13 @@ class RedisConfig(BaseModel):
     retry_on_timeout: bool = True
     socket_timeout: int = 5
 
+    @field_validator("url")
+    def validate_redis_url(cls, v: str) -> str:
+        """Validate Redis URL format."""
+        if not v.startswith(("redis://", "rediss://")):
+            raise ValueError("Redis URL must start with redis:// or rediss://")
+        return v
+
 
 class APIConfig(BaseModel):
     """API server configuration settings."""
@@ -83,7 +90,14 @@ class APIConfig(BaseModel):
     def parse_cors_origins(cls, v: Any) -> Any:
         """Parse CORS origins from string or list."""
         if isinstance(v, str):
-            return [origin.strip() for origin in v.split(",")]
+            return [origin.strip() for origin in v.split(",") if origin.strip()]
+        return v
+
+    @field_validator("access_token_expire_minutes")
+    def validate_token_expire(cls, v: int) -> int:
+        """Validate token expiration time."""
+        if v <= 0:
+            raise ValueError("Token expiration time must be positive")
         return v
 
 
@@ -91,14 +105,14 @@ class LoggingConfig(BaseModel):
     """Logging configuration settings."""
 
     level: str = "INFO"
-    format: str = "json"  # json or text
+    format: str = "[%(asctime)s] %(name)s:%(levelname)s: %(message)s"
     file_path: str | None = None
-    max_file_size: int = 10485760  # 10MB
+    max_file_size: str = "10MB"
     backup_count: int = 5
 
-    # Structured logging
+    # 服务信息
     service_name: str = "football-predict-system"
-    service_version: str = "1.0.0"
+    service_version: str = "3.0.0"
 
     @field_validator("level")
     def validate_log_level(cls, v: str) -> str:
@@ -144,9 +158,9 @@ class MLConfig(BaseModel):
 
     @field_validator("train_test_split")
     def validate_train_test_split(cls, v: float) -> float:
-        """Validate train/test split ratio."""
-        if not 0.1 <= v <= 0.5:
-            raise ValueError("Train/test split must be between 0.1 and 0.5")
+        """Validate train_test_split ratio."""
+        if not 0.1 <= v <= 0.9:
+            raise ValueError("Train test split must be between 0.1 and 0.9")
         return v
 
 
@@ -216,12 +230,10 @@ class Settings(BaseSettings):
         extra="ignore",  # 忽略额外的环境变量字段
     )
 
-    @field_validator("environment", mode="before")
-    def parse_environment(cls, v: Any) -> Any:
-        """Parse environment from string."""
-        if isinstance(v, str):
-            return Environment(v.lower())
-        return v
+    @field_validator("environment")
+    def parse_environment(cls, v: str) -> Environment:
+        """Parse environment string to enum."""
+        return Environment(v.lower())
 
     def is_production(self) -> bool:
         """Check if running in production environment."""

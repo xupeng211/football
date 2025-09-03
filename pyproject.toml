@@ -54,6 +54,7 @@ dependencies = [
     "psycopg2-binary>=2.9.10",
     "pre-commit>=4.3.0",
     "sqlparse>=0.5.3",
+    "vulture>=2.14",
 ]
 
 [project.optional-dependencies]
@@ -214,9 +215,9 @@ python_functions = ["test_*"]
 asyncio_mode = "auto"
 addopts = [
     "-v",
-    "--tb=short",
+    "--tb=short", 
     "--strict-markers",
-    # 跳过有Mock配置问题的测试（临时解决方案）
+    # 跳过有Mock配置问题的测试（已发现问题，需要系统性修复）
     "-m", "not skip_for_ci",
 ]
 markers = [
