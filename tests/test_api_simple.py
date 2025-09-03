@@ -9,6 +9,8 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 from fastapi.testclient import TestClient
 
+from football_predict_system.core.constants import HTTPStatus
+
 
 # 在导入任何应用模块之前清理环境变量
 @pytest.fixture(autouse=True)
@@ -199,15 +201,15 @@ def test_app_routes_registered(client: TestClient) -> None:
     """测试应用路由注册"""
     # 检查根路径
     response = client.get("/")
-    assert response.status_code == 200
+    assert response.status_code == HTTPStatus.OK
 
     # 检查健康检查端点
     response = client.get("/health")
-    assert response.status_code == 200
+    assert response.status_code == HTTPStatus.OK
 
     # 检查API状态端点
     response = client.get("/api/v1/status")
-    assert response.status_code == 200
+    assert response.status_code == HTTPStatus.OK
 
 
 def test_cors_middleware() -> None:
@@ -255,7 +257,7 @@ def test_exception_handler() -> None:
 def test_health_endpoint(client: TestClient) -> None:
     """测试健康检查端点"""
     response = client.get("/health")
-    assert response.status_code == 200
+    assert response.status_code == HTTPStatus.OK
 
     data = response.json()
     assert "status" in data
@@ -266,7 +268,7 @@ def test_health_endpoint(client: TestClient) -> None:
 def test_root_endpoint(client: TestClient) -> None:
     """测试根端点"""
     response = client.get("/")
-    assert response.status_code == 200
+    assert response.status_code == HTTPStatus.OK
 
     data = response.json()
     assert "app_name" in data
@@ -277,7 +279,7 @@ def test_root_endpoint(client: TestClient) -> None:
 def test_api_status_endpoint(client: TestClient) -> None:
     """测试API状态端点"""
     response = client.get("/api/v1/status")
-    assert response.status_code == 200
+    assert response.status_code == HTTPStatus.OK
 
     data = response.json()
     assert data["status"] == "ok"

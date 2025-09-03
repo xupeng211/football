@@ -44,13 +44,13 @@ class TestDataFactory:
 
     @classmethod
     def create_match_data(
-        self, home_team: str | None = None, away_team: str | None = None, **kwargs
+        cls, home_team: str | None = None, away_team: str | None = None, **kwargs: Any
     ) -> dict[str, Any]:
         """创建单场比赛数据"""
         if not home_team:
-            home_team = random.choice(self.TEAMS)
+            home_team = random.choice(cls.TEAMS)
         if not away_team:
-            away_team = random.choice([t for t in self.TEAMS if t != home_team])
+            away_team = random.choice([t for t in cls.TEAMS if t != home_team])
 
         default_data = {
             "home_team": home_team,
@@ -68,27 +68,27 @@ class TestDataFactory:
         return default_data
 
     @classmethod
-    def create_batch_matches(self, count: int = 5) -> list[dict[str, Any]]:
+    def create_batch_matches(cls, count: int = 5) -> list[dict[str, Any]]:
         """创建批量比赛数据"""
         matches = []
         used_pairs = set()
 
         for _ in range(count):
             while True:
-                home = random.choice(self.TEAMS)
-                away = random.choice([t for t in self.TEAMS if t != home])
+                home = random.choice(cls.TEAMS)
+                away = random.choice([t for t in cls.TEAMS if t != home])
                 pair = (home, away)
 
                 if pair not in used_pairs:
                     used_pairs.add(pair)
-                    matches.append(self.create_match_data(home, away))
+                    matches.append(cls.create_match_data(home, away))
                     break
 
         return matches
 
     @classmethod
     def create_prediction_response(
-        self,
+        cls,
         home_win: float | None = None,
         draw: float | None = None,
         away_win: float | None = None,
@@ -120,7 +120,7 @@ class TestDataFactory:
 
     @classmethod
     def create_health_response(
-        self,
+        cls,
         status: str = "healthy",
         db_status: bool = True,
         redis_status: bool = True,
@@ -139,11 +139,11 @@ class TestDataFactory:
         }
 
     @classmethod
-    def create_dataframe_sample(self, rows: int = 100) -> pd.DataFrame:
+    def create_dataframe_sample(cls, rows: int = 100) -> pd.DataFrame:
         """创建示例DataFrame用于测试"""
         data = []
         for i in range(rows):
-            match = self.create_match_data()
+            match = cls.create_match_data()
             # 添加一些额外的特征列
             match.update(
                 {

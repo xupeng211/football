@@ -1,4 +1,5 @@
 import asyncio
+from http import HTTPStatus
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
@@ -132,7 +133,7 @@ class TestErrorHandling:
 
         # Should return a JSONResponse
         assert isinstance(response, JSONResponse)
-        assert response.status_code == 400
+        assert response.status_code == HTTPStatus.BAD_REQUEST
 
 
 class TestAppMetadata:

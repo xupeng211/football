@@ -4,6 +4,7 @@
 """
 
 import asyncio
+import json
 import sys
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -191,8 +192,6 @@ def save_results_to_files(results: list[dict[str, Any]]) -> None:
     }
 
     summary_file = data_dir / f"collection_summary_{timestamp}.json"
-    import json
-
     with open(summary_file, "w", encoding="utf-8") as f:
         json.dump(summary, f, ensure_ascii=False, indent=2)
 

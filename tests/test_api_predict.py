@@ -5,6 +5,7 @@ FastAPI预测接口测试
 import pytest
 from fastapi.testclient import TestClient
 
+from football_predict_system.core.constants import HTTPStatus
 from football_predict_system.main import app
 
 # 跳过API预测测试用于CI(集成问题)
@@ -20,7 +21,7 @@ client = TestClient(app)
 def test_health_endpoint():
     """测试健康检查接口"""
     response = client.get("/health")
-    assert response.status_code == 200
+    assert response.status_code == HTTPStatus.OK
 
     data = response.json()
     assert "status" in data
@@ -31,7 +32,7 @@ def test_health_endpoint():
 def test_version_endpoint():
     """测试版本信息接口"""
     response = client.get("/version")
-    assert response.status_code == 200
+    assert response.status_code == HTTPStatus.OK
 
     data = response.json()
     assert "api_version" in data
@@ -91,7 +92,7 @@ def test_predict_smoke(monkeypatch):
         },
     )
 
-    assert response.status_code == 200
+    assert response.status_code == HTTPStatus.OK
 
     data = response.json()
     assert len(data["predictions"]) == 1
@@ -103,7 +104,7 @@ def test_predict_smoke(monkeypatch):
 def test_predict_empty_list():
     """测试空列表预测请求"""
     response = client.post("/api/v1/predict/batch", json={"matches": []})
-    assert response.status_code == 422
+    assert response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
 
 
 def test_predict_too_many_matches():
@@ -121,13 +122,13 @@ def test_predict_too_many_matches():
     ]
 
     response = client.post("/api/v1/predict/batch", json={"matches": matches})
-    assert response.status_code == 200  # No max limit by default
+    assert response.status_code == HTTPStatus.OK  # No max limit by default
 
 
 def test_root_endpoint():
     """测试根路径"""
     response = client.get("/")
-    assert response.status_code == 200
+    assert response.status_code == HTTPStatus.OK
 
     data = response.json()
     assert "message" in data
@@ -140,4 +141,4 @@ def test_predict_422():
 
     # Send invalid data (empty match object)
     r = TestClient(app).post("/api/v1/predict/batch", json={"matches": [{}]})
-    assert r.status_code == 422
+    assert r.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
