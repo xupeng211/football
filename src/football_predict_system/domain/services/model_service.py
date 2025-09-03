@@ -12,7 +12,6 @@ from typing import Any
 from uuid import UUID
 
 from ...core.cache import get_cache_manager
-from ...core.exceptions import ModelNotFoundError
 from ...core.logging import get_logger, log_performance
 from ..models import Model
 
@@ -51,39 +50,20 @@ class ModelService:
         models = await self.get_available_models()
 
         if not model_version or model_version == "default":
-            # Return the default model (highest accuracy)
-            if models:
-                return max(
-                    models, key=lambda m: m.accuracy if hasattr(m, "accuracy") else 0
-                )
-            return None
+            # Return the first active model as default
+            return next((m for m in models if m.is_active), None)
 
-        # Find specific version
-        for model in models:
-            if model.version == model_version:
-                return model
+        return next((m for m in models if m.version == model_version), None)
 
-        raise ModelNotFoundError(f"Model version {model_version} not found")
-
-    async def get_model_performance(
-        self, model_id: UUID, days_back: int = 30
-    ) -> dict[str, Any]:
-        """Get model performance metrics."""
-        cache_manager = await get_cache_manager()
-
-        cache_key = f"performance:{model_id}:{days_back}"
-        cached_performance = await cache_manager.get(cache_key, "model_performance")
-
-        if cached_performance:
-            return cached_performance
-
-        # Calculate performance metrics
-        performance = await self._calculate_model_performance(model_id, days_back)
-
-        # Cache for 1 hour
-        await cache_manager.set(cache_key, performance, 3600, "model_performance")
-
-        return performance
+    async def get_model_metadata(self, model_id: UUID | None = None) -> dict[str, Any]:
+        """Get model metadata."""
+        # Placeholder implementation
+        return {
+            "model_id": str(model_id) if model_id else "default",
+            "features": ["team_strength", "recent_form", "head_to_head"],
+            "training_data_size": 10000,
+            "last_updated": "2024-01-01T00:00:00Z",
+        }
 
     async def _load_models_from_registry(self) -> list[Model]:
         """Load models from the model registry."""
@@ -91,31 +71,32 @@ class ModelService:
         # In a real system, this would load from a model registry or database
         return [
             Model(
-                id="default",
+                id=UUID("12345678-1234-5678-9abc-123456789def"),
                 name="Default XGBoost Model",
                 version="1.0.0",
+                algorithm="XGBoost",
                 description="XGBoost model trained on historical match data",
                 accuracy=0.75,
                 created_at="2024-01-01T00:00:00Z",
                 is_active=True,
             ),
             Model(
-                id="neural_v2",
+                id=UUID("87654321-4321-8765-cba9-fedcba987654"),
                 name="Neural Network v2",
                 version="2.1.0",
-                description="Deep learning model with team embeddings",
-                accuracy=0.78,
+                algorithm="Neural Network",
+                description="Deep learning model with advanced features",
+                accuracy=0.82,
                 created_at="2024-02-01T00:00:00Z",
                 is_active=True,
             ),
         ]
 
-    async def _calculate_model_performance(
-        self, model_id: UUID, days_back: int
+    async def evaluate_model_performance(
+        self, model_id: UUID, days_back: int = 30
     ) -> dict[str, Any]:
-        """Calculate model performance metrics."""
+        """Evaluate model performance over a time period."""
         # Placeholder implementation
-        # In a real system, this would query prediction history and results
         return {
             "model_id": str(model_id),
             "accuracy": 0.75,

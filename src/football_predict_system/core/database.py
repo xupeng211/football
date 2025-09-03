@@ -287,11 +287,17 @@ class DatabaseManager:
         """Close all database connections."""
         if self._engine:
             self._engine.dispose()
+            self._engine = None
             logger.info("Synchronous database engine disposed")
 
         if self._async_engine:
             await self._async_engine.dispose()
+            self._async_engine = None
             logger.info("Asynchronous database engine disposed")
+
+        # Clear session factories
+        self._session_factory = None
+        self._async_session_factory = None
 
     async def create_engine(self) -> AsyncEngine:
         """Create database engine (public method for tests)."""
@@ -347,7 +353,9 @@ class DatabaseManager:
         """Initialize database tables."""
         engine = self.get_engine()
         # Create all tables defined in Base metadata
-        Base.metadata.create_all(bind=engine.sync_engine if hasattr(engine, 'sync_engine') else engine)
+        Base.metadata.create_all(
+            bind=engine.sync_engine if hasattr(engine, "sync_engine") else engine
+        )
 
 
 # Global database manager instance
