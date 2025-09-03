@@ -1,0 +1,1 @@
+✅ 数据库文件 football_data.db 和 my_football_database.db 就在这个目录中！包含1043场比赛数据。

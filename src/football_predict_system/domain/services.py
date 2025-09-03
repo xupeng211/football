@@ -11,24 +11,10 @@ from typing import Any
 from uuid import UUID
 
 from ..core.cache import get_cache_manager
-from ..core.exceptions import (
-    InsufficientDataError,
-    ModelNotFoundError,
-    NotFoundError,
-    PredictionError,
-)
+from ..core.exceptions import InsufficientDataError, ModelNotFoundError, NotFoundError, PredictionError
 from ..core.logging import get_logger, log_performance
-from .models import (
-    BatchPredictionRequest,
-    BatchPredictionResponse,
-    Match,
-    MatchStatus,
-    Model,
-    Prediction,
-    PredictionRequest,
-    PredictionResponse,
-    Team,
-)
+from .models import (BatchPredictionRequest, BatchPredictionResponse, Match, MatchStatus, Model, Prediction,
+                     PredictionRequest, PredictionResponse, Team)
 
 logger = get_logger(__name__)
 
@@ -302,7 +288,6 @@ class ModelService:
     async def _load_models_from_registry(self) -> list[Model]:
         """Load models from registry."""
         # Mock implementation for testing
-        from datetime import datetime
         from uuid import uuid4
 
         mock_model = Model(
@@ -312,13 +297,12 @@ class ModelService:
             algorithm="RandomForest",
             description="Mock model for testing",
             accuracy=0.85,
-            precision=0.80,
-            recall=0.75,
-            f1_score=0.77,
-            is_active=True,
-            is_production=True,
-            created_at=datetime.utcnow(),
-            updated_at=datetime.utcnow(),
+            precision=0.83,
+            recall=0.87,
+            f1_score=0.85,
+            roc_auc=0.92,
+            log_loss=0.35,
+            training_data_size=1000,
         )
 
         return [mock_model]
@@ -404,7 +388,20 @@ class DataService:
             scheduled_date=datetime.utcnow() + timedelta(days=7),
             competition="Premier League",
             season="2024-25",
+            matchday=1,
             status=MatchStatus.SCHEDULED,
+            home_score=None,
+            away_score=None,
+            # 添加所有必需的统计参数
+            home_possession=None,
+            away_possession=None,
+            home_shots=None,
+            away_shots=None,
+            home_shots_on_target=None,
+            away_shots_on_target=None,
+            home_odds=None,
+            draw_odds=None,
+            away_odds=None,
         )
 
     async def _load_team_from_db(self, team_id: UUID) -> Team | None:
@@ -416,8 +413,7 @@ class DataService:
             short_name="MOC",
             country="England",
             founded_year=1900,
-            stadium="Mock Stadium",
-            manager="Mock Manager",
+            venue="Mock Stadium",  # 使用venue而不是stadium
         )
 
     async def _load_upcoming_matches_from_db(self, end_date: datetime) -> list[Match]:

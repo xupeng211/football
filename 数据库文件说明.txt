@@ -1,0 +1,14 @@
+📊 您的足球数据库信息:
+- 主数据库: football_data.db (244KB)
+- 包含: 1,043场比赛 + 120支球队
+- 覆盖: 英超、英冠、西甲、德甲、意甲、法甲
+- 时间范围: 2025年3月 到 10月
+
+📂 数据库表结构:
+- real_matches: 比赛数据 (1043条)
+- real_teams: 球队数据 (120条)  
+- collection_logs: 收集日志 (6条)
+
+🎯 使用方法:
+python -c "import sqlite3; conn=sqlite3.connect('football_data.db'); cursor=conn.cursor(); cursor.execute('SELECT COUNT(*) FROM real_matches'); print(f'比赛数: {cursor.fetchone()[0]}')"
+
