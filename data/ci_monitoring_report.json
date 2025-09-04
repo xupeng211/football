@@ -1,0 +1,17 @@
+{
+  "timestamp": "2025-09-04T21:34:15.933736",
+  "repository": "your-username/football-predict-system",
+  "metrics": {
+    "success_rate": 0.0,
+    "average_duration": 0.0,
+    "failure_patterns": {},
+    "performance_trend": "unknown"
+  },
+  "recent_runs": [],
+  "summary": {
+    "total_runs_analyzed": 0,
+    "recommendations": [
+      "成功率偏低,建议加强本地CI检查"
+    ]
+  }
+}

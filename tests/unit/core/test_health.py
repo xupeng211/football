@@ -1,16 +1,17 @@
+import pytest
 import asyncio
+from football_predict_system.core.health import (
+
+pytestmark = pytest.mark.skip_for_ci
 from unittest.mock import AsyncMock, Mock, patch
 
-import pytest
 
-from football_predict_system.core.health import (
     ComponentHealth,
     HealthChecker,
     HealthStatus,
     get_health_checker,
 )
 
-pytestmark = pytest.mark.skip_for_ci
 """Tests for core health module."""
 
 # 跳过有Mock配置问题的健康检查测试

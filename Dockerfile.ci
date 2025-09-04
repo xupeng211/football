@@ -32,6 +32,10 @@ COPY pyproject.toml uv.lock README.md ./
 # 复制其余项目文件
 COPY . .
 
+# 复制CI运行器脚本到正确位置
+COPY scripts/ci/local_ci_runner.sh /usr/local/bin/local_ci_runner.sh
+RUN chmod +x /usr/local/bin/local_ci_runner.sh
+
 # 安装Python依赖 (与CI环境一致)
 RUN uv sync --extra dev
 

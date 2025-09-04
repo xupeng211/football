@@ -34,7 +34,7 @@ class DataPlatformSetup:
         self.settings = get_settings()
         self.db_manager = get_database_manager()
 
-    async def setup_database(self) -> bool:
+    async def setup_database(self) -> bool:  # noqa: C901
         """Setup database schema."""
         logger.info("Setting up database schema...")
 

@@ -68,6 +68,7 @@ docker-compose*.yml
 # 文档和README
 docs/
 *.md
+!README.md
 !requirements.txt
 
 # 测试和CI相关
