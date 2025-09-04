@@ -413,7 +413,9 @@ def log_performance(operation: str) -> Callable[..., Any]:
     return decorator
 
 
-def monitor_performance(operation_name: str = ""):
+def monitor_performance(
+    operation_name: str = "",
+) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
     """
     简单的性能监控装饰器
 
@@ -432,7 +434,7 @@ def monitor_performance(operation_name: str = ""):
         ```
     """
 
-    def decorator(func: Callable) -> Callable:
+    def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
         @functools.wraps(func)
         async def async_wrapper(*args: Any, **kwargs: Any) -> Any:
             logger = get_logger(__name__)
