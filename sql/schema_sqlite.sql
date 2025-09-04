@@ -3,7 +3,7 @@
 
 -- Teams table
 CREATE TABLE IF NOT EXISTS teams (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id TEXT PRIMARY KEY,
     external_api_id INTEGER UNIQUE,
     name VARCHAR(100) NOT NULL,
     short_name VARCHAR(50),
@@ -13,17 +13,17 @@ CREATE TABLE IF NOT EXISTS teams (
     venue VARCHAR(100),
     website VARCHAR(200),
     league_id INTEGER,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TEXT DEFAULT (datetime('now')),
+    updated_at TEXT DEFAULT (datetime('now'))
 );
 
 -- Matches table
 CREATE TABLE IF NOT EXISTS matches (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id TEXT PRIMARY KEY,
     external_api_id INTEGER UNIQUE,
-    home_team_id INTEGER NOT NULL,
-    away_team_id INTEGER NOT NULL,
-    match_date TIMESTAMP NOT NULL,
+    home_team_id TEXT NOT NULL,
+    away_team_id TEXT NOT NULL,
+    match_date TEXT NOT NULL,
     home_score INTEGER,
     away_score INTEGER,
     status VARCHAR(20) DEFAULT 'scheduled',
@@ -31,8 +31,8 @@ CREATE TABLE IF NOT EXISTS matches (
     matchday INTEGER,
     competition VARCHAR(50),
     venue VARCHAR(100),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TEXT DEFAULT (datetime('now')),
+    updated_at TEXT DEFAULT (datetime('now')),
     FOREIGN KEY (home_team_id) REFERENCES teams(id),
     FOREIGN KEY (away_team_id) REFERENCES teams(id)
 );

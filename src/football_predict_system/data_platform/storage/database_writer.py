@@ -45,6 +45,18 @@ class DatabaseWriter:
         self.db_manager = get_database_manager()
         self.logger = get_logger(__name__)
 
+    def _get_timestamp_func(self) -> str:
+        """Get the appropriate timestamp function for the database type."""
+        # Check if we're using SQLite via environment variable
+        import os
+
+        database_url = os.getenv("DATABASE_URL", "")
+        if "sqlite" in database_url.lower():
+            return "datetime('now')"
+        else:
+            # PostgreSQL and other databases
+            return "CURRENT_TIMESTAMP"
+
     async def upsert_teams(self, teams_data: list[Team] | pd.DataFrame) -> UpsertResult:
         """Insert or update team data."""
 
@@ -83,6 +95,7 @@ class DatabaseWriter:
         inserted = 0
         updated = 0
         failed = 0
+        timestamp_func = self._get_timestamp_func()
 
         async with self.db_manager.get_async_session() as session:
             for _, row in df.iterrows():
@@ -100,11 +113,11 @@ class DatabaseWriter:
                     if existing:
                         # Update existing team
                         await session.execute(
-                            text("""
+                            text(f"""
                             UPDATE teams SET
                                 name = :name,
                                 short_name = :short_name,
-                                updated_at = NOW()
+                                updated_at = {timestamp_func}
                             WHERE external_api_id = :external_api_id
                             """),
                             {
@@ -123,13 +136,13 @@ class DatabaseWriter:
                         # Insert new team
                         team_id = str(uuid.uuid4())
                         await session.execute(
-                            text("""
+                            text(f"""
                             INSERT INTO teams (
                                 id, external_api_id, name, short_name,
                                 created_at, updated_at
                             ) VALUES (
                                 :id, :external_api_id, :name, :short_name,
-                                NOW(), NOW()
+                                {timestamp_func}, {timestamp_func}
                             )
                             """),
                             {
@@ -225,7 +238,7 @@ class DatabaseWriter:
                                 home_score_ht = :home_score_ht,
                                 away_score_ht = :away_score_ht,
                                 result = :result,
-                                updated_at = NOW()
+                                updated_at = {self._get_timestamp_func()}
                             WHERE external_api_id = :external_api_id
                             """),
                             match_data,
