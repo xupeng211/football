@@ -4,11 +4,15 @@
 -- Teams table
 CREATE TABLE IF NOT EXISTS teams (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name VARCHAR(100) NOT NULL UNIQUE,
+    external_api_id INTEGER UNIQUE,
+    name VARCHAR(100) NOT NULL,
+    short_name VARCHAR(50),
+    tla VARCHAR(3),
     code VARCHAR(10) UNIQUE,
     founded INTEGER,
     venue VARCHAR(100),
     website VARCHAR(200),
+    league_id INTEGER,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -16,6 +20,7 @@ CREATE TABLE IF NOT EXISTS teams (
 -- Matches table
 CREATE TABLE IF NOT EXISTS matches (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    external_api_id INTEGER UNIQUE,
     home_team_id INTEGER NOT NULL,
     away_team_id INTEGER NOT NULL,
     match_date TIMESTAMP NOT NULL,
