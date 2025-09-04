@@ -1,0 +1,41 @@
+
+FROM ubuntu:latest
+
+# 安装系统依赖 (完全模拟GitHub Actions runner)
+RUN apt-get update && apt-get install -y \
+    python3.11 \
+    python3-pip \
+    postgresql-client \
+    redis-tools \
+    curl \
+    git \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# 安装uv (与GitHub Actions完全一致的方式)
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+ENV PATH="/root/.local/bin:$PATH"
+
+# 设置工作目录
+WORKDIR /workspace
+
+# 设置环境变量 (与GitHub Actions完全一致)
+ENV PYTHON_VERSION="3.11"
+ENV DATABASE_URL="sqlite:///./test_football.db"
+ENV REDIS_URL="redis://redis:6379/1"
+ENV FOOTBALL_DATA_API_KEY="test_api_key"
+ENV ENVIRONMENT="testing"
+ENV CI="true"
+ENV POSTGRES_HOST="postgres"
+ENV POSTGRES_PORT="5432"
+ENV POSTGRES_USER="test_user"
+ENV POSTGRES_PASSWORD="test_pass"
+ENV POSTGRES_DB="test_football_db"
+
+# 复制项目文件
+COPY . /workspace/
+
+# 安装依赖 (与GitHub Actions完全一致)
+RUN uv sync --extra dev
+
+CMD ["/bin/bash"]

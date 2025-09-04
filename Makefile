@@ -560,3 +560,69 @@ full-pre-commit-check: ci-check-new ci-db-test docker-build-test ## 🛡️ 完�
 	@echo "🛡️ 完整提交前检查全部完成！"
 	@echo "✅ 代码质量、数据库功能、Docker构建全部验证通过"
 	@echo "🚀 代码已完全验证，可以安全部署"
+
+# =================== Next-Gen CI 升级系统 ===================
+.PHONY: ci-nextgen ci-nextgen-setup ci-nextgen-full ci-docker-check
+
+ci-nextgen-setup:
+	@echo "🚀 设置Next-Gen CI环境..."
+	@pip install docker pyyaml structlog
+	@docker --version || (echo "❌ 请安装Docker" && exit 1)
+	@docker-compose --version || (echo "❌ 请安装docker-compose" && exit 1)
+	@echo "✅ Next-Gen CI环境就绪"
+
+ci-nextgen:
+	@echo "🚀 运行Next-Gen CI系统 - GitHub Actions完美模拟"
+	@echo "=========================================="
+	@echo "🎯 解决本地通过但远程失败的问题"
+	@echo "🐳 Docker化环境 + AI智能诊断"
+	@echo "=========================================="
+	@uv run python scripts/next_gen_ci_system.py
+
+ci-nextgen-full: ci-nextgen-setup ci-nextgen
+	@echo "🏆 Next-Gen CI完整检查完成"
+
+ci-docker-check:
+	@echo "🐳 运行Docker化CI检查（快速版本）"
+	@docker-compose -f docker-compose.github-actions.yml up --build --abort-on-container-exit ci-runner
+
+# =================== Next-Gen CI 完整工具套件 ===================
+.PHONY: ci-diagnose ci-monitor ci-auto-fix ci-nextgen-help
+
+ci-diagnose:
+	@echo "🧠 运行智能CI诊断..."
+	@uv run python scripts/ci_smart_diagnostic.py
+
+ci-monitor:
+	@echo "📡 启动GitHub Actions实时监控..."
+	@uv run python scripts/ci_realtime_monitor.py
+
+ci-auto-fix:
+	@echo "🔧 启动自动CI修复系统..."
+	@uv run python scripts/ci_auto_fix.py
+
+ci-nextgen-help:
+	@echo "🚀 Next-Gen CI工具套件 - 使用指南"
+	@echo "========================================"
+	@echo ""
+	@echo "🎯 主要命令:"
+	@echo "  make ci-nextgen         - 完整GitHub Actions模拟"
+	@echo "  make ci-nextgen-full    - 环境设置 + 完整模拟"
+	@echo "  make ci-docker-check    - Docker化快速检查"
+	@echo ""
+	@echo "🔧 辅助工具:"
+	@echo "  make ci-diagnose        - 智能诊断CI问题"
+	@echo "  make ci-monitor         - 实时监控GitHub Actions"
+	@echo "  make ci-auto-fix        - 自动修复CI问题"
+	@echo ""
+	@echo "📊 高级功能:"
+	@echo "  • AI驱动的错误诊断和解决方案"
+	@echo "  • Docker化环境完美模拟GitHub Actions"
+	@echo "  • 实时CI状态监控和预警"
+	@echo "  • 自动修复常见CI问题"
+	@echo ""
+	@echo "💡 推荐工作流:"
+	@echo "  1. make ci-nextgen-full    # 完整检查"
+	@echo "  2. make ci-diagnose        # 如果失败，诊断问题"
+	@echo "  3. make ci-auto-fix        # 自动修复问题"
+	@echo "  4. make ci-monitor         # 监控远程CI状态"

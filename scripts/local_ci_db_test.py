@@ -29,7 +29,7 @@ sys.path.insert(0, str(project_root / "src"))
 
 
 def setup_test_database() -> str:
-    """设置测试数据库，返回数据库文件路径"""  # noqa: RUF002
+    """设置测试数据库,返回数据库文件路径"""
     print("🏗️ 设置测试SQLite数据库...")
 
     # 创建临时数据库文件
