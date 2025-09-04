@@ -195,6 +195,7 @@ class TestUser:
             username="defaulttest",
             email="default@example.com",
             role=UserRole.USER,
+            created_at=datetime.utcnow(),
         )
 
         assert user.permissions == []
@@ -309,6 +310,7 @@ class TestSecurityModelsIntegration:
                 username=f"user_{role.value}",
                 email=f"{role.value}@example.com",
                 role=role,
+                created_at=datetime.utcnow(),
             )
             assert user.role == role
 
@@ -327,6 +329,7 @@ class TestSecurityModelsIntegration:
             email="multi@example.com",
             role=UserRole.USER,
             permissions=permissions,
+            created_at=datetime.utcnow(),
         )
 
         assert len(user.permissions) == 4
@@ -343,6 +346,7 @@ class TestSecurityModelsIntegration:
             permissions=[Permission.ADMIN_ACCESS, Permission.READ_PREDICTIONS],
             is_active=True,
             is_verified=True,
+            created_at=datetime.utcnow(),
         )
 
         data = original_user.model_dump()

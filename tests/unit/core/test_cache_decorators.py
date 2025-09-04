@@ -23,9 +23,9 @@ class TestCachedDecorator:
         cache_manager.set.return_value = True
 
         with patch(
-            "football_predict_system.core.cache.decorators.get_cache_manager"
-        ) as mock_get_cache:
-            mock_get_cache.return_value = cache_manager
+            "football_predict_system.core.cache.decorators.CacheManager"
+        ) as mock_cache_class:
+            mock_cache_class.return_value = cache_manager
 
             @cached(ttl=300)
             async def test_function(x: int) -> int:
@@ -45,7 +45,7 @@ class TestCachedDecorator:
         cache_manager.get.return_value = 20  # Cache hit
 
         with patch(
-            "football_predict_system.core.cache.decorators.get_cache_manager"
+            "football_predict_system.core.cache.decorators.CacheManager"
         ) as mock_get_cache:
             mock_get_cache.return_value = cache_manager
 
@@ -68,7 +68,7 @@ class TestCachedDecorator:
         cache_manager.set.return_value = True
 
         with patch(
-            "football_predict_system.core.cache.decorators.get_cache_manager"
+            "football_predict_system.core.cache.decorators.CacheManager"
         ) as mock_get_cache:
             mock_get_cache.return_value = cache_manager
 
@@ -82,7 +82,7 @@ class TestCachedDecorator:
             # Check that namespace was used in cache key
             cache_manager.get.assert_called_once()
             call_args = cache_manager.get.call_args
-            assert call_args[1]["namespace"] == "custom"
+            assert call_args[0][1] == "custom"  # namespace is the second positional arg
 
     @pytest.mark.asyncio
     async def test_cached_decorator_key_generation(self):
@@ -93,7 +93,7 @@ class TestCachedDecorator:
         cache_manager.set.return_value = True
 
         with patch(
-            "football_predict_system.core.cache.decorators.get_cache_manager"
+            "football_predict_system.core.cache.decorators.CacheManager"
         ) as mock_get_cache:
             mock_get_cache.return_value = cache_manager
 
@@ -123,7 +123,7 @@ class TestCachedDecorator:
         cache_manager.set.side_effect = Exception("Cache error")
 
         with patch(
-            "football_predict_system.core.cache.decorators.get_cache_manager"
+            "football_predict_system.core.cache.decorators.CacheManager"
         ) as mock_get_cache:
             mock_get_cache.return_value = cache_manager
 
@@ -144,7 +144,7 @@ class TestCachedDecorator:
         cache_manager.set.return_value = True
 
         with patch(
-            "football_predict_system.core.cache.decorators.get_cache_manager"
+            "football_predict_system.core.cache.decorators.CacheManager"
         ) as mock_get_cache:
             mock_get_cache.return_value = cache_manager
 
@@ -185,7 +185,7 @@ class TestCachedDecorator:
         cache_manager.set.return_value = True
 
         with patch(
-            "football_predict_system.core.cache.decorators.get_cache_manager"
+            "football_predict_system.core.cache.decorators.CacheManager"
         ) as mock_get_cache:
             mock_get_cache.return_value = cache_manager
 
@@ -207,7 +207,7 @@ class TestCachedDecorator:
         cache_manager.set.return_value = True
 
         with patch(
-            "football_predict_system.core.cache.decorators.get_cache_manager"
+            "football_predict_system.core.cache.decorators.CacheManager"
         ) as mock_get_cache:
             mock_get_cache.return_value = cache_manager
 
@@ -244,7 +244,7 @@ class TestCacheKeyGeneration:
         cache_manager.set.return_value = True
 
         with patch(
-            "football_predict_system.core.cache.decorators.get_cache_manager"
+            "football_predict_system.core.cache.decorators.CacheManager"
         ) as mock_get_cache:
             mock_get_cache.return_value = cache_manager
 
@@ -272,7 +272,7 @@ class TestCacheKeyGeneration:
         cache_manager.get.return_value = "cached_result"
 
         with patch(
-            "football_predict_system.core.cache.decorators.get_cache_manager"
+            "football_predict_system.core.cache.decorators.CacheManager"
         ) as mock_get_cache:
             mock_get_cache.return_value = cache_manager
 
@@ -314,7 +314,7 @@ class TestCacheDecoratorIntegration:
         cache_manager.set.return_value = True
 
         with patch(
-            "football_predict_system.core.cache.decorators.get_cache_manager"
+            "football_predict_system.core.cache.decorators.CacheManager"
         ) as mock_get_cache:
             mock_get_cache.return_value = cache_manager
 

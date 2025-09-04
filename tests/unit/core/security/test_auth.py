@@ -84,7 +84,9 @@ class TestJWTManager:
             )
             assert payload["role"] == role.value
 
-    @pytest.mark.skip(reason="JWT timing issue in CI environment - token appears expired immediately")
+    @pytest.mark.skip(
+        reason="JWT timing issue in CI environment - token appears expired immediately"
+    )
     def test_verify_token_valid(self):
         """Test verifying valid token."""
         user_id = "test_user"
