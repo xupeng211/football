@@ -302,7 +302,9 @@ class TestDatabaseWriter:
                 assert result.errors == 0  # Invalid data filtered, not counted as error
 
 
-@pytest.mark.skip(reason="Integration tests need refactoring for current implementation")
+@pytest.mark.skip(
+    reason="Integration tests need refactoring for current implementation"
+)
 class TestDatabaseWriterIntegration:
     """Integration-style tests with less mocking."""
 

@@ -101,7 +101,7 @@ class TestDataService:
                 mock_cache_manager.get.assert_called_once_with(
                     "match:match123", "matches"
                 )
-                                mock_load_db.assert_called_once_with("match123")
+                mock_load_db.assert_called_once_with("match123")
                 # Verify cache was set with the actual match data
                 mock_cache_manager.set.assert_called_once()
                 call_args = mock_cache_manager.set.call_args
@@ -142,7 +142,13 @@ class TestDataService:
 
         # Mock cache manager
         mock_cache_manager = AsyncMock()
-        mock_cache_data = {"id": "team123", "name": "Team A", "country": "Country"}
+        mock_cache_data = {
+            "id": "123e4567-e89b-12d3-a456-426614174000",
+            "name": "Team A",
+            "short_name": "TMA",
+            "tla": "TMA",
+            "country": "Country"
+        }
         mock_cache_manager.get.return_value = mock_cache_data
 
         with patch(
@@ -154,10 +160,10 @@ class TestDataService:
                 mock_team = MagicMock()
                 mock_team_class.return_value = mock_team
 
-                result = await service.get_team_by_id("team123")
+                result = await service.get_team_by_id("123e4567-e89b-12d3-a456-426614174000")
 
                 assert result is mock_team
-                mock_cache_manager.get.assert_called_once_with("team:team123", "teams")
+                mock_cache_manager.get.assert_called_once_with("team:123e4567-e89b-12d3-a456-426614174000", "teams")
                 mock_team_class.assert_called_once_with(**mock_cache_data)
 
     @pytest.mark.asyncio
@@ -175,6 +181,7 @@ class TestDataService:
             "id": "123e4567-e89b-12d3-a456-426614174000",
             "name": "Team A",
             "short_name": "TMA",
+            "tla": "TMA"
         }
 
         with patch(
@@ -185,13 +192,13 @@ class TestDataService:
             with patch.object(service, "_load_team_from_db") as mock_load_db:
                 mock_load_db.return_value = mock_db_team
 
-                result = await service.get_team_by_id("team123")
+                result = await service.get_team_by_id("123e4567-e89b-12d3-a456-426614174000")
 
                 assert result is mock_db_team
-                mock_cache_manager.get.assert_called_once_with("team:team123", "teams")
-                mock_load_db.assert_called_once_with("team123")
+                mock_cache_manager.get.assert_called_once_with("team:123e4567-e89b-12d3-a456-426614174000", "teams")
+                mock_load_db.assert_called_once_with("123e4567-e89b-12d3-a456-426614174000")
                 mock_cache_manager.set.assert_called_once_with(
-                    "team:team123", {"id": "team123", "name": "Team A"}, 3600, "teams"
+                    "team:123e4567-e89b-12d3-a456-426614174000", {"id": "123e4567-e89b-12d3-a456-426614174000", "name": "Team A", "short_name": "TMA", "tla": "TMA"}, 3600, "teams"
                 )
 
     @pytest.mark.asyncio
@@ -211,11 +218,11 @@ class TestDataService:
             with patch.object(service, "_load_team_from_db") as mock_load_db:
                 mock_load_db.return_value = None
 
-                result = await service.get_team_by_id("team123")
+                result = await service.get_team_by_id("123e4567-e89b-12d3-a456-426614174000")
 
                 assert result is None
-                mock_cache_manager.get.assert_called_once_with("team:team123", "teams")
-                mock_load_db.assert_called_once_with("team123")
+                mock_cache_manager.get.assert_called_once_with("team:123e4567-e89b-12d3-a456-426614174000", "teams")
+                mock_load_db.assert_called_once_with("123e4567-e89b-12d3-a456-426614174000")
                 mock_cache_manager.set.assert_not_called()
 
     @pytest.mark.asyncio
@@ -346,7 +353,7 @@ class TestDataService:
         """Test _load_team_from_db placeholder implementation."""
         service = DataService()
 
-        result = await service._load_team_from_db("team123")
+        result = await service._load_team_from_db("123e4567-e89b-12d3-a456-426614174000")
 
         assert result is None
 
@@ -410,7 +417,7 @@ class TestDataService:
         mock_match.dict.return_value = {"id": "match123"}
 
         mock_team = MagicMock()
-        mock_team.dict.return_value = {"id": "team123"}
+        mock_team.dict.return_value = {"id": "123e4567-e89b-12d3-a456-426614174000"}
 
         with patch(
             "football_predict_system.domain.services.data_service.get_cache_manager"
@@ -429,7 +436,7 @@ class TestDataService:
                 mock_load_upcoming.return_value = []
 
                 await service.get_match_by_id("match123")
-                await service.get_team_by_id("team123")
+                await service.get_team_by_id("123e4567-e89b-12d3-a456-426614174000")
                 await service.get_upcoming_matches(5)
 
                 # Verify TTL values
@@ -470,7 +477,7 @@ class TestDataService:
                 mock_load_upcoming.return_value = []
 
                 await service.get_match_by_id("match123")
-                await service.get_team_by_id("team123")
+                await service.get_team_by_id("123e4567-e89b-12d3-a456-426614174000")
                 await service.get_upcoming_matches(5)
 
                 # Verify namespaces
@@ -508,7 +515,7 @@ class TestDataService:
 
                 # Methods should execute without errors (decorators work)
                 result1 = await service.get_match_by_id("match123")
-                result2 = await service.get_team_by_id("team123")
+                result2 = await service.get_team_by_id("123e4567-e89b-12d3-a456-426614174000")
                 result3 = await service.get_upcoming_matches(5)
 
                 assert result1 is None
@@ -527,7 +534,7 @@ class TestDataService:
             None,  # match miss
             {"id": "match123", "home_team": "Team A"},  # match hit
             None,  # team miss
-            {"id": "team123", "name": "Team A"},  # team hit
+            {"id": "123e4567-e89b-12d3-a456-426614174000", "name": "Team A", "short_name": "TMA", "tla": "TMA"},  # team hit
             None,  # upcoming miss
             [{"id": "match1"}, {"id": "match2"}],  # upcoming hit
         ]
@@ -537,7 +544,7 @@ class TestDataService:
         mock_match.dict.return_value = {"id": "match123", "home_team": "Team A"}
 
         mock_team = MagicMock()
-        mock_team.dict.return_value = {"id": "team123", "name": "Team A"}
+        mock_team.dict.return_value = {"id": "123e4567-e89b-12d3-a456-426614174000", "name": "Team A", "short_name": "TMA", "tla": "TMA"}
 
         mock_upcoming = [MagicMock()]
         mock_upcoming[0].dict.return_value = {"id": "match1"}
@@ -573,12 +580,12 @@ class TestDataService:
 
                     # First calls - cache miss, db hit
                     await service.get_match_by_id("match123")
-                    await service.get_team_by_id("team123")
+                    await service.get_team_by_id("123e4567-e89b-12d3-a456-426614174000")
                     await service.get_upcoming_matches(5)
 
                     # Second calls - cache hit
                     await service.get_match_by_id("match123")
-                    await service.get_team_by_id("team123")
+                    await service.get_team_by_id("123e4567-e89b-12d3-a456-426614174000")
                     await service.get_upcoming_matches(5)
 
                     # Verify cache behavior
@@ -620,3 +627,4 @@ class TestDataService:
         assert inspect.iscoroutinefunction(service._load_match_from_db)
         assert inspect.iscoroutinefunction(service._load_team_from_db)
         assert inspect.iscoroutinefunction(service._load_upcoming_matches_from_db)
+
