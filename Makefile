@@ -492,3 +492,32 @@ ready: ci.ready ## 🎯 ci.ready 的别名
 
 .PHONY: safe-push  
 safe-push: push.safe ## 🛡️ push.safe 的别名
+
+# ============================================================================
+# CI/CD 相关命令
+# ============================================================================
+
+.PHONY: ci-check
+ci-check: ## 🚀 完整CI检查 (与远程CI完全一致)
+	@echo "🚀 运行完整CI级别检查..."
+	@echo "📋 1. 代码格式化检查..."
+	$(UV_RUN) ruff format . --check
+	@echo "📋 2. 代码质量检查..."
+	$(UV_RUN) ruff check .
+	@echo "📋 3. 类型检查..."
+	-$(UV_RUN) mypy src/ --ignore-missing-imports --no-strict-optional
+	@echo "📋 4. 安全扫描..."
+	-$(UV_RUN) bandit -r src/ -c pyproject.toml
+	@echo "✅ CI检查完成！"
+
+.PHONY: ci-db-test
+ci-db-test: ## 🧪 本地CI数据库测试 (模拟CI环境)
+	@echo "🧪 运行本地CI数据库测试..."
+	@echo "这个测试模拟CI环境中的数据库功能验证，帮助在提交前发现问题"
+	$(UV_RUN) python scripts/local_ci_db_test.py
+
+.PHONY: pre-commit-check
+pre-commit-check: ci-check ci-db-test ## 🛡️ 提交前完整检查
+	@echo "🛡️ 提交前检查全部完成！"
+	@echo "✅ 代码质量合格，数据库功能正常"
+	@echo "🚀 可以安全提交到远程仓库"

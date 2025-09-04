@@ -373,6 +373,24 @@ jobs:
           echo "🔧 确保数据库存在..."
           PGPASSWORD=test_pass psql -h localhost -U test_user -d postgres -c "CREATE DATABASE test_football_db;" || echo "数据库可能已存在"
           
+          echo "🏗️ 初始化SQLite数据库schema..."
+          uv run python -c "
+          import sqlite3
+          import sys
+          sys.path.insert(0, 'src')
+          
+          # 读取SQLite schema文件并执行
+          with open('sql/schema_sqlite.sql', 'r') as f:
+              schema_sql = f.read()
+          
+          # 连接到SQLite数据库并执行schema
+          conn = sqlite3.connect('./test_football.db')
+          conn.executescript(schema_sql)
+          conn.commit()
+          conn.close()
+          print('✅ SQLite数据库schema初始化完成')
+          "
+          
           echo "🏗️ 运行数据库设置..."
           uv run python scripts/data_platform/setup_data_platform.py --action setup
           
