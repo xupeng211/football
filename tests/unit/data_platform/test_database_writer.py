@@ -47,23 +47,15 @@ class TestDatabaseWriter:
         writer = DatabaseWriter()
 
         assert writer.logger is not None
-        assert writer.settings is not None
-        assert hasattr(writer, "_session_factory")
+        assert hasattr(writer, "db_manager")
+        # DatabaseWriter uses db_manager from get_database_manager()
 
-    @pytest.mark.asyncio
+    @pytest.mark.skip(reason="DatabaseWriter no longer has _create_session method")
     async def test_create_session(self):
-        """Test session creation."""
-        writer = DatabaseWriter()
-
-        # Mock session factory
-        mock_session = AsyncMock()
-        mock_factory = MagicMock()
-        mock_factory.return_value = mock_session
-        writer._session_factory = mock_factory
-
-        session = await writer._create_session()
-        assert session == mock_session
-        mock_factory.assert_called_once()
+        """Test session creation - DEPRECATED."""
+        # This test is for a method that no longer exists
+        # DatabaseWriter now uses db_manager for session management
+        pass
 
     def test_validate_team_data(self):
         """Test team data validation."""
