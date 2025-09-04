@@ -37,7 +37,7 @@ ENV PATH="/root/.local/bin:$PATH"
 WORKDIR /workspace
 
 # 复制项目文件
-COPY pyproject.toml uv.lock README.md ./
+COPY pyproject.toml uv.lock ./
 COPY src/ ./src/
 COPY tests/ ./tests/
 COPY Makefile ./
