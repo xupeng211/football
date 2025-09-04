@@ -64,6 +64,8 @@ class TestHealthChecker:
         """Create a HealthChecker instance."""
         with patch("football_predict_system.core.health.get_settings") as mock_settings:
             mock_settings.return_value.health_check_timeout = 30
+            mock_settings.return_value.app_version = "1.0.0"
+            mock_settings.return_value.app_name = "Football Prediction System"
             return HealthChecker()
 
     def test_health_checker_initialization(self, health_checker):
@@ -339,6 +341,8 @@ class TestHealthCheckerIntegration:
         """Test health check with timeout handling."""
         with patch("football_predict_system.core.health.get_settings") as mock_settings:
             mock_settings.return_value.health_check_timeout = 1  # 1 second timeout
+            mock_settings.return_value.app_version = "1.0.0"
+            mock_settings.return_value.app_name = "Football Prediction System"
             health_checker = HealthChecker()
 
             # Mock a slow database check

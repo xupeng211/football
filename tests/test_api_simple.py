@@ -177,7 +177,10 @@ def test_predictions_router_import() -> None:
         patch("src.football_predict_system.core.config.Settings") as MockSettings,
         patch("src.football_predict_system.core.logging.get_logger"),
     ):
-        MockSettings.return_value = MagicMock()
+        mock_settings = MagicMock()
+        mock_settings.app_version = "1.0.0"
+        mock_settings.app_name = "Football Prediction System"
+        MockSettings.return_value = mock_settings
 
         from src.football_predict_system.api.v1.predictions import router
 
@@ -190,7 +193,10 @@ def test_models_router_import() -> None:
         patch("src.football_predict_system.core.config.Settings") as MockSettings,
         patch("src.football_predict_system.core.logging.get_logger"),
     ):
-        MockSettings.return_value = MagicMock()
+        mock_settings = MagicMock()
+        mock_settings.app_version = "1.0.0"
+        mock_settings.app_name = "Football Prediction System"
+        MockSettings.return_value = mock_settings
 
         from src.football_predict_system.api.v1.models import router
 

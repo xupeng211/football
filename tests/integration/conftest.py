@@ -92,6 +92,8 @@ async def test_app():
         mock_settings.return_value.redis_url = "redis://localhost:6379/15"
         mock_settings.return_value.debug = True
         mock_settings.return_value.testing = True
+        mock_settings.return_value.app_version = "1.0.0"
+        mock_settings.return_value.app_name = "Football Prediction System"
 
         yield app
 
@@ -109,6 +111,8 @@ async def database_manager():
     # Use in-memory SQLite for fast testing
     with patch("football_predict_system.core.config.get_settings") as mock_settings:
         mock_settings.return_value.database_url = "sqlite:///:memory:"
+        mock_settings.return_value.app_version = "1.0.0"
+        mock_settings.return_value.app_name = "Football Prediction System"
 
         db_manager = get_database_manager()
         await db_manager.initialize()
