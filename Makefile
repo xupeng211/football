@@ -125,6 +125,11 @@ security: ## 🔧 安全扫描
 	uv run bandit -r src/ -c pyproject.toml -q
 	@echo "$(GREEN)✅ 安全扫描完成$(NC)"
 
+validate-production: ## 🔐 验证生产环境配置安全
+	@echo "$(BLUE)🔐 验证生产环境配置...$(NC)"
+	uv run python scripts/validate_production_config.py
+	@echo "$(GREEN)✅ 生产配置验证完成$(NC)"
+
 # === 测试相关 ===
 test: ## 🧪 运行所有测试
 	@echo "$(BLUE)🧪 运行测试...$(NC)"

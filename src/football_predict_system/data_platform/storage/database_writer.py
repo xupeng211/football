@@ -139,7 +139,7 @@ class DatabaseWriter:
                                 short_name = :short_name,
                                 updated_at = {timestamp_func}
                             WHERE external_api_id = :external_api_id
-                            """),
+                            """),  # nosec B608 - timestamp_func is a safe database function
                             {
                                 "external_api_id": row["external_api_id"],
                                 "name": row["name"],
@@ -164,7 +164,7 @@ class DatabaseWriter:
                                 :id, :external_api_id, :name, :short_name,
                                 {timestamp_func}, {timestamp_func}
                             )
-                            """),
+                            """),  # nosec B608 - timestamp_func is a safe database function
                             {
                                 "id": team_id,
                                 "external_api_id": row["external_api_id"],

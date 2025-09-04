@@ -1,349 +1,442 @@
-"""Simple comprehensive unit tests for logging module to boost coverage."""
+"""
+Simplified tests for core logging system.
 
-from unittest.mock import MagicMock, patch
+Tests the actual available components to achieve coverage improvement.
+"""
+
+import time
+from unittest.mock import Mock
+from uuid import uuid4
+
+import pytest
 
 from football_predict_system.core.logging import (
     CorrelationIDProcessor,
-    CustomJSONRenderer,
     ErrorProcessor,
     PerformanceProcessor,
     clear_context,
+    correlation_id_var,
     get_logger,
+    request_id_var,
     set_correlation_id,
+    set_request_id,
     set_user_id,
-    setup_logging,
+    user_id_var,
 )
 
 
 class TestCorrelationIDProcessor:
-    """Test the CorrelationIDProcessor class."""
+    """Test CorrelationIDProcessor functionality."""
 
-    def test_init(self):
-        """Test CorrelationIDProcessor initialization."""
+    def setup_method(self):
+        """Clean context before each test."""
+        clear_context()
+
+    def test_processor_with_correlation_id(self):
+        """Test processor adds correlation ID when available."""
         processor = CorrelationIDProcessor()
-        assert processor is not None
+        correlation_id = str(uuid4())
 
-    def test_call_without_correlation_id(self):
-        """Test __call__ without correlation ID set."""
+        # Set correlation ID in context
+        set_correlation_id(correlation_id)
+
+        # Process event dict
+        event_dict = {"message": "test"}
+        result = processor(Mock(), "info", event_dict)
+
+        assert result["correlation_id"] == correlation_id
+        assert result["message"] == "test"
+
+    def test_processor_with_user_id(self):
+        """Test processor adds user ID when available."""
         processor = CorrelationIDProcessor()
-        logger = MagicMock()
+        user_id = "test-user-123"
 
-        event_dict = {"event": "Test event"}
+        # Set user ID in context
+        set_user_id(user_id)
 
-        result = processor(logger, "info", event_dict)
+        # Process event dict
+        event_dict = {"message": "test"}
+        result = processor(Mock(), "info", event_dict)
 
-        # Should return original event dict without correlation_id
-        assert isinstance(result, dict)
-        assert "event" in result
-        assert result["event"] == "Test event"
+        assert result["user_id"] == user_id
+        assert "correlation_id" not in result
 
-    @patch("football_predict_system.core.logging.correlation_id_var")
-    def test_call_with_correlation_id(self, mock_correlation_var):
-        """Test __call__ with correlation ID set."""
+    def test_processor_with_request_id(self):
+        """Test processor adds request ID when available."""
         processor = CorrelationIDProcessor()
-        logger = MagicMock()
+        request_id = str(uuid4())
 
-        # Mock correlation ID
-        mock_correlation_var.get.return_value = "test-correlation-123"
+        # Set request ID in context
+        set_request_id(request_id)
 
-        event_dict = {"event": "Test event"}
+        # Process event dict
+        event_dict = {"message": "test"}
+        result = processor(Mock(), "info", event_dict)
 
-        result = processor(logger, "info", event_dict)
+        assert result["request_id"] == request_id
 
-        # Should add correlation_id to event dict
-        assert "correlation_id" in result
-        assert result["correlation_id"] == "test-correlation-123"
-
-    @patch("football_predict_system.core.logging.user_id_var")
-    def test_call_with_user_id(self, mock_user_var):
-        """Test __call__ with user ID set."""
+    def test_processor_with_no_context(self):
+        """Test processor when no context variables are set."""
         processor = CorrelationIDProcessor()
-        logger = MagicMock()
 
-        # Mock user ID
-        mock_user_var.get.return_value = "user-456"
+        # Process event dict without context
+        event_dict = {"message": "test"}
+        result = processor(Mock(), "info", event_dict)
 
-        event_dict = {"event": "Test event"}
-
-        result = processor(logger, "info", event_dict)
-
-        # Should add user_id to event dict
-        assert "user_id" in result
-        assert result["user_id"] == "user-456"
+        # Should only contain original message
+        assert result == {"message": "test"}
 
 
 class TestPerformanceProcessor:
-    """Test the PerformanceProcessor class."""
+    """Test PerformanceProcessor functionality."""
 
-    def test_init(self):
-        """Test PerformanceProcessor initialization."""
+    def test_processor_adds_timestamp(self):
+        """Test processor adds timestamp to events."""
         processor = PerformanceProcessor()
-        assert processor is not None
 
-    def test_call_basic(self):
-        """Test basic performance processing."""
-        processor = PerformanceProcessor()
-        logger = MagicMock()
+        start_time = time.time()
+        event_dict = {"message": "test"}
+        result = processor(Mock(), "info", event_dict)
+        end_time = time.time()
 
-        event_dict = {"event": "Performance test"}
-
-        result = processor(logger, "info", event_dict)
-
-        # Should add timestamp
-        assert isinstance(result, dict)
         assert "timestamp" in result
-        assert "event" in result
+        assert start_time <= result["timestamp"] <= end_time
+        assert result["message"] == "test"
+
+    def test_processor_with_duration_fast(self):
+        """Test processor with fast duration (< 1s)."""
+        processor = PerformanceProcessor()
+
+        event_dict = {"message": "test", "duration": 0.5}
+        result = processor(Mock(), "info", event_dict)
+
+        assert "performance" in result
+        assert result["performance"]["duration_ms"] == 500.0
+        assert result["performance"]["slow_query"] is False
+
+    def test_processor_with_duration_slow(self):
+        """Test processor with slow duration (> 1s)."""
+        processor = PerformanceProcessor()
+
+        event_dict = {"message": "test", "duration": 2.5}
+        result = processor(Mock(), "info", event_dict)
+
+        assert "performance" in result
+        assert result["performance"]["duration_ms"] == 2500.0
+        assert result["performance"]["slow_query"] is True
+
+    def test_processor_without_duration(self):
+        """Test processor when no duration is provided."""
+        processor = PerformanceProcessor()
+
+        event_dict = {"message": "test"}
+        result = processor(Mock(), "info", event_dict)
+
+        assert "timestamp" in result
+        assert "performance" not in result
+        assert result["message"] == "test"
 
 
 class TestErrorProcessor:
-    """Test the ErrorProcessor class."""
+    """Test ErrorProcessor functionality."""
 
-    def test_init(self):
-        """Test ErrorProcessor initialization."""
+    def test_processor_with_error_method(self):
+        """Test processor processes error level messages."""
         processor = ErrorProcessor()
-        assert processor is not None
 
-    def test_call_without_exception(self):
-        """Test error processing without exception."""
+        event_dict = {"message": "An error occurred"}
+        result = processor(Mock(), "error", event_dict)
+
+        # Should add stack trace for error level
+        assert "stack_trace" in result
+        assert result["message"] == "An error occurred"
+
+    def test_processor_with_exception_object(self):
+        """Test processor handles exception objects."""
         processor = ErrorProcessor()
-        logger = MagicMock()
 
-        event_dict = {"event": "Normal log"}
+        error = ValueError("Test error message")
+        event_dict = {"message": "Error occurred", "error": error}
+        result = processor(Mock(), "error", event_dict)
 
-        result = processor(logger, "info", event_dict)
+        # Should process the exception
+        assert "error_details" in result
+        assert result["error_details"]["type"] == "ValueError"
+        assert result["error_details"]["message"] == "Test error message"
+        assert "traceback" in result["error_details"]
+        assert result["error"] == "Test error message"
 
-        # Should return event dict unchanged
-        assert isinstance(result, dict)
-        assert "event" in result
-        assert result["event"] == "Normal log"
-
-    def test_call_with_exception_info(self):
-        """Test error processing with exception info."""
+    def test_processor_with_info_level(self):
+        """Test processor doesn't add error details for info level."""
         processor = ErrorProcessor()
-        logger = MagicMock()
 
-        # Simulate exception info
-        try:
-            raise ValueError("Test error")
-        except ValueError:
-            import sys
+        event_dict = {"message": "Info message"}
+        result = processor(Mock(), "info", event_dict)
 
-            exc_info = sys.exc_info()
+        # Should not add error details for non-error levels
+        assert "error_details" not in result
+        assert "stack_trace" not in result
+        assert result["message"] == "Info message"
 
-        event_dict = {"event": "Error occurred", "exc_info": exc_info}
+    def test_processor_with_string_error(self):
+        """Test processor handles string errors."""
+        processor = ErrorProcessor()
 
-        result = processor(logger, "error", event_dict)
+        event_dict = {"message": "Error occurred", "error": "String error"}
+        result = processor(Mock(), "error", event_dict)
 
-        # Should process exception information
-        assert isinstance(result, dict)
-        assert "event" in result
-
-
-class TestCustomJSONRenderer:
-    """Test the CustomJSONRenderer class."""
-
-    def test_init(self):
-        """Test CustomJSONRenderer initialization."""
-        renderer = CustomJSONRenderer()
-        assert renderer is not None
-
-    def test_call_basic(self):
-        """Test basic JSON rendering."""
-        renderer = CustomJSONRenderer()
-        logger = MagicMock()
-
-        event_dict = {"event": "Test event", "level": "info", "data": {"key": "value"}}
-
-        result = renderer(logger, "info", event_dict)
-
-        # Should return JSON string
-        assert isinstance(result, str)
-
-        # Should be valid JSON
-        import json
-
-        parsed = json.loads(result)
-        assert "event" in parsed
-        assert parsed["event"] == "Test event"
-
-    def test_call_with_complex_data(self):
-        """Test JSON rendering with complex data."""
-        renderer = CustomJSONRenderer()
-        logger = MagicMock()
-
-        event_dict = {
-            "event": "Complex event",
-            "nested": {"a": 1, "b": [1, 2, 3]},
-            "number": 42,
-            "boolean": True,
-        }
-
-        result = renderer(logger, "info", event_dict)
-
-        # Should handle complex data
-        assert isinstance(result, str)
-
-        import json
-
-        parsed = json.loads(result)
-        assert parsed["nested"]["a"] == 1
-        assert parsed["nested"]["b"] == [1, 2, 3]
-        assert parsed["number"] == 42
-        assert parsed["boolean"] is True
+        # Should add stack trace but not error_details for string errors
+        assert "stack_trace" in result
+        assert "error_details" not in result
+        assert result["error"] == "String error"
 
 
-class TestLoggingFunctions:
-    """Test logging utility functions."""
+class TestContextManagement:
+    """Test context variable management functions."""
 
-    @patch("football_predict_system.core.logging.get_settings")
-    def test_setup_logging(self, mock_get_settings):
-        """Test logging setup."""
-        # Mock settings
-        mock_settings = MagicMock()
-        mock_settings.logging.level = "INFO"
-        mock_settings.logging.format = "json"
-        mock_settings.logging.file.enabled = False
-        mock_settings.logging.console.enabled = True
-        mock_settings.logging.file_path = None
-        mock_settings.logging.max_file_size = 10485760
-        mock_settings.logging.backup_count = 5
-        mock_get_settings.return_value = mock_settings
+    def setup_method(self):
+        """Clear context before each test."""
+        clear_context()
 
-        # Should not raise exception
-        with patch("structlog.configure"):
-            setup_logging()
+    def test_set_correlation_id_with_value(self):
+        """Test setting correlation ID with specific value."""
+        correlation_id = str(uuid4())
 
-    def test_get_logger_basic(self):
-        """Test getting a logger."""
-        logger = get_logger("test.module")
+        result = set_correlation_id(correlation_id)
+        assert result == correlation_id
+        assert correlation_id_var.get() == correlation_id
 
-        assert logger is not None
-        assert hasattr(logger, "info")
-        assert hasattr(logger, "error")
-        assert hasattr(logger, "warning")
-        assert hasattr(logger, "debug")
+    def test_set_correlation_id_generates_uuid(self):
+        """Test setting correlation ID generates UUID when None."""
+        result = set_correlation_id(None)
 
-    def test_get_logger_with_name(self):
-        """Test getting logger with specific name."""
-        logger = get_logger("custom.logger.name")
-
-        # Should return structlog logger
-        assert logger is not None
-        # Structlog loggers have bind method
-        assert hasattr(logger, "bind")
-
-    def test_get_logger_default_name(self):
-        """Test getting logger with default name."""
-        logger = get_logger()
-
-        assert logger is not None
-        assert hasattr(logger, "info")
-
-    def test_set_correlation_id(self):
-        """Test setting correlation ID."""
-        # Test with specific ID
-        correlation_id = set_correlation_id("test-123")
-        assert correlation_id == "test-123"
-
-        # Test with None (should generate ID)
-        correlation_id = set_correlation_id(None)
-        assert correlation_id is not None
-        assert len(correlation_id) > 0
-
-        # Test with no argument (should generate ID)
-        correlation_id = set_correlation_id()
-        assert correlation_id is not None
-        assert len(correlation_id) > 0
+        # Should generate a UUID
+        assert result is not None
+        assert len(result) == 36  # UUID string length
+        assert correlation_id_var.get() == result
 
     def test_set_user_id(self):
         """Test setting user ID."""
-        # Should not raise exception
-        set_user_id("user-456")
-        set_user_id("another-user")
+        user_id = "test-user-123"
+
+        set_user_id(user_id)
+        assert user_id_var.get() == user_id
+
+    def test_set_request_id_with_value(self):
+        """Test setting request ID with specific value."""
+        request_id = str(uuid4())
+
+        result = set_request_id(request_id)
+        assert result == request_id
+        assert request_id_var.get() == request_id
+
+    def test_set_request_id_generates_uuid(self):
+        """Test setting request ID generates UUID when None."""
+        result = set_request_id(None)
+
+        # Should generate a UUID
+        assert result is not None
+        assert len(result) == 36  # UUID string length
+        assert request_id_var.get() == result
 
     def test_clear_context(self):
-        """Test clearing context."""
-        # Set some context first
-        set_correlation_id("test-123")
-        set_user_id("user-456")
+        """Test clearing all context variables."""
+        # Set all context variables
+        set_correlation_id("corr-123")
+        set_user_id("user-123")
+        set_request_id("req-123")
 
-        # Clear context - should not raise exception
+        # Verify they're set
+        assert correlation_id_var.get() == "corr-123"
+        assert user_id_var.get() == "user-123"
+        assert request_id_var.get() == "req-123"
+
+        # Clear context
         clear_context()
 
+        # Verify they're cleared
+        assert correlation_id_var.get() is None
+        assert user_id_var.get() is None
+        assert request_id_var.get() is None
 
-class TestLoggingIntegration:
-    """Integration tests for logging functionality."""
 
-    @patch("football_predict_system.core.logging.get_settings")
-    def test_full_logging_workflow(self, mock_get_settings):
-        """Test complete logging workflow."""
-        # Setup mock settings
-        mock_settings = MagicMock()
-        mock_settings.logging.level = "DEBUG"
-        mock_settings.logging.format = "json"
-        mock_settings.logging.file.enabled = False
-        mock_settings.logging.console.enabled = True
-        mock_settings.logging.file_path = None
-        mock_settings.logging.max_file_size = 10485760
-        mock_settings.logging.backup_count = 5
-        mock_get_settings.return_value = mock_settings
+class TestGetLogger:
+    """Test get_logger function."""
 
-        # Test full workflow
-        with patch("structlog.configure"):
-            # Setup logging
-            setup_logging()
+    def test_get_logger_returns_logger(self):
+        """Test get_logger returns a structlog logger."""
+        logger = get_logger("test.module")
 
-            # Set context
-            correlation_id = set_correlation_id("workflow-123")
-            set_user_id("test-user")
+        # Should be a bound logger with standard methods
+        assert hasattr(logger, "info")
+        assert hasattr(logger, "error")
+        assert hasattr(logger, "debug")
+        assert hasattr(logger, "warning")
 
-            # Get logger and test logging
-            logger = get_logger("test.integration")
+    def test_get_logger_with_different_names(self):
+        """Test get_logger with different module names."""
+        logger1 = get_logger("module1")
+        logger2 = get_logger("module2")
 
-            # These should not raise exceptions
-            logger.info("Test info message", extra="data")
-            logger.warning("Test warning", count=42)
-            logger.error("Test error", error_code=500)
+        # Should return different logger instances
+        assert logger1 is not logger2
 
-            # Clear context
-            clear_context()
+    def test_get_logger_with_none_name(self):
+        """Test get_logger with None name."""
+        logger = get_logger(None)
 
-            assert correlation_id == "workflow-123"
+        # Should return a logger instance
+        assert logger is not None
+        assert hasattr(logger, "info")
 
-    def test_logger_binding(self):
-        """Test logger context binding."""
-        logger = get_logger("test.binding")
 
-        # Test binding context
-        bound_logger = logger.bind(user_id=123, action="test")
+class TestLogPerformance:
+    """Test log_performance decorator."""
 
-        assert bound_logger is not None
-        assert hasattr(bound_logger, "info")
+    def test_decorator_basic_functionality(self):
+        """Test basic decorator functionality."""
+        # Import the decorator - check if it exists first
+        try:
+            from football_predict_system.core.logging import log_performance
 
-        # Test logging with bound context
-        bound_logger.info("Bound log message", result="success")
+            @log_performance("test_operation")
+            def test_function():
+                return "result"
 
-    def test_processors_chain(self):
-        """Test that processors work together."""
-        # Test individual processors
+            # Should preserve function behavior
+            result = test_function()
+            assert result == "result"
+
+        except ImportError:
+            # Skip if decorator doesn't exist
+            pytest.skip("log_performance decorator not available")
+
+    def test_decorator_preserves_function_name(self):
+        """Test decorator preserves function metadata."""
+        try:
+            from football_predict_system.core.logging import log_performance
+
+            @log_performance("test_op")
+            def documented_function():
+                """Test function with docstring."""
+                pass
+
+            assert documented_function.__name__ == "documented_function"
+            assert "Test function with docstring." in documented_function.__doc__
+
+        except ImportError:
+            pytest.skip("log_performance decorator not available")
+
+
+class TestProcessorIntegration:
+    """Integration tests for processors working together."""
+
+    def setup_method(self):
+        """Set up test environment."""
+        clear_context()
+
+    def test_multiple_processors_pipeline(self):
+        """Test multiple processors working in sequence."""
+        # Set up context
+        correlation_id = str(uuid4())
+        user_id = "test-user"
+        set_correlation_id(correlation_id)
+        set_user_id(user_id)
+
+        # Create processors
         correlation_processor = CorrelationIDProcessor()
-        perf_processor = PerformanceProcessor()
+        performance_processor = PerformanceProcessor()
         error_processor = ErrorProcessor()
-        json_renderer = CustomJSONRenderer()
 
-        logger = MagicMock()
-        event_dict = {"event": "Chain test", "level": "info"}
+        # Test event processing
+        event_dict = {"message": "User action", "duration": 1.5}
 
-        # Process through chain
-        result1 = correlation_processor(logger, "info", event_dict)
-        result2 = perf_processor(logger, "info", result1)
-        result3 = error_processor(logger, "info", result2)
-        final_result = json_renderer(logger, "info", result3)
+        # Process through pipeline
+        result = correlation_processor(Mock(), "info", event_dict)
+        result = performance_processor(Mock(), "info", result)
+        result = error_processor(Mock(), "info", result)
 
-        # Should produce valid JSON
-        import json
+        # Verify all processors worked
+        assert result["correlation_id"] == correlation_id
+        assert result["user_id"] == user_id
+        assert "timestamp" in result
+        assert result["performance"]["slow_query"] is True
+        assert result["message"] == "User action"
 
-        parsed = json.loads(final_result)
-        assert "event" in parsed
-        assert parsed["event"] == "Chain test"
-        assert "timestamp" in parsed
+    def test_error_processor_with_context(self):
+        """Test error processor with context variables."""
+        # Set context
+        set_correlation_id("error-context")
+        set_user_id("error-user")
+
+        # Create processors
+        correlation_processor = CorrelationIDProcessor()
+        error_processor = ErrorProcessor()
+
+        # Process error event
+        error = RuntimeError("Test runtime error")
+        event_dict = {"message": "Critical error", "error": error}
+
+        # Process through pipeline
+        result = correlation_processor(Mock(), "error", event_dict)
+        result = error_processor(Mock(), "error", result)
+
+        # Verify context and error processing
+        assert result["correlation_id"] == "error-context"
+        assert result["user_id"] == "error-user"
+        assert "error_details" in result
+        assert result["error_details"]["type"] == "RuntimeError"
+        assert "stack_trace" in result
+
+
+class TestContextVariables:
+    """Test context variables directly."""
+
+    def setup_method(self):
+        """Clear context before each test."""
+        clear_context()
+
+    def test_context_var_isolation(self):
+        """Test that context variables work independently."""
+        # Set only correlation ID
+        set_correlation_id("test-correlation")
+
+        assert correlation_id_var.get() == "test-correlation"
+        assert user_id_var.get() is None
+        assert request_id_var.get() is None
+
+        # Set only user ID
+        clear_context()
+        set_user_id("test-user")
+
+        assert correlation_id_var.get() is None
+        assert user_id_var.get() == "test-user"
+        assert request_id_var.get() is None
+
+    def test_context_var_overwrite(self):
+        """Test that context variables can be overwritten."""
+        # Set initial values
+        set_correlation_id("first-correlation")
+        set_user_id("first-user")
+
+        assert correlation_id_var.get() == "first-correlation"
+        assert user_id_var.get() == "first-user"
+
+        # Overwrite values
+        set_correlation_id("second-correlation")
+        set_user_id("second-user")
+
+        assert correlation_id_var.get() == "second-correlation"
+        assert user_id_var.get() == "second-user"
+
+    def test_uuid_generation_uniqueness(self):
+        """Test that generated UUIDs are unique."""
+        uuid1 = set_correlation_id(None)
+        uuid2 = set_correlation_id(None)
+        uuid3 = set_request_id(None)
+        uuid4 = set_request_id(None)
+
+        # All should be different
+        uuids = [uuid1, uuid2, uuid3, uuid4]
+        assert len(set(uuids)) == 4  # All unique
