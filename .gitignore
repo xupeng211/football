@@ -59,7 +59,8 @@ __pypackages__/
 # Modern Python Dependency Management
 # -----------------------------------------------------------------------------
 # uv (modern Python package manager)
-uv.lock
+# uv.lock should be committed for reproducible builds
+# uv.lock
 .uv_cache/
 
 # Legacy dependency files (no longer used in v3.0)
