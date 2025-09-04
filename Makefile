@@ -516,8 +516,26 @@ ci-db-test: ## 🧪 本地CI数据库测试 (模拟CI环境)
 	@echo "这个测试模拟CI环境中的数据库功能验证，帮助在提交前发现问题"
 	$(UV_RUN) python scripts/local_ci_db_test.py
 
+.PHONY: docker-test
+docker-test: ## 🐳 本地Docker构建测试 (模拟CD环境)
+	@echo "🐳 运行本地Docker构建测试..."
+	@echo "这个测试验证Docker构建所需文件完整性，防止CD失败"
+	$(UV_RUN) python scripts/local_docker_test.py
+
+.PHONY: docker-build-test  
+docker-build-test: ## 🏗️ 完整Docker构建测试 (实际构建)
+	@echo "🏗️ 运行完整Docker构建测试..."
+	@echo "⚠️ 这将执行实际Docker构建，需要较长时间"
+	$(UV_RUN) python scripts/local_docker_test.py --build
+
 .PHONY: pre-commit-check
-pre-commit-check: ci-check-new ci-db-test ## 🛡️ 提交前完整检查
+pre-commit-check: ci-check-new ci-db-test docker-test ## 🛡️ 提交前完整检查
 	@echo "🛡️ 提交前检查全部完成！"
-	@echo "✅ 代码质量合格，数据库功能正常"
+	@echo "✅ 代码质量合格，数据库功能正常，Docker构建就绪"
 	@echo "🚀 可以安全提交到远程仓库"
+
+.PHONY: full-pre-commit-check
+full-pre-commit-check: ci-check-new ci-db-test docker-build-test ## 🛡️ 完整提交前检查 (包含实际Docker构建)
+	@echo "🛡️ 完整提交前检查全部完成！"
+	@echo "✅ 代码质量、数据库功能、Docker构建全部验证通过"
+	@echo "🚀 代码已完全验证，可以安全部署"
