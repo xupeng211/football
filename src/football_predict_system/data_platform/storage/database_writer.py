@@ -58,7 +58,27 @@ class DatabaseWriter:
             return "CURRENT_TIMESTAMP"
 
     async def upsert_teams(self, teams_data: list[Team] | pd.DataFrame) -> UpsertResult:
-        """Insert or update team data."""
+        """
+        批量插入或更新球队数据到数据库
+
+        核心数据平台方法, 支持:
+        - 自动检测重复数据(基于external_api_id)
+        - 批量处理提升性能
+        - 事务安全保证数据一致性
+
+        Args:
+            teams_data: 球队数据(Team对象列表或DataFrame)
+
+        Returns:
+            UpsertResult: 操作结果统计(inserted/updated/failed)
+
+        Example:
+            ```python
+            teams = [Team(name="Barcelona", external_api_id=123)]
+            result = await writer.upsert_teams(teams)
+            print(f"处理了 {result.records_processed} 条记录")
+            ```
+        """
 
         # Handle both DataFrame and list of Team objects
         if isinstance(teams_data, list):
@@ -376,7 +396,28 @@ class DatabaseWriter:
         stats: dict[str, Any],
         status: str = "success",
     ) -> None:
-        """Log data collection run."""
+        """
+        记录数据采集运行日志
+
+        用于跟踪数据平台各数据源的采集状态和统计信息,
+        支持数据治理和运维监控.
+
+        Args:
+            source_name: 数据源名称 (如 "football-data-api")
+            task_name: 任务名称 (如 "collect_teams", "collect_matches")
+            stats: 统计信息字典 (如 {"processed": 100, "errors": 0})
+            status: 运行状态 ("success", "failure", "partial")
+
+        Example:
+            ```python
+            await writer.log_collection_run(
+                source_name="football-data-api",
+                task_name="collect_teams",
+                stats={"processed": 20, "new": 5, "updated": 15},
+                status="success"
+            )
+            ```
+        """
         async with self.db_manager.get_async_session() as session:
             # Get or create data source
             result = await session.execute(

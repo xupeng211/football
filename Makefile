@@ -506,8 +506,10 @@ ci-check-new: ## 🚀 完整CI检查 (与远程CI完全一致)
 	$(UV_RUN) ruff check .
 	@echo "📋 3. 类型检查..."
 	-$(UV_RUN) mypy src/ --ignore-missing-imports --no-strict-optional
-	@echo "📋 4. 安全扫描..."
+	@echo "📋 4. 代码安全扫描..."
 	-$(UV_RUN) bandit -r src/ -c pyproject.toml
+	@echo "📋 5. 依赖安全扫描..."
+	-$(UV_RUN) pip-audit --desc
 	@echo "✅ CI检查完成！"
 
 .PHONY: ci-db-test
@@ -533,6 +535,20 @@ pre-commit-check: ci-check-new ci-db-test docker-test ## 🛡️ 提交前完整
 	@echo "🛡️ 提交前检查全部完成！"
 	@echo "✅ 代码质量合格，数据库功能正常，Docker构建就绪"
 	@echo "🚀 可以安全提交到远程仓库"
+
+.PHONY: test-coverage
+test-coverage: ## 📊 运行测试并生成覆盖率报告
+	@echo "📊 运行测试并生成覆盖率报告..."
+	$(UV_RUN) coverage run -m pytest tests/unit/ -v --tb=short
+	$(UV_RUN) coverage report --show-missing
+	@echo "📈 覆盖率报告已生成，使用 'make coverage-html' 查看详细报告"
+
+.PHONY: coverage-html
+coverage-html: test-coverage ## 🌐 生成HTML覆盖率报告
+	@echo "🌐 生成HTML覆盖率报告..."
+	$(UV_RUN) coverage html
+	@echo "✅ HTML报告已生成在 htmlcov/ 目录"
+	@echo "💡 在浏览器中打开 htmlcov/index.html 查看详细覆盖率"
 
 .PHONY: full-pre-commit-check
 full-pre-commit-check: ci-check-new ci-db-test docker-build-test ## 🛡️ 完整提交前检查 (包含实际Docker构建)

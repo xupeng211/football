@@ -11,6 +11,7 @@ This module provides:
 
 from __future__ import annotations
 
+import functools
 import json
 import logging
 import logging.handlers
@@ -408,5 +409,90 @@ def log_performance(operation: str) -> Callable[..., Any]:
         if asyncio.iscoroutinefunction(func):
             return async_wrapper
         return sync_wrapper
+
+    return decorator
+
+
+def monitor_performance(operation_name: str = ""):
+    """
+    简单的性能监控装饰器
+
+    用于监控关键数据处理操作的执行时间,
+    记录性能日志用于后续优化.
+
+    Args:
+        operation_name: 操作名称, 用于日志标识
+
+    Example:
+        ```python
+        @monitor_performance("数据库写入")
+        async def write_data(data):
+            # 数据写入逻辑
+            pass
+        ```
+    """
+
+    def decorator(func: Callable) -> Callable:
+        @functools.wraps(func)
+        async def async_wrapper(*args: Any, **kwargs: Any) -> Any:
+            logger = get_logger(__name__)
+            start_time = time.time()
+            operation = operation_name or func.__name__
+
+            try:
+                result = await func(*args, **kwargs)
+                execution_time = time.time() - start_time
+                logger.info(
+                    "性能监控",
+                    operation=operation,
+                    execution_time_ms=round(execution_time * 1000, 2),
+                    status="success",
+                )
+                return result
+            except Exception as e:
+                execution_time = time.time() - start_time
+                logger.warning(
+                    "性能监控 - 操作失败",
+                    operation=operation,
+                    execution_time_ms=round(execution_time * 1000, 2),
+                    status="failed",
+                    error=str(e),
+                )
+                raise
+
+        @functools.wraps(func)
+        def sync_wrapper(*args: Any, **kwargs: Any) -> Any:
+            logger = get_logger(__name__)
+            start_time = time.time()
+            operation = operation_name or func.__name__
+
+            try:
+                result = func(*args, **kwargs)
+                execution_time = time.time() - start_time
+                logger.info(
+                    "性能监控",
+                    operation=operation,
+                    execution_time_ms=round(execution_time * 1000, 2),
+                    status="success",
+                )
+                return result
+            except Exception as e:
+                execution_time = time.time() - start_time
+                logger.warning(
+                    "性能监控 - 操作失败",
+                    operation=operation,
+                    execution_time_ms=round(execution_time * 1000, 2),
+                    status="failed",
+                    error=str(e),
+                )
+                raise
+
+        # 根据函数类型返回对应的包装器
+        if (
+            hasattr(func, "__code__") and func.__code__.co_flags & 0x80
+        ):  # 检查是否为协程
+            return async_wrapper
+        else:
+            return sync_wrapper
 
     return decorator

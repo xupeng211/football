@@ -244,25 +244,34 @@ filterwarnings = [
 # 异步测试配置
 asyncio_default_fixture_loop_scope = "function"
 
+# Coverage configuration - 测试覆盖率配置
 [tool.coverage.run]
-source = ["."]
-branch = true
+source = ["src"]
 omit = [
-    "tests/*",
-    ".venv/*", 
-    "*/site-packages/*",
-    "external/*",
-    "vendor/*",
+    "*/tests/*",
+    "*/conftest.py",
+    "*/migrations/*",
+    "*/__pycache__/*",
 ]
 
 [tool.coverage.report]
 exclude_lines = [
     "pragma: no cover",
     "def __repr__",
-    "if TYPE_CHECKING:",
-    "raise AssertionError", 
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
     "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
 ]
+show_missing = true
+skip_covered = false
+
+[tool.coverage.html]
+directory = "htmlcov"
 
 [tool.bandit]
 exclude_dirs = ["tests", ".venv", "external", "vendor"]
@@ -272,3 +281,10 @@ skips = ["B101", "B601", "B404", "B603", "B607", "B403", "B301", "B104"]
 paths_to_mutate = "apps/,data_pipeline/,models/,trainer/"
 runner = "pytest"
 tests_dir = "tests/"
+
+[dependency-groups]
+dev = [
+    "coverage[toml]>=7.10.6",
+    "pip-audit>=2.9.0",
+    "safety>=3.2.11",
+]
