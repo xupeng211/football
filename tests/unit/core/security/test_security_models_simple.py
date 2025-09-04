@@ -4,6 +4,7 @@ Tests for security models.
 Simple and accurate tests for security enums and models.
 """
 
+from datetime import datetime
 from uuid import uuid4
 
 from football_predict_system.core.security.models import (
@@ -108,6 +109,7 @@ class TestUser:
             username="testuser",
             email="test@example.com",
             role=UserRole.USER,
+            created_at=datetime.utcnow(),
         )
 
         assert user.id == user_id
@@ -127,6 +129,7 @@ class TestUser:
             email="power@example.com",
             role=UserRole.USER,
             permissions=permissions,
+            created_at=datetime.utcnow(),
         )
 
         assert len(user.permissions) == 2
@@ -143,6 +146,7 @@ class TestUser:
             permissions=[Permission.ADMIN_ACCESS],
             is_active=True,
             is_verified=True,
+            created_at=datetime.utcnow(),
         )
 
         assert user.role == UserRole.ADMIN
@@ -158,6 +162,7 @@ class TestUser:
             role=UserRole.API_CLIENT,
             permissions=[Permission.DATA_READ],
             is_active=False,
+            created_at=datetime.utcnow(),
         )
 
         data = user.model_dump()
@@ -175,6 +180,7 @@ class TestUser:
             username="jsontest",
             email="json@example.com",
             role=UserRole.GUEST,
+            created_at=datetime.utcnow(),
         )
 
         json_data = user.model_dump_json()

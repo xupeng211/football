@@ -103,6 +103,7 @@ async def get_current_user() -> User:
     """Get current authenticated user."""
     # This would be implemented with proper authentication
     # For now, return a mock user
+    from datetime import datetime
     from uuid import UUID
 
     from ...core.security import UserRole
@@ -111,6 +112,7 @@ async def get_current_user() -> User:
         username="api_user",
         email="user@example.com",
         role=UserRole.USER,
+        created_at=datetime.utcnow(),
     )
 
 

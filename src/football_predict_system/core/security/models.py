@@ -1,5 +1,6 @@
 """Security data models and enums."""
 
+from datetime import datetime
 from enum import Enum
 from typing import Any
 from uuid import UUID
@@ -66,6 +67,7 @@ class User(BaseModel):
     permissions: list[Permission] = []
     is_active: bool = True
     is_verified: bool = False
+    created_at: datetime
 
 
 class SecurityConfig(BaseModel):

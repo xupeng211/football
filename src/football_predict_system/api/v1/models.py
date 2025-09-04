@@ -53,10 +53,12 @@ class ModelComparisonResponse(BaseModel):
 # Dependency for getting current user (placeholder)
 async def get_current_user() -> User:
     """Get current authenticated user."""
+    from uuid import UUID
+
     from ...core.security import UserRole
 
     return User(
-        id="mock-user-id",
+        id=UUID("12345678-1234-5678-9012-123456789012"),
         username="api_user",
         email="user@example.com",
         role=UserRole.USER,
