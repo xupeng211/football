@@ -348,6 +348,7 @@ def log_performance(operation: str) -> Callable[..., Any]:
     """Decorator for logging operation performance."""
 
     def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
+        @functools.wraps(func)
         async def async_wrapper(*args: Any, **kwargs: Any) -> Any:
             logger = get_logger(func.__module__)
             start_time = time.time()
@@ -376,6 +377,7 @@ def log_performance(operation: str) -> Callable[..., Any]:
                 )
                 raise
 
+        @functools.wraps(func)
         def sync_wrapper(*args: Any, **kwargs: Any) -> Any:
             logger = get_logger(func.__module__)
             start_time = time.time()
