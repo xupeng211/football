@@ -1,16 +1,16 @@
-import pytest
 import asyncio
-from football_predict_system.core.exceptions import BaseApplicationError, ErrorCode
-from football_predict_system.main import app, lifespan
-
-pytestmark = pytest.mark.skip_for_ci
 from http import HTTPStatus
 from unittest.mock import AsyncMock, Mock, patch
 
+import pytest
 from fastapi import FastAPI, Request
 
+from football_predict_system.core.exceptions import BaseApplicationError, ErrorCode
+from football_predict_system.main import app, lifespan
 
 """Tests for main application module."""
+
+pytestmark = pytest.mark.skip_for_ci
 
 # 跳过有Mock配置问题的主应用测试
 
