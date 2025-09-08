@@ -35,7 +35,7 @@ dependencies = [
     # Cache & Message Queue
     "redis>=5.0.0",
     # Data Pipeline
-    "prefect>=2.20.17,<3.0.0",
+    "prefect>=2.20.17,<4.0.0",
     # Security & Auth
     "bcrypt>=4.3.0",
     "PyJWT>=2.10.0",
